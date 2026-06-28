@@ -1,6 +1,6 @@
 # Project 01 runbook
 
-Updated: 2026-06-29 01:25 CST
+Updated: 2026-06-29 02:18 CST
 
 This runbook records lightweight, reproducible commands for the current enzyme-design pipeline. It intentionally excludes passwords, raw model weights, cloned repositories, conda environments, and generated structure ensembles.
 
@@ -9,6 +9,9 @@ This runbook records lightweight, reproducible commands for the current enzyme-d
 ```text
 Tool root: /data/bht/design_tools
 Seed structures: /data/bht/enzyme_scaffold_search_v2_gpu/seeds/structures
+RFdiffusion-AA venv: /data/bht/design_tools/envs/rfaa_venv
+RFdiffusion-AA SIF: /data/bht/design_tools/models/rfdiffusion_aa/rf_se3_diffusion.sif
+Apptainer env: /data/bht/design_tools/envs/apptainer_env
 PLACER env: /data/bht/design_tools/envs/placer_env
 LigandMPNN env: /data/bht/design_tools/envs/ligandmpnn_venv
 Existing GPU Python env: /data/bht/miniforge3/envs/protrek_gpu
@@ -32,6 +35,58 @@ ProteinMPNN             8907e66
 LigandMPNN              26ec57a
 PLACER                  7dc5563
 ```
+
+## RFdiffusion-AA container and manual venv
+
+Official SIF container is present and checksum-matched:
+
+```bash
+cd /data/bht/design_tools/models/rfdiffusion_aa
+ls -lh rf_se3_diffusion.sif
+sha256sum rf_se3_diffusion.sif
+```
+
+Observed sha256:
+
+```text
+aba2b443f9a35a1f409eda30dbef3e810cf6b1fdb163251a0ea377d082c1dc41  rf_se3_diffusion.sif
+```
+
+User-space Apptainer is installed:
+
+```bash
+/data/bht/design_tools/envs/apptainer_env/bin/apptainer --version
+/data/bht/design_tools/envs/apptainer_env/bin/apptainer buildcfg | grep APPTAINER_SUID_INSTALL
+```
+
+Observed:
+
+```text
+apptainer version 1.5.2
+APPTAINER_SUID_INSTALL=0
+```
+
+Current Apptainer limitation:
+
+```bash
+/data/bht/design_tools/envs/apptainer_env/bin/apptainer exec rf_se3_diffusion.sif python -V
+```
+
+Observed failure:
+
+```text
+FATAL: while extracting rf_se3_diffusion.sif: root filesystem extraction failed: Operation not permitted
+```
+
+So the practical route for now is the manual venv:
+
+```bash
+cd /data/bht/design_tools/src/rf_diffusion_all_atom
+PYTHONPATH=/data/bht/design_tools/src/rf_diffusion_all_atom:/data/bht/design_tools/src/rf_diffusion_all_atom/lib/rf2aa \
+  /data/bht/design_tools/envs/rfaa_venv/bin/python run_inference.py --help | sed -n '1,80p'
+```
+
+Expected result: Hydra configuration help is printed. This is an import/config smoke only; it does not generate a backbone.
 
 ## ProteinMPNN PETase seed smoke
 
@@ -139,8 +194,7 @@ Do not launch full RFdiffusion-AA generation or PLACER ensembles while the GPU i
 
 When the A100 is free, the next practical target is:
 
-1. Set up RFdiffusion-AA dependencies or container route.
-2. Extract a compact catalytic motif from PETase/cutinase seed `PET_01__6ILW.pdb` using Ser160, Asp206, His237 on chain A.
-3. Run a tiny RFdiffusion-AA backbone generation smoke around that motif.
-4. Sequence-fill generated backbones with ProteinMPNN or LigandMPNN.
-5. Run PLACER on a small designed-scaffold subset before selecting conformers for DFT/QM/MM labels.
+1. Extract a compact catalytic motif from PETase/cutinase seed `PET_01__6ILW.pdb` using Ser160, Asp206, His237 on chain A.
+2. Run a tiny RFdiffusion-AA backbone generation smoke with `/data/bht/design_tools/envs/rfaa_venv`.
+3. Sequence-fill generated backbones with ProteinMPNN or LigandMPNN.
+4. Run PLACER on a small designed-scaffold subset before selecting conformers for DFT/QM/MM labels.
