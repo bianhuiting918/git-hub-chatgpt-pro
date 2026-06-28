@@ -6,7 +6,14 @@ Updated: 2026-06-28
 
 Codex started the Project 01 implementation from the repository task outline.
 
-Completed in this update:
+Important upload scope note:
+
+- This file is a progress summary for ChatGPT Pro and the user.
+- The tested scaffold/code/schema/test files were created and validated in a local/CPU temporary workspace.
+- They have not all been uploaded to GitHub, per user instruction.
+- GitHub should receive selected artifacts only after the user decides what should be kept in the shared repository.
+
+Completed locally / on CPU server in this update:
 
 - Prepared CPU server execution environment for lightweight Python tests:
   - host: `user-PowerEdge-R940`
@@ -14,27 +21,27 @@ Completed in this update:
   - virtual environment: `~/codex_venvs/enzyme_tasks`
   - Python: 3.11.4
   - installed packages: `pytest`, `jsonschema`, `numpy`, `pandas`, `pyyaml`, `scikit-learn`
-- Added Project 01 scaffold directories:
+- Built a Project 01 scaffold candidate:
   - `configs/`
   - `data_schema/`
   - `scripts/`
   - `src/ts_aware_scorer/`
   - `tests/`
   - `notebooks/README.md`
-- Added first-pass JSON schemas for Project 01 manifests, labels, feature tables, and teacher export.
-- Added deterministic lightweight Python utilities for:
+- Built first-pass JSON schema candidates for Project 01 manifests, labels, feature tables, and teacher export.
+- Built deterministic lightweight Python utility candidates for:
   - reaction geometry calculations
   - electrostatic baseline calculations
   - conformer ensemble summaries
   - QM/MM label parsing and validation
   - feature-row assembly from a sample manifest
-- Added the first runnable Project 01 baseline layer:
+- Built a first runnable Project 01 baseline candidate:
   - `src/ts_aware_scorer/models.py`
   - `scripts/prepare_dataset.py`
   - `scripts/train_baseline.py`
   - `scripts/predict_rank.py`
   - synthetic Project 01 CSV inputs
-- Added unit tests covering the first feature utilities and schema examples.
+- Built unit tests covering the first feature utilities and schema examples.
 
 ## Validation completed
 
@@ -72,10 +79,10 @@ Synthetic-data training metrics:
 
 This update does not implement PLACER, QM/MM, DFT, TS search, or protein embedding inference. It only creates the orchestration and validation layer that can consume outputs from those external workflows.
 
-## Next recommended step
+## Next recommended decision
 
-Proceed to the next Project 01 increment:
+Decide which artifacts should be uploaded to GitHub:
 
-- extend teacher export fields and add `scripts/export_teacher_labels.py`
-- add baseline comparison documentation
-- add a root `run_all.sh` once Project 02 has a matching minimal runnable layer
+1. progress summary only,
+2. minimal runnable scripts and synthetic CSV only,
+3. full Project 01 scaffold, schemas, source modules, and tests.
