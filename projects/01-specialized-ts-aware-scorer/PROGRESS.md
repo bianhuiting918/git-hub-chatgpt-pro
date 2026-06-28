@@ -1,6 +1,6 @@
 # Project 01 progress log
 
-Updated: 2026-06-29 02:15 CST
+Updated: 2026-06-29 07:35 CST
 
 ## Corrected project direction
 
@@ -135,9 +135,26 @@ Observed result:
 - After adding `deepdiff`, `run_inference.py --help` reaches the Hydra configuration page.
 - No RFdiffusion-AA design has been generated yet.
 
-## Current GPU state
+## 2026-06-29 morning validation
 
-At this stage the A100 remains heavily occupied by another user process, with about `4.6 GiB` used and about `99-100%` GPU utilization. Because of that, only a minimal PLACER smoke was run. Full PLACER conformer ensembles and RFdiffusion-AA generation should wait until the GPU is free or an agreed job window is available.
+A fresh validation was run at about 07:28 CST through the CPU jump host to the GPU server.
+
+Confirmed:
+
+- GPU host: `dell-PowerEdge-R760`
+- RFdiffusion-AA venv exists: `/data/bht/design_tools/envs/rfaa_venv`
+- PLACER env exists: `/data/bht/design_tools/envs/placer_env`
+- RFdiffusion-AA `run_inference.py --help` still reaches the Hydra configuration page.
+- PLACER `run_PLACER.py --help` still starts successfully.
+
+Current blocker:
+
+```text
+NVIDIA A100 80GB PCIe, about 4.6 GiB used, 100% GPU utilization
+active process: /Dell/Dell9/chenchao23/miniconda3/envs/pxdesign/bin/python
+```
+
+No RFdiffusion-AA generation was launched during this validation because the GPU remains fully occupied. After the successful check, subsequent SSH attempts from the local machine to the CPU jump host briefly failed before handshake, so no further remote commands were forced.
 
 ## Immediate next steps
 
