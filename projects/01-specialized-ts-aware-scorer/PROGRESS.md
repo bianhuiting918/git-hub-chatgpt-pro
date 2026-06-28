@@ -1,10 +1,10 @@
 # Project 01 progress log
 
-Updated: 2026-06-29 01:20 CST
+Updated: 2026-06-29 02:15 CST
 
 ## Corrected project direction
 
-The working target has been corrected from the earlier GMX-CP2K-first smoke workflow to the intended Baker-style enzyme design pipeline:
+The working target is the intended Baker-style enzyme design pipeline:
 
 1. Generate or search backbones around a serine-hydrolase active-site motif.
 2. Fill/design sequences for the generated backbones.
@@ -30,10 +30,21 @@ Downloaded/synchronized tools:
 
 | Tool | Server path | Version checked | Status |
 | --- | --- | --- | --- |
-| RFdiffusion-AA | `/data/bht/design_tools/src/rf_diffusion_all_atom` | `f913a19` | Repository and paper weights present; runtime environment still needs dependency setup/container decision. |
+| RFdiffusion-AA | `/data/bht/design_tools/src/rf_diffusion_all_atom` | `f913a19` | Repository, paper weights, official SIF container, Apptainer env, and manual Python venv are present. Help/config loading works in `rfaa_venv`; full generation has not been launched because GPU is occupied. |
 | ProteinMPNN | `/data/bht/design_tools/src/ProteinMPNN` | `8907e66` | Runs with existing `protrek_gpu` Python environment. |
 | LigandMPNN | `/data/bht/design_tools/src/LigandMPNN` | `26ec57a` | Model parameters downloaded; local venv built; Numpy compatibility patch applied to vendored OpenFold files. |
 | PLACER | `/data/bht/design_tools/src/PLACER` | `7dc5563` | Official environment created and smoke-tested on CUDA. |
+
+Important RFdiffusion-AA runtime details:
+
+- Official container copied to GPU: `/data/bht/design_tools/models/rfdiffusion_aa/rf_se3_diffusion.sif`
+- Container size: about `12G`
+- Container sha256 on GPU: `aba2b443f9a35a1f409eda30dbef3e810cf6b1fdb163251a0ea377d082c1dc41`
+- User-space Apptainer installed at: `/data/bht/design_tools/envs/apptainer_env/bin/apptainer`
+- Apptainer version: `1.5.2`
+- Apptainer SIF execution currently fails without system/user-namespace permission: `Operation not permitted`
+- Manual RFdiffusion-AA venv created at: `/data/bht/design_tools/envs/rfaa_venv`
+- `run_inference.py --help` reaches the Hydra config page in `rfaa_venv`, after installing missing packages including `hydra-core`, `omegaconf`, `icecream`, `biopython`, `assertpy`, `fire`, `ipdb`, `rdkit`, and `deepdiff`.
 
 PLACER environment:
 
@@ -63,8 +74,6 @@ Input seed:
 /data/bht/enzyme_scaffold_search_v2_gpu/seeds/structures/pdb/PET_01__6ILW.pdb
 ```
 
-Command type: one-sequence CPU smoke, chain A, model `v_48_020`.
-
 Observed output:
 
 ```text
@@ -80,8 +89,6 @@ Input seed:
 ```text
 /data/bht/enzyme_scaffold_search_v2_gpu/seeds/structures/pdb/PET_01__6ILW.pdb
 ```
-
-Command type: one-batch CPU smoke using downloaded LigandMPNN `protein_mpnn` checkpoint.
 
 Observed outputs:
 
@@ -118,24 +125,28 @@ Single-sample score line:
 fape=1.39487, lddt=0.94432, prmsd=0.90885, plddt=0.96652, plddt_pde=0.93063
 ```
 
+### RFdiffusion-AA lightweight runtime smoke
+
+Command type: import/config/help test only, no generation.
+
+Observed result:
+
+- `rfaa_venv` imports `torch`, `dgl`, `e3nn`, `hydra`, `omegaconf`, `icecream`, `rdkit`, `Bio`, `assertpy`, `fire`, `ipdb`.
+- After adding `deepdiff`, `run_inference.py --help` reaches the Hydra configuration page.
+- No RFdiffusion-AA design has been generated yet.
+
 ## Current GPU state
 
-At 2026-06-29 01:18 CST, the A100 is still heavily occupied by another user process:
-
-```text
-NVIDIA A100 80GB PCIe, about 4.6 GiB used, about 99-100% GPU utilization
-```
-
-Because of that, only one minimal PLACER smoke was run. Full PLACER conformer ensembles and RFdiffusion-AA generation should wait until the GPU is free or an agreed job window is available.
+At this stage the A100 remains heavily occupied by another user process, with about `4.6 GiB` used and about `99-100%` GPU utilization. Because of that, only a minimal PLACER smoke was run. Full PLACER conformer ensembles and RFdiffusion-AA generation should wait until the GPU is free or an agreed job window is available.
 
 ## Immediate next steps
 
-1. Finish RFdiffusion-AA runtime setup: either build a compatible Python environment or decide on Apptainer/Singularity/container route, since Docker is not available to the user without daemon permission.
-2. Prepare an active-site motif input from the existing PETase/cutinase seed set, starting from `PET_01__6ILW.pdb` where chain A catalytic residues were verified as Ser160, Asp206, His237.
-3. Run a small RFdiffusion-AA backbone-generation smoke around the active-site motif when GPU is available.
-4. Feed generated/scaffolded backbones to ProteinMPNN or LigandMPNN for sequence filling.
-5. Use PLACER to generate a small conformer ensemble for the first designed scaffold.
-6. Select a small number of conformers for DFT/QM/MM label generation; only lightweight manifests and parsed scalar labels should return to GitHub.
+1. Prepare an active-site motif input from the existing PETase/cutinase seed set, starting from `PET_01__6ILW.pdb` where chain A catalytic residues were verified as Ser160, Asp206, His237.
+2. Run a tiny RFdiffusion-AA backbone-generation smoke around that motif using `/data/bht/design_tools/envs/rfaa_venv` when GPU is free.
+3. Feed generated/scaffolded backbones to ProteinMPNN or LigandMPNN for sequence filling.
+4. Use PLACER to generate a small conformer ensemble for the first designed scaffold.
+5. Select a small number of conformers for DFT/QM/MM label generation; only lightweight manifests and parsed scalar labels should return to GitHub.
+6. If Apptainer container execution is preferred, ask the server administrator to enable user namespaces or install a system/setuid Apptainer/Singularity runtime.
 
 ## Source repositories
 
