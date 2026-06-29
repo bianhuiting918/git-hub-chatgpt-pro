@@ -1,6 +1,6 @@
 # Project 01 progress log
 
-Updated: 2026-06-29 09:20 CST
+Updated: 2026-06-29 13:05 CST
 
 ## Corrected project direction
 
@@ -207,13 +207,74 @@ Interpretation:
 
 This validates the chain `GPU PLACER conformer generation -> archive/checksum -> CPU receive -> model splitting -> manifest/ranking`. It is still not a production DFT/barrier run. Before launching DFT/QM/MM, the next required CPU preparation is to define QM region, charge, multiplicity, protonation state, substrate/TS state, and CP2K/DFT input templates for the selected conformers.
 
+## 2026-06-29 PLACER crop back-mapping and no-min QMMM trial
+
+User clarified that the PLACER outputs should be interpreted as active-site conformer crops, not complete proteins. The full PLACER input was recovered from the GPU examples directory and copied to CPU:
+
+```text
+GPU: /data/bht/design_tools/src/PLACER/examples/inputs/denovo_SER_hydrolase.pdb
+CPU: /Dell/Dell14/bianht/project01_conformer_queue/placer_denovo_ser_hydrolase_n5_20260629T011253/inputs/denovo_SER_hydrolase_full_input.pdb
+```
+
+Checksums on CPU:
+
+```text
+8615932565dfd91deed3f7aa8c59f9126e69874785f65ccbe7ce34861c6b7fa2  denovo_SER_hydrolase_full_input.pdb
+7d9e2bd92efbd4725383902c424b6d4e403596e83830f2649804835295696d3e  75I.json
+```
+
+Full-length no-min mapping directory:
+
+```text
+/Dell/Dell14/bianht/project01_conformer_queue/placer_denovo_ser_hydrolase_n5_20260629T011253/full_length_mapped_no_min_20260629_1255
+```
+
+Generated for recommended PLACER conformers `model_004`, `model_001`, and `model_005`:
+
+- `full_mapped_no_min.pdb`: full protein coordinates, with PLACER crop coordinates replacing matching active-site atoms.
+- `protein_only_mapped_no_min.pdb`: protein-only input for `pdb2gmx`.
+- `qex_extra_75I.xyz`: six extra heavy atoms from PLACER 75I reaction fragment.
+- `mapping_report.tsv`: atom counts and key distances.
+
+Mapping summary:
+
+| model | protein atoms written | PLACER-replaced protein atoms | QEX atoms | Ser128 OG-C1A A | Ser128 OG-O17 A | Ser126 OG-OAC A |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 004 | 1246 | 575 | 6 | 1.4279 | 2.2505 | 3.2390 |
+| 001 | 1246 | 575 | 6 | 1.3311 | 2.3061 | 7.0873 |
+| 005 | 1246 | 575 | 6 | 1.4260 | 2.3058 | 3.4526 |
+
+`pdb2gmx` validation succeeded for all three full-length protein-only structures with `amber99sb-ildn` and no water:
+
+```text
+160 residues, 2494 atoms after hydrogen addition, total charge -10 e
+```
+
+For `model_004`, a no-min GMX preparation was built by adding the six PLACER QEX atoms as an extra GROMACS molecule and centering the system in an 8 nm vacuum box. MM-only one-step steepest descent completed successfully:
+
+```text
+Potential Energy = 3.75035417350657e+03 kJ/mol
+Maximum force    = 5.15069605455416e+05 on atom 2495
+```
+
+GMX-CP2K QMMM smoke status:
+
+- `grompp` succeeds and reports `Number of MM atoms=2494; Number of QM atoms=6`.
+- QEX-only QMMM `mdrun` aborts during force evaluation with MPI_ABORT before a CP2K output file is written.
+- The same topology without QMMM runs successfully, so the current blocker is the temporary incomplete QEX/QMMM interface, not the full-length back-mapped protein or GROMACS topology.
+- PETase successful examples use a complete minimal ligand molecule (`LG3`/`LG4`, 23 atoms including H) as the QM group and have `Bonds removed=0; F_CONNBONDS added=0`. The current QEX model is only six heavy atoms from the 75I reaction fragment and is not yet a complete 75I ligand topology.
+
+Interpretation:
+
+The safe no-min mapping workflow is now validated up to full-length PDB generation and GROMACS MM topology. For production GMX-CP2K labels, the next required step is to build a complete 75I/TS-state ligand representation with hydrogens and a minimal GROMACS topology analogous to PETase `LG3`/`LG4`, then use that full ligand as the QM group. Until that is done, direct QMMM energies from the six-heavy-atom QEX smoke should not be interpreted scientifically.
+
 ## Immediate next steps
 
-1. Prepare an active-site motif input from the existing PETase/cutinase seed set, starting from `PET_01__6ILW.pdb` where chain A catalytic residues were verified as Ser160, Asp206, His237.
-2. Run a tiny RFdiffusion-AA backbone-generation smoke around that motif using `/data/bht/design_tools/envs/rfaa_venv` when GPU is free.
-3. Feed generated/scaffolded backbones to ProteinMPNN or LigandMPNN for sequence filling.
-4. Use PLACER to generate a small conformer ensemble for the first designed scaffold.
-5. Prepare selected conformers for DFT/QM/MM on CPU; only lightweight manifests and parsed scalar labels should return to GitHub.
+1. Build a complete 75I ligand/topology from `75I.json`, including hydrogens and the correct atom ordering, instead of the temporary six-heavy-atom QEX molecule.
+2. Re-run the `model_004` no-min GMX-CP2K smoke with complete 75I as the QM group.
+3. If the smoke succeeds, repeat for `model_001` and `model_005` and parse GROMACS `Potential Energy` only as a technical label candidate.
+4. Keep all active-site heavy-atom coordinates from PLACER fixed as the reference geometry; avoid using minimized output coordinates unless a separate geometry-drift report shows the catalytic distances are unchanged.
+5. Prepare a tiny RFdiffusion-AA backbone-generation smoke around the catalytic motif when GPU is free, then use ProteinMPNN/LigandMPNN and PLACER on the generated scaffold.
 6. If Apptainer container execution is preferred, ask the server administrator to enable user namespaces or install a system/setuid Apptainer/Singularity runtime.
 
 ## Source repositories
