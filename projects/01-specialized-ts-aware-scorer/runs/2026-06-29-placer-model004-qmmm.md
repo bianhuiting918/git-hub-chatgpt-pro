@@ -10,98 +10,191 @@ CPU work directory:
 /Dell/Dell14/bianht/project01_conformer_queue/placer_denovo_ser_hydrolase_n5_20260629T011253/full_length_mapped_no_min_20260629_1255/model_004
 ```
 
+## Current data scale
+
+Current PLACER data are from one mutation/design setting, `128A:75I`.
+
+- PLACER conformers generated: `5`
+- Recommended first-pass conformers: `model_004`, `model_001`, `model_005`
+- Full-length no-min mapped structures prepared so far: `model_004`, `model_001`, `model_005`
+- `pdb2gmx` succeeded for all three mapped protein-only structures: `160 residues`, `2494 atoms`, total charge `-10 e`
+
+`model_004` is the active template and first calculation target.
+
 ## Structure state
 
 - Full-length protein was reconstructed from the original PLACER full input.
 - Matching active-site atoms were replaced by PLACER crop coordinates.
 - No free minimization was used before QMMM setup.
-- Six PLACER 75I/QEX heavy atoms were appended as an extra molecule for the current technical smoke.
-- `pdb2gmx` protein topology succeeded with `160 residues`, `2494 atoms`, total charge `-10 e`.
+- PLACER 75I heavy-atom geometry was preserved as the conformer reference.
+
+PLACER `75I` heavy atoms present in `model_004`:
+
+```text
+N CA C O CB OG C1A OAC O17 C18 C19 C20
+```
+
+The first technical smoke used only the six extra QEX heavy atoms:
+
+```text
+C1A OAC O17 C18 C19 C20
+```
+
+That smoke established the GMX-CP2K path but is no longer the main scientific target.
 
 ## Technical fixes found
 
 The earlier QMMM aborts were not proof that the PLACER geometry or GROMACS topology was unusable. They were caused by CP2K input/runtime details:
 
-1. `COMMENSURATE` was required under `&DFT / &MGRID` for GAUSS/S-WAVE QMMM coupling.
-2. `PREFERRED_DIAG_LIBRARY = SL` was required under `&GLOBAL`; without this, the embedded CP2K tried ELPA and aborted with `Setting the ELPA real_kernel failed`.
-3. CP2K needed an extended-charge PDB. Generated:
+1. `COMMENSURATE` is required under `&DFT / &MGRID` for GAUSS/S-WAVE QMMM coupling.
+2. `PREFERRED_DIAG_LIBRARY = SL` is required under `&GLOBAL`; without this, embedded CP2K tried ELPA and aborted with `Setting the ELPA real_kernel failed`.
+3. CP2K needs an extended-charge PDB with MM point charges. The current complete-75I file is:
 
 ```text
-processed_qex_box8_for_cp2k_ext.pdb
+processed_75i_complete_for_cp2k_ext.pdb
 ```
 
-Generation summary:
+## Complete 75I reconstruction
+
+Using `75I.json`, the non-leaving 75I/QEXC atoms appended beyond the normal Ser128 protein topology are:
 
 ```text
-atoms=2500
-qm_atoms=17
-total_gromacs_charge=-10.000000
-mm_charge_written=-10.000000
+HW C1A OAC O17 C18 C19 C20 H21 H22 H23 H24 H25 H26 H27
 ```
 
-## SER128+QEX QMMM validation
-
-Input files updated:
+Excluded as leaving/protein-terminal atoms for the current protein-context model:
 
 ```text
-placer_ser128_qex_qmmm_sp.inp
-processed_qex_box8_for_cp2k_ext.pdb
-index_ser128_qex.ndx
-sp-qmmm-ser128-qex-steep1.mdp
+OXT HXT H2
 ```
 
-`grompp` result:
+Kept from the protein/Ser128 topology:
 
 ```text
-Number of MM atoms=2483; Number of QM atoms=17
-Bonds removed=33; F_CONNBONDS added=15
+N H CA HA CB HB1 HB2 OG HG C O
+```
+
+Ligand-side anchor fit used the six PLACER heavy atoms:
+
+```text
+C1A OAC O17 C18 C19 C20
+```
+
+Alignment report:
+
+```text
+ligand_anchor_rmsd_A=0.542525
+qex_complete_count=14
+protein_atoms=2494
+qex_complete_atoms=14
+total_atoms=2508
+```
+
+Generated complete-75I files:
+
+```text
+processed_75i_complete.gro
+processed_75i_complete_for_cp2k_ext.pdb
+topol_75i_complete.top
+index_ser128_75i_complete.ndx
+placer_ser128_75i_complete_qmmm.inp
+sp-qmmm-ser128-75i-complete.mdp
+sp_qmmm_ser128_75i_complete.tpr
+cluster_ser128_75i_complete.xyz
+cluster_ser128_75i_complete_noMM.inp
+```
+
+## Complete 75I QMMM with MM environment
+
+`grompp` result for the complete-75I QMMM input:
+
+```text
+Number of MM atoms=2483; Number of QM atoms=25
+Bonds removed=28; F_CONNBONDS added=10
 Dihedrals removed=28; Links generated=2
 ```
 
-Short 900 s `mdrun` validation reached CP2K SCF output without the previous missing-charge or ELPA aborts:
+QM region:
 
 ```text
-GLOBAL| Preferred diagonalization lib. SL
-Total QM atoms: 17
-Number of electrons: 62
-OT step 1 energy: -106.1542671308
-OT step 2 energy: -108.6588370191
-OT step 3 energy: -109.5639576728
+SER128: N H CA HA CB HB1 HB2 OG HG C O
+QEXC:   HW C1A OAC O17 C18 C19 C20 H21 H22 H23 H24 H25 H26 H27
 ```
 
-The 900 s run timed out before full SCF completion, so these are not final energies.
-
-## Background production smoke started
-
-A longer no-min one-step QMMM run was started in the same directory:
+Background QMMM job:
 
 ```text
-pid file: mdrun_ser128_qex_prod.pid
-pid at launch: 150881
-timeout: 21600 s
-threads: 8 OpenMP threads
-TPR: sp_qmmm_ser128_qex_prod.tpr
-MD log: sp_qmmm_ser128_qex_prod.log
-CP2K output: placer_ser128_qex_qmmm_prod.out
-console: mdrun_ser128_qex_prod.console
-exit file: mdrun_ser128_qex_prod.exit
+pid file: mdrun_ser128_75i_complete.pid
+pid at launch: 222526
+TPR: sp_qmmm_ser128_75i_complete.tpr
+console: mdrun_ser128_75i_complete.console
+GROMACS log: sp_qmmm_ser128_75i_complete_run.log
+CP2K output: placer_ser128_75i_complete_qmmm.out
+exit file: mdrun_ser128_75i_complete.exit
 ```
 
-Initial check confirmed the process was running and CP2K output had started:
+Initial CP2K evidence:
 
 ```text
 GLOBAL| Preferred diagonalization lib. SL
 CHARGE_INFO| Total Charge of the Classical System: -10.000000
-Total QM atoms: 17
+Number of electrons: 70
+OT step 1 energy: -111.4088151124
+```
+
+No final QMMM energy had been reached at the time this note was updated.
+
+## No-MM cluster control
+
+A matched no-MM control was started with the same QM atoms only, using standalone CP2K:
+
+```text
+cluster_ser128_75i_complete.xyz
+cluster_ser128_75i_complete_noMM.inp
+cluster_ser128_75i_complete_noMM.out
+cluster_ser128_75i_complete_noMM.exit
+```
+
+Background no-MM job:
+
+```text
+pid file: cluster_ser128_75i_complete_noMM.pid
+pid at launch: 222566
+```
+
+Initial CP2K evidence:
+
+```text
+Number of electrons: 70
+outer SCF iter 1 energy: -120.6893765099
+outer SCF iter 2 reached at least OT step 9, energy: -120.7811352437
+```
+
+No final no-MM energy had been reached at the time this note was updated.
+
+## Superseded technical smoke
+
+The earlier six-heavy-atom `SER128+QEX` QMMM job was stopped after the complete-75I jobs started, to free CPU resources. It had reached the second outer-SCF but was not the final target.
+
+```text
+old pid: 150881
+old input: sp_qmmm_ser128_qex_prod.tpr
+old CP2K output: placer_ser128_qex_qmmm_prod.out
 ```
 
 ## Interpretation
 
-The current pipeline is now past the setup blockers and is performing the actual QMMM SCF for the PLACER-derived active site. The remaining issue is wall time/SCF completion, not file-format setup. The current SER128+QEX model is still a technical smoke because QEX contains only six extra heavy atoms; final production labels should use a chemically complete 75I/transition-state representation with hydrogens and an explicit charge/protonation decision.
+The current pipeline is now at the requested comparison stage for the priority conformer:
+
+1. Complete 75I/Ser128 QMMM with the full MM protein environment is running.
+2. A matched no-MM QM cluster control is running.
+3. Both calculations use the same PLACER-derived active-site heavy-atom conformer and no free full-system minimization.
+
+Final interpretation must wait for converged CP2K `ENERGY| Total FORCE_EVAL` lines from both jobs.
 
 ## Next actions
 
-1. Poll `mdrun_ser128_qex_prod.exit` and `placer_ser128_qex_qmmm_prod.out` for completion or failure.
-2. If complete, extract CP2K `ENERGY| Total FORCE_EVAL` and GROMACS potential energy.
-3. If not complete within the timeout, keep the input as the validated template and reduce the smoke problem by using a smaller/complete QM test molecule or looser SCF settings only for pipeline testing.
-4. Build the chemically complete 75I/TS-state topology before treating energies as scientific labels.
+1. Poll `mdrun_ser128_75i_complete.exit`, `placer_ser128_75i_complete_qmmm.out`, and `cluster_ser128_75i_complete_noMM.exit`.
+2. Extract complete-75I QMMM and no-MM cluster final energies when available.
+3. Compare the with-MM and no-MM energy behavior as a technical environment-effect control.
+4. After `model_004` completes, replicate the validated complete-75I workflow to `model_001` and `model_005`.
