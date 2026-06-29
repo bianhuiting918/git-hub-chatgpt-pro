@@ -1,6 +1,6 @@
 # Project 01 progress log
 
-Updated: 2026-06-29 07:35 CST
+Updated: 2026-06-29 09:20 CST
 
 ## Corrected project direction
 
@@ -154,7 +154,58 @@ NVIDIA A100 80GB PCIe, about 4.6 GiB used, 100% GPU utilization
 active process: /Dell/Dell9/chenchao23/miniconda3/envs/pxdesign/bin/python
 ```
 
-No RFdiffusion-AA generation was launched during this validation because the GPU remains fully occupied. After the successful check, subsequent SSH attempts from the local machine to the CPU jump host briefly failed before handshake, so no further remote commands were forced.
+No RFdiffusion-AA generation was launched during this validation because the GPU remains fully occupied.
+
+## PLACER n=5 conformer transfer to CPU
+
+At about 2026-06-29 09:13 CST, a very small PLACER conformer ensemble was generated on the GPU and transferred to the CPU server to validate the GPU-to-CPU handoff path.
+
+Input:
+
+```text
+/data/bht/design_tools/src/PLACER/examples/inputs/denovo_SER_hydrolase.pdb
+```
+
+GPU output directory:
+
+```text
+/data/bht/design_tools/runs/placer_denovo_ser_hydrolase_n5_20260629T011253
+```
+
+CPU queue directory:
+
+```text
+/Dell/Dell14/bianht/project01_conformer_queue/placer_denovo_ser_hydrolase_n5_20260629T011253
+```
+
+Transfer archive checksum:
+
+```text
+12418688982dafb4f4e69881604ef27b85f92314a62d4be1b68029299286a8a4
+```
+
+Generation summary:
+
+- PLACER samples: `5`
+- GPU runtime reported by PLACER: `16.08 seconds`
+- Output PDB size: about `230K`
+- Output CSV size: `721 bytes`
+- CPU split models: `5` files under `split_models/model_001.pdb` to `model_005.pdb`
+- CPU manifest: `manifest.tsv`
+
+Scores sorted by ascending `prmsd`:
+
+| model_idx | prmsd | plddt | recommended_for_qm |
+| --- | --- | --- | --- |
+| 4 | 0.8627644777 | 0.9733046293 | yes |
+| 1 | 0.8691723943 | 0.9810498953 | yes |
+| 5 | 0.8789390326 | 0.9692426920 | yes |
+| 2 | 0.8951162100 | 0.9736832380 | no |
+| 3 | 0.9116663933 | 0.9686573148 | no |
+
+Interpretation:
+
+This validates the chain `GPU PLACER conformer generation -> archive/checksum -> CPU receive -> model splitting -> manifest/ranking`. It is still not a production DFT/barrier run. Before launching DFT/QM/MM, the next required CPU preparation is to define QM region, charge, multiplicity, protonation state, substrate/TS state, and CP2K/DFT input templates for the selected conformers.
 
 ## Immediate next steps
 
@@ -162,7 +213,7 @@ No RFdiffusion-AA generation was launched during this validation because the GPU
 2. Run a tiny RFdiffusion-AA backbone-generation smoke around that motif using `/data/bht/design_tools/envs/rfaa_venv` when GPU is free.
 3. Feed generated/scaffolded backbones to ProteinMPNN or LigandMPNN for sequence filling.
 4. Use PLACER to generate a small conformer ensemble for the first designed scaffold.
-5. Select a small number of conformers for DFT/QM/MM label generation; only lightweight manifests and parsed scalar labels should return to GitHub.
+5. Prepare selected conformers for DFT/QM/MM on CPU; only lightweight manifests and parsed scalar labels should return to GitHub.
 6. If Apptainer container execution is preferred, ask the server administrator to enable user namespaces or install a system/setuid Apptainer/Singularity runtime.
 
 ## Source repositories
