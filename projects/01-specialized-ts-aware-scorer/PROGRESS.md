@@ -283,3 +283,8 @@ The safe no-min mapping workflow is now validated up to full-length PDB generati
 - ProteinMPNN: https://github.com/dauparas/ProteinMPNN
 - LigandMPNN: https://github.com/dauparas/LigandMPNN
 - PLACER: https://github.com/baker-laboratory/PLACER
+## 2026-06-29 complete 75I QMMM/cluster batch status
+
+The current real-compute scale is one design/mutation setting, `128A:75I`, with 5 PLACER conformers. The first-pass QM/MM comparison batch uses 3 conformers: `model_004`, `model_001`, and `model_005`.
+
+`model_004` now has a completed with-MM QMMM step-0 energy and a no-MM cluster control energy. `model_001` and `model_005` have complete 75I reconstructions and validated QMMM `.tpr` files. Their no-MM cluster jobs are running, and `model_001` with-MM QMMM is running. See `runs/2026-06-29-placer-128a-75i-qmmm-cluster.md`.
