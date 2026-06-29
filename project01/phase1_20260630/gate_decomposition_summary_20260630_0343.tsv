@@ -1,0 +1,5 @@
+universe	total_rows	evaluated_with_output	failed_before_evaluation	reaction_geometry_pass	strict_all_pass	ligand_rmsd_pass	key_distance_pass
+pilot_rank1_n3	15	15	0	0	0	0	0
+resample_bonded_ser128_c1_n5	5	5	0	1	0	0	1
+resample_fixedlig_n5	1	0	1	0	0	0	0
+resample_fixedlig_targetres_smoke_n1	1	1	0	0	0	0	0
