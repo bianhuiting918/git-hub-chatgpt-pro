@@ -40,8 +40,8 @@ Per-conformer anchor-fit RMSD:
 | conformer | ligand anchor RMSD (A) | status |
 | --- | ---: | --- |
 | `model_004` | 0.542525 | QMMM and no-MM cluster results available |
-| `model_001` | 0.614371 | QMMM input ready; QMMM and no-MM jobs launched |
-| `model_005` | 0.580491 | QMMM input ready; no-MM job launched |
+| `model_001` | 0.614371 | no-MM cluster result available; QMMM running |
+| `model_005` | 0.580491 | no-MM cluster result available; QMMM running |
 
 ## Model 004 results
 
@@ -86,11 +86,10 @@ Generated for both `model_001` and `model_005`:
 
 Jobs launched on the CPU server:
 
-- `model_001` no-MM cluster CP2K refine: running
-- `model_005` no-MM cluster CP2K refine: running
+- `model_001` no-MM cluster CP2K refine: completed, SCF converged, `-121.359969245670726 a.u.`
+- `model_005` no-MM cluster CP2K refine: completed, SCF converged, `-121.139529659314576 a.u.`
 - `model_001` with-MM QMMM single-point: running
-
-`model_005` with-MM QMMM is queued conceptually but not launched yet, to keep the CPU load controlled.
+- `model_005` with-MM QMMM single-point: running
 
 ## Remote working directory
 
