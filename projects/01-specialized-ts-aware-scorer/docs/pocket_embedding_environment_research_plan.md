@@ -37,6 +37,8 @@ delta_E_env = E_QMMM_with_MM - E_cluster_no_MM
 
 This is not a rigorous reaction barrier by itself. It is a practical label for how the protein background changes the energy of the same active-site / ligand state relative to an isolated active-site cluster.
 
+Use `docs/project01_always_questioning_protocol.md` as the standing audit checklist for every structure-selection, sequence-generation, embedding, and QMMM/no-MM labeling step in this plan.
+
 ## 2. What must be varied
 
 The catalytic motif and ligand reaction template should remain fixed in the first learning phase. Variation should be introduced in a controlled hierarchy:
