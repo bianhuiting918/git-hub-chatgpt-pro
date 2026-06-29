@@ -1,0 +1,33 @@
+{
+  "project": "project01_phase1_similarity_embedding_placer",
+  "reference_pdb": "/Dell/Dell14/bianht/project01_conformer_queue/placer_denovo_ser_hydrolase_n5_20260629T011253/inputs/denovo_SER_hydrolase_full_input.pdb",
+  "protein_chain": "A",
+  "protein_length": 160,
+  "ligand": {"resname": "bu2", "chain": "X", "resseq": 1, "reactive_atom": "C1"},
+  "fixed_active_or_direct_contact_residues": [57,61,67,70,71,76,78,86,95,98,99,102,125,126,127,128,129],
+  "redesignable_residue_file": "/Dell/Dell14/bianht/project01_sequence_panel_serhydrolase_20260629/redesigned_all_nonfixed_residues_v3.txt",
+  "bins": [
+    {"label": "90", "target_identity": 0.90, "target_mutations": 16, "mutation_min": 12, "mutation_max": 20, "required_selected": 10},
+    {"label": "80", "target_identity": 0.80, "target_mutations": 32, "mutation_min": 28, "mutation_max": 36, "required_selected": 10},
+    {"label": "70", "target_identity": 0.70, "target_mutations": 48, "mutation_min": 44, "mutation_max": 52, "required_selected": 10},
+    {"label": "60", "target_identity": 0.60, "target_mutations": 64, "mutation_min": 60, "mutation_max": 68, "required_selected": 10},
+    {"label": "50", "target_identity": 0.50, "target_mutations": 80, "mutation_min": 76, "mutation_max": 84, "required_selected": 10}
+  ],
+  "hard_filters": {
+    "fixed_active_or_direct_contact_sequence_identity": 1.0,
+    "allowed_mutations_outside_redesignable_set": 0,
+    "reference_self_geometry_must_pass": true,
+    "pocket_geometry": {
+      "catalytic_heavy_rmsd_max_A": 0.50,
+      "fixed_heavy_rmsd_max_A": 0.75,
+      "ligand_heavy_rmsd_max_A": 0.50,
+      "key_distance_abs_delta_max_A": 0.35
+    }
+  },
+  "embedding_filters": {
+    "model": "ProTrek_650M",
+    "global_cosine": "record_for_all_selected",
+    "pocket_5A_cosine": "record_for_all_selected",
+    "shell_5_12A_cosine": "record_for_all_selected"
+  }
+}
