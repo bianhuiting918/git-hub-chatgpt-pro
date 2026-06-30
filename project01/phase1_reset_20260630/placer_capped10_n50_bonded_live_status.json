@@ -1,22 +1,30 @@
-{
-  "csv_outputs_present": 25,
-  "current_interpretation": "PLACER_RUNNING_NOT_READY_FOR_FINAL_CROP_GATE",
+﻿{
+  "csv_outputs_present": 50,
+  "current_interpretation": "PLACER_COMPLETE_FINAL_CROP_GATE_STRICT_PASS_ZERO_DOWNSTREAM_DIAGNOSTIC_ONLY",
   "driver_pid_file": "/data/bht/project01_phase1_reset_gpu/placer_runs/capped10_n50_bonded/per_input_driver.pid",
   "driver_tail": [
-    "[2026-06-30 14:49:37] DONE 21 bin70_rank10_rec10.holo_bu2_refpose",
-    "[2026-06-30 14:49:37] START 22 bin90_r2c_rank1_rec1.holo_bu2_refpose",
-    "[2026-06-30 14:50:45] DONE 22 bin90_r2c_rank1_rec1.holo_bu2_refpose",
-    "[2026-06-30 14:50:45] START 23 bin70_r2d_r2b_from90_rank2_rec6.holo_bu2_refpose",
-    "[2026-06-30 14:51:55] DONE 23 bin70_r2d_r2b_from90_rank2_rec6.holo_bu2_refpose",
-    "[2026-06-30 14:51:55] START 24 bin70_r2d_r2b_from90_rank3_rec11.holo_bu2_refpose",
-    "[2026-06-30 14:53:06] DONE 24 bin70_r2d_r2b_from90_rank3_rec11.holo_bu2_refpose",
-    "[2026-06-30 14:53:06] START 25 bin70_r2d_r2b_from90_rank5_rec21.holo_bu2_refpose",
-    "[2026-06-30 14:54:14] DONE 25 bin70_r2d_r2b_from90_rank5_rec21.holo_bu2_refpose",
-    "[2026-06-30 14:54:14] START 26 bin70_r2d_r2b_from90_rank6_rec23.holo_bu2_refpose"
+    "[2026-06-30 15:18:37] DONE 46 bin60_r04_subset_rank34_orig106.holo_bu2_refpose",
+    "[2026-06-30 15:18:37] START 47 bin60_r04_next72_rank69_orig141.holo_bu2_refpose",
+    "[2026-06-30 15:19:47] DONE 47 bin60_r04_next72_rank69_orig141.holo_bu2_refpose",
+    "[2026-06-30 15:19:47] START 48 bin60_r04_next72_rank71_orig143.holo_bu2_refpose",
+    "[2026-06-30 15:20:56] DONE 48 bin60_r04_next72_rank71_orig143.holo_bu2_refpose",
+    "[2026-06-30 15:20:56] START 49 bin60_r05_subset72_rank2_orig2.holo_bu2_refpose",
+    "[2026-06-30 15:22:06] DONE 49 bin60_r05_subset72_rank2_orig2.holo_bu2_refpose",
+    "[2026-06-30 15:22:06] START 50 bin60_r05_subset72_rank18_orig18.holo_bu2_refpose",
+    "[2026-06-30 15:23:15] DONE 50 bin60_r05_subset72_rank18_orig18.holo_bu2_refpose"
   ],
   "expected_outputs": 50,
-  "model_pdb_outputs_present": 25,
-  "next_action": "When csv and model PDB counts reach 50, run scripts/run_crop_gate_capped10_final.sh.",
+  "final_crop_gate": {
+    "crop_strict_pass_conformers": 0,
+    "evaluated_conformers": 2500,
+    "evaluated_sequences": 50,
+    "sequence_status_counts": {
+      "DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM": 50
+    },
+    "summary_json": "/data/bht/project01_phase1_reset_gpu/placer_crop_gate_capped10_final/two_layer_placer_crop_gate_summary.json"
+  },
+  "model_pdb_outputs_present": 50,
+  "next_action": "Do not launch full ligand/protein completion or strict QMMM for this capped10 PLACER batch. Current sequence-generation work continues through natural/de-novo scaffold routes without PLACER as a sequence-stage gate.",
   "run_label": "capped10_n50_bonded",
-  "status_time_local": "2026-06-30 14:55:15 CST"
+  "status_time_local": "2026-06-30 15:45:11 CST"
 }
