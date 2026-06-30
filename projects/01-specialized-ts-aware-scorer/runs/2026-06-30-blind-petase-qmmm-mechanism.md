@@ -26,11 +26,15 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/retained_water_candidates.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/prepared_structure_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/altloc_resolution_decisions.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/protonation_site_scan.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/protonation_hypothesis_manifest.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/protonation_setup_notes.md`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/download_stage1_rcsb_structures.ps1`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/identify_ser_his_asp_triads.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/audit_stage1_pdb_preparation.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/prepare_stage1_initial_structures_v2.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/write_ligand_build_environment_report.py`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/scan_stage1_protonation_sites.py`
 
 ## Boundary
 
@@ -71,6 +75,8 @@ A PDB preparation audit was completed. It records selected chain decisions, miss
 
 Initial cleaned chain-A PDB files were generated locally from RCSB inputs. The manifest records nine generated files, retained water counts, altloc decision counts, SHA256 hashes, and explicit `not_assigned` protonation status. A validation check found zero nonblank altloc indicators in the v2 cleaned PDB files.
 
+Protonation setup was started from cleaned coordinates. The scan records all titratable residues near the catalytic triad and all histidines requiring tautomer assignment. For primary template `6EQE`, catalytic `ASP206` is deprotonated in the primary hypothesis but has a conditional neutral-Asp sensitivity gate; catalytic `HIS237` requires HID/HIE tautomer sensitivity before QM/MM reaction scans.
+
 Blind substrate model definitions were added for:
 
 - `PET_dimer_capped` as the primary PET-like acylation substrate;
@@ -86,10 +92,11 @@ Current structure-prep decisions:
 - keep geometric disulfide candidates unless preparation software contradicts connectivity;
 - retain listed catalytic-site water candidates for first local relaxation, then test sensitivity;
 - use v2 altloc decisions before substrate placement;
-- preserve scissile ester atom labels through ligand 3D generation and topology conversion.
+- preserve scissile ester atom labels through ligand 3D generation and topology conversion;
+- run external pKa/protonation tooling before production topology generation and compare against `protonation_hypothesis_manifest.tsv`.
 
 This is structure/substrate-derived preparation evidence and is not a paper-derived mechanism result.
 
 ## Next action
 
-Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states, exposing RDKit/Open Babel or equivalent ligand-builder tooling, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
+Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states with external pKa/protonation tooling, exposing RDKit/Open Babel or equivalent ligand-builder tooling, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
