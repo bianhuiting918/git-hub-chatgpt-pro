@@ -163,6 +163,22 @@ project01/phase1_reset_20260630/scripts/run_crop_gate_capped10_final.sh
 
 The final script refuses to run until 50 CSV and 50 model PDB files exist.
 
+Status at 2026-06-30 14:36 CST:
+
+```text
+PER_INPUT_DRIVER_RUNNING
+CSV outputs present: 9
+model PDB outputs present: 9
+current input started: 10 / 50, bin80_rank1_rec2.holo_bu2_refpose
+final crop gate status: NOT_READY
+```
+
+Live snapshot:
+
+```text
+project01/phase1_reset_20260630/placer_capped10_n50_bonded_live_status.json
+```
+
 ## Gate Caveat
 
 These PLACER outputs are not complete until the downstream crop ligand geometry screen has run. The project strict filter remains:

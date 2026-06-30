@@ -1,0 +1,24 @@
+{
+  "csv_outputs_present": 9,
+  "current_interpretation": "PLACER_RUNNING_NOT_READY_FOR_FINAL_CROP_GATE",
+  "driver_pid_file": "/data/bht/project01_phase1_reset_gpu/placer_runs/capped10_n50_bonded/per_input_driver.pid",
+  "driver_tail": [
+    "[2026-06-30 14:28:42] DONE 4 bin90_rank4_rec5.holo_bu2_refpose",
+    "[2026-06-30 14:28:43] START 5 bin90_rank5_rec6.holo_bu2_refpose",
+    "[2026-06-30 14:30:16] DONE 5 bin90_rank5_rec6.holo_bu2_refpose",
+    "[2026-06-30 14:30:16] START 6 bin90_rank6_rec7.holo_bu2_refpose",
+    "[2026-06-30 14:31:49] DONE 6 bin90_rank6_rec7.holo_bu2_refpose",
+    "[2026-06-30 14:31:49] START 7 bin90_rank8_rec9.holo_bu2_refpose",
+    "[2026-06-30 14:33:23] DONE 7 bin90_rank8_rec9.holo_bu2_refpose",
+    "[2026-06-30 14:33:23] START 8 bin90_rank9_rec10.holo_bu2_refpose",
+    "[2026-06-30 14:34:32] DONE 8 bin90_rank9_rec10.holo_bu2_refpose",
+    "[2026-06-30 14:34:32] START 9 bin90_rank10_rec13.holo_bu2_refpose",
+    "[2026-06-30 14:35:43] DONE 9 bin90_rank10_rec13.holo_bu2_refpose",
+    "[2026-06-30 14:35:43] START 10 bin80_rank1_rec2.holo_bu2_refpose"
+  ],
+  "expected_outputs": 50,
+  "model_pdb_outputs_present": 9,
+  "next_action": "When csv and model PDB counts reach 50, run scripts/run_crop_gate_capped10_final.sh.",
+  "run_label": "capped10_n50_bonded",
+  "status_time_local": "2026-06-30 14:36:15 CST"
+}
