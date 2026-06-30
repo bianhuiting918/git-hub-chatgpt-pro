@@ -1,0 +1,57 @@
+{
+  "updated": "2026-06-30 13:30:46 CST",
+  "remote_root": "/data/bht/project01_phase1_reset_gpu",
+  "evaluated_batches": [
+    "initial_all50",
+    "round02",
+    "round02d_actual_bins"
+  ],
+  "round02": {
+    "evaluated": 164,
+    "esmfold_ok": 164,
+    "entrance_pass": 7,
+    "pass_by_bin": {
+      "90": 7
+    }
+  },
+  "round02d_actual_bins": {
+    "evaluated": 66,
+    "esmfold_ok": 66,
+    "entrance_pass": 18,
+    "pass_by_bin": {
+      "70": 5,
+      "60": 2,
+      "50": 11
+    }
+  },
+  "accepted_distinct_by_bin": {
+    "90": 16,
+    "80": 8,
+    "70": 9,
+    "60": 2,
+    "50": 11
+  },
+  "needed_to_10_by_bin": {
+    "90": 0,
+    "80": 2,
+    "70": 1,
+    "60": 8,
+    "50": 0
+  },
+  "current_stage_complete": false,
+  "next_action": "Use natural-scaffold conserved-site regeneration for 80/70/60 and start a separate de novo active-site scaffold track for Baker-style diversity.",
+  "remote_lightweight_files": [
+    "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel.tsv",
+    "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_summary.json",
+    "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_gate_manifest_round02.tsv",
+    "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_gate_manifest_round02d_actual_bins.tsv"
+  ],
+  "do_not_upload": [
+    "predicted PDB files",
+    "raw PLACER outputs",
+    "model checkpoints",
+    "large logs",
+    "trajectories",
+    "QM/MM raw outputs"
+  ]
+}

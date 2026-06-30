@@ -4,7 +4,7 @@
 
 **Goal:** Generate sequence-diverse enzyme backgrounds at 90/80/70/60/50 identity until each similarity bin has 10 distinct sequences that pass the postseq protein/pocket entrance gate.
 
-**Architecture:** Run sequence/backbone generation, predict full protein structures, and run the postseq entrance gate immediately after each batch. Treat sequence generation as a closed loop: if a bin lacks enough postseq entrance-pass samples, regenerate that bin with stronger active-pocket constraints and repeat prediction/gating.
+**Architecture:** Run sequence/backbone generation, predict full protein structures, and run the postseq entrance gate immediately after each batch. Treat sequence generation as a closed loop: if a bin lacks enough postseq entrance-pass samples, regenerate that bin with stronger active-pocket constraints and repeat prediction/gating. Use two separated generation tracks: natural-scaffold conserved-site redesign and Baker-style active-site constrained de novo scaffold generation.
 
 **Tech Stack:** ESMFold/fair-esm + OpenFold on GPU for post-sequence structures; project Python gate scripts for Kabsch/RMSD/key-distance evaluation; GitHub stores only markdown, scripts, TSV/JSON manifests, and summaries.
 
@@ -15,9 +15,11 @@
 - Current stage ends at sequence-panel generation; do not launch QMMM in this stage.
 - PLACER is optional downstream diagnosis in this stage, not a hard filter for accepting sequences.
 - A sequence is accepted for the current stage when its predicted full-protein structure passes the postseq entrance gate.
-- 50/60/70 bins must be regenerated if they do not reach the target postseq entrance-pass count.
+- 80/70/60 bins must be regenerated if they do not reach the target postseq entrance-pass count.
+- Natural-scaffold regeneration must use MSA/conservation evidence to fix catalytic, pocket, shell, and conserved-core residues before generating low-similarity variants.
+- De novo scaffold regeneration must start from fixed active-site/reactive geometry and generate new backbones around that motif; do not treat this as mutation of one fixed natural backbone.
 
-## Current Audited State
+## Initial Audited State Before Round02
 
 Evaluated universe:
 
@@ -37,8 +39,29 @@ Postseq entrance gate results:
 Interpretation:
 
 - 90/80/70 already contain entrance-pass samples but still need enough rows to complete the 10-per-bin sequence panel.
-- 60/50 are evaluated FAIL under the current entrance gate, not merely missing. They must be regenerated with stronger active-pocket preservation.
+- In the initial all50 batch, 60/50 were evaluated FAIL under the entrance gate, not merely missing.
 - The completed PLACER pilot is diagnostic only. `CROP_STRICT_PASS = 0/300` is not a reason to reject postseq entrance-pass sequences in this stage, because TS-like conformers are not expected to behave like ligand low-energy poses.
+
+## Current Audited State After Round02/Round02d
+
+Updated GPU round02/round02d status:
+
+| Batch | Evaluated | ESMFold OK | Entrance PASS | Interpretation |
+| --- | ---: | ---: | ---: | --- |
+| round02 controlled mutation-count candidates | 164 | 164 | 7 | PASS only in 90%; random low-identity mutations drifted the pocket. |
+| round02d actual-bin LigandMPNN refilter | 66 | 66 | 18 | Cooperative LigandMPNN designs restored 70/60/50 passes. |
+
+Current combined accepted distinct sequence-panel counts:
+
+| Bin | Accepted distinct PASS | Target | Still needed |
+| --- | ---: | ---: | ---: |
+| 90 | 16 | 10 | 0 |
+| 80 | 8 | 10 | 2 |
+| 70 | 9 | 10 | 1 |
+| 60 | 2 | 10 | 8 |
+| 50 | 11 | 10 | 0 |
+
+Next generation should focus only on 80/70/60.
 
 ## Current Stage Acceptance Targets
 
@@ -87,7 +110,28 @@ COMPLETE_BIN =
   count(distinct ACCEPT_SEQUENCE_FOR_SEQUENCE_PANEL sequences in bin) >= 10
 ```
 
-## Task 1: Regenerate Low-Pass Bins
+## Task 1: Regenerate Low-Pass Bins With Two Tracks
+
+### Track A: natural-scaffold conserved-site redesign
+
+For natural scaffold work, first build or import an MSA for the chosen enzyme family/scaffold. Use it to classify residues:
+
+```text
+FIXED = catalytic residues + ligand/direct-contact residues + MSA-conserved core + pocket-shell positions that preserve key geometry
+MUTABLE = nonconserved background residues, expanded cautiously after gate evidence
+```
+
+This track should fill the current 80/70/60 shortages. The immediate target is:
+
+```text
+80: 2 more entrance-pass sequences
+70: 1 more entrance-pass sequence
+60: 8 more entrance-pass sequences
+```
+
+### Track B: active-site constrained de novo scaffold generation
+
+For Baker-style serine-hydrolase diversity, fixed active-site/reactive geometry comes before backbone generation. Generate new backbones around the motif, then design sequences for those backbones. Keep these candidates in a separate manifest until the downstream comparison between natural and de novo backgrounds is explicitly defined.
 
 **Files:**
 
@@ -158,18 +202,17 @@ manifests/regeneration_queue_round02.tsv
 Use the existing fixed-active-pocket generation workflow, but set bin-specific sequence identity targets:
 
 ```text
-90: request 1 additional entrance-pass sequence
+90: complete; do not generate unless replacement is needed
 80: request 2 additional entrance-pass sequences
-70: request 6 additional entrance-pass sequences
-60: request 10 additional entrance-pass sequences with stronger fixed-pocket constraints
-50: request 10 additional entrance-pass sequences with stronger fixed-pocket constraints
+70: request 1 additional entrance-pass sequence
+60: request 8 additional entrance-pass sequences with stronger conserved-site/pocket constraints
+50: complete; do not generate unless replacement is needed
 ```
 
-For 60/50, increase candidate oversampling rather than relaxing the gate. Start with at least 5x oversampling per needed pass:
+For 60, increase candidate oversampling rather than relaxing the gate. Start with at least 5x oversampling per needed pass:
 
 ```text
-60: generate at least 50 new candidates before postseq gate
-50: generate at least 50 new candidates before postseq gate
+60: generate at least 40 new candidates before postseq gate
 ```
 
 - [ ] **Step 3: Predict and gate each new batch immediately on GPU**
