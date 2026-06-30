@@ -136,6 +136,33 @@ third input started: bin90_rank3_rec4.holo_bu2_refpose
 
 This verifies the per-input recovery path across at least one input boundary after the single-process `75I` registration failure.
 
+Status at 2026-06-30 14:31 CST:
+
+```text
+PER_INPUT_DRIVER_RUNNING
+CSV outputs present: 6
+model PDB outputs present: 6
+current input started: 7 / 50
+```
+
+Partial crop gate smoke:
+
+```text
+remote out dir: /data/bht/project01_phase1_reset_gpu/placer_crop_gate_capped10_partial
+evaluated universe: 6 completed sequences, 300 conformers
+CROP_STRICT_PASS: 0 / 300
+```
+
+This partial result validates the crop gate interface only. It is not the final 50-sequence crop gate result. Missing PLACER outputs remain `NOT_EVALUATED`.
+
+Final crop gate script prepared:
+
+```text
+project01/phase1_reset_20260630/scripts/run_crop_gate_capped10_final.sh
+```
+
+The final script refuses to run until 50 CSV and 50 model PDB files exist.
+
 ## Gate Caveat
 
 These PLACER outputs are not complete until the downstream crop ligand geometry screen has run. The project strict filter remains:
