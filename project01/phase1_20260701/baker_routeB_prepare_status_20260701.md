@@ -132,6 +132,32 @@ ligand bn1 atom records = 36
 missing_contig_refs = 0
 ```
 
+## Shared GPU Policy
+
+The launcher and monitor were tightened after the GPU was found to have another active compute process.
+
+Default policy:
+
+```text
+ALLOW_SHARED_GPU = 0
+FORCE = 0
+launch condition = gpu_util <= MAX_GPU_UTIL and compute_process_count == 0
+```
+
+Current conservative monitor:
+
+```text
+remote_pid = 4101639
+status_at_2026-07-01T00:54:34+08:00 = WAITING_GPU_BUSY_OR_COMPUTE_PROCESS_PRESENT
+gpu_util_percent = 100
+gpu_memory_used_mib = 4619
+compute_process_count = 1
+allow_shared_gpu = 0
+rfaa_output_files = 0
+```
+
+This means Project 01 will not launch RFAA while another compute process is present unless `ALLOW_SHARED_GPU=1` or `FORCE=1` is explicitly set by a later decision.
+
 ## Launcher Check
 
 The launcher was pulled and syntax-checked on the GPU node from commit `087a779`.
