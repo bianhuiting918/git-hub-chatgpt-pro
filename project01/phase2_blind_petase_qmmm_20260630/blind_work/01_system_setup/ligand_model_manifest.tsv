@@ -1,0 +1,5 @@
+model_id	formal_charge	protonation_state	parameter_source	qm_atom_label_file	scissile_carbonyl_c	scissile_carbonyl_o	leaving_o	nucleophile_target_o	build_command	validation_status
+PET_dimer_capped	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending
+BHET_like	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending
+MHET_like	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending
+MHET_like_acyl_enzyme_precursor	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending
