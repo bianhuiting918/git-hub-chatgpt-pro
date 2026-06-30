@@ -18,6 +18,8 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_definitions.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_build_environment_report.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_environment_enablement_status.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_remote_execution_instructions.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/structure_download_manifest.csv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ser_his_asp_triad_candidates.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/pdb_preparation_log.md`
@@ -35,6 +37,7 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/prepare_stage1_initial_structures_v2.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/write_ligand_build_environment_report.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/scan_stage1_protonation_sites.py`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/probe_stage1_compute_environment.sh`
 
 ## Boundary
 
@@ -58,6 +61,8 @@ Use only:
 ## Compute note
 
 A previous Zenodo paper-trajectory download on the CPU server was stopped after the boundary correction, because paper shooting trajectories are concrete results and should not enter the blind workflow. The partial archive fragments were not deleted.
+
+Non-interactive SSH to the known compute server was tested without embedding a password and failed with `Permission denied (publickey,password)`. A remote-safe environment probe script and execution instructions were added; running them requires interactive login or key-based authentication.
 
 ## Stage 1 progress
 
@@ -93,10 +98,11 @@ Current structure-prep decisions:
 - retain listed catalytic-site water candidates for first local relaxation, then test sensitivity;
 - use v2 altloc decisions before substrate placement;
 - preserve scissile ester atom labels through ligand 3D generation and topology conversion;
-- run external pKa/protonation tooling before production topology generation and compare against `protonation_hypothesis_manifest.tsv`.
+- run external pKa/protonation tooling before production topology generation and compare against `protonation_hypothesis_manifest.tsv`;
+- do not accept docking/MD/QM-MM inputs until the compute environment probe records exact tool paths and versions.
 
 This is structure/substrate-derived preparation evidence and is not a paper-derived mechanism result.
 
 ## Next action
 
-Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states with external pKa/protonation tooling, exposing RDKit/Open Babel or equivalent ligand-builder tooling, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
+Continue Stage 1 by running `probe_stage1_compute_environment.sh` on the compute server through interactive/key-based login, then implementing repaired/protonation-ready coordinate files, assigning protonation states with external pKa/protonation tooling, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
