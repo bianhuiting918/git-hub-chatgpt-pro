@@ -1,0 +1,2 @@
+pose_job_id	pdb	substrate_model	scissile_candidate_id	protein_path	ligand_path	atom_label_path	triad_ser	triad_his	triad_asp	box_center_x	box_center_y	box_center_z	box_size_x	box_size_y	box_size_z	docking_config_path	status	source	note
+pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	pending	not_ready	blind_workflow_pending	no_ready_ligand_build_manifest
