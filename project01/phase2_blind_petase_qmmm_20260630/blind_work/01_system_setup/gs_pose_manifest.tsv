@@ -1,0 +1,8 @@
+pose_id	template_pdb	substrate_model	generation_method	relaxed_structure_path	ser_og_to_c_A	attack_angle_deg	oxyanion_hbond_count	his_acceptor_distance_A	leaving_group_relay_distance_A	trp_rotamer_label	pass_fail	rejection_reason	next_step
+AC_GS_0001	6EQE	PET_dimer_capped	pending	pending							pending	pending	pending
+AC_GS_0002	6EQE	BHET_like	pending	pending							pending	pending	pending
+AC_GS_0003	5XJH	PET_dimer_capped	pending	pending							pending	pending	pending
+AC_GS_0004	5YFE	PET_dimer_capped	pending	pending							pending	pending	pending
+DE_GS_0001	6EQE	MHET_like_acyl_enzyme_precursor	pending	pending							pending	pending	pending
+DE_GS_0002	5XJH	MHET_like_acyl_enzyme_precursor	pending	pending							pending	pending	pending
+DE_GS_0003	5YFE	MHET_like_acyl_enzyme_precursor	pending	pending							pending	pending	pending
