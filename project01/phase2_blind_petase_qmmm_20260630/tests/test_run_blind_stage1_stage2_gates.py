@@ -9,6 +9,8 @@ from pathlib import Path
 class RunBlindStage1Stage2GatesTest(unittest.TestCase):
     def test_runner_writes_blocked_status_when_required_inputs_are_missing(self):
         script = Path("work/run_blind_stage1_stage2_gates.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/run_blind_stage1_stage2_gates.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             out_root = tmpdir / "blind_work"
