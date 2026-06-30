@@ -203,3 +203,35 @@ Remote evidence, not uploaded:
 ```
 
 Next action: use RFAA `sample_2` as the first productive motif-backbone seed. Generate more sequences for `sample_2` and/or run ligand-aware sidechain repack/holo validation before deciding whether the sidechain-heavy gate should reject it.
+
+## Active-Pocket-Only Identity-Bin Target - 2026-06-30
+
+New goal has been set for Route B serine hydrolase:
+
+```text
+Generate active-pocket-only accepted de novo scaffold sequences at 90/80/70/60/50 sequence-identity bins.
+Target: 10 accepted sequences per bin, 50 accepted sequences total.
+```
+
+Acceptance is now defined at sequence stage by Baker-style active pocket preservation:
+
+```text
+active_site = catalytic residues and essential reaction-geometry residues
+pocket_4A = residues with any heavy atom <= 4 A from ligand/reactive fragment
+sequence-stage hard gate = active_site/pocket_4A fixed + motif_ca_rmsd_A <= 1.0
+```
+
+Current first family seed:
+
+```text
+RFAA family = sample_2
+RFAA-renumbered motif = A40 HIS; A49 GLU; A56 SER
+provisional reference sequence = routeB_serhyd_sample_2_lmpnn_03
+```
+
+Detailed target file:
+
+```text
+project01/phase1_reset_20260630/routeB_denovo_scaffold/routeB_active_pocket_only_sequence_target_20260630.md
+project01/phase1_reset_20260630/routeB_denovo_scaffold/routeB_active_pocket_only_bin_targets.tsv
+```

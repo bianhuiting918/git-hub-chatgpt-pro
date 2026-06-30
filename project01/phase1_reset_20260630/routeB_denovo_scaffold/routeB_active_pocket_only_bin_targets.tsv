@@ -1,0 +1,6 @@
+enzyme_system	track	identity_bin	target_accepted	current_accepted	acceptance_gate	identity_reference_policy	status
+serine_hydrolase	true_de_novo_new_backbone	90	10	0	active_site/pocket_4A_fixed + motif_ca_rmsd_A<=1.0	within RFAA backbone family, starting sample_2	TARGET_SET
+serine_hydrolase	true_de_novo_new_backbone	80	10	0	active_site/pocket_4A_fixed + motif_ca_rmsd_A<=1.0	within RFAA backbone family, starting sample_2	TARGET_SET
+serine_hydrolase	true_de_novo_new_backbone	70	10	0	active_site/pocket_4A_fixed + motif_ca_rmsd_A<=1.0	within RFAA backbone family, starting sample_2	TARGET_SET
+serine_hydrolase	true_de_novo_new_backbone	60	10	0	active_site/pocket_4A_fixed + motif_ca_rmsd_A<=1.0	within RFAA backbone family, starting sample_2	TARGET_SET
+serine_hydrolase	true_de_novo_new_backbone	50	10	0	active_site/pocket_4A_fixed + motif_ca_rmsd_A<=1.0	within RFAA backbone family, starting sample_2	TARGET_SET
