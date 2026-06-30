@@ -16,6 +16,7 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_system_setup_protocol.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/gs_pose_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_manifest.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_definitions.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/structure_download_manifest.csv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ser_his_asp_triad_candidates.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/pdb_preparation_log.md`
@@ -63,15 +64,23 @@ The selected WT-like/backup RCSB coordinate files were downloaded locally. A coo
 
 A PDB preparation audit was completed. It records selected chain decisions, missing residues/atoms from PDB headers, alternate conformers, non-water heterogens, geometric disulfide candidates, water counts, and crystallographic waters within 4 A of catalytic hetero atoms.
 
+Blind substrate model definitions were added for:
+
+- `PET_dimer_capped` as the primary PET-like acylation substrate;
+- `BHET_like` as a small neutral docking/pose control;
+- `MHET_like` as a product-side/deacylation reference fragment with explicit pH-7 carboxylate state;
+- `MHET_like_acyl_enzyme_precursor` as a protein-covalent Ser160 acyl-enzyme precursor for deacylation setup.
+
 Current structure-prep decisions:
 
 - use chain A for the initial blind setup across selected templates;
 - keep geometric disulfide candidates unless preparation software contradicts connectivity;
 - retain listed catalytic-site water candidates for first local relaxation, then test sensitivity;
-- resolve `6EQE` alternate conformers before substrate placement.
+- resolve `6EQE` alternate conformers before substrate placement;
+- preserve scissile ester atom labels through ligand 3D generation and topology conversion.
 
-This is structure-derived preparation evidence and is not a paper-derived mechanism result.
+This is structure/substrate-derived preparation evidence and is not a paper-derived mechanism result.
 
 ## Next action
 
-Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states, building PET-like ligand fragments, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
+Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
