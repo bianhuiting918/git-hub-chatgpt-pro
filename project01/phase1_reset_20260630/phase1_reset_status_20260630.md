@@ -147,13 +147,13 @@ defer_placer_filtering = true
 defer_qmmm_calculation = true
 ```
 
-Current entrance-pass shortage after GPU round02 and round02d:
+Current entrance-pass status after GPU round02/round03/round04/round05:
 
 ```text
 90: complete; 16 distinct entrance-pass sequences available
-80: needs 2 more passes
-70: needs 1 more pass
-60: needs 8 more passes
+80: complete; 11 distinct entrance-pass sequences available
+70: complete; 38 distinct entrance-pass sequences available
+60: complete; 16 distinct entrance-pass sequences available
 50: complete; 11 distinct entrance-pass sequences available
 ```
 
@@ -163,15 +163,18 @@ Audited added batches:
 | --- | ---: | ---: | ---: | --- |
 | round02 controlled mutation-count candidates | 164 | 164 | 7 | 90:7 |
 | round02d actual-bin LigandMPNN refilter | 66 | 66 | 18 | 70:5, 60:2, 50:11 |
+| round03 actual-bin production | 152 | 152 | 33 | 80:3, 70:29, 60:1 |
+| round04 empirical 60 subsets | 144 | 144 | 5 | 60:5 |
+| round05 template2 60 subset | 72 | 72 | 8 | 60:8 |
 
 Combined accepted distinct sequence-panel counts:
 
 | Bin | Accepted distinct PASS | Target | Still needed |
 | --- | ---: | ---: | ---: |
 | 90 | 16 | 10 | 0 |
-| 80 | 8 | 10 | 2 |
-| 70 | 9 | 10 | 1 |
-| 60 | 2 | 10 | 8 |
+| 80 | 11 | 10 | 0 |
+| 70 | 38 | 10 | 0 |
+| 60 | 16 | 10 | 0 |
 | 50 | 11 | 10 | 0 |
 
 Previous pre-round02 shortage was:
@@ -187,14 +190,11 @@ Previous pre-round02 shortage was:
 Required next action:
 
 1. Keep the accepted sequence panel at `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel.tsv`.
-2. Continue generation only for shortage bins 80/70/60.
+2. Use the capped panel at `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_capped10.tsv` as the 50-row current-stage panel.
 3. Use the dual-track scaffold strategy in `project01/phase1_reset_20260630/dual_track_scaffold_strategy_20260630.md`.
 4. For natural scaffolds, use sequence alignment to fix conserved catalytic/pocket/core positions before generating new sequences.
 5. For Baker-style diversity, use active-site constrained de novo scaffold generation as a separate track rather than forcing one reference backbone to carry 50/60% identity mutations.
-6. Predict and gate the new candidates on GPU immediately after generation.
-7. Add only postseq entrance-pass rows to the sequence panel manifest.
-8. Continue until every bin has 10 accepted postseq entrance-pass sequences.
-9. Do not launch PLACER or QMMM as a current-stage requirement.
+6. Do not launch PLACER or QMMM as a current-stage requirement.
 
 ## GitHub sync rule
 

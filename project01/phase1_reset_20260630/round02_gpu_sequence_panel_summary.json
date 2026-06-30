@@ -1,10 +1,14 @@
 {
-  "updated": "2026-06-30 13:30:46 CST",
+  "updated": "2026-06-30 14:01:09 CST",
   "remote_root": "/data/bht/project01_phase1_reset_gpu",
   "evaluated_batches": [
     "initial_all50",
     "round02",
-    "round02d_actual_bins"
+    "round02d_actual_bins",
+    "round03_actual_bins",
+    "round04_subset72",
+    "round04_next72",
+    "round05_subset72"
   ],
   "round02": {
     "evaluated": 164,
@@ -26,22 +30,25 @@
   },
   "accepted_distinct_by_bin": {
     "90": 16,
-    "80": 8,
-    "70": 9,
-    "60": 2,
+    "80": 11,
+    "70": 38,
+    "60": 16,
     "50": 11
   },
   "needed_to_10_by_bin": {
     "90": 0,
-    "80": 2,
-    "70": 1,
-    "60": 8,
+    "80": 0,
+    "70": 0,
+    "60": 0,
     "50": 0
   },
-  "current_stage_complete": false,
-  "next_action": "Use natural-scaffold conserved-site regeneration for 80/70/60 and start a separate de novo active-site scaffold track for Baker-style diversity.",
+  "accepted_total": 92,
+  "capped10_total": 50,
+  "current_stage_complete": true,
+  "next_action": "Freeze the capped10 sequence panel; start natural-scaffold MSA and de novo active-site scaffold tracks separately; do not start QMMM yet.",
   "remote_lightweight_files": [
     "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel.tsv",
+    "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_capped10.tsv",
     "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_summary.json",
     "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_gate_manifest_round02.tsv",
     "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_gate_manifest_round02d_actual_bins.tsv"

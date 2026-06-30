@@ -42,26 +42,31 @@ Interpretation:
 - In the initial all50 batch, 60/50 were evaluated FAIL under the entrance gate, not merely missing.
 - The completed PLACER pilot is diagnostic only. `CROP_STRICT_PASS = 0/300` is not a reason to reject postseq entrance-pass sequences in this stage, because TS-like conformers are not expected to behave like ligand low-energy poses.
 
-## Current Audited State After Round02/Round02d
+## Current Audited State After Round02/Round03/Round04/Round05
 
-Updated GPU round02/round02d status:
+Updated GPU status:
 
 | Batch | Evaluated | ESMFold OK | Entrance PASS | Interpretation |
 | --- | ---: | ---: | ---: | --- |
 | round02 controlled mutation-count candidates | 164 | 164 | 7 | PASS only in 90%; random low-identity mutations drifted the pocket. |
 | round02d actual-bin LigandMPNN refilter | 66 | 66 | 18 | Cooperative LigandMPNN designs restored 70/60/50 passes. |
+| round03 actual-bin production | 152 | 152 | 33 | Completed 80/70 and added one 60. |
+| round04 empirical 60 subsets | 144 | 144 | 5 | Used empirical 60-pass mutation position sets. |
+| round05 template2 60 subset | 72 | 72 | 8 | Completed 60 bin. |
 
 Current combined accepted distinct sequence-panel counts:
 
 | Bin | Accepted distinct PASS | Target | Still needed |
 | --- | ---: | ---: | ---: |
 | 90 | 16 | 10 | 0 |
-| 80 | 8 | 10 | 2 |
-| 70 | 9 | 10 | 1 |
-| 60 | 2 | 10 | 8 |
+| 80 | 11 | 10 | 0 |
+| 70 | 38 | 10 | 0 |
+| 60 | 16 | 10 | 0 |
 | 50 | 11 | 10 | 0 |
 
-Next generation should focus only on 80/70/60.
+The current sequence-generation target is complete. Do not generate more variants for the denovo_SER_hydrolase reference unless replacement rows are needed after manual review.
+
+Use `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_capped10.tsv` as the 10-per-bin current-stage panel.
 
 ## Current Stage Acceptance Targets
 
@@ -121,12 +126,11 @@ FIXED = catalytic residues + ligand/direct-contact residues + MSA-conserved core
 MUTABLE = nonconserved background residues, expanded cautiously after gate evidence
 ```
 
-This track should fill the current 80/70/60 shortages. The immediate target is:
+This track should now be used for new natural-scaffold work, not to fill the completed denovo_SER_hydrolase panel. If a natural scaffold is selected, first build the MSA/conservation map and then generate a separate manifest.
 
 ```text
-80: 2 more entrance-pass sequences
-70: 1 more entrance-pass sequence
-60: 8 more entrance-pass sequences
+current denovo_SER_hydrolase panel: COMPLETE
+new natural-scaffold panel: NOT_STARTED
 ```
 
 ### Track B: active-site constrained de novo scaffold generation
@@ -203,16 +207,17 @@ Use the existing fixed-active-pocket generation workflow, but set bin-specific s
 
 ```text
 90: complete; do not generate unless replacement is needed
-80: request 2 additional entrance-pass sequences
-70: request 1 additional entrance-pass sequence
-60: request 8 additional entrance-pass sequences with stronger conserved-site/pocket constraints
+80: complete; do not generate unless replacement is needed
+70: complete; do not generate unless replacement is needed
+60: complete; do not generate unless replacement is needed
 50: complete; do not generate unless replacement is needed
 ```
 
-For 60, increase candidate oversampling rather than relaxing the gate. Start with at least 5x oversampling per needed pass:
+If replacement rows are ever needed, use empirical tolerated-position redesign rather than relaxing the gate:
 
 ```text
-60: generate at least 40 new candidates before postseq gate
+do_not_relax_postseq_entrance_gate = true
+prefer_empirical_tolerated_position_redesign_for_60 = true
 ```
 
 - [ ] **Step 3: Predict and gate each new batch immediately on GPU**
