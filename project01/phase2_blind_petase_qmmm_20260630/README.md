@@ -65,7 +65,7 @@ scripts/generate_stage3_mechanism_tree.py
 tests/test_generate_stage3_mechanism_tree.py
 ```
 
-Stage 5/6/7 now has TS refinement, TS ensemble, and committor-queue scaffolds:
+Stage 5/6/7 has TS refinement, TS ensemble, and committor-queue scaffolds:
 
 ```text
 blind_work/05_ts_refinement/ts_refinement_manifest.tsv
@@ -77,7 +77,19 @@ scripts/generate_stage5_ts_manifests.py
 tests/test_generate_stage5_ts_manifests.py
 ```
 
-Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate TS-like guesses, refined TS candidates, ensembles, or committor jobs from paper coordinates or paper trajectories.
+Stage 8/9 now has free-energy and final paper-validation scaffolds:
+
+```text
+blind_work/08_free_energy/acylation_pmf.tsv
+blind_work/08_free_energy/deacylation_pmf.tsv
+blind_work/08_free_energy/barrier_summary.md
+blind_work/09_paper_validation/blind_vs_paper_comparison.md
+blind_work/09_paper_validation/discrepancy_audit.md
+scripts/generate_stage8_stage9_manifests.py
+tests/test_generate_stage8_stage9_manifests.py
+```
+
+Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate TS-like guesses, refined TS candidates, ensembles, committor jobs, PMFs, barriers, or final paper-comparison files from paper coordinates, paper trajectories, or paper conclusions.
 
 ## Execution Stages
 
