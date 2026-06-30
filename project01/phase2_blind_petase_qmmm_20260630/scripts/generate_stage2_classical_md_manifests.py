@@ -70,6 +70,8 @@ def reaction_stage(pose_id: str) -> str:
         return "acylation"
     if pose_id.startswith("DE_"):
         return "deacylation"
+    if pose_id.startswith("REACTIVE_"):
+        return "preacylation_michaelis_complex"
     return "unknown"
 
 
