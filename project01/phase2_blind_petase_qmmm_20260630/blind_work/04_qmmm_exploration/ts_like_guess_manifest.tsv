@@ -1,0 +1,2 @@
+ts_guess_id	path_id	source_pose_id	source_method	structure_path	imaginary_mode_status	committor_status	validation_status	notes
+pending	pending	pending	scan_maximum_or_string_image_after_stage4_runs	pending	not_generated	not_generated	not_generated	Do not populate from paper TS coordinates or paper trajectories.
