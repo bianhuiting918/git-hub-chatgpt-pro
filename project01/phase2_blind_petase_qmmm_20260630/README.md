@@ -37,7 +37,7 @@ projects/01-specialized-ts-aware-scorer/docs/petase_blind_qmmm_mechanism_plan.md
 
 ## Active Gate Artifacts
 
-Stage 1 has executable gates for environment readiness, ligand construction, protonation, pose scoring, and pose acceptance:
+Stage 1 has executable gates for environment readiness, ligand construction, protonation, pose generation, pose scoring, and pose acceptance:
 
 ```text
 blind_work/01_system_setup/stage1_remote_execution_instructions.md
@@ -45,13 +45,16 @@ blind_work/01_system_setup/stage1_ligand_and_protonation_execution_protocol.md
 blind_work/01_system_setup/stage1_pose_geometry_filter_protocol.md
 blind_work/01_system_setup/ligand_smiles.tsv
 blind_work/01_system_setup/ligand_model_manifest.tsv
+blind_work/01_system_setup/pose_generation_queue.tsv
 blind_work/01_system_setup/gs_pose_manifest.tsv
 blind_work/01_system_setup/rejected_pose_manifest.tsv
 scripts/probe_stage1_compute_environment.sh
 scripts/build_stage1_ligands_rdkit.py
+scripts/generate_stage1_pose_generation_queue.py
 scripts/run_stage1_protonation_gate.sh
 scripts/score_stage1_pose_geometry.py
 scripts/run_blind_stage1_stage2_gates.py
+tests/test_generate_stage1_pose_generation_queue.py
 tests/test_run_blind_stage1_stage2_gates.py
 ```
 
@@ -102,7 +105,7 @@ scripts/generate_stage8_stage9_manifests.py
 tests/test_generate_stage8_stage9_manifests.py
 ```
 
-Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate classical MD conformer selections, TS-like guesses, refined TS candidates, ensembles, committor jobs, PMFs, barriers, or final paper-comparison files from paper coordinates, paper trajectories, or paper conclusions.
+Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate pose-generation queues, classical MD conformer selections, TS-like guesses, refined TS candidates, ensembles, committor jobs, PMFs, barriers, or final paper-comparison files from paper coordinates, paper trajectories, or paper conclusions.
 
 ## Execution Stages
 
@@ -112,6 +115,7 @@ Deliverables:
 
 ```text
 blind_work/01_system_setup/structure_selection.tsv
+blind_work/01_system_setup/pose_generation_queue.tsv
 blind_work/01_system_setup/gs_pose_manifest.tsv
 blind_work/01_system_setup/rejected_pose_manifest.tsv
 blind_work/01_system_setup/ligand_smiles.tsv
@@ -125,8 +129,9 @@ Tasks:
 2. Repair missing residues/atoms and assign disulfides.
 3. Assign protonation states around pH 7.
 4. Build PET dimer or BHET/MHET-like ester fragments.
-5. Generate multiple substrate-bound Michaelis candidates.
-6. Filter poses by generic catalytic geometry.
+5. Generate blind docking/pose queues centered from catalytic Ser OG geometry.
+6. Generate multiple substrate-bound Michaelis candidates.
+7. Filter poses by generic catalytic geometry.
 
 ### Stage 2 - Classical ensemble
 
