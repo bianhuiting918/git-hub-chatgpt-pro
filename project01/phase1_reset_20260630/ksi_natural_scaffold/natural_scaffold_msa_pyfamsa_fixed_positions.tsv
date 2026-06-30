@@ -1,0 +1,13 @@
+ref_pos	ref_aa	coverage_count	major_aa	major_freq	is_catalytic	is_ligand_contact	class
+16	Y	198	Y	0.7222	true	true	FIXED_CATALYTIC
+40	D	198	D	0.8131	true	true	FIXED_CATALYTIC
+41	P	198	P	0.8737	false	false	FIXED_CONSERVED
+43	G	198	G	0.9091	false	false	FIXED_CONSERVED
+49	G	199	G	0.8693	false	false	FIXED_CONSERVED
+56	F	198	F	0.7121	false	true	FIXED_LIGAND_CONTACT
+60	G	199	L	0.2261	false	true	FIXED_LIGAND_CONTACT
+86	F	199	F	0.5779	false	true	FIXED_LIGAND_CONTACT
+90	M	196	T	0.2194	false	true	FIXED_LIGAND_CONTACT
+99	L	181	I	0.4420	false	true	FIXED_LIGAND_CONTACT
+103	D	197	D	0.5736	true	true	FIXED_CATALYTIC
+120	W	187	W	0.7861	false	true	FIXED_LIGAND_CONTACT

@@ -1,0 +1,35 @@
+{
+  "alignment_columns": 401,
+  "alignment_sequences": 200,
+  "catalytic_positions": [
+    16,
+    40,
+    103
+  ],
+  "fixed_positions_count": 12,
+  "ligand_contact_positions": [
+    16,
+    40,
+    56,
+    60,
+    86,
+    90,
+    99,
+    103,
+    120
+  ],
+  "method": "pyfamsa_full_msa_on_reference_filtered_homologs",
+  "mutable_positions_count": 100,
+  "outputs": {
+    "alignment_fasta": "natural_scaffold/KSI/manifests/natural_scaffold_msa_pyfamsa.aln.fasta",
+    "conservation_by_position": "natural_scaffold/KSI/manifests/natural_scaffold_msa_pyfamsa_conservation_by_position.tsv",
+    "fixed_positions": "natural_scaffold/KSI/manifests/natural_scaffold_msa_pyfamsa_fixed_positions.tsv",
+    "mutable_positions": "natural_scaffold/KSI/manifests/natural_scaffold_msa_pyfamsa_mutable_positions.tsv",
+    "review_positions": "natural_scaffold/KSI/manifests/natural_scaffold_msa_pyfamsa_review_positions.tsv"
+  },
+  "raw_homolog_records": 7400,
+  "reference_accession": "P07445",
+  "reference_length": 131,
+  "review_positions_count": 19,
+  "selected_homolog_records_from_prefilter": 200
+}
