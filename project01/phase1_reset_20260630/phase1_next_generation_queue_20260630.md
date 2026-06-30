@@ -9,6 +9,22 @@ Proceed with two separated generation tracks:
 
 The current serine-hydrolase sequence panel for the local `denovo_SER_hydrolase` reference is complete at 10 accepted sequences per 90/80/70/60/50 bin. Do not keep mutating that same de novo reference as the main route for new biological diversity.
 
+Updated generation rule:
+
+```text
+natural_scaffold_track:
+  sequence alignment first
+  fixed positions = catalytic + ligand/TS-contact + pocket-shell + MSA-conserved core
+  generate 90/80/70/60/50 bins only over allowed mutable positions
+
+de_novo_scaffold_track:
+  active-site/reactive geometry first
+  generate new backbones around that motif
+  sequence generated backbones and then apply the same postseq entrance gate
+```
+
+These tracks must remain separately labeled in manifests because their similarity bins have different meanings.
+
 ## Immediate Queue
 
 ### 1. KSI Natural-Scaffold Track
@@ -66,7 +82,8 @@ Next executable action:
 
 ```text
 Prepare an MSA toolchain or use an external homolog-retrieval route for UniProt P07445.
-Then generate natural_scaffold_msa_summary.tsv and fixed/mutable position masks before any KSI sequence generation.
+Generate natural_scaffold_msa_summary.tsv and fixed/mutable position masks before any KSI sequence generation.
+Only after that, generate 90/80/70/60/50 KSI bins while keeping fixed positions unchanged.
 ```
 
 Required next files:

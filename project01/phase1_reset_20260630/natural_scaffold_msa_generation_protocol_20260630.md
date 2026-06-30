@@ -46,6 +46,14 @@ mutable_default = nonconserved solvent/background positions
 
 These thresholds are project policy, not tool-native pass/fail criteria. They should be reported separately from model outputs.
 
+Conservation-first rule:
+
+```text
+MSA and fixed/mutable masks must be built before any 90/80/70/60/50 sequence generation.
+Identity-bin generation is allowed only over positions that remain mutable after catalytic, ligand-contact, pocket-shell, and MSA-conservation filters.
+If the requested identity target requires mutating fixed positions, mark that request as NOT_GENERATED_CONSERVATION_CONFLICT and choose another scaffold/family representative instead of weakening the pocket constraint.
+```
+
 ## Mutable-Site Definition
 
 Positions are mutable only when they satisfy all conditions:
@@ -73,6 +81,14 @@ MSA -> fixed-site mask -> ProteinMPNN/LigandMPNN generation
 -> full-structure prediction
 -> post-sequence entrance gate
 -> accepted sequence panel
+```
+
+Similarity-bin accounting:
+
+```text
+90/80/70/60/50 identity is measured against the selected natural scaffold,
+family representative, or MSA consensus named in the run manifest.
+The manifest must record which reference was used; otherwise the bin is NOT_EVALUATED_REFERENCE_UNDEFINED.
 ```
 
 Acceptance at this stage:

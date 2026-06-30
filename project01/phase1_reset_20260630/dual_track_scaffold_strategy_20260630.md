@@ -32,11 +32,23 @@ Combined accepted distinct sequence-panel counts after these evaluated batches:
 | 60 | 2 | 10 | 8 |
 | 50 | 11 | 10 | 0 |
 
-Current stage is therefore not complete. The shortage is now specific: 80 needs 2, 70 needs 1, and 60 needs 8 entrance-pass sequences.
+That shortage has now been closed by later regeneration rounds. The current capped sequence panel has at least 10 entrance-pass sequences in every 90/80/70/60/50 bin. This historical table is retained to document why the workflow was split, but it is no longer the active shortage.
+
+Current accepted distinct sequence-panel counts:
+
+| Bin | Accepted distinct PASS | Target | Still needed |
+| --- | ---: | ---: | ---: |
+| 90 | 16 | 10 | 0 |
+| 80 | 11 | 10 | 0 |
+| 70 | 38 | 10 | 0 |
+| 60 | 16 | 10 | 0 |
+| 50 | 11 | 10 | 0 |
 
 ## Natural-Scaffold Track
 
 Goal: generate sequence-diverse variants on natural or known-family scaffolds while preserving the active pocket.
+
+Hard rule: do not mutate a natural scaffold by random identity-bin forcing before conservation analysis. Natural-scaffold generation must start from sequence alignment, fixed-site annotation, and a mutable-position mask.
 
 Required steps:
 
@@ -52,6 +64,16 @@ Required steps:
 5. Generate candidates with LigandMPNN/ProteinMPNN using fixed conserved positions.
 6. Predict full structures with ESMFold or a stronger sequence+structure predictor when available.
 7. Accept only rows with `postseq_entrance_gate == PASS`.
+
+Identity-bin definition for this track:
+
+```text
+identity_bin = sequence identity to the selected natural scaffold, family representative, or MSA consensus
+fixed_positions = catalytic residues + direct ligand/TS-contact residues + MSA-conserved pocket/core residues
+mutable_positions = nonconserved background residues that are not known pocket-drift drivers
+```
+
+If a requested identity bin cannot be reached without mutating fixed positions, the row is `NOT_GENERATED_CONSERVATION_CONFLICT`, not a failed biological candidate.
 
 Detailed natural-scaffold execution protocol:
 
@@ -77,6 +99,16 @@ Required steps:
 6. Keep de novo candidates in a separate manifest from natural-scaffold candidates until downstream comparison is explicitly defined.
 
 This track is the correct way to obtain low sequence similarity while still preserving a designed active center.
+
+Identity-bin definition for this track:
+
+```text
+identity_bin = sequence identity within a generated scaffold family or against a chosen design reference
+fixed_positions = active-site motif and geometry-support residues required by the generated backbone
+mutable_positions = designable positions allowed by the generated scaffold model
+```
+
+Do not directly compare natural-scaffold identity bins and de novo-scaffold identity bins as if they were the same perturbation. They answer different questions and must remain separately labeled in manifests.
 
 ## Current Acceptance Rule
 
