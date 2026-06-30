@@ -212,6 +212,10 @@ def resolve_structure_path(raw: str, manifest_path: Path) -> Path:
         return path
     if path.exists():
         return path
+    for base in [manifest_path.parent, *manifest_path.parents]:
+        candidate = base / path
+        if candidate.exists():
+            return candidate
     return manifest_path.parent / path
 
 
@@ -329,4 +333,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 

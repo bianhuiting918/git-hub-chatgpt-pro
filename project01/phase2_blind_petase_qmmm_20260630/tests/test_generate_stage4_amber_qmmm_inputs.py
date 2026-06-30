@@ -11,8 +11,12 @@ class GenerateStage4AmberQmmmInputsTest(unittest.TestCase):
         script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage4_amber_qmmm_inputs.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
-            manifest = tmpdir / "gs_pose_manifest.tsv"
-            structure = tmpdir / "seed.pdb"
+            repo_root = tmpdir / "repo_root"
+            relative_structure = "project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/reactive_pose_seeds/6EQE_BHET_like_E01/seed.pdb"
+            manifest = repo_root / "project01" / "phase2_blind_petase_qmmm_20260630" / "blind_work" / "01_system_setup" / "gs_pose_manifest.tsv"
+            structure = repo_root / relative_structure
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            structure.parent.mkdir(parents=True, exist_ok=True)
             structure.write_text(
                 "\n".join(
                     [
@@ -51,7 +55,7 @@ class GenerateStage4AmberQmmmInputsTest(unittest.TestCase):
                 "\n".join(
                     [
                         "pose_id\tpass_fail\tligand_model\trelaxed_structure_path\tgeneration_method",
-                        f"REACTIVE_6EQE_BHET_like_E01_001\tpass\tBHET_like\t{structure}\treactive_geometry_seed",
+                        f"REACTIVE_6EQE_BHET_like_E01_001\tpass\tBHET_like\t{relative_structure}\treactive_geometry_seed",
                     ]
                 )
                 + "\n",
@@ -126,3 +130,6 @@ class GenerateStage4AmberQmmmInputsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
