@@ -133,6 +133,17 @@ project01/phase1_reset_20260630/two_layer_placer_crop_gate_sequence_summary.tsv
 projects/01-specialized-ts-aware-scorer/scripts/phase1_reset/two_layer_placer_crop_gate.py
 ```
 
+Updated downstream PLACER queue evidence:
+
+```text
+project01/phase1_reset_20260630/placer_n50_holo_inputs_capped10_summary.json
+project01/phase1_reset_20260630/placer_capped10_n50_bonded_queue_summary.json
+project01/phase1_reset_20260630/placer_capped10_n50_bonded_run_status_20260630.md
+project01/phase1_reset_20260630/scripts/run_placer_capped10_n50_bonded.sh
+```
+
+The capped10 n50 PLACER batch is downstream exploratory sampling, not a sequence-generation acceptance gate. PLACER outputs must still pass the crop ligand geometry screen before any full ligand/protein completion or strict QMMM manifest is prepared.
+
 ## Regeneration policy
 
 Active controlling plan:

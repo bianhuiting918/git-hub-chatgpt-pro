@@ -1,0 +1,19 @@
+{
+  "all_holo_inputs_ready": true,
+  "bins_written": {
+    "50": 10,
+    "60": 10,
+    "70": 10,
+    "80": 10,
+    "90": 10
+  },
+  "errors": [],
+  "holo_inputs_written": 50,
+  "input_panel": "/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_capped10.tsv",
+  "input_rows": 50,
+  "ligand_hetatm_expected": 32,
+  "manifest": "/data/bht/project01_phase1_reset_gpu/manifests/placer_n50_holo_inputs_capped10.gpu.tsv",
+  "next_required_check": "Run PLACER n=1 smoke on a newly generated 60/50 input before queueing n=50 batch.",
+  "output_dir": "/data/bht/project01_phase1_reset_gpu/placer_inputs_holo_capped10",
+  "reference_ligand_template": "/data/bht/project01_phase1_reset_gpu/manifests/denovo_SER_hydrolase_full_input.pdb"
+}

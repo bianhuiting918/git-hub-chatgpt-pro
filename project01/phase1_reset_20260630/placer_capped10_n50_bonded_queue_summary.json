@@ -1,0 +1,18 @@
+{
+  "bins": {
+    "50": 10,
+    "60": 10,
+    "70": 10,
+    "80": 10,
+    "90": 10
+  },
+  "ifile": "/data/bht/project01_phase1_reset_gpu/manifests/placer_n50_holo_inputs_capped10.ifile",
+  "input_count": 50,
+  "manifest": "/data/bht/project01_phase1_reset_gpu/manifests/placer_n50_holo_inputs_capped10.gpu.tsv",
+  "nsamples_per_input": 50,
+  "output_dir": "/data/bht/project01_phase1_reset_gpu/placer_runs/capped10_n50_bonded",
+  "script": "/data/bht/project01_phase1_reset_gpu/scripts/run_placer_capped10_n50_bonded_per_input.sh",
+  "single_process_script": "/data/bht/project01_phase1_reset_gpu/scripts/run_placer_capped10_n50_bonded.sh",
+  "status": "RUNNING_PER_INPUT_AFTER_SINGLE_PROCESS_75I_REGISTRATION_FAILURE",
+  "total_requested_conformers": 2500
+}
