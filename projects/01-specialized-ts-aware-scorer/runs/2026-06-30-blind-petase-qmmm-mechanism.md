@@ -2,7 +2,7 @@
 
 ## Status
 
-A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stage 1 has structure, ligand, protonation, and pose-gate scaffolding. Stage 3/4 has a blind mechanism hypothesis tree, candidate CV table, path screening manifest, and TS-like guess manifest. Stage 5/6/7 now has TS refinement, acylation/deacylation TS ensemble, and committor-queue manifests. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, low-cost QM/MM scans, refined TS structures, committors, and PMFs are not yet complete.
+A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stages 1 through 9 now have blind workflow scaffolds, manifests, protocols, and generator tests through final paper-validation. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, low-cost QM/MM scans, refined TS structures, committors, PMFs, barriers, and final paper comparison are not yet complete.
 
 ## Scope correction
 
@@ -61,6 +61,14 @@ Stage 5/6/7 TS and committor scaffolds:
 - `blind_work/06_ts_ensemble/deacylation_ts_ensemble.tsv`
 - `blind_work/07_committor/committor_queue.tsv`
 
+Stage 8/9 free-energy and final-validation scaffolds:
+
+- `blind_work/08_free_energy/acylation_pmf.tsv`
+- `blind_work/08_free_energy/deacylation_pmf.tsv`
+- `blind_work/08_free_energy/barrier_summary.md`
+- `blind_work/09_paper_validation/blind_vs_paper_comparison.md`
+- `blind_work/09_paper_validation/discrepancy_audit.md`
+
 Scripts and tests:
 
 - `scripts/download_stage1_rcsb_structures.ps1`
@@ -75,8 +83,10 @@ Scripts and tests:
 - `scripts/score_stage1_pose_geometry.py`
 - `scripts/generate_stage3_mechanism_tree.py`
 - `scripts/generate_stage5_ts_manifests.py`
+- `scripts/generate_stage8_stage9_manifests.py`
 - `tests/test_generate_stage3_mechanism_tree.py`
 - `tests/test_generate_stage5_ts_manifests.py`
+- `tests/test_generate_stage8_stage9_manifests.py`
 
 ## Stage 1 progress
 
@@ -108,13 +118,16 @@ A TDD check was used for `generate_stage5_ts_manifests.py`:
 - Red: `test_generate_stage5_ts_manifests.py` failed because the generator did not exist.
 - Green: after implementation, the test passed with bundled Python: `Ran 1 test in 0.386s OK`.
 
-The generator accepts only Stage 4 TS-like guesses with `validation_status=endpoint_checked`, real structure paths, and non-placeholder IDs. It writes:
+The generator accepts only Stage 4 TS-like guesses with `validation_status=endpoint_checked`, real structure paths, and non-placeholder IDs. Because the current Stage 4 manifest is still a placeholder, the generated Stage 5/6/7 manifests remain empty or `pending/not_generated`. No TS coordinates or TS claims were fabricated.
 
-- `ts_refinement_manifest.tsv` for Stage 5 TS optimization or constrained saddle refinement;
-- `acylation_ts_ensemble.tsv` and `deacylation_ts_ensemble.tsv` for Stage 6 ensemble construction;
-- `committor_queue.tsv` for Stage 7 dynamical validation scheduling.
+## Stage 8/9 progress
 
-Because the current Stage 4 `ts_like_guess_manifest.tsv` is still a placeholder with no endpoint-checked structures, the generated Stage 5/6/7 manifests correctly remain empty or `pending/not_generated`. No TS coordinates or TS claims were fabricated.
+A TDD check was used for `generate_stage8_stage9_manifests.py`:
+
+- Red: `test_generate_stage8_stage9_manifests.py` failed because the generator did not exist.
+- Green: after implementation and one boundary-text correction, the test passed with bundled Python: `Ran 1 test in 0.292s OK`.
+
+The generator accepts only accepted TS entries from Stage 7. It writes acylation/deacylation PMF manifests, a barrier summary scaffold, and final paper-validation documents. Because there is no accepted TS manifest yet, the generated PMF and validation outputs correctly remain `not_ready` and contain no barrier values or paper-derived comparison results.
 
 ## Compute note
 
@@ -124,4 +137,4 @@ Non-interactive SSH to the known compute server was tested without embedding a p
 
 ## Next action
 
-Continue by running `probe_stage1_compute_environment.sh` on the compute server. If RDKit and pKa/protonation tools are available, run `build_stage1_ligands_rdkit.py`, `run_stage1_protonation_gate.sh`, build accepted/rejected Michaelis or acyl-enzyme poses, score them with `score_stage1_pose_geometry.py`, then activate supported Stage 3 paths in `path_screening_table.tsv` for low-cost QM/MM scans. Stage 5/6 manifests should remain pending until Stage 4 produces endpoint-checked TS-like guesses.
+Continue by running `probe_stage1_compute_environment.sh` on the compute server. If RDKit and pKa/protonation tools are available, run `build_stage1_ligands_rdkit.py`, `run_stage1_protonation_gate.sh`, build accepted/rejected Michaelis or acyl-enzyme poses, score them with `score_stage1_pose_geometry.py`, then activate supported Stage 3 paths in `path_screening_table.tsv` for low-cost QM/MM scans. Later stages must remain pending until upstream evidence exists.
