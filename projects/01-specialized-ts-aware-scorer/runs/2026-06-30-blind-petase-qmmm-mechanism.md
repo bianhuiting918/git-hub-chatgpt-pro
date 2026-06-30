@@ -19,8 +19,12 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/structure_download_manifest.csv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ser_his_asp_triad_candidates.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/pdb_preparation_log.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/pdb_preparation_audit.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/template_chain_decisions.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/retained_water_candidates.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/download_stage1_rcsb_structures.ps1`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/identify_ser_his_asp_triads.py`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/audit_stage1_pdb_preparation.py`
 
 ## Boundary
 
@@ -57,8 +61,17 @@ Mutant, non-PETase, and failed pre-query IDs were explicitly marked as excluded 
 
 The selected WT-like/backup RCSB coordinate files were downloaded locally. A coordinate-only Ser-His-Asp geometric scan found the same active-site triad geometry across the WT-like templates, with `6EQE`, `5XJH`, and `6ILW` using chain A `SER160-HIS237-ASP206`, and `5YFE` using a numbering-shifted chain A `SER134-HIS211-ASP180`.
 
-This triad assignment is structure-derived and is not a paper-derived mechanism result.
+A PDB preparation audit was completed. It records selected chain decisions, missing residues/atoms from PDB headers, alternate conformers, non-water heterogens, geometric disulfide candidates, water counts, and crystallographic waters within 4 A of catalytic hetero atoms.
+
+Current structure-prep decisions:
+
+- use chain A for the initial blind setup across selected templates;
+- keep geometric disulfide candidates unless preparation software contradicts connectivity;
+- retain listed catalytic-site water candidates for first local relaxation, then test sensitivity;
+- resolve `6EQE` alternate conformers before substrate placement.
+
+This is structure-derived preparation evidence and is not a paper-derived mechanism result.
 
 ## Next action
 
-Continue Stage 1 by auditing missing atoms/residues, choosing alternate conformers and retained waters, assigning protonation states, building PET-like ligand fragments, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
+Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states, building PET-like ligand fragments, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
