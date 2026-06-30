@@ -85,6 +85,31 @@ Threshold provenance:
 - In this project, C-alpha/backbone RMSD belongs mainly to the pre-PLACER post-sequence structure gate: it asks whether the generated sequence still folds into the intended backbone/pocket before ligand conformer sampling.
 - `ligand_heavy_rmsd_max_A = 0.75` is our current `PROJECT_STRICT_GATE` for PLACER crop/full-ligand ligand-pose preservation. It is inspired by the sub-angstrom active-site agreement in the Baker work, but it is not currently confirmed as a direct Baker hard cutoff.
 - Do not describe the 0.75 A ligand RMSD gate as `BAKER_LITERATURE_GATE` unless the exact threshold is later verified from the paper's methods or released filtering code.
+- PLACER screening must stay consistent with the pre-PLACER gate. A PLACER conformer first inherits the same protein/pocket gate used at postseq entrance: global backbone RMSD, fixed-pocket backbone RMSD, catalytic heavy-atom RMSD, and protein key-distance deltas. Ligand/reaction-pose checks are additional PLACER-specific gates, not a replacement for the previous step.
+
+PLACER conformer gate:
+
+```text
+PLACER_CROP_STRICT_PASS =
+  inherited_postseq_protein_gate == PASS
+  and ligand_reaction_pose_gate == PASS
+```
+
+Inherited postseq protein gate:
+
+```text
+global_backbone_rmsd_max_A = 2.50
+fixed_backbone_rmsd_max_A = 1.00
+catalytic_heavy_rmsd_max_A = 0.75
+protein_key_distance_abs_delta_max_A = 0.75
+```
+
+PLACER ligand/reaction add-on gate:
+
+```text
+ligand_heavy_rmsd_max_A = 0.75
+ser128_og_to_bu2_c1_abs_delta_max_A = 0.50
+```
 
 ## GPU-local prediction status
 

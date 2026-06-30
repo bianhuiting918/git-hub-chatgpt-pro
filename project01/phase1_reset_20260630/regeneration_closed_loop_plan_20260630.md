@@ -53,7 +53,7 @@ Use these targets before Phase1 can be considered complete:
 
 ## Threshold Provenance
 
-Current strict gate values are project screening thresholds, not all direct literature thresholds.
+Current strict gate values are project screening thresholds, not all direct literature thresholds. PLACER screening must inherit the same protein/pocket geometry gate used immediately before PLACER; ligand/reaction-pose checks are added on top of that inherited gate.
 
 - `ligand_heavy_rmsd_max_A = 0.75` is a project-level conservative ligand-pose preservation threshold.
 - It is motivated by the Baker serine-hydrolase work reporting sub-angstrom backbone/design agreement and active-site all-atom RMSD values around the sub-angstrom range for successful designs, but this exact `0.75 A` ligand heavy-atom RMSD cutoff has not been confirmed as a direct Baker paper threshold.
@@ -71,6 +71,16 @@ ligand_heavy_rmsd_max_A = 0.75                     # PROJECT_STRICT_GATE, not co
 ligand_key_distance_abs_delta_max_A = 0.50         # PROJECT_STRICT_GATE
 minimum_placer_crop_pass_conformers_per_sequence = 10 / 50  # PROJECT_ROBUSTNESS_GATE
 ```
+
+PLACER gate consistency rule:
+
+```text
+PLACER_CROP_STRICT_PASS =
+  inherited_postseq_protein_gate == PASS
+  and ligand_reaction_pose_gate == PASS
+```
+
+where `inherited_postseq_protein_gate` uses the same global backbone, fixed-pocket backbone, catalytic heavy-atom, and protein key-distance thresholds as the postseq entrance gate.
 
 If a bin misses any target, return to the nearest upstream generation stage:
 
@@ -277,29 +287,44 @@ One *_model.pdb and one *.csv per entrance-pass sample.
 
 - [ ] **Step 1: Evaluate ligand and reaction geometry before completion**
 
-For every PLACER conformer, compute:
+For every PLACER conformer, compute the same protein/pocket metrics used in the postseq entrance gate:
 
 ```text
-bu2 heavy-atom RMSD vs reference pose after protein-pocket alignment
-Ser128-OG to bu2-C1 distance
-His95-NE2 to Ser128-OG distance
-His95-ND1 to Ser128-OG distance
-oxyanion/contact distances if present in the crop
+global backbone RMSD after Kabsch alignment
+fixed-pocket backbone RMSD
+catalytic heavy-atom RMSD
+protein key-distance deltas
+```
+
+Then compute the PLACER-added ligand/reaction metrics:
+
+```text
+bu2 heavy-atom RMSD vs reference pose after the same protein/pocket alignment
+Ser128-OG to bu2-C1 distance delta
+ligand-contact/oxyanion distances if present in the crop
 ```
 
 Gate:
 
 ```text
-crop_ligand_heavy_rmsd_max_A = 0.75
-ser128_og_to_bu2_c1_abs_delta_max_A = 0.50
-protein_key_distance_abs_delta_max_A = 0.75
+inherited_postseq_protein_gate:
+  global_backbone_rmsd_max_A = 2.50
+  fixed_backbone_rmsd_max_A = 1.00
+  catalytic_heavy_rmsd_max_A = 0.75
+  protein_key_distance_abs_delta_max_A = 0.75
+
+placer_ligand_addon_gate:
+  ligand_heavy_rmsd_max_A = 0.75
+  ser128_og_to_bu2_c1_abs_delta_max_A = 0.50
 ```
 
 Expected labels:
 
 ```text
 CROP_STRICT_PASS
-CROP_GEOMETRY_FAIL
+FAIL_INHERITED_POSTSEQ_PROTEIN_GATE
+FAIL_PLACER_LIGAND_ADDON_GATE
+FAIL_BOTH_PROTEIN_AND_LIGAND_GATES
 NOT_EVALUATED_PARSE_FAIL
 ```
 
