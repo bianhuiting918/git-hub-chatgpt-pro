@@ -10,11 +10,8 @@ This log records structure-only preparation steps for the blind PETase QM/MM mec
 
 1. Queried RCSB metadata for candidate PETase structures.
 2. Selected `6EQE` as the primary WT-like template, with `5XJH`, `5YFE`, and `6ILW` as secondary WT-like sensitivity templates.
-3. Downloaded nine WT-like or backup PDB coordinate files from RCSB:
-   - `6EQE`, `5XJH`, `5YFE`, `6ILW`, `6EQD`, `6EQF`, `6EQG`, `6EQH`, `6QGC`.
-4. Ran a coordinate-only Ser-His-Asp geometric scan with these thresholds:
-   - Ser OG to His ND1/NE2 <= 4.0 A;
-   - His ND1/NE2 to Asp OD1/OD2 <= 4.0 A.
+3. Downloaded nine WT-like or backup PDB coordinate files from RCSB: `6EQE`, `5XJH`, `5YFE`, `6ILW`, `6EQD`, `6EQF`, `6EQG`, `6EQH`, `6QGC`.
+4. Ran a coordinate-only Ser-His-Asp geometric scan with these thresholds: Ser OG to His ND1/NE2 <= 4.0 A; His ND1/NE2 to Asp OD1/OD2 <= 4.0 A.
 5. Ran PDB preparation audit for chains, missing residues, missing atoms, alternate conformers, non-water heterogens, crystallographic water, and geometric disulfide candidates.
 6. Wrote explicit template-chain decisions and retained-water candidate tables.
 7. Defined blind substrate model inputs: `PET_dimer_capped`, `BHET_like`, `MHET_like`, and `MHET_like_acyl_enzyme_precursor`.
@@ -25,6 +22,8 @@ This log records structure-only preparation steps for the blind PETase QM/MM mec
 12. Wrote the primary-template protonation hypothesis manifest for `6EQE`.
 13. Added a remote-safe compute environment probe script and remote execution instructions.
 14. Confirmed non-interactive SSH key login to the known compute server is not available; no password was written into commands or files.
+15. Added `ligand_smiles.tsv`, `rejected_pose_manifest.tsv`, `build_stage1_ligands_rdkit.py`, `run_stage1_protonation_gate.sh`, and `stage1_ligand_and_protonation_execution_protocol.md` so the next server run has executable gates for ligand construction, atom-label enumeration, and protonation review.
+16. Locally compile-checked `build_stage1_ligands_rdkit.py` and verified its missing-RDKit path writes a `blocked_missing_rdkit` manifest instead of fabricating ligand coordinates.
 
 ## Triad Scan Result
 
@@ -59,6 +58,7 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - Catalytic `HIS237` requires HID/HIE tautomer sensitivity before committing to QM/MM reaction scans; HIP is only a branch if pKa/local electrostatics supports cationic histidine.
 - Remote histidines such as `HIS104` and `HIS293` require tautomer naming for topology generation but are not automatically reaction-mechanism sensitivity branches.
 - `CYS203` and `CYS239` are near the triad but treated as disulfide-linked unless preparation software contradicts the geometric disulfide assignment.
+- `run_stage1_protonation_gate.sh` now records input hashes, pKa/protonation/hydrogen-tool outputs, and the required manual review items for catalytic Asp/His assignments.
 
 ## Ligand Model Definition Result
 
@@ -67,7 +67,8 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `MHET_like` is the default product-side/deacylation reference fragment, with pH-7 carboxylate state explicit.
 - `MHET_like_acyl_enzyme_precursor` is explicitly a protein-covalent Ser160 acyl-enzyme model, not a standalone free ligand.
 - Stable atom-label files are required before topology conversion so the scissile ester atoms can be traced into QM/MM setup.
-- Ligand 3D conformer generation is blocked in the current local bundled Python because RDKit/Open Babel are unavailable; see `ligand_build_environment_report.md`.
+- `build_stage1_ligands_rdkit.py` builds RDKit conformers when RDKit is present and enumerates ester atom-label candidates from substrate chemistry; it does not select a scissile ester from paper data.
+- Ligand 3D conformer generation remains blocked in the current local bundled Python because RDKit/Open Babel are unavailable; see `ligand_build_environment_report.md` and the local `blocked_missing_rdkit` probe output.
 
 ## Environment Enablement Result
 
@@ -83,9 +84,9 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 3. Geometric disulfide candidates should be kept unless later preparation software contradicts the connectivity.
 4. Water molecules listed in `retained_water_candidates.tsv` should be retained for the first local relaxation pass, then tested by sensitivity runs.
 5. Alternate conformers in `6EQE` are resolved in the v2 initial-cleaned PDB by highest altloc-atom occupancy; this remains subject to active-site geometry inspection after ligand placement.
-6. Ligand construction must preserve the named scissile ester atom labels from `ligand_model_manifest.tsv`.
+6. Ligand construction must preserve named scissile ester candidates from `ligand_model_manifest.tsv` and the generated `qm_atom_labels/*_atoms.tsv` files.
 7. Protonation production setup must run an external pKa/protonation tool and compare its output with `protonation_hypothesis_manifest.tsv` before topology generation.
-8. No docking, MD, or QM/MM input should be accepted until the compute environment probe output records exact tool paths and versions.
+8. No docking, MD, or QM/MM input should be accepted until the compute environment probe, ligand build gate, and protonation gate record exact tool paths, versions, and hashes.
 
 ## Not Yet Done
 
@@ -110,7 +111,13 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `protonation_setup_notes.md`
 - `ligand_model_manifest.tsv`
 - `ligand_model_definitions.md`
+- `ligand_smiles.tsv`
 - `ligand_build_environment_report.md`
+- `rejected_pose_manifest.tsv`
+- `stage1_ligand_and_protonation_execution_protocol.md`
 - `stage1_environment_enablement_status.md`
 - `stage1_remote_execution_instructions.md`
 - `stage1_system_setup_protocol.md`
+- `scripts/build_stage1_ligands_rdkit.py`
+- `scripts/run_stage1_protonation_gate.sh`
+- `scripts/probe_stage1_compute_environment.sh`
