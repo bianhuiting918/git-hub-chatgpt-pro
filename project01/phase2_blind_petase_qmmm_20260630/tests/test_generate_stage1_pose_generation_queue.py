@@ -9,6 +9,8 @@ from pathlib import Path
 class GenerateStage1PoseGenerationQueueTest(unittest.TestCase):
     def test_generates_docking_queue_from_structure_triad_and_ligand_manifest(self):
         script = Path("work/generate_stage1_pose_generation_queue.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage1_pose_generation_queue.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             prepared_dir = tmpdir / "prepared"
