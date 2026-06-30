@@ -23,7 +23,23 @@
     "conformers_per_sample": 50,
     "total_conformers": 150,
     "output_dir": "/data/bht/project01_phase1_reset_gpu/placer_runs/representative_90_80_70_n50_bonded",
-    "status": "PLACER_GENERATED_AWAITING_CROP_LIGAND_RMSD_GATE"
+    "status": "FAILED_TWO_LAYER_CROP_GATE"
+  },
+  "completed_placer_diagnostic": {
+    "representative_bins": ["90", "80", "70"],
+    "samples": 3,
+    "conformers_per_sample": 50,
+    "total_conformers": 150,
+    "output_dir": "/data/bht/project01_phase1_reset_gpu/placer_runs/representative_90_80_70_n50_posecentered",
+    "status": "FAILED_TWO_LAYER_CROP_GATE"
+  },
+  "two_layer_crop_gate": {
+    "evaluated_sequence_run_entries": 6,
+    "evaluated_conformers": 300,
+    "crop_strict_pass_conformers": 0,
+    "accepted_sequences": 0,
+    "failed_sequence_run_entries": 6,
+    "summary_file": "project01/phase1_reset_20260630/two_layer_placer_crop_gate_summary.json"
   },
   "regeneration_policy": {
     "postseq_entrance_pass_target_per_bin": 10,

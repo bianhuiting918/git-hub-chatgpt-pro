@@ -1,0 +1,52 @@
+{
+  "updated_cst": "2026-06-30T12:05:00+08:00",
+  "evaluated_universe": {
+    "runs": ["bonded", "posecentered_diagnostic"],
+    "total_sequences": 6,
+    "total_conformers": 300,
+    "conformers_per_sequence": 50
+  },
+  "gate_definition": {
+    "crop_strict_pass": "inherited_postseq_protein_gate == PASS and ligand_reaction_pose_gate == PASS",
+    "sequence_acceptance": "crop_strict_pass_conformers >= 10 out of 50"
+  },
+  "thresholds": {
+    "global_backbone_rmsd_max_A": 2.5,
+    "fixed_backbone_rmsd_max_A": 1.0,
+    "catalytic_heavy_rmsd_max_A": 0.75,
+    "protein_key_distance_abs_delta_max_A": 0.75,
+    "ligand_heavy_rmsd_max_A": 0.75,
+    "ser128_og_to_bu2_c1_abs_delta_max_A": 0.5,
+    "minimum_placer_crop_pass_conformers_per_sequence": 10,
+    "expected_placer_conformers_per_sequence": 50
+  },
+  "conformer_status_counts": {
+    "bonded": {
+      "FAIL_BOTH_PROTEIN_AND_LIGAND_GATES": 111,
+      "FAIL_PLACER_LIGAND_ADDON_GATE": 39
+    },
+    "posecentered_diagnostic": {
+      "FAIL_BOTH_PROTEIN_AND_LIGAND_GATES": 133,
+      "FAIL_PLACER_LIGAND_ADDON_GATE": 17
+    }
+  },
+  "sequence_status_counts": {
+    "bonded": {
+      "DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM": 3
+    },
+    "posecentered_diagnostic": {
+      "DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM": 3
+    }
+  },
+  "strict_pass": {
+    "crop_strict_pass_conformers": 0,
+    "accepted_sequences": 0,
+    "qmmm_ready_sequences": 0
+  },
+  "outputs": {
+    "remote_sequence_summary_tsv": "/data/bht/project01_phase1_reset_gpu/placer_crop_gate/two_layer_placer_crop_gate_sequence_summary.tsv",
+    "remote_conformer_detail_tsv_bonded": "/data/bht/project01_phase1_reset_gpu/placer_crop_gate/two_layer_placer_crop_gate_bonded.tsv",
+    "remote_conformer_detail_tsv_posecentered": "/data/bht/project01_phase1_reset_gpu/placer_crop_gate/two_layer_placer_crop_gate_posecentered_diagnostic.tsv"
+  },
+  "next_action": "Regenerate replacement sequences from upstream; do not complete ligand or launch QMMM for these six sequence-run entries."
+}

@@ -1,0 +1,7 @@
+run_label	sample_id	bin	evaluated_conformers	protein_gate_pass_conformers	ligand_addon_gate_pass_conformers	crop_strict_pass_conformers	sequence_status	best_ligand_heavy_rmsd_A
+bonded	bin70_rank1_rec1	70	50	30	0	0	DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM	2.362061350751744
+bonded	bin80_rank1_rec2	80	50	2	0	0	DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM	2.1208793101397356
+bonded	bin90_rank1_rec1	90	50	7	0	0	DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM	2.830207241193021
+posecentered_diagnostic	bin70_rank1_rec1	70	50	13	0	0	DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM	3.0098443542384516
+posecentered_diagnostic	bin80_rank1_rec2	80	50	1	0	0	DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM	1.7780946665867308
+posecentered_diagnostic	bin90_rank1_rec1	90	50	3	0	0	DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM	3.2521440771061263

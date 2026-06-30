@@ -169,16 +169,26 @@ Completed PLACER pilot:
 
 The PLACER raw CSV/PDB outputs are not strict-pass evidence.
 
-Crop ligand RMSD/reaction gate result for the first representative PLACER run:
+Two-layer PLACER crop gate result for the representative PLACER runs:
 
-- Evaluated universe: 150 PLACER conformers from 3 sequences.
-- PASS: 0.
-- FAIL: 150.
+- Evaluated universe: 300 PLACER conformers from 6 sequence-run entries.
+- Runs: `bonded` and `posecentered_diagnostic`.
+- `CROP_STRICT_PASS`: 0.
+- `FAIL_BOTH_PROTEIN_AND_LIGAND_GATES`: 244.
+- `FAIL_PLACER_LIGAND_ADDON_GATE`: 56.
 - NOT_EVALUATED: 0.
-- Per-sequence threshold result: all 3 sequences fail `minimum_placer_crop_pass_conformers_per_sequence = 10`.
-- Best observed ligand heavy-atom RMSD was still 2.12 A, above the 0.75 A gate.
+- Per-sequence threshold result: all 6 sequence-run entries fail `minimum_placer_crop_pass_conformers_per_sequence = 10`.
+- Best observed ligand heavy-atom RMSD was 1.778 A in the pose-centered diagnostic run, still above the 0.75 A ligand add-on gate.
 
-Therefore the first representative PLACER run produces no QMMM-ready sequence and no full-ligand completion queue.
+Therefore these representative PLACER runs produce no accepted sequence, no full-ligand completion queue, and no QMMM-ready manifest rows.
+
+Lightweight evidence files:
+
+```text
+project01/phase1_reset_20260630/two_layer_placer_crop_gate_summary.json
+project01/phase1_reset_20260630/two_layer_placer_crop_gate_sequence_summary.tsv
+projects/01-specialized-ts-aware-scorer/scripts/phase1_reset/two_layer_placer_crop_gate.py
+```
 
 ## Regeneration policy
 
@@ -207,8 +217,8 @@ Current entrance-pass shortage:
 
 Required next action:
 
-1. Treat the first 90/80/70 representative PLACER run as failed under the new per-sequence `>=10/50` crop-pass rule.
-2. Use the running pose-centered PLACER batch only as a diagnostic; it must still meet `>=10/50` to count.
+1. Treat both completed representative PLACER runs as failed under the per-sequence `>=10/50` crop-pass rule.
+2. Do not send any conformer from these representative runs to full-ligand completion or QMMM.
 3. Build `regeneration_queue_round02.tsv`.
 4. Generate replacement candidates for shortage bins, especially 70/60/50.
 5. Predict and gate the new candidates on GPU immediately after generation.
