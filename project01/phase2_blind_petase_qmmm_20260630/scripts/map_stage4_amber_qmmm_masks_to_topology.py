@@ -97,13 +97,39 @@ def element_or_name(atom: Atom) -> str:
     return ""
 
 
-def map_atom(source_atom: Atom, leap_atoms: list[Atom], tolerance: float) -> Atom:
-    strict = [atom for atom in leap_atoms if atom.name == source_atom.name and atom.resname == source_atom.resname]
-    candidates = strict or [
-        atom
-        for atom in leap_atoms
-        if atom.resname == source_atom.resname and element_or_name(atom) == element_or_name(source_atom)
-    ]
+HISTIDINE_NAMES = {"HIS", "HID", "HIE", "HIP"}
+
+def canonical_resname(resname: str) -> str:
+    return "HIS" if resname in HISTIDINE_NAMES else resname
+
+
+def atom_family(atom: Atom, use_element: bool = False) -> tuple[str, str]:
+    return (canonical_resname(atom.resname), element_or_name(atom) if use_element else atom.name)
+
+
+def occurrence_index(source_atom: Atom, atoms: list[Atom], use_element: bool = False) -> int:
+    family = atom_family(source_atom, use_element)
+    matches = [atom for atom in atoms if atom_family(atom, use_element) == family]
+    for index, atom in enumerate(matches):
+        if atom.serial == source_atom.serial:
+            return index
+    raise ValueError(f"Source atom serial {source_atom.serial} not found in its occurrence family")
+
+
+def map_atom(source_atom: Atom, source_atoms: list[Atom], leap_atoms: list[Atom], tolerance: float) -> Atom:
+    family = atom_family(source_atom)
+    occurrence = occurrence_index(source_atom, source_atoms)
+    exact = [atom for atom in leap_atoms if atom_family(atom) == family]
+    if occurrence < len(exact):
+        return exact[occurrence]
+
+    element_occurrence = occurrence_index(source_atom, source_atoms, use_element=True)
+    element_family = atom_family(source_atom, use_element=True)
+    element_matches = [atom for atom in leap_atoms if atom_family(atom, use_element=True) == element_family]
+    if element_occurrence < len(element_matches):
+        return element_matches[element_occurrence]
+
+    candidates = exact or element_matches
     if not candidates:
         raise ValueError(f"No topology candidates for {source_atom.resname} {source_atom.name} serial {source_atom.serial}")
     mapped = min(candidates, key=lambda atom: dist(source_atom, atom))
@@ -161,7 +187,7 @@ def map_job(qrow: dict[str, str], trow: dict[str, str], out_dir: Path, tolerance
     for selection in selection_rows:
         source_serial = int(selection["serial"])
         source_atom = source_atoms[source_serial]
-        mapped_serials.append(map_atom(source_atom, leap_atoms, tolerance).serial)
+        mapped_serials.append(map_atom(source_atom, list(source_atoms.values()), leap_atoms, tolerance).serial)
     qmmask = "@" + ",".join(str(serial) for serial in mapped_serials)
 
     mapped_job_id = f"MAPPED_{qrow['qmmm_job_id']}"
@@ -233,3 +259,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

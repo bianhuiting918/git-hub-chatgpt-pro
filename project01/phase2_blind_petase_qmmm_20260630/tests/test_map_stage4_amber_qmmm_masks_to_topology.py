@@ -11,7 +11,7 @@ def pdb_line(record, serial, name, resname, chain, resseq, x, y, z, element):
 
 
 class MapStage4AmberQmmmMasksTest(unittest.TestCase):
-    def test_maps_original_seed_qm_atoms_to_tleap_atom_indices_by_coordinates(self):
+    def test_maps_original_seed_qm_atoms_to_tleap_atom_indices_by_occurrence(self):
         script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/map_stage4_amber_qmmm_masks_to_topology.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
@@ -28,6 +28,7 @@ class MapStage4AmberQmmmMasksTest(unittest.TestCase):
                         pdb_line("ATOM", 5, "CB", "SER", "A", 160, 1.0, 2.0, 3.0, "C"),
                         pdb_line("ATOM", 6, "OG", "SER", "A", 160, 1.5, 2.0, 3.0, "O"),
                         pdb_line("HETATM", 7, "C001", "LIG", " ", 1, 2.0, 2.0, 3.0, "C"),
+                        pdb_line("ATOM", 8, "NE2", "HIS", "A", 237, 3.0, 2.0, 3.0, "N"),
                         "END",
                     ]
                 )
@@ -42,6 +43,7 @@ class MapStage4AmberQmmmMasksTest(unittest.TestCase):
                         "5\tCB\tSER\t160\tA\tATOM\tcatalytic_or_neighbor_sidechain",
                         "6\tOG\tSER\t160\tA\tATOM\tcatalytic_or_neighbor_sidechain",
                         "7\tC001\tLIG\t1\t\tHETATM\tsubstrate_ligand",
+                        "8\tNE2\tHIS\t237\tA\tATOM\tcatalytic_or_neighbor_sidechain",
                     ]
                 )
                 + "\n",
@@ -49,14 +51,14 @@ class MapStage4AmberQmmmMasksTest(unittest.TestCase):
             )
             min_mdin = qmmm_dir / "01_qmmm_min.in"
             equil_mdin = qmmm_dir / "02_qmmm_equil_200ps.in"
-            min_mdin.write_text("&cntrl\n  imin=1, maxcyc=2000, ifqnt=1,\n/\n&qmmm\n  qmmask='@5,6,7',\n  qm_theory='DFTB3',\n/\n", encoding="utf-8")
-            equil_mdin.write_text("&cntrl\n  imin=0, nstlim=200000, ifqnt=1,\n/\n&qmmm\n  qmmask='@5,6,7',\n  qm_theory='DFTB3',\n/\n", encoding="utf-8")
+            min_mdin.write_text("&cntrl\n  imin=1, maxcyc=2000, ifqnt=1,\n/\n&qmmm\n  qmmask='@5,6,7,8',\n  qm_theory='DFTB3',\n/\n", encoding="utf-8")
+            equil_mdin.write_text("&cntrl\n  imin=0, nstlim=200000, ifqnt=1,\n/\n&qmmm\n  qmmask='@5,6,7,8',\n  qm_theory='DFTB3',\n/\n", encoding="utf-8")
             qmmm_manifest = tmpdir / "amber_qmmm_job_manifest.tsv"
             qmmm_manifest.write_text(
                 "\n".join(
                     [
                         "qmmm_job_id\tpose_id\tligand_model\tsource_structure_path\tengine\tqm_theory\tqmcharge\tspin\tqm_atom_count\tqmmask\tjob_dir\tqm_selection_path\tmin_mdin_path\tequil_mdin_path\trunner_path\tstatus\tsource",
-                        f"AMBER_QMMM_TEST_001\tPOSE1\tBHET_like\t{source_pdb}\tamber_sander\tDFTB3\t0\t1\t3\t@5,6,7\t{qmmm_dir}\t{selection}\t{min_mdin}\t{equil_mdin}\t{qmmm_dir / 'run.sh'}\tinputs_ready_needs_amber_prmtop_inpcrd\tblind_stage1_accepted_seed",
+                        f"AMBER_QMMM_TEST_001\tPOSE1\tBHET_like\t{source_pdb}\tamber_sander\tDFTB3\t0\t1\t4\t@5,6,7,8\t{qmmm_dir}\t{selection}\t{min_mdin}\t{equil_mdin}\t{qmmm_dir / 'run.sh'}\tinputs_ready_needs_amber_prmtop_inpcrd\tblind_stage1_accepted_seed",
                     ]
                 )
                 + "\n",
@@ -67,9 +69,10 @@ class MapStage4AmberQmmmMasksTest(unittest.TestCase):
             complex_leap.write_text(
                 "\n".join(
                     [
-                        pdb_line("ATOM", 20, "CB", "SER", " ", 12, 1.0, 2.0, 3.0, "C"),
-                        pdb_line("ATOM", 21, "OG", "SER", " ", 12, 1.5, 2.0, 3.0, "O"),
-                        pdb_line("HETATM", 22, "C001", "LIG", " ", 98, 2.0, 2.0, 3.0, "C"),
+                        pdb_line("ATOM", 20, "CB", "SER", " ", 12, 11.0, 0.0, 8.0, "C"),
+                        pdb_line("ATOM", 21, "OG", "SER", " ", 12, 11.5, 0.0, 8.0, "O"),
+                        pdb_line("HETATM", 22, "C001", "LIG", " ", 98, 12.0, 0.0, 8.0, "C"),
+                        pdb_line("ATOM", 23, "NE2", "HIE", " ", 209, 13.0, 0.0, 8.0, "N"),
                         "END",
                     ]
                 )
@@ -111,12 +114,12 @@ class MapStage4AmberQmmmMasksTest(unittest.TestCase):
             with mapped_manifest.open("r", encoding="utf-8", newline="") as handle:
                 rows = list(csv.DictReader(handle, delimiter="\t"))
             self.assertEqual(len(rows), 1)
-            self.assertEqual(rows[0]["mapped_qmmask"], "@20,21,22")
+            self.assertEqual(rows[0]["mapped_qmmask"], "@20,21,22,23")
             self.assertEqual(rows[0]["status"], "qmmm_inputs_mapped_to_amber_topology")
 
             job_dir = Path(rows[0]["mapped_job_dir"])
             smoke = (job_dir / "00_qmmm_smoke_min_1step.in").read_text(encoding="utf-8")
-            self.assertIn("qmmask='@20,21,22'", smoke)
+            self.assertIn("qmmask='@20,21,22,23'", smoke)
             self.assertIn("maxcyc=1", smoke)
             self.assertIn("ifqnt=1", smoke)
             runner = (job_dir / "run_sander_qmmm_smoke.sh").read_text(encoding="utf-8")
