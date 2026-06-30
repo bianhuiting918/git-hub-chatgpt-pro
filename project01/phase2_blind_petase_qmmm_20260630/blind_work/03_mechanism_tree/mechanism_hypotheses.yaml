@@ -1,0 +1,55 @@
+blind_stage3_boundary:
+  allowed_inputs:
+    - accepted Stage 1 Michaelis/acyl-enzyme poses
+    - substrate chemistry
+    - generic serine-hydrolase chemistry
+    - protonation-gate evidence
+  forbidden_inputs:
+    - paper TS coordinates
+    - paper reaction-coordinate formulas
+    - paper selected CVs
+    - paper trajectories or umbrella windows
+    - paper barrier or rate-limiting conclusions
+mechanism_hypotheses:
+  - path_id: AC_DIRECT_HIS_GENERAL_BASE
+    reaction_stage: acylation
+    description: "Ser O-gamma attacks the ester carbonyl while catalytic His acts as the general base."
+    proton_relay: Ser_to_His_direct
+    intermediate_model: tetrahedral_or_concerted_to_be_resolved
+    initial_gate: accepted_acylation_michaelis_pose
+    reject_if: "Ser attack geometry, His accessibility, or leaving group path fails Stage 1 filters"
+  - path_id: AC_WATER_ASSISTED_LEAVING_GROUP
+    reaction_stage: acylation
+    description: "Ser activation is His-mediated; leaving-group proton delivery may be water-assisted."
+    proton_relay: Ser_to_His_and_His_or_water_to_leaving_O
+    intermediate_model: tetrahedral_or_stepwise
+    initial_gate: accepted_acylation_pose_with_relay_water
+    reject_if: "No persistent relay water or leaving oxygen access after restrained relaxation"
+  - path_id: AC_ASP_COUPLED_HIS_BRANCH
+    reaction_stage: acylation
+    description: "Catalytic Asp/His protonation sensitivity branch tested only if pKa/protonation gate supports it."
+    proton_relay: His_Asp_network_sensitivity
+    intermediate_model: same_as_parent_path
+    initial_gate: protonation_gate_disagrees_or_flags_sensitivity
+    reject_if: "pKa/protonation evidence does not support an alternate Asp/His state"
+  - path_id: DE_WATER_ATTACK_HIS_GENERAL_BASE
+    reaction_stage: deacylation
+    description: "A bound water attacks the acyl-enzyme carbonyl while His acts as the general base."
+    proton_relay: water_to_His_then_SerO_protonation
+    intermediate_model: tetrahedral_or_concerted_to_be_resolved
+    initial_gate: accepted_acyl_enzyme_pose_with_nucleophilic_water
+    reject_if: "No water has productive attack geometry and His access"
+  - path_id: DE_WATER_NETWORK_ASSISTED
+    reaction_stage: deacylation
+    description: "Water attack is coupled to a local water network before product release."
+    proton_relay: water_network_to_His_or_leaving_SerO
+    intermediate_model: stepwise_water_network_branch
+    initial_gate: stable_water_network_in_classical_ensemble
+    reject_if: "Water network is not persistent across equilibrated conformers"
+  - path_id: DE_CARBOXYLATE_PROTONATION_BRANCH
+    reaction_stage: deacylation
+    description: "Distal fragment carboxylate protonation sensitivity branch if protonation gate supports it."
+    proton_relay: fragment_carboxylate_state_sensitivity
+    intermediate_model: same_as_parent_path
+    initial_gate: pH_or_local_environment_supports_neutral_fragment
+    reject_if: "No protonation evidence for neutral distal carboxylate"
