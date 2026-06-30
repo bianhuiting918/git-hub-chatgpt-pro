@@ -2,7 +2,7 @@
 
 ## Status
 
-A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stages 1 through 9 now have blind workflow scaffolds, manifests, protocols, and generator tests through final paper-validation. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, low-cost QM/MM scans, refined TS structures, committors, PMFs, barriers, and final paper comparison are not yet complete.
+A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stages 1 through 9 now have blind workflow scaffolds, manifests, protocols, and generator tests through final paper-validation, including the Stage 2 classical-MD bridge from accepted GS poses to productive conformer clusters. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, classical MD trajectories, productive conformer clusters, low-cost QM/MM scans, refined TS structures, committors, PMFs, barriers, and final paper comparison are not yet complete.
 
 ## Scope correction
 
@@ -45,6 +45,13 @@ Stage 1 setup and gates:
 - `blind_work/01_system_setup/protonation_hypothesis_manifest.tsv`
 - `blind_work/01_system_setup/protonation_setup_notes.md`
 
+Stage 2 classical-MD ensemble gate:
+
+- `blind_work/02_classical_md/md_replicate_queue.tsv`
+- `blind_work/02_classical_md/productive_conformer_manifest.tsv`
+- `blind_work/02_classical_md/rejected_pose_manifest.tsv`
+- `blind_work/02_classical_md/stage2_classical_md_protocol.md`
+
 Stage 3/4 mechanism and low-cost QM/MM scaffolds:
 
 - `blind_work/03_mechanism_tree/mechanism_hypotheses.yaml`
@@ -81,9 +88,11 @@ Scripts and tests:
 - `scripts/build_stage1_ligands_rdkit.py`
 - `scripts/run_stage1_protonation_gate.sh`
 - `scripts/score_stage1_pose_geometry.py`
+- `scripts/generate_stage2_classical_md_manifests.py`
 - `scripts/generate_stage3_mechanism_tree.py`
 - `scripts/generate_stage5_ts_manifests.py`
 - `scripts/generate_stage8_stage9_manifests.py`
+- `tests/test_generate_stage2_classical_md_manifests.py`
 - `tests/test_generate_stage3_mechanism_tree.py`
 - `tests/test_generate_stage5_ts_manifests.py`
 - `tests/test_generate_stage8_stage9_manifests.py`
@@ -101,6 +110,15 @@ Protonation setup was started from cleaned coordinates. For primary template `6E
 Blind substrate model definitions were added for `PET_dimer_capped`, `BHET_like`, `MHET_like`, and `MHET_like_acyl_enzyme_precursor`.
 
 Executable Stage 1 gates were added for ligand conformer generation, protonation review, and pose geometry scoring. Local verification showed the RDKit ligand script compiles and writes `blocked_missing_rdkit` in the local missing-RDKit environment instead of fabricating coordinates. The pose geometry scorer compiles locally. Bash validation for `run_stage1_protonation_gate.sh` remains server-side because local Windows lacks `bash`.
+
+## Stage 2 progress
+
+A TDD check was used for `generate_stage2_classical_md_manifests.py`:
+
+- Red: `test_generate_stage2_classical_md_manifests.py` failed because the generator did not exist.
+- Green: after implementation and one boundary-text correction, the test passed with bundled Python: `Ran 1 test in 0.605s OK`.
+
+The generator accepts only Stage 1 GS pose rows with `pass_fail=pass` and a non-pending relaxed structure path. It writes an MD replicate queue, productive conformer manifest, rejected pose manifest, and Stage 2 classical-MD protocol. Because Stage 1 has no accepted GS pose yet, the generated Stage 2 queue remains `not_ready_no_accepted_gs_pose` and no productive conformers are claimed.
 
 ## Stage 3/4 progress
 
@@ -137,4 +155,4 @@ Non-interactive SSH to the known compute server was tested without embedding a p
 
 ## Next action
 
-Continue by running `probe_stage1_compute_environment.sh` on the compute server. If RDKit and pKa/protonation tools are available, run `build_stage1_ligands_rdkit.py`, `run_stage1_protonation_gate.sh`, build accepted/rejected Michaelis or acyl-enzyme poses, score them with `score_stage1_pose_geometry.py`, then activate supported Stage 3 paths in `path_screening_table.tsv` for low-cost QM/MM scans. Later stages must remain pending until upstream evidence exists.
+Continue by running `probe_stage1_compute_environment.sh` on the compute server. If RDKit and pKa/protonation tools are available, run `build_stage1_ligands_rdkit.py`, `run_stage1_protonation_gate.sh`, build accepted/rejected Michaelis or acyl-enzyme poses, score them with `score_stage1_pose_geometry.py`, then use `generate_stage2_classical_md_manifests.py` to queue classical MD replicates from accepted poses. Only after productive conformers exist should Stage 4 low-cost QM/MM scans be activated.
