@@ -1,0 +1,51 @@
+{
+  "accepted_per_bin_target": 10,
+  "accepted_total": 50,
+  "accepted_tsv": "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_sample2_identity_bins_combined_active_pocket_accepted_top10.tsv",
+  "by_bin": {
+    "50": {
+      "best_motif_ca_rmsd_A": 0.4339,
+      "evaluated": 160,
+      "pass": 20,
+      "selected": 10,
+      "worst_selected_motif_ca_rmsd_A": 0.7155
+    },
+    "60": {
+      "best_motif_ca_rmsd_A": 0.2676,
+      "evaluated": 140,
+      "pass": 21,
+      "selected": 10,
+      "worst_selected_motif_ca_rmsd_A": 0.6517
+    },
+    "70": {
+      "best_motif_ca_rmsd_A": 0.2493,
+      "evaluated": 140,
+      "pass": 16,
+      "selected": 10,
+      "worst_selected_motif_ca_rmsd_A": 0.8006
+    },
+    "80": {
+      "best_motif_ca_rmsd_A": 0.4067,
+      "evaluated": 200,
+      "pass": 22,
+      "selected": 10,
+      "worst_selected_motif_ca_rmsd_A": 0.8388
+    },
+    "90": {
+      "best_motif_ca_rmsd_A": 0.1713,
+      "evaluated": 70,
+      "pass": 14,
+      "selected": 10,
+      "worst_selected_motif_ca_rmsd_A": 0.8496
+    }
+  },
+  "evaluated_total": 710,
+  "gate_definition": "active_site+pocket fixed in generation; ESMFold OK; Kabsch-aligned motif CA RMSD over A40/A49/A56 <= 1.0 A; global RMSD not hard gate",
+  "pass_total": 93,
+  "pocket_definition_for_sequence_stage": "active_site plus CA-to-bu2 <= 8 A because RFAA sidechain/heavy atoms are diagnostic only",
+  "source_gate_tsvs": [
+    "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_sample2_identity_bins_round01_active_pocket_gate.tsv",
+    "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_sample2_identity_bins_round02_active_pocket_gate.tsv"
+  ],
+  "target_complete": true
+}

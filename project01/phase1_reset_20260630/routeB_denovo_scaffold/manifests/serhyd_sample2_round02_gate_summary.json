@@ -1,0 +1,50 @@
+{
+  "accepted_tsv": "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_sample2_identity_bins_round02_active_pocket_accepted_top10.tsv",
+  "bins_meeting_target": [
+    "50",
+    "60",
+    "70",
+    "80"
+  ],
+  "by_bin": {
+    "50": {
+      "evaluated": 120,
+      "pass": 18,
+      "selected_for_target": 10
+    },
+    "60": {
+      "evaluated": 100,
+      "pass": 18,
+      "selected_for_target": 10
+    },
+    "70": {
+      "evaluated": 100,
+      "pass": 13,
+      "selected_for_target": 10
+    },
+    "80": {
+      "evaluated": 160,
+      "pass": 21,
+      "selected_for_target": 10
+    },
+    "90": {
+      "evaluated": 30,
+      "pass": 7,
+      "selected_for_target": 7
+    }
+  },
+  "counts": {
+    "FAIL": 433,
+    "PASS": 77
+  },
+  "evaluated_universe_rows": 510,
+  "gate_definition": "PASS if ESMFold OK/SKIP_EXISTS, fixed positions unchanged, motif CA RMSD over A40/A49/A56 <= 1.0 A",
+  "global_ca_rmsd_role": "not a hard gate",
+  "manifest": "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_sample2_identity_bins_round02_manifest.tsv",
+  "out_tsv": "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_sample2_identity_bins_round02_active_pocket_gate.tsv",
+  "reference_pdb": "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/outputs/esmfold_rfaabatch5_seq5/routeB_serhyd_sample_2_lmpnn_03.pdb",
+  "sidechain_ligand_geometry_role": "diagnostic only until ligand-aware holo stage",
+  "status_tsv": "/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_sample2_identity_bins_round02_esmfold_status.tsv",
+  "target_complete": false,
+  "target_per_bin": 10
+}
