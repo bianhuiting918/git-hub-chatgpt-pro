@@ -1,0 +1,18 @@
+﻿{
+  "bins": {
+    "50": {"elapsed_s": 5.01, "exit_code": 0, "pass_filter_count": 60, "records": 61, "redesigned_residues": 65, "target_mutations": 65},
+    "60": {"elapsed_s": 4.76, "exit_code": 0, "pass_filter_count": 50, "records": 51, "redesigned_residues": 52, "target_mutations": 52},
+    "70": {"elapsed_s": 4.49, "exit_code": 0, "pass_filter_count": 40, "records": 41, "redesigned_residues": 39, "target_mutations": 39},
+    "80": {"elapsed_s": 4.23, "exit_code": 0, "pass_filter_count": 30, "records": 31, "redesigned_residues": 26, "target_mutations": 26},
+    "90": {"elapsed_s": 4.50, "exit_code": 0, "pass_filter_count": 12, "records": 41, "redesigned_residues": 13, "target_mutations": 13}
+  },
+  "finished": "2026-06-30T15:58:54",
+  "fixed_positions": 12,
+  "mutable_positions": 100,
+  "reference_pdb": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/refs/6UBQ.pdb",
+  "selected_fasta": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_ligandmpnn_sequence_bins_selected.fasta",
+  "selected_total": 192,
+  "selected_tsv": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_ligandmpnn_sequence_bins_selected.tsv",
+  "sequence_length": 126,
+  "started": "2026-06-30T15:58:31"
+}

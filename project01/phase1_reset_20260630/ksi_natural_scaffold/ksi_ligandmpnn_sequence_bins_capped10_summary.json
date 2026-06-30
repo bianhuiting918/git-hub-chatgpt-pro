@@ -1,0 +1,14 @@
+﻿{
+  "bins": {
+    "50": {"available_pass": 60, "fixed_mutation_total": 0, "identity_max": 0.507937, "identity_min": 0.507937, "mutation_max": 62, "mutation_min": 62, "outside_redesignable_mutation_total": 0, "selected": 10},
+    "60": {"available_pass": 50, "fixed_mutation_total": 0, "identity_max": 0.611111, "identity_min": 0.611111, "mutation_max": 49, "mutation_min": 49, "outside_redesignable_mutation_total": 0, "selected": 10},
+    "70": {"available_pass": 40, "fixed_mutation_total": 0, "identity_max": 0.706349, "identity_min": 0.706349, "mutation_max": 37, "mutation_min": 37, "outside_redesignable_mutation_total": 0, "selected": 10},
+    "80": {"available_pass": 30, "fixed_mutation_total": 0, "identity_max": 0.809524, "identity_min": 0.809524, "mutation_max": 24, "mutation_min": 24, "outside_redesignable_mutation_total": 0, "selected": 10},
+    "90": {"available_pass": 12, "fixed_mutation_total": 0, "identity_max": 0.912698, "identity_min": 0.912698, "mutation_max": 11, "mutation_min": 11, "outside_redesignable_mutation_total": 0, "selected": 10}
+  },
+  "capped_fasta": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_ligandmpnn_sequence_bins_capped10.fasta",
+  "capped_tsv": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_ligandmpnn_sequence_bins_capped10.tsv",
+  "source": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_ligandmpnn_sequence_bins_selected.tsv",
+  "structure_prediction_queue": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_postseq_structure_prediction_queue_capped10.tsv",
+  "total_selected": 50
+}
