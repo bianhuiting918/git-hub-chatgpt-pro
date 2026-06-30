@@ -16,6 +16,11 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_system_setup_protocol.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/gs_pose_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_manifest.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/structure_download_manifest.csv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ser_his_asp_triad_candidates.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/pdb_preparation_log.md`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/download_stage1_rcsb_structures.ps1`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/identify_ser_his_asp_triads.py`
 
 ## Boundary
 
@@ -50,6 +55,10 @@ RCSB metadata was queried on 2026-06-30 for PETase structure candidates. The ini
 
 Mutant, non-PETase, and failed pre-query IDs were explicitly marked as excluded in `structure_selection.tsv`.
 
+The selected WT-like/backup RCSB coordinate files were downloaded locally. A coordinate-only Ser-His-Asp geometric scan found the same active-site triad geometry across the WT-like templates, with `6EQE`, `5XJH`, and `6ILW` using chain A `SER160-HIS237-ASP206`, and `5YFE` using a numbering-shifted chain A `SER134-HIS211-ASP180`.
+
+This triad assignment is structure-derived and is not a paper-derived mechanism result.
+
 ## Next action
 
-Continue Stage 1 by downloading the selected RCSB structures, preparing repaired/protonated models, building PET-like ligand fragments, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
+Continue Stage 1 by auditing missing atoms/residues, choosing alternate conformers and retained waters, assigning protonation states, building PET-like ligand fragments, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
