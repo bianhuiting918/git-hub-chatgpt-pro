@@ -53,6 +53,7 @@ Active Stage 4 input and topology-preparation generators:
 ```text
 scripts/generate_stage4_amber_qmmm_inputs.py
 scripts/prepare_stage4_amber_topology_inputs.py
+scripts/map_stage4_amber_qmmm_masks_to_topology.py
 ```
 
 The generator prepares blind Amber/Sander DFTB3 QM/MM inputs from accepted seed structures:
@@ -61,7 +62,9 @@ The generator prepares blind Amber/Sander DFTB3 QM/MM inputs from accepted seed 
 - 200 ps DFTB3/MM equilibration at 310 K before TS-search tooling consumes coordinates;
 - QM atom selection from catalytic side chains, nearby side chains, and the bound substrate atoms in our own seed structures;
 - status explicitly remains `inputs_ready_needs_amber_prmtop_inpcrd` until Amber topology and coordinate files are built or mapped;
-- topology preparation now writes ligand extraction, GAFF2/AM1-BCC `antechamber`, `parmchk2`, `tleap`, 15 A TIP3P solvation, and `complex.prmtop`/`complex.inpcrd` output checks.
+- topology preparation now writes ligand extraction, GAFF2/AM1-BCC `antechamber`, `parmchk2`, `tleap`, 15 A TIP3P solvation, and `complex.prmtop`/`complex.inpcrd` output checks;
+- QM/MM masks must be remapped after `tleap`, because Amber atom indices differ from the original seed PDB serials after hydrogen/water/ion addition.
 
 Methodological inspiration from the article is allowed here, but concrete article coordinates, trajectories, reaction-coordinate formulas, selected CVs, windows, barriers, rates, and mechanism conclusions remain blocked until final validation.
+
 
