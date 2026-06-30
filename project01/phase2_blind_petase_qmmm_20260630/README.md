@@ -37,6 +37,12 @@ projects/01-specialized-ts-aware-scorer/docs/petase_blind_qmmm_mechanism_plan.md
 
 ## Active Gate Artifacts
 
+Current execution status:
+
+```text
+blind_work/00_run_status/current_reproduction_status.md
+```
+
 Stage 1 has executable gates for environment readiness, ligand construction, protonation, pose generation, pose scoring, and pose acceptance:
 
 ```text
