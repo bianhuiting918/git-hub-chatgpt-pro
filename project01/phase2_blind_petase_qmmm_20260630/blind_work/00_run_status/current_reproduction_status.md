@@ -46,17 +46,19 @@ Only productive conformer representatives may feed Stage 4 low-cost QM/MM scans.
 
 ## QM/MM Engine Route
 
-Use the existing CPU-server GMX-CP2K route recorded in:
+Use the Amber/Sander route for the current PETase mechanism reproduction. The CPU-server environment has AmberTools with `sander`, `tleap`, `antechamber`, and `parmchk2` available in the PETase micromamba environment.
+
+Active Stage 4 input generator:
 
 ```text
-docs/scnet-gmx-cp2k.md
-程序使用指南/gmx-cp2k指南/PETase_QMMM_运行手册.md
+scripts/generate_stage4_amber_qmmm_inputs.py
 ```
 
-On `210.73.40.29`, GROMACS/CP2K is invoked through:
+The generator prepares blind Amber/Sander DFTB3 QM/MM inputs from accepted seed structures:
 
-```text
-/Dell/Dell14/bianht/gmx_cp2k_patched.sh
-```
+- QM/MM minimization with `ifqnt=1` and at least 2000 minimization steps;
+- 200 ps DFTB3/MM equilibration at 310 K before TS-search tooling consumes coordinates;
+- QM atom selection from catalytic side chains, nearby side chains, and the bound substrate atoms in our own seed structures;
+- status explicitly remains `inputs_ready_needs_amber_prmtop_inpcrd` until Amber topology and coordinate files are built or mapped.
 
-This wrapper is verified present on the CPU server. It launches the local GROMACS-CP2K environment inside the existing sandbox. The active PETase route should extract final comparison energies from GROMACS log `Potential Energy`, not CP2K `Total FORCE_EVAL`.
+Methodological inspiration from the article is allowed here, but concrete article coordinates, trajectories, reaction-coordinate formulas, selected CVs, windows, barriers, rates, and mechanism conclusions remain blocked until final validation.

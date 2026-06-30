@@ -24,8 +24,9 @@ The minimum usable Stage 1 environment needs:
 - RDKit or Open Babel for ligand 3D generation and atom-label preservation;
 - PROPKA, pdb2pqr, Amber reduce, H++, or equivalent for protonation/pKa handling;
 - AmberTools or equivalent for ligand/protein parameter preparation;
-- later, GMX-CP2K tooling for QM/MM execution.
+- later, Amber/Sander QM/MM tooling for DFTB3/MM execution.
 
 ## Grill Gate
 
 No docking, MD, or QM/MM input should be accepted until the environment probe output is committed or otherwise recorded with exact tool paths and versions.
+

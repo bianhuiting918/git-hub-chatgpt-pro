@@ -72,7 +72,7 @@ Proceed to ligand/protonation execution only if the probe finds at least:
 - one ligand builder: RDKit Python module or Open Babel `obabel`;
 - one protonation/pKa route: PROPKA, pdb2pqr, H++, Amber reduce, or equivalent;
 - one force-field preparation route: AmberTools or an equivalent stack;
-- later for QM/MM: GROMACS/CP2K or the lab's established GMX-CP2K stack.
+- later for QM/MM: Amber/Sander with DFTB3/MM, plus AmberTools topology preparation.
 
 If this gate fails, create an environment such as:
 
@@ -144,3 +144,4 @@ Required record:
 - validation that atom names survive topology conversion.
 
 Do not begin docking until this atom-label gate is satisfied.
+
