@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "route_label": "baker_theozyme_new_backbone",
+  "root": "/data/bht/project01_baker_serhyd_routeB_20260701",
+  "missing_or_empty_files": [],
+  "theozyme_atom_records": 1501,
+  "ligand_counts": {
+    "bn1": 36
+  },
+  "tasks_contig": "12,A56-60,36,A83-85,15,A113-115,73,B145-147,10",
+  "contig_reference_count": 14,
+  "missing_contig_refs": [],
+  "contig_residues": [
+    {"chain": "A", "resi": 56, "resn": "GLY"},
+    {"chain": "A", "resi": 57, "resn": "ALA"},
+    {"chain": "A", "resi": 58, "resn": "SER"},
+    {"chain": "A", "resi": 59, "resn": "ALA"},
+    {"chain": "A", "resi": 60, "resn": "ALA"},
+    {"chain": "A", "resi": 83, "resn": "ALA"},
+    {"chain": "A", "resi": 84, "resn": "HIS"},
+    {"chain": "A", "resi": 85, "resn": "ALA"},
+    {"chain": "A", "resi": 113, "resn": "ALA"},
+    {"chain": "A", "resi": 114, "resn": "ASP"},
+    {"chain": "A", "resi": 115, "resn": "ALA"},
+    {"chain": "B", "resi": 145, "resn": "ALA"},
+    {"chain": "B", "resi": 146, "resn": "ALA"},
+    {"chain": "B", "resi": 147, "resn": "ALA"}
+  ],
+  "constraint_checks": {
+    "has_ser_attack": true,
+    "has_oxyanion_hole": true,
+    "has_ser_his": true,
+    "has_his_asp": true,
+    "bn1_params_has_c1_o1_o2": true
+  },
+  "remote_preflight": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_input_preflight.json",
+  "evaluated_universe_note": "Input validation only; no new backbone candidate is evaluated until RFAA writes output PDBs."
+}

@@ -111,6 +111,26 @@ gpu_memory_used_mib = 4619
 
 This monitor does not count any candidate as evaluated until the launcher actually starts and RFAA writes output.
 
+Second monitor check:
+
+```text
+status_at_2026-07-01T00:45:59+08:00 = WAITING_GPU_BUSY
+attempt = 2
+gpu_util_percent = 100
+gpu_memory_used_mib = 4619
+rfaa_output_files = 0
+```
+
+Input preflight passed independently of GPU availability:
+
+```text
+remote_preflight = /data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_input_preflight.json
+status = PASS
+theozyme_atom_records = 1501
+ligand bn1 atom records = 36
+missing_contig_refs = 0
+```
+
 ## Launcher Check
 
 The launcher was pulled and syntax-checked on the GPU node from commit `087a779`.
