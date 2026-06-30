@@ -23,6 +23,8 @@ This log records structure-only preparation steps for the blind PETase QM/MM mec
 10. Checked the local ligand-build environment and confirmed RDKit/Open Babel/Biopython are not available in the bundled Python runtime.
 11. Scanned v2 cleaned structures for titratable residues near the catalytic triad and all histidines requiring tautomer assignment.
 12. Wrote the primary-template protonation hypothesis manifest for `6EQE`.
+13. Added a remote-safe compute environment probe script and remote execution instructions.
+14. Confirmed non-interactive SSH key login to the known compute server is not available; no password was written into commands or files.
 
 ## Triad Scan Result
 
@@ -67,6 +69,13 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - Stable atom-label files are required before topology conversion so the scissile ester atoms can be traced into QM/MM setup.
 - Ligand 3D conformer generation is blocked in the current local bundled Python because RDKit/Open Babel are unavailable; see `ligand_build_environment_report.md`.
 
+## Environment Enablement Result
+
+- Local bundled Python lacks RDKit/Open Babel/Biopython.
+- Non-interactive SSH to the known compute server failed with `Permission denied (publickey,password)`.
+- A remote-safe script now probes RDKit/Open Babel/PROPKA/pdb2pqr/AmberTools/GROMACS/CP2K without changing the environment.
+- Remote execution requires an interactive SSH login or key-based authentication, then running `probe_stage1_compute_environment.sh`.
+
 ## Current Decisions
 
 1. Primary production template remains `6EQE`, chain A.
@@ -76,6 +85,7 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 5. Alternate conformers in `6EQE` are resolved in the v2 initial-cleaned PDB by highest altloc-atom occupancy; this remains subject to active-site geometry inspection after ligand placement.
 6. Ligand construction must preserve the named scissile ester atom labels from `ligand_model_manifest.tsv`.
 7. Protonation production setup must run an external pKa/protonation tool and compare its output with `protonation_hypothesis_manifest.tsv` before topology generation.
+8. No docking, MD, or QM/MM input should be accepted until the compute environment probe output records exact tool paths and versions.
 
 ## Not Yet Done
 
@@ -101,4 +111,6 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `ligand_model_manifest.tsv`
 - `ligand_model_definitions.md`
 - `ligand_build_environment_report.md`
+- `stage1_environment_enablement_status.md`
+- `stage1_remote_execution_instructions.md`
 - `stage1_system_setup_protocol.md`
