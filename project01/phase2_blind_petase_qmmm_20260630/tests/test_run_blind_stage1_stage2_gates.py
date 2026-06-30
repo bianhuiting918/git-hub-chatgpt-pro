@@ -39,6 +39,10 @@ class RunBlindStage1Stage2GatesTest(unittest.TestCase):
             self.assertEqual(rows[0]["gate"], "ligand_smiles")
             self.assertEqual(rows[0]["status"], "blocked")
             self.assertEqual(rows[0]["required_before"], "ligand_build")
+            self.assertTrue(any(row["gate"] == "pose_generation_queue" for row in rows))
+            pose_rows = [row for row in rows if row["gate"] == "pose_generation_queue"]
+            self.assertEqual(pose_rows[0]["status"], "blocked")
+            self.assertIn("ready_ligand", pose_rows[0]["note"])
             self.assertEqual(rows[-1]["gate"], "stage2_md_queue")
             self.assertEqual(rows[-1]["status"], "blocked")
             self.assertIn("accepted_gs_pose", rows[-1]["note"])
