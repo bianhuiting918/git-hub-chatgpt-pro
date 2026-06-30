@@ -1,0 +1,2 @@
+ensemble_candidate_id	ts_guess_id	path_id	reaction_stage	source_pose_id	refined_structure_path	cluster_id	ensemble_status	diversity_notes	next_step
+pending	pending	pending	deacylation	pending	pending	pending	not_generated	no_endpoint_checked_stage4_guess_available	generate_stage4_ts_like_guess
