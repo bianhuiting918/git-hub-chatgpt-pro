@@ -131,3 +131,38 @@ Both designed sequences retained the fixed motif positions after RFAA renumberin
 3. Run a Route B postseq gate adapted to generated backbones: motif-local catalytic geometry first, not whole-reference RMSD.
 4. If both sequences fail structure prediction or motif-local geometry, regenerate a larger but still small RFAA/LigandMPNN batch.
 5. Do not start PLACER or QMMM from these smoke outputs yet.
+
+## Gate Policy Correction - Pocket-Only Hard Gate
+
+For Route B de novo/new-backbone work, global CA RMSD to the RFAA generated backbone is no longer a hard acceptance gate. It remains a diagnostic field showing whether the designed sequence supports the generated fold.
+
+Hard acceptance should focus on active-site motif/pocket geometry:
+
+```text
+routeB_pocket_only_gate = PASS only if
+  motif_ca_rmsd_A <= 1.0
+  motif_heavy_rmsd_A <= 1.0
+  max_key_distance_delta_A <= 1.0
+```
+
+Global CA RMSD is recorded as:
+
+```text
+global_ca_rmsd_role = DIAGNOSTIC_NOT_HARD_GATE
+```
+
+Updated remote summaries:
+
+```text
+/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_lmpnn_postseq_gate_pocket_only_summary.json
+/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_batch20_postseq_gate_pocket_only_summary.json
+```
+
+Current pocket-only result:
+
+```text
+initial n2 LigandMPNN smoke: 0 PASS / 2 evaluated
+batch20 LigandMPNN expansion: 0 PASS / 20 evaluated
+```
+
+Interpretation: the first RFAA backbone and its current LigandMPNN sequences do not yet preserve the active-site motif after ESMFold prediction. The next regeneration step should sample additional RFAA backbones and screen by pocket-only gate, rather than rejecting based on global fold RMSD.
