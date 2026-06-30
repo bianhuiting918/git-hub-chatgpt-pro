@@ -53,7 +53,7 @@ scripts/run_stage1_protonation_gate.sh
 scripts/score_stage1_pose_geometry.py
 ```
 
-Stage 3/4 now has blind mechanism and low-cost QM/MM exploration scaffolds:
+Stage 3/4 has blind mechanism and low-cost QM/MM exploration scaffolds:
 
 ```text
 blind_work/03_mechanism_tree/mechanism_hypotheses.yaml
@@ -65,7 +65,19 @@ scripts/generate_stage3_mechanism_tree.py
 tests/test_generate_stage3_mechanism_tree.py
 ```
 
-Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate Stage 4 TS-like guesses from paper coordinates or paper trajectories.
+Stage 5/6/7 now has TS refinement, TS ensemble, and committor-queue scaffolds:
+
+```text
+blind_work/05_ts_refinement/ts_refinement_manifest.tsv
+blind_work/05_ts_refinement/stage5_stage6_ts_refinement_protocol.md
+blind_work/06_ts_ensemble/acylation_ts_ensemble.tsv
+blind_work/06_ts_ensemble/deacylation_ts_ensemble.tsv
+blind_work/07_committor/committor_queue.tsv
+scripts/generate_stage5_ts_manifests.py
+tests/test_generate_stage5_ts_manifests.py
+```
+
+Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate TS-like guesses, refined TS candidates, ensembles, or committor jobs from paper coordinates or paper trajectories.
 
 ## Execution Stages
 
@@ -147,6 +159,7 @@ Deliverables:
 
 ```text
 blind_work/05_ts_refinement/ts_refinement_manifest.tsv
+blind_work/05_ts_refinement/stage5_stage6_ts_refinement_protocol.md
 blind_work/05_ts_refinement/acylation_ts_candidates/
 blind_work/05_ts_refinement/deacylation_ts_candidates/
 ```
@@ -155,7 +168,8 @@ Tasks:
 
 1. Refine TS guesses with QM/MM TS optimization or constrained saddle refinement.
 2. Expand QM region for top candidates.
-3. Reject chemically wrong or unstable candidates.
+3. Record imaginary-mode/saddle evidence and endpoint chemistry checks.
+4. Reject chemically wrong or unstable candidates.
 
 ### Stage 6 - TS ensemble construction
 
@@ -178,6 +192,7 @@ Tasks:
 Deliverables:
 
 ```text
+blind_work/07_committor/committor_queue.tsv
 blind_work/07_committor/committor_summary.tsv
 blind_work/07_committor/accepted_ts_manifest.tsv
 blind_work/07_committor/rejected_ts_manifest.tsv
@@ -185,9 +200,10 @@ blind_work/07_committor/rejected_ts_manifest.tsv
 
 Tasks:
 
-1. Run short forward/backward trajectories from TS candidates.
-2. Estimate committors for representative TS clusters.
-3. Verify product/reactant endpoint chemistry.
+1. Queue only refined TS ensemble candidates for committor testing.
+2. Run short forward/backward trajectories from TS candidates.
+3. Estimate committors for representative TS clusters.
+4. Verify product/reactant endpoint chemistry.
 
 ### Stage 8 - Free-energy barriers
 
