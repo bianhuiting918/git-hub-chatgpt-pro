@@ -91,3 +91,22 @@ large_outputs_to_github = false
 ```
 
 Do not upload PDBs, trajectories, model weights, raw PLACER folders, or large logs. Sync only lightweight status markdown, manifests, and scripts.
+
+## 2026-06-30 Serine-Hydrolase Smoke Update
+
+A minimal GPU Route B smoke has now run for serine hydrolase:
+
+```text
+RFAA raw new backbone outputs: 1
+LigandMPNN designed sequences: 2
+Postseq ESMFold/gate evaluated: 0
+```
+
+See:
+
+```text
+project01/phase1_reset_20260630/routeB_denovo_scaffold/serhyd_routeB_smoke_status_20260630.md
+project01/phase1_reset_20260630/routeB_denovo_scaffold/serhyd_routeB_smoke_public_manifest.tsv
+```
+
+This changes serine-hydrolase Route B from `NOT_STARTED` to `SMOKE_RFAA_LIGANDMPNN_COMPLETE__POSTSEQ_GATE_NOT_EVALUATED`. It is still not a completed Route B panel.
