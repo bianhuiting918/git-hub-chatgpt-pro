@@ -78,6 +78,26 @@ Default behavior: if GPU utilization is above `MAX_GPU_UTIL=40`, the script writ
 
 This remains a compute-resource block, not a biological or design failure.
 
+## Waiting Launcher
+
+The checked-in waiting launcher can be used for long GPU waits:
+
+```bash
+nohup bash project01/phase1_20260701/scripts/wait_and_launch_baker_theozyme_smoke.sh \
+  /data/bht/project01_baker_serhyd_routeB_20260701 \
+  > /data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_smoke_monitor.nohup.log 2>&1 &
+```
+
+Defaults:
+
+```text
+MAX_GPU_UTIL=40
+INTERVAL_SECONDS=300
+MAX_WAIT_MINUTES=360
+```
+
+It writes only lightweight status/log files and invokes `launch_baker_theozyme_smoke.sh` once GPU utilization drops below the threshold.
+
 ## Launcher Check
 
 The launcher was pulled and syntax-checked on the GPU node from commit `087a779`.
