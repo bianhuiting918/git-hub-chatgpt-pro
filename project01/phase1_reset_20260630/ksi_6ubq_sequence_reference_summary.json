@@ -1,0 +1,13 @@
+{
+  "dbref_lines": [
+    "DBREF  6UBQ A    1   131  UNP    P07445   SDIS_PSEPU       1    131",
+    "DBREF  6UBQ B    1   131  UNP    P07445   SDIS_PSEPU       1    131"
+  ],
+  "fasta": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_6ubq_chains.fasta",
+  "seqres_lengths": {
+    "A": 131,
+    "B": 131
+  },
+  "uniprot_accession": "P07445",
+  "uniprot_entry": "SDIS_PSEPU"
+}

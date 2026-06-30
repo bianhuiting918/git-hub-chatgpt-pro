@@ -58,7 +58,15 @@ Result:
 Protein chains: A and B.
 Ligand: ASD, 47 HETATM per chain.
 Initial fixed residues Tyr16/Asp40/Asp103 found in both chains.
+DBREF: UniProt P07445 / SDIS_PSEPU, residues 1-131 for both chains.
 MSA tools checked on GPU host: mmseqs/jackhmmer/mafft/hmmer/blastp are not currently on PATH.
+```
+
+Next executable action:
+
+```text
+Prepare an MSA toolchain or use an external homolog-retrieval route for UniProt P07445.
+Then generate natural_scaffold_msa_summary.tsv and fixed/mutable position masks before any KSI sequence generation.
 ```
 
 Required next files:
