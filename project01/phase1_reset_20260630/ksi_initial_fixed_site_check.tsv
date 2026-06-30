@@ -1,0 +1,7 @@
+chain	resseq	expected	observed	atom_count	nearest_ASD_distance_A	nearest_atom_pair	status
+A	16	TYR	TYR	21	1.846	HH:O1	FOUND
+A	40	ASP	ASP	12	2.25	OD1:H62	FOUND
+A	103	ASP	ASP	12	2.696	OD2:O1	FOUND
+B	16	TYR	TYR	22	1.88	HH:O1	FOUND
+B	40	ASP	ASP	12	2.211	OD1:H62	FOUND
+B	103	ASP	ASP	12	2.607	OD2:O1	FOUND

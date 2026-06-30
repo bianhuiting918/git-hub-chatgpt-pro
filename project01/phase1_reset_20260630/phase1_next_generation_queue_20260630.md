@@ -44,6 +44,23 @@ ligand/direct-contact residues
 MSA conserved structural core
 ```
 
+Remote reference check:
+
+```text
+/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/refs/6UBQ.pdb
+/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_6ubq_reference_check_summary.json
+```
+
+Result:
+
+```text
+6UBQ downloaded.
+Protein chains: A and B.
+Ligand: ASD, 47 HETATM per chain.
+Initial fixed residues Tyr16/Asp40/Asp103 found in both chains.
+MSA tools checked on GPU host: mmseqs/jackhmmer/mafft/hmmer/blastp are not currently on PATH.
+```
+
 Required next files:
 
 ```text

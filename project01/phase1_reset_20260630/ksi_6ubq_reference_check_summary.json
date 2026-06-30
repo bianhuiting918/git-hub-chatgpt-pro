@@ -1,0 +1,88 @@
+{
+  "asD_ligand_atom_count_by_chain": {
+    "A": 47,
+    "B": 47
+  },
+  "initial_fixed_site_checks": [
+    {
+      "atom_count": 21,
+      "chain": "A",
+      "expected": "TYR",
+      "nearest_ASD_distance_A": 1.846,
+      "nearest_atom_pair": "HH:O1",
+      "observed": "TYR",
+      "resseq": "16",
+      "status": "FOUND"
+    },
+    {
+      "atom_count": 12,
+      "chain": "A",
+      "expected": "ASP",
+      "nearest_ASD_distance_A": 2.25,
+      "nearest_atom_pair": "OD1:H62",
+      "observed": "ASP",
+      "resseq": "40",
+      "status": "FOUND"
+    },
+    {
+      "atom_count": 12,
+      "chain": "A",
+      "expected": "ASP",
+      "nearest_ASD_distance_A": 2.696,
+      "nearest_atom_pair": "OD2:O1",
+      "observed": "ASP",
+      "resseq": "103",
+      "status": "FOUND"
+    },
+    {
+      "atom_count": 22,
+      "chain": "B",
+      "expected": "TYR",
+      "nearest_ASD_distance_A": 1.88,
+      "nearest_atom_pair": "HH:O1",
+      "observed": "TYR",
+      "resseq": "16",
+      "status": "FOUND"
+    },
+    {
+      "atom_count": 12,
+      "chain": "B",
+      "expected": "ASP",
+      "nearest_ASD_distance_A": 2.211,
+      "nearest_atom_pair": "OD1:H62",
+      "observed": "ASP",
+      "resseq": "40",
+      "status": "FOUND"
+    },
+    {
+      "atom_count": 12,
+      "chain": "B",
+      "expected": "ASP",
+      "nearest_ASD_distance_A": 2.607,
+      "nearest_atom_pair": "OD2:O1",
+      "observed": "ASP",
+      "resseq": "103",
+      "status": "FOUND"
+    }
+  ],
+  "notes": [
+    "6UBQ has two protein chains A/B with ASD ligand in each chain.",
+    "MSA and conserved-site mask are not started until homolog retrieval/alignment toolchain is selected.",
+    "Remote check used /usr/bin/wget because snap curl failed on write."
+  ],
+  "pdb_id": "6UBQ",
+  "protein_atom_counts_by_chain": {
+    "A": 2158,
+    "B": 2243
+  },
+  "reference_pdb": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/refs/6UBQ.pdb",
+  "remote_status": "REFERENCE_DOWNLOADED_FIXED_SITES_CHECKED_MSA_NOT_STARTED",
+  "tool_availability": {
+    "blastp": null,
+    "hmmscan": null,
+    "hmmsearch": null,
+    "jackhmmer": null,
+    "mafft": null,
+    "mmseqs": null
+  }
+}

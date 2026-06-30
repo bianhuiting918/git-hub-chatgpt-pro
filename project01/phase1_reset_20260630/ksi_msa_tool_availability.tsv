@@ -1,0 +1,7 @@
+tool	path	status
+mmseqs		NOT_FOUND
+jackhmmer		NOT_FOUND
+mafft		NOT_FOUND
+hmmscan		NOT_FOUND
+hmmsearch		NOT_FOUND
+blastp		NOT_FOUND
