@@ -1,8 +1,8 @@
-# Project 01 Phase1 Sequence Panel Complete - 2026-06-30
+# Project 01 Phase1 Existing/Reference-Scaffold Sequence Panel Complete - 2026-06-30
 
 ## Result
 
-The current sequence-generation stage is complete.
+The current existing/reference-scaffold sequence-generation stage is complete. This does not mean the true active-site constrained de novo/new-backbone Route B is complete.
 
 Completion rule:
 
@@ -88,3 +88,4 @@ Remote lightweight evidence:
 ```
 
 Do not upload predicted PDBs, PLACER outputs, trajectories, model weights, or large logs.
+

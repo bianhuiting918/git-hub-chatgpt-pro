@@ -7,7 +7,7 @@ Proceed with two separated generation tracks:
 1. Natural-scaffold conserved-site redesign.
 2. Baker-style active-site constrained de novo scaffold generation.
 
-The current serine-hydrolase sequence panel for the local `denovo_SER_hydrolase` reference is complete at 10 accepted sequences per 90/80/70/60/50 bin. Do not keep mutating that same de novo reference as the main route for new biological diversity.
+Route-state correction on 2026-06-30: the completed serine-hydrolase panel is an existing/reference-scaffold sequence panel, not proof that new backbones have been generated. KSI natural-scaffold sequence generation is complete for the current stage. True active-site constrained de novo backbone generation remains not started for serine hydrolase and deferred for KSI until the TS-like motif is defined.
 
 Updated generation rule:
 
@@ -25,89 +25,62 @@ de_novo_scaffold_track:
 
 These tracks must remain separately labeled in manifests because their similarity bins have different meanings.
 
+## Current Route Status
+
+| Enzyme system | Track | Current status | Evidence | Next action |
+| --- | --- | --- | --- | --- |
+| serine hydrolase | existing/reference scaffold sequence panel | COMPLETE | `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_capped10.tsv` | freeze as Route A panel |
+| serine hydrolase | true active-site constrained de novo/new-backbone | NOT_STARTED | no generated-backbone manifest yet | extract motif constraints and run RFdiffusion/RFdiffusionAA smoke when remote access is restored |
+| serine hydrolase | natural scaffold | NOT_STARTED | no selected natural family/scaffold yet | select natural hydrolase family, build MSA/fixed mask |
+| KSI | natural scaffold | SEQUENCE_PANEL_COMPLETE | `/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_final_postseq_entrance_pass_sequence_panel_capped10.tsv` | freeze capped10 current-stage panel |
+| KSI | de novo/motif scaffold | DEFERRED_TS_GEOMETRY_NOT_DEFINED | no KSI TS-like steroid/enolate motif definition yet | define ligand/protonation/motif geometry first |
+
 ## Immediate Queue
 
-### 1. KSI Natural-Scaffold Track
+### 1. Serine-Hydrolase True De Novo/New-Backbone Track
 
 Status: `NOT_STARTED`.
 
-Reason to start first:
+This is now the first missing route to start. The existing capped10 serine-hydrolase sequence panel should not be counted as de novo backbone completion.
 
-- KSI is the mechanistic control system.
-- It has a compact active-site electrostatic/oxyanion-hole question.
-- The natural-scaffold workflow directly matches the user's requested MSA -> conserved-site fixed mask -> new sequence generation logic.
-
-Initial candidate reference:
+Input motif/reference starting point:
 
 ```text
-RCSB 6UBQ: pKSI bound to 4-androstenedione
+/data/bht/project01_phase1_reset_gpu/manifests/denovo_SER_hydrolase_full_input.pdb
 ```
 
-Reference sources:
+First executable actions on the GPU host:
 
 ```text
-https://www.rcsb.org/structure/6UBQ
-https://www.ebi.ac.uk/thornton-srv/m-csa/entry/349/
+1. Confirm the reference PDB exists and identify catalytic/motif residues plus ligand/reactive atoms.
+2. Check available motif-scaffolding tools: RFdiffusion, RFdiffusionAA, or existing project scripts.
+3. Generate a small smoke batch of new backbones around the fixed active-site/reactive motif.
+4. Sequence generated backbones with ProteinMPNN/LigandMPNN.
+5. Predict/validate full protein structures.
+6. Apply the same postseq entrance gate before expanding to 90/80/70/60/50-style panels.
 ```
 
-Initial fixed-site hypothesis:
+Do not use PLACER or QMMM as acceptance gates for this current sequence/backbone stage.
+
+### 2. KSI Natural-Scaffold Track
+
+Status: `SEQUENCE_PANEL_COMPLETE` for the current stage.
+
+Accepted distinct PASS counts from the final postseq entrance gate:
+
+| Bin | Accepted distinct PASS | Target |
+| --- | ---: | ---: |
+| 90 | 13 | 10 |
+| 80 | 22 | 10 |
+| 70 | 137 | 10 |
+| 60 | 94 | 10 |
+| 50 | 95 | 10 |
+
+Final capped panel:
 
 ```text
-Tyr16
-Asp40
-Asp103
-ligand/direct-contact residues
-MSA conserved structural core
+/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_final_postseq_entrance_pass_sequence_panel_capped10.tsv
 ```
-
-Remote reference check:
-
-```text
-/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/refs/6UBQ.pdb
-/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_6ubq_reference_check_summary.json
-```
-
-Result:
-
-```text
-6UBQ downloaded.
-Protein chains: A and B.
-Ligand: ASD, 47 HETATM per chain.
-Initial fixed residues Tyr16/Asp40/Asp103 found in both chains.
-DBREF: UniProt P07445 / SDIS_PSEPU, residues 1-131 for both chains.
-MSA tools checked on GPU host: mmseqs/jackhmmer/mafft/hmmer/blastp are not currently on PATH.
-```
-
-Next executable action:
-
-```text
-Prepare an MSA toolchain or use an external homolog-retrieval route for UniProt P07445.
-Generate natural_scaffold_msa_summary.tsv and fixed/mutable position masks before any KSI sequence generation.
-Only after that, generate 90/80/70/60/50 KSI bins while keeping fixed positions unchanged.
-```
-
-Required next files:
-
-```text
-natural_scaffold_msa_summary.tsv
-natural_scaffold_fixed_positions.tsv
-natural_scaffold_mutable_positions.tsv
-natural_scaffold_generation_manifest.tsv
-```
-
-Do not label missing homologs, failed downloads, or unmapped residues as `FAIL`; report them as `NOT_EVALUATED`.
-
-### 2. Serine-Hydrolase De Novo Track
-
-Status: `SEQUENCE_PANEL_COMPLETE` for current local reference.
-
-Use existing capped panel:
-
-```text
-/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_capped10.tsv
-```
-
-Next de novo expansion should not be random mutation of this one reference. It should use active-site constrained backbone generation around the catalytic/reactive motif, then sequence and postseq-gate the generated backbones.
 
 ### 3. Natural Serine-Hydrolase Track
 
@@ -121,6 +94,8 @@ For sequence generation:
 
 ```text
 accepted_sequence = postseq_entrance_gate == PASS
+PLACER_required_for_sequence_acceptance = false
+QMMM_current_stage = false
 ```
 
 PLACER and QMMM are downstream analyses and are not sequence-stage acceptance gates.
@@ -129,9 +104,11 @@ PLACER and QMMM are downstream analyses and are not sequence-stage acceptance ga
 
 Before accepting any generated sequence panel:
 
-1. Which positions were fixed by catalytic chemistry?
-2. Which positions were fixed by ligand or TS contact?
-3. Which positions were fixed by MSA conservation?
-4. Which positions were actually mutable?
-5. Is the identity bin measured against a natural scaffold, a family reference, or a de novo design reference?
-6. Does the predicted structure pass the postseq entrance gate?
+1. What is the evaluated universe and denominator?
+2. Which positions were fixed by catalytic chemistry?
+3. Which positions were fixed by ligand or TS contact?
+4. Which positions were fixed by MSA conservation or backbone generation constraints?
+5. Which positions were actually mutable?
+6. Is the identity bin measured against a natural scaffold, a family reference, a generated scaffold family, or a design reference?
+7. Does the predicted structure pass the postseq entrance gate?
+8. Which candidates are NOT_EVALUATED rather than FAIL?

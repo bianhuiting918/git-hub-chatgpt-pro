@@ -2,7 +2,7 @@
 
 ## Decision
 
-Project 01 Phase1 now uses two explicitly separated sequence/backbone-generation tracks.
+Project 01 Phase1 now uses two explicitly separated sequence/backbone-generation tracks. Route-state correction on 2026-06-30: completed existing/reference-scaffold sequence panels must not be counted as true de novo/new-backbone completion.
 
 1. Natural-scaffold track: start from known enzyme family scaffolds. Use sequence alignment to identify conserved catalytic, pocket, and structurally conserved residues; keep these fixed or strongly constrained; generate different-similarity sequences only over tolerated background positions.
 2. De novo scaffold track: follow the Baker-style serine-hydrolase logic. Fix the active-site/reactive geometry first, then generate new backbones that support that motif. Sequence identity bins in this track should compare generated sequences within a scaffold family or against the chosen design reference, but should not be interpreted as mutations on one fixed natural backbone.
@@ -81,7 +81,7 @@ Detailed natural-scaffold execution protocol:
 project01/phase1_reset_20260630/natural_scaffold_msa_generation_protocol_20260630.md
 ```
 
-Current capped sequence panel is complete for the first serine-hydrolase test system, but new enzyme systems or new natural scaffold families must start from the MSA-constrained fixed-site mask instead of random low-identity mutation.
+The current capped sequence panel is complete for the first serine-hydrolase existing/reference-scaffold test system. It is not a true de novo/new-backbone result. New enzyme systems or new natural scaffold families must start from the MSA-constrained fixed-site mask instead of random low-identity mutation.
 
 ## De Novo Scaffold Track
 
@@ -98,7 +98,7 @@ Required steps:
 5. Run the same postseq entrance gate for the protein pocket.
 6. Keep de novo candidates in a separate manifest from natural-scaffold candidates until downstream comparison is explicitly defined.
 
-This track is the correct way to obtain low sequence similarity while still preserving a designed active center.
+This track is the correct way to obtain low sequence similarity while still preserving a designed active center. As of this update, the serine-hydrolase true new-backbone Route B has not yet started; the next step is motif extraction and a small RFdiffusion/RFdiffusionAA-style smoke batch.
 
 Identity-bin definition for this track:
 
@@ -142,3 +142,4 @@ postseq_structure_gate/tables/round02d_esmfold_prediction_summary.json
 ```
 
 Do not upload predicted PDBs, raw PLACER outputs, trajectories, or large logs.
+

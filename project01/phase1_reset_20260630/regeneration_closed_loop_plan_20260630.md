@@ -129,8 +129,7 @@ MUTABLE = nonconserved background residues, expanded cautiously after gate evide
 This track should now be used for new natural-scaffold work, not to fill the completed denovo_SER_hydrolase panel. If a natural scaffold is selected, first build the MSA/conservation map and then generate a separate manifest.
 
 ```text
-current denovo_SER_hydrolase panel: COMPLETE
-new natural-scaffold panel: NOT_STARTED
+current serine-hydrolase existing/reference-scaffold sequence panel: COMPLETE`r`ntrue active-site constrained de novo/new-backbone panel: NOT_STARTED`r`nnew natural-scaffold panel: NOT_STARTED
 ```
 
 The current seed/queue files are:
@@ -143,7 +142,7 @@ project01/phase1_reset_20260630/natural_scaffold_msa_generation_protocol_2026063
 
 ### Track B: active-site constrained de novo scaffold generation
 
-For Baker-style serine-hydrolase diversity, fixed active-site/reactive geometry comes before backbone generation. Generate new backbones around the motif, then design sequences for those backbones. Keep these candidates in a separate manifest until the downstream comparison between natural and de novo backgrounds is explicitly defined.
+For Baker-style serine-hydrolase diversity, fixed active-site/reactive geometry comes before backbone generation. This true new-backbone Route B is not yet complete; the completed capped10 panel only covers the existing/reference-scaffold sequence route. Generate new backbones around the motif, then design sequences for those backbones. Keep these candidates in a separate manifest until the downstream comparison between natural and de novo backgrounds is explicitly defined.
 
 **Files:**
 
@@ -382,3 +381,4 @@ NOT_EVALUATED count
 thresholds used
 next upstream action if target pass count is not met
 ```
+
