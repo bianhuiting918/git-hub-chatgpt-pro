@@ -1,0 +1,38 @@
+﻿{
+  "updated": "2026-06-30T18:46:00",
+  "current_stage_complete": true,
+  "accepted_distinct_by_bin": {
+    "90": 13,
+    "80": 22,
+    "70": 137,
+    "60": 94,
+    "50": 95
+  },
+  "needed_to_10_by_bin": {
+    "90": 0,
+    "80": 0,
+    "70": 0,
+    "60": 0,
+    "50": 0
+  },
+  "capped10_by_bin": {
+    "90": 10,
+    "80": 10,
+    "70": 10,
+    "60": 10,
+    "50": 10
+  },
+  "capped10_total": 50,
+  "pass_rows_total": 361,
+  "unique_pass_rows_total": 361,
+  "remote_all_pass_tsv": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_final_postseq_entrance_pass_sequence_panel.tsv",
+  "remote_capped10_tsv": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/manifests/ksi_final_postseq_entrance_pass_sequence_panel_capped10.tsv",
+  "remote_summary_json": "/data/bht/project01_phase1_reset_gpu/natural_scaffold/KSI/postseq_structure_gate/tables/ksi_final_postseq_entrance_pass_sequence_panel_summary.json",
+  "selection_rule": "PASS rows only; de-duplicate by exact sequence within bin; rank by max_abs_protein_key_distance_delta_A, catalytic_heavy_rmsd_A, fixed_backbone_rmsd_A, global_backbone_rmsd_A",
+  "gate_thresholds": {
+    "global_backbone_rmsd_max_A": 2.5,
+    "fixed_backbone_rmsd_max_A": 1.0,
+    "catalytic_heavy_rmsd_max_A": 0.75,
+    "protein_key_distance_abs_delta_max_A": 0.75
+  }
+}
