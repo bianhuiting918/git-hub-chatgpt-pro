@@ -35,6 +35,24 @@ Primary plan document:
 projects/01-specialized-ts-aware-scorer/docs/petase_blind_qmmm_mechanism_plan.md
 ```
 
+## Stage 1 Gates
+
+Stage 1 now has executable gates for environment readiness, ligand construction, protonation, and pose acceptance:
+
+```text
+blind_work/01_system_setup/stage1_remote_execution_instructions.md
+blind_work/01_system_setup/stage1_ligand_and_protonation_execution_protocol.md
+blind_work/01_system_setup/ligand_smiles.tsv
+blind_work/01_system_setup/ligand_model_manifest.tsv
+blind_work/01_system_setup/gs_pose_manifest.tsv
+blind_work/01_system_setup/rejected_pose_manifest.tsv
+scripts/probe_stage1_compute_environment.sh
+scripts/build_stage1_ligands_rdkit.py
+scripts/run_stage1_protonation_gate.sh
+```
+
+Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, and protonation gate are recorded with exact tool versions and input/output hashes.
+
 ## Execution Stages
 
 ### Stage 1 - Structure-only setup
@@ -44,6 +62,9 @@ Deliverables:
 ```text
 blind_work/01_system_setup/structure_selection.tsv
 blind_work/01_system_setup/gs_pose_manifest.tsv
+blind_work/01_system_setup/rejected_pose_manifest.tsv
+blind_work/01_system_setup/ligand_smiles.tsv
+blind_work/01_system_setup/stage1_ligand_and_protonation_execution_protocol.md
 ```
 
 Tasks:
@@ -188,7 +209,7 @@ Tasks:
 Recommended first action:
 
 ```text
-Build WT PETase + PET dimer/BHET-like ester GS candidates, then run classical equilibration and active-site geometry filtering.
+Run the environment probe on the compute server, build RDKit ligand conformers/atom labels, run the protonation gate for 6EQE, then generate WT PETase + PET dimer/BHET-like ester GS candidates.
 ```
 
 Do not start mutant ranking until WT acylation/deacylation TS ensembles are chemically validated.
