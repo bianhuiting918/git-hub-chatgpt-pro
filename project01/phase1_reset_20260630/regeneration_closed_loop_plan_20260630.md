@@ -13,10 +13,10 @@
 - Do not upload PDB ensembles, model weights, trajectories, large logs, or QMMM raw outputs to GitHub.
 - Missing files, failed downloads, or not-yet-generated batches are `NOT_EVALUATED`, not `FAIL`.
 - A sequence enters PLACER only after post-sequence entrance gate `PASS`.
-- A PLACER conformer enters full-ligand completion only after crop ligand/key-distance gate `PASS`.
+- A PLACER conformer enters full-ligand completion only after `PLACER_CROP_STRICT_PASS`.
 - A completed structure enters QMMM manifest only after strict all-atom ligand RMSD and reaction geometry gates pass.
 - 50/60/70 bins must be regenerated if they do not reach the target pass count.
-- A sequence is not accepted unless at least 10 of its 50 PLACER conformers pass the PLACER crop/RMSD gate.
+- A sequence is not accepted unless at least 10 of its 50 PLACER conformers pass the PLACER crop strict gate.
 - If a sequence fails the per-sequence PLACER threshold, discard that sequence for final accounting and generate a replacement sequence from the upstream sequence/backbone generation stage.
 
 ## Current Audited State
@@ -82,6 +82,8 @@ PLACER_CROP_STRICT_PASS =
 
 where `inherited_postseq_protein_gate` uses the same global backbone, fixed-pocket backbone, catalytic heavy-atom, and protein key-distance thresholds as the postseq entrance gate.
 
+Do not use a ligand-only PLACER screen as an acceptance rule. The PLACER conformer must still satisfy the same protein/pocket preservation standards that allowed the sequence to enter PLACER; ligand RMSD and Ser128-OG-to-bu2-C1 geometry are additional checks on top of that inherited gate.
+
 If a bin misses any target, return to the nearest upstream generation stage:
 
 - Entrance gate shortage: regenerate sequences/backbones for that bin.
@@ -94,7 +96,7 @@ Per-sequence acceptance rule:
 ACCEPT_SEQUENCE_FOR_QMMM_POOL =
   postseq_entrance_gate == PASS
   and PLACER_conformers_generated == 50
-  and PLACER_crop_RMSD_gate_PASS_count >= 10
+  and PLACER_crop_strict_gate_PASS_count >= 10
   and full_ligand_strict_QMMM_ready_count >= 1
 ```
 

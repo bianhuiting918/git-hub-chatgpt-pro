@@ -43,7 +43,7 @@
   },
   "regeneration_policy": {
     "postseq_entrance_pass_target_per_bin": 10,
-    "minimum_crop_ligand_gate_pass_per_bin": 10,
+    "minimum_crop_strict_gate_pass_conformers_per_accepted_sequence": 10,
     "minimum_qmmm_ready_strict_pass_per_bin": 3,
     "shortage_bins_must_regenerate": ["90", "80", "70", "60", "50"],
     "priority_bins": ["70", "60", "50"],

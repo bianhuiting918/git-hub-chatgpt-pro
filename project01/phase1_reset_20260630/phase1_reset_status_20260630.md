@@ -8,7 +8,7 @@ The active control rule is now a closed loop:
 
 ```text
 generate sequences/backbones -> predict full protein structure -> postseq entrance gate
--> PLACER n=50 only for entrance-pass samples -> crop ligand RMSD/reaction gate
+-> PLACER n=50 only for entrance-pass samples -> crop strict gate
 -> full-ligand completion only for accepted sequences -> strict QMMM manifest
 -> if any bin lacks 10 accepted sequences, return to the nearest upstream stage
 ```
@@ -20,7 +20,7 @@ Each similarity bin must have 10 distinct accepted sequences.
 Each accepted sequence must have:
   postseq_entrance_gate == PASS
   PLACER_conformers_generated == 50
-  PLACER_crop_RMSD_gate_PASS_count >= 10
+  PLACER_crop_strict_gate_PASS_count >= 10
   full_ligand_strict_QMMM_ready_count >= 1
 ```
 
@@ -86,6 +86,7 @@ Threshold provenance:
 - `ligand_heavy_rmsd_max_A = 0.75` is our current `PROJECT_STRICT_GATE` for PLACER crop/full-ligand ligand-pose preservation. It is inspired by the sub-angstrom active-site agreement in the Baker work, but it is not currently confirmed as a direct Baker hard cutoff.
 - Do not describe the 0.75 A ligand RMSD gate as `BAKER_LITERATURE_GATE` unless the exact threshold is later verified from the paper's methods or released filtering code.
 - PLACER screening must stay consistent with the pre-PLACER gate. A PLACER conformer first inherits the same protein/pocket gate used at postseq entrance: global backbone RMSD, fixed-pocket backbone RMSD, catalytic heavy-atom RMSD, and protein key-distance deltas. Ligand/reaction-pose checks are additional PLACER-specific gates, not a replacement for the previous step.
+- A ligand-only PLACER result is not enough for acceptance. If the inherited postseq protein/pocket gate fails after PLACER, the conformer is not strict-pass even when ligand RMSD looks acceptable.
 
 PLACER conformer gate:
 

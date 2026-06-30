@@ -8,7 +8,9 @@
   },
   "gate_definition": {
     "crop_strict_pass": "inherited_postseq_protein_gate == PASS and ligand_reaction_pose_gate == PASS",
-    "sequence_acceptance": "crop_strict_pass_conformers >= 10 out of 50"
+    "sequence_acceptance": "crop_strict_pass_conformers >= 10 out of 50",
+    "inherited_postseq_protein_gate": "same global backbone, fixed-pocket backbone, catalytic heavy-atom, and protein key-distance thresholds as the postseq entrance gate",
+    "ligand_reaction_pose_gate": "PLACER-specific add-on ligand RMSD and Ser128-OG-to-bu2-C1 distance checks"
   },
   "thresholds": {
     "global_backbone_rmsd_max_A": 2.5,
