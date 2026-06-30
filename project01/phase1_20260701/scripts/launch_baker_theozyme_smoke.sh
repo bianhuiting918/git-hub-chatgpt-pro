@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="${1:-/data/bht/project01_baker_serhyd_routeB_20260701}"
 MAX_GPU_UTIL="${MAX_GPU_UTIL:-40}"
 FORCE="${FORCE:-0}"
+ALLOW_SHARED_GPU="${ALLOW_SHARED_GPU:-0}"
 
 RFAA="/data/bht/design_tools/src/rf_diffusion_all_atom"
 PY="/data/bht/design_tools/envs/rfaa_venv/bin/python"
@@ -38,9 +39,39 @@ fi
 gpu_util="NA"
 gpu_mem_used="NA"
 gpu_mem_total="NA"
+compute_process_count="NA"
+compute_processes="NA"
 if command -v nvidia-smi >/dev/null 2>&1; then
   gpu_line="$(nvidia-smi --query-gpu=utilization.gpu,memory.used,memory.total --format=csv,noheader,nounits | head -1 | tr -d ' ')"
   IFS=',' read -r gpu_util gpu_mem_used gpu_mem_total <<< "$gpu_line"
+  compute_processes="$(nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits 2>/dev/null | sed '/^[[:space:]]*$/d' || true)"
+  if [ -z "$compute_processes" ]; then
+    compute_process_count="0"
+    compute_processes=""
+  else
+    compute_process_count="$(printf '%s\n' "$compute_processes" | wc -l | tr -d ' ')"
+  fi
+fi
+
+if [ "$FORCE" != "1" ] && [ "$ALLOW_SHARED_GPU" != "1" ] && [ "$compute_process_count" != "NA" ] && [ "$compute_process_count" -gt 0 ]; then
+  compute_processes_json="$(printf '%s' "$compute_processes" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')"
+  cat > "$STATUS" <<JSON
+{
+  "status": "BLOCKED_GPU_COMPUTE_PROCESS_PRESENT",
+  "route_label": "baker_theozyme_new_backbone",
+  "root": "$ROOT",
+  "input": "$INPUT",
+  "gpu_util_percent": "$gpu_util",
+  "gpu_memory_used_mib": "$gpu_mem_used",
+  "gpu_memory_total_mib": "$gpu_mem_total",
+  "compute_process_count": "$compute_process_count",
+  "compute_processes": $compute_processes_json,
+  "allow_shared_gpu": "$ALLOW_SHARED_GPU",
+  "next_action": "Wait until no other compute process is present, or intentionally set ALLOW_SHARED_GPU=1 / FORCE=1."
+}
+JSON
+  echo "$STATUS"
+  exit 0
 fi
 
 if [ "$FORCE" != "1" ] && [ "$gpu_util" != "NA" ] && [ "$gpu_util" -gt "$MAX_GPU_UTIL" ]; then
@@ -53,6 +84,7 @@ if [ "$FORCE" != "1" ] && [ "$gpu_util" != "NA" ] && [ "$gpu_util" -gt "$MAX_GPU
   "gpu_util_percent": "$gpu_util",
   "gpu_memory_used_mib": "$gpu_mem_used",
   "gpu_memory_total_mib": "$gpu_mem_total",
+  "compute_process_count": "$compute_process_count",
   "max_gpu_util_percent": "$MAX_GPU_UTIL",
   "next_action": "Rerun this script when GPU util is below threshold, or set FORCE=1 intentionally."
 }
@@ -103,7 +135,9 @@ cat > "$STATUS" <<JSON
   "manifest": "$MANIFEST",
   "gpu_util_percent_at_launch": "$gpu_util",
   "gpu_memory_used_mib_at_launch": "$gpu_mem_used",
-  "gpu_memory_total_mib": "$gpu_mem_total"
+  "gpu_memory_total_mib": "$gpu_mem_total",
+  "compute_process_count_at_launch": "$compute_process_count",
+  "allow_shared_gpu": "$ALLOW_SHARED_GPU"
 }
 JSON
 

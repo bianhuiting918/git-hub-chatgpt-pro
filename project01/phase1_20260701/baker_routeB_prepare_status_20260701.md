@@ -92,11 +92,12 @@ Defaults:
 
 ```text
 MAX_GPU_UTIL=40
+ALLOW_SHARED_GPU=0
 INTERVAL_SECONDS=300
 MAX_WAIT_MINUTES=360
 ```
 
-It writes only lightweight status/log files and invokes `launch_baker_theozyme_smoke.sh` once GPU utilization drops below the threshold.
+It writes only lightweight status/log files and invokes `launch_baker_theozyme_smoke.sh` only when GPU utilization drops below the threshold and no other compute process is present. Shared-GPU launch requires explicitly setting `ALLOW_SHARED_GPU=1` or `FORCE=1`.
 
 Current monitor:
 
