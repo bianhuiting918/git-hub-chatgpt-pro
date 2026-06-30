@@ -192,7 +192,7 @@ Required next action:
 1. Keep the accepted sequence panel at `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel.tsv`.
 2. Use the capped panel at `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel_capped10.tsv` as the 50-row current-stage panel.
 3. Use the dual-track scaffold strategy in `project01/phase1_reset_20260630/dual_track_scaffold_strategy_20260630.md`.
-4. For natural scaffolds, use sequence alignment to fix conserved catalytic/pocket/core positions before generating new sequences.
+4. For natural scaffolds, use sequence alignment to fix conserved catalytic/pocket/core positions before generating new sequences. The executable protocol is now `project01/phase1_reset_20260630/natural_scaffold_msa_generation_protocol_20260630.md`.
 5. For Baker-style diversity, use active-site constrained de novo scaffold generation as a separate track rather than forcing one reference backbone to carry 50/60% identity mutations.
 6. Do not launch PLACER or QMMM as a current-stage requirement.
 

@@ -53,15 +53,13 @@ Required steps:
 6. Predict full structures with ESMFold or a stronger sequence+structure predictor when available.
 7. Accept only rows with `postseq_entrance_gate == PASS`.
 
-For the immediate continuation, use this track to fill:
+Detailed natural-scaffold execution protocol:
 
 ```text
-80: needs 2 more entrance-pass sequences
-70: needs 1 more entrance-pass sequence
-60: needs 8 more entrance-pass sequences
+project01/phase1_reset_20260630/natural_scaffold_msa_generation_protocol_20260630.md
 ```
 
-Do not spend more generation on 90 or 50 until the incomplete bins are filled.
+Current capped sequence panel is complete for the first serine-hydrolase test system, but new enzyme systems or new natural scaffold families must start from the MSA-constrained fixed-site mask instead of random low-identity mutation.
 
 ## De Novo Scaffold Track
 
