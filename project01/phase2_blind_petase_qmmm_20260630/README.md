@@ -53,6 +53,17 @@ scripts/run_stage1_protonation_gate.sh
 scripts/score_stage1_pose_geometry.py
 ```
 
+Stage 2 has a blind classical-MD queue and conformer-selection gate:
+
+```text
+blind_work/02_classical_md/md_replicate_queue.tsv
+blind_work/02_classical_md/productive_conformer_manifest.tsv
+blind_work/02_classical_md/rejected_pose_manifest.tsv
+blind_work/02_classical_md/stage2_classical_md_protocol.md
+scripts/generate_stage2_classical_md_manifests.py
+tests/test_generate_stage2_classical_md_manifests.py
+```
+
 Stage 3/4 has blind mechanism and low-cost QM/MM exploration scaffolds:
 
 ```text
@@ -89,7 +100,7 @@ scripts/generate_stage8_stage9_manifests.py
 tests/test_generate_stage8_stage9_manifests.py
 ```
 
-Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate TS-like guesses, refined TS candidates, ensembles, committor jobs, PMFs, barriers, or final paper-comparison files from paper coordinates, paper trajectories, or paper conclusions.
+Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes. Do not populate classical MD conformer selections, TS-like guesses, refined TS candidates, ensembles, committor jobs, PMFs, barriers, or final paper-comparison files from paper coordinates, paper trajectories, or paper conclusions.
 
 ## Execution Stages
 
@@ -120,8 +131,10 @@ Tasks:
 Deliverables:
 
 ```text
+blind_work/02_classical_md/md_replicate_queue.tsv
 blind_work/02_classical_md/productive_conformer_manifest.tsv
 blind_work/02_classical_md/rejected_pose_manifest.tsv
+blind_work/02_classical_md/stage2_classical_md_protocol.md
 ```
 
 Tasks:
