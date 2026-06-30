@@ -44,3 +44,19 @@ blind_work/02_classical_md/productive_conformer_manifest.tsv
 
 Only productive conformer representatives may feed Stage 4 low-cost QM/MM scans. No TS ensemble exists yet.
 
+## QM/MM Engine Route
+
+Use the existing CPU-server GMX-CP2K route recorded in:
+
+```text
+docs/scnet-gmx-cp2k.md
+程序使用指南/gmx-cp2k指南/PETase_QMMM_运行手册.md
+```
+
+On `210.73.40.29`, GROMACS/CP2K is invoked through:
+
+```text
+/Dell/Dell14/bianht/gmx_cp2k_patched.sh
+```
+
+This wrapper is verified present on the CPU server. It launches the local GROMACS-CP2K environment inside the existing sandbox. The active PETase route should extract final comparison energies from GROMACS log `Potential Energy`, not CP2K `Total FORCE_EVAL`.
