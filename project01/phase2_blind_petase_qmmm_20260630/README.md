@@ -37,11 +37,12 @@ projects/01-specialized-ts-aware-scorer/docs/petase_blind_qmmm_mechanism_plan.md
 
 ## Stage 1 Gates
 
-Stage 1 now has executable gates for environment readiness, ligand construction, protonation, and pose acceptance:
+Stage 1 now has executable gates for environment readiness, ligand construction, protonation, pose scoring, and pose acceptance:
 
 ```text
 blind_work/01_system_setup/stage1_remote_execution_instructions.md
 blind_work/01_system_setup/stage1_ligand_and_protonation_execution_protocol.md
+blind_work/01_system_setup/stage1_pose_geometry_filter_protocol.md
 blind_work/01_system_setup/ligand_smiles.tsv
 blind_work/01_system_setup/ligand_model_manifest.tsv
 blind_work/01_system_setup/gs_pose_manifest.tsv
@@ -49,9 +50,10 @@ blind_work/01_system_setup/rejected_pose_manifest.tsv
 scripts/probe_stage1_compute_environment.sh
 scripts/build_stage1_ligands_rdkit.py
 scripts/run_stage1_protonation_gate.sh
+scripts/score_stage1_pose_geometry.py
 ```
 
-Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, and protonation gate are recorded with exact tool versions and input/output hashes.
+Do not begin docking, MD, or QM/MM until the environment probe, ligand atom-label gate, protonation gate, and pose geometry filter outputs are recorded with exact tool versions and input/output hashes.
 
 ## Execution Stages
 
@@ -65,6 +67,7 @@ blind_work/01_system_setup/gs_pose_manifest.tsv
 blind_work/01_system_setup/rejected_pose_manifest.tsv
 blind_work/01_system_setup/ligand_smiles.tsv
 blind_work/01_system_setup/stage1_ligand_and_protonation_execution_protocol.md
+blind_work/01_system_setup/stage1_pose_geometry_filter_protocol.md
 ```
 
 Tasks:
@@ -209,7 +212,7 @@ Tasks:
 Recommended first action:
 
 ```text
-Run the environment probe on the compute server, build RDKit ligand conformers/atom labels, run the protonation gate for 6EQE, then generate WT PETase + PET dimer/BHET-like ester GS candidates.
+Run the environment probe on the compute server, build RDKit ligand conformers/atom labels, run the protonation gate for 6EQE, then generate WT PETase + PET dimer/BHET-like ester GS candidates and score them with score_stage1_pose_geometry.py.
 ```
 
 Do not start mutant ranking until WT acylation/deacylation TS ensembles are chemically validated.
