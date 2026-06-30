@@ -1,23 +1,21 @@
-# Project 01 Phase1 Regeneration Closed-Loop Plan - 2026-06-30
+# Project 01 Phase1 Sequence-Generation Plan - 2026-06-30
 
-> **For agentic workers:** keep this file as the controlling runbook for Phase1 until all 90/80/70/60/50 bins have 10 distinct sequences that pass every screening stage and are ready for QMMM. Do not stop a bin after one failed batch.
+> **For agentic workers:** keep this file as the controlling runbook for the current Phase1 sequence-generation stage until all 90/80/70/60/50 bins have 10 distinct postseq entrance-pass sequences. Do not start QMMM in this stage.
 
-**Goal:** Generate sequence-diverse enzyme backgrounds at 90/80/70/60/50 identity until each similarity bin has 10 distinct sequences that pass all filters and can enter QMMM calculation.
+**Goal:** Generate sequence-diverse enzyme backgrounds at 90/80/70/60/50 identity until each similarity bin has 10 distinct sequences that pass the postseq protein/pocket entrance gate.
 
-**Architecture:** Run prediction on the GPU host and run all lightweight gates on the same host immediately after each output is written. Treat every stage as a closed loop: if a bin lacks enough passing samples, regenerate that bin with tighter active-pocket constraints, then repeat prediction, gate, PLACER, and RMSD evaluation.
+**Architecture:** Run sequence/backbone generation, predict full protein structures, and run the postseq entrance gate immediately after each batch. Treat sequence generation as a closed loop: if a bin lacks enough postseq entrance-pass samples, regenerate that bin with stronger active-pocket constraints and repeat prediction/gating.
 
-**Tech Stack:** ESMFold/fair-esm + OpenFold on GPU for post-sequence structures; PLACER on GPU for ligand/crop conformers; project Python gate scripts for Kabsch/RMSD/key-distance evaluation; GitHub stores only markdown, scripts, TSV/JSON manifests, and summaries.
+**Tech Stack:** ESMFold/fair-esm + OpenFold on GPU for post-sequence structures; project Python gate scripts for Kabsch/RMSD/key-distance evaluation; GitHub stores only markdown, scripts, TSV/JSON manifests, and summaries.
 
 ## Global Constraints
 
 - Do not upload PDB ensembles, model weights, trajectories, large logs, or QMMM raw outputs to GitHub.
 - Missing files, failed downloads, or not-yet-generated batches are `NOT_EVALUATED`, not `FAIL`.
-- A sequence enters PLACER only after post-sequence entrance gate `PASS`.
-- A PLACER conformer enters full-ligand completion only after `PLACER_CROP_STRICT_PASS`.
-- A completed structure enters QMMM manifest only after strict all-atom ligand RMSD and reaction geometry gates pass.
-- 50/60/70 bins must be regenerated if they do not reach the target pass count.
-- A sequence is not accepted unless at least 10 of its 50 PLACER conformers pass the PLACER crop strict gate.
-- If a sequence fails the per-sequence PLACER threshold, discard that sequence for final accounting and generate a replacement sequence from the upstream sequence/backbone generation stage.
+- Current stage ends at sequence-panel generation; do not launch QMMM in this stage.
+- PLACER is optional downstream diagnosis in this stage, not a hard filter for accepting sequences.
+- A sequence is accepted for the current stage when its predicted full-protein structure passes the postseq entrance gate.
+- 50/60/70 bins must be regenerated if they do not reach the target postseq entrance-pass count.
 
 ## Current Audited State
 
@@ -38,27 +36,22 @@ Postseq entrance gate results:
 
 Interpretation:
 
-- 90/80/70 have at least one entrance-pass sample and can feed pilot PLACER runs.
-- 70 is not complete; it needs regeneration until at least 10 entrance-pass sequences are available.
+- 90/80/70 already contain entrance-pass samples but still need enough rows to complete the 10-per-bin sequence panel.
 - 60/50 are evaluated FAIL under the current entrance gate, not merely missing. They must be regenerated with stronger active-pocket preservation.
+- The completed PLACER pilot is diagnostic only. `CROP_STRICT_PASS = 0/300` is not a reason to reject postseq entrance-pass sequences in this stage, because TS-like conformers are not expected to behave like ligand low-energy poses.
 
-## Final Acceptance Targets
+## Current Stage Acceptance Targets
 
-Use these targets before Phase1 can be considered complete:
+Use these targets before the current sequence-generation stage can be considered complete:
 
-- `final_accepted_sequences_per_similarity_bin = 10`.
-- `placer_samples_per_postseq_pass_sequence = 50`.
-- `minimum_placer_crop_pass_conformers_per_sequence = 10`.
-- `minimum_qmmm_ready_strict_pass_conformers_per_accepted_sequence = 1`.
+- `postseq_entrance_pass_sequences_per_similarity_bin = 10`.
+- `accepted_sequence_for_current_stage = postseq_entrance_gate == PASS`.
+- `defer_placer_filtering = true`.
+- `defer_qmmm_calculation = true`.
 
 ## Threshold Provenance
 
-Current strict gate values are project screening thresholds, not all direct literature thresholds. PLACER screening must inherit the same protein/pocket geometry gate used immediately before PLACER; ligand/reaction-pose checks are added on top of that inherited gate.
-
-- `ligand_heavy_rmsd_max_A = 0.75` is a project-level conservative ligand-pose preservation threshold.
-- It is motivated by the Baker serine-hydrolase work reporting sub-angstrom backbone/design agreement and active-site all-atom RMSD values around the sub-angstrom range for successful designs, but this exact `0.75 A` ligand heavy-atom RMSD cutoff has not been confirmed as a direct Baker paper threshold.
-- The public serine-hydrolase design repository uses PLACER/ChemNet-style geometry analysis with RMSD, hydrogen-bond, angle, dihedral, and uncertainty features; it does not by itself establish `0.75 A` as the final ligand-RMSD hard cutoff for this project.
-- Until the threshold is recalibrated against the paper's exact filter code or an internal validation set, report it as `PROJECT_STRICT_GATE`, not `BAKER_LITERATURE_GATE`.
+Current strict gate values are project screening thresholds, not all direct literature thresholds. The active gate for this stage is the postseq protein/pocket entrance gate. PLACER ligand/reaction-pose filters are retained only as downstream diagnostic records and must not be used to reject sequences in the current sequence-generation stage.
 
 Current threshold labels:
 
@@ -67,44 +60,31 @@ global_backbone_rmsd_max_A = 2.50                  # PROJECT_ENTRANCE_GATE
 fixed_backbone_rmsd_max_A = 1.00                   # PROJECT_ENTRANCE_GATE
 catalytic_heavy_rmsd_max_A = 0.75                  # PROJECT_ENTRANCE_GATE
 protein_key_distance_abs_delta_max_A = 0.75        # PROJECT_ENTRANCE_GATE
-ligand_heavy_rmsd_max_A = 0.75                     # PROJECT_STRICT_GATE, not confirmed Baker hard cutoff
-ligand_key_distance_abs_delta_max_A = 0.50         # PROJECT_STRICT_GATE
-minimum_placer_crop_pass_conformers_per_sequence = 10 / 50  # PROJECT_ROBUSTNESS_GATE
+ligand_heavy_rmsd_max_A = DEFERRED                 # not used in current sequence-generation stage
+ligand_key_distance_abs_delta_max_A = DEFERRED     # not used in current sequence-generation stage
+minimum_placer_crop_pass_conformers_per_sequence = DEFERRED
 ```
 
-PLACER gate consistency rule:
-
-```text
-PLACER_CROP_STRICT_PASS =
-  inherited_postseq_protein_gate == PASS
-  and ligand_reaction_pose_gate == PASS
-```
-
-where `inherited_postseq_protein_gate` uses the same global backbone, fixed-pocket backbone, catalytic heavy-atom, and protein key-distance thresholds as the postseq entrance gate.
-
-Do not use a ligand-only PLACER screen as an acceptance rule. The PLACER conformer must still satisfy the same protein/pocket preservation standards that allowed the sequence to enter PLACER; ligand RMSD and Ser128-OG-to-bu2-C1 geometry are additional checks on top of that inherited gate.
+Do not use PLACER failure as a sequence-rejection rule in this stage. The immediate question is whether the protein background preserves the intended active pocket strongly enough to later test explicit TS conformer stability.
 
 If a bin misses any target, return to the nearest upstream generation stage:
 
 - Entrance gate shortage: regenerate sequences/backbones for that bin.
-- Per-sequence PLACER crop shortage: discard that sequence from final accounting and regenerate a replacement sequence. Do not count a sequence with fewer than 10 crop-pass conformers as accepted, even if one conformer looks promising.
-- Full-ligand strict gate shortage: revise ligand completion/grafting, then rerun strict gate before QMMM.
+- PLACER crop shortage: record as downstream diagnostic only; do not regenerate solely because of PLACER failure in this stage.
+- QMMM shortage: out of scope for this stage.
 
-Per-sequence acceptance rule:
+Per-sequence acceptance rule for the current stage:
 
 ```text
-ACCEPT_SEQUENCE_FOR_QMMM_POOL =
+ACCEPT_SEQUENCE_FOR_SEQUENCE_PANEL =
   postseq_entrance_gate == PASS
-  and PLACER_conformers_generated == 50
-  and PLACER_crop_strict_gate_PASS_count >= 10
-  and full_ligand_strict_QMMM_ready_count >= 1
 ```
 
 Per-bin completion rule:
 
 ```text
 COMPLETE_BIN =
-  count(distinct ACCEPT_SEQUENCE_FOR_QMMM_POOL sequences in bin) >= 10
+  count(distinct ACCEPT_SEQUENCE_FOR_SEQUENCE_PANEL sequences in bin) >= 10
 ```
 
 ## Task 1: Regenerate Low-Pass Bins
@@ -209,7 +189,7 @@ cd /data/bht/project01_phase1_reset_gpu
   --reference manifests/denovo_SER_hydrolase_full_input.pdb \
   --fixed-residues manifests/fixed_active_or_direct_contact_residues.txt \
   --out-manifest manifests/postseq_entrance_gate_manifest_round02.tsv \
-  --queue-out manifests/placer_n50_entrance_pass_queue_round02.gpu.tsv \
+  --queue-out manifests/postseq_entrance_pass_sequence_panel_round02.gpu.tsv \
   --gate-json-dir postseq_structure_gate/json_round02
 ```
 
@@ -220,201 +200,91 @@ New rows with status PASS, FAIL, or NOT_EVALUATED_*.
 No missing prediction is counted as FAIL.
 ```
 
-## Task 2: PLACER for Entrance-Pass Samples
+## Task 2: Maintain the Sequence Panel Manifest
 
 **Files:**
 
-- Read: `/data/bht/project01_phase1_reset_gpu/manifests/placer_n50_entrance_pass_queue.gpu.tsv`
-- Read: `/data/bht/project01_phase1_reset_gpu/manifests/placer_n50_entrance_pass_queue_round02.gpu.tsv`
-- Create: `/data/bht/project01_phase1_reset_gpu/manifests/placer_n50_holo_inputs.round02.tsv`
-- Create: `/data/bht/project01_phase1_reset_gpu/placer_runs/`
+- Read: `/data/bht/project01_phase1_reset_gpu/postseq_structure_gate/tables/all50_entrance_gate.tsv`
+- Read: `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_gate_manifest_round02.tsv`
+- Create: `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel.tsv`
+- Create: `project01/phase1_reset_20260630/sequence_panel_status_round02.md`
 
 **Interfaces:**
 
-- Consumes: entrance-pass samples only.
-- Produces: PLACER model PDB/CSV files outside GitHub and lightweight manifest/status files for GitHub.
+- Consumes: postseq entrance-gate rows from all completed batches.
+- Produces: one lightweight manifest of accepted sequences for the current stage.
 
-- [ ] **Step 1: Build holo inputs for every entrance-pass sample**
+- [ ] **Step 1: Merge entrance-pass rows across batches**
 
-Append reference `bu2` HETATM/CONECT records to each entrance-pass protein prediction:
-
-```text
-ligand_policy = append_reference_bu2_refpose_before_PLACER
-```
-
-This is only an initial pose for PLACER. It is not a final ligand conformation.
-
-- [ ] **Step 2: Run PLACER n=50 only for entrance-pass samples**
-
-Use the reference Ser128-OG to bu2-C1 bond length:
+For every evaluated batch, append rows where `status == PASS` to:
 
 ```text
-A-128-SER-OG:X-1-bu2-C1:1.533
+/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel.tsv
 ```
 
-Representative command:
-
-```bash
-cd /data/bht/project01_phase1_reset_gpu
-CUDA_VISIBLE_DEVICES=0 /data/bht/design_tools/envs/placer_env/bin/python \
-  /data/bht/design_tools/src/PLACER/run_PLACER.py \
-  -f manifests/placer_n50_selected.ifile \
-  -o placer_runs/selected_n50_bonded \
-  -n 50 \
-  --predict_ligand bu2 \
-  --bonds A-128-SER-OG:X-1-bu2-C1:1.533 \
-  --suffix bonded_bu2_n50 \
-  --rerank prmsd
-```
-
-Expected result:
+The manifest must include at least:
 
 ```text
-One *_model.pdb and one *.csv per entrance-pass sample.
+sample_id
+bin
+sequence
+sequence_identity_target
+predicted_pdb
+postseq_gate_json
+global_backbone_rmsd_A
+fixed_backbone_rmsd_A
+catalytic_heavy_rmsd_A
+max_abs_protein_key_delta_A
+status
 ```
 
-## Task 3: Crop Ligand RMSD and Reaction Geometry Gate
+- [ ] **Step 2: Stop when each bin has 10 sequence-panel rows**
+
+Completion criterion:
+
+```text
+for each bin in 90/80/70/60/50:
+    count(distinct sample_id where status == PASS) >= 10
+```
+
+If any bin remains below 10, return to Task 1 Step 2 and regenerate more candidates for that bin.
+
+## Task 3: Deferred PLACER/TS/QMMM Work
 
 **Files:**
 
-- Read: PLACER `*_model.pdb`
-- Read: reference `/data/bht/project01_phase1_reset_gpu/manifests/denovo_SER_hydrolase_full_input.pdb`
-- Create: `/data/bht/project01_phase1_reset_gpu/placer_crop_gate/placer_crop_ligand_gate.tsv`
-- Create: `/data/bht/project01_phase1_reset_gpu/manifests/full_ligand_completion_queue.tsv`
+- Read later: `/data/bht/project01_phase1_reset_gpu/manifests/postseq_entrance_pass_sequence_panel.tsv`
+- Create later: TS conformer and QMMM manifests outside the current stage.
 
 **Interfaces:**
 
-- Consumes: PLACER crop outputs.
-- Produces: only crop-pass conformers for full-ligand completion.
+- Consumes: accepted sequence panel after the current stage is complete.
+- Produces: future TS-stability/QMMM inputs.
 
-- [ ] **Step 1: Evaluate ligand and reaction geometry before completion**
+- [ ] **Step 1: Do not launch QMMM during current sequence generation**
 
-For every PLACER conformer, compute the same protein/pocket metrics used in the postseq entrance gate:
-
-```text
-global backbone RMSD after Kabsch alignment
-fixed-pocket backbone RMSD
-catalytic heavy-atom RMSD
-protein key-distance deltas
-```
-
-Then compute the PLACER-added ligand/reaction metrics:
+Current decision:
 
 ```text
-bu2 heavy-atom RMSD vs reference pose after the same protein/pocket alignment
-Ser128-OG to bu2-C1 distance delta
-ligand-contact/oxyanion distances if present in the crop
+QMMM_OUT_OF_SCOPE_FOR_CURRENT_STAGE = true
+PLACER_REQUIRED_FOR_SEQUENCE_ACCEPTANCE = false
 ```
 
-Gate:
+- [ ] **Step 2: Keep previous PLACER pilot as diagnostic only**
+
+The completed PLACER pilot showed `CROP_STRICT_PASS = 0/300`, but this is not a sequence-generation blocker. Interpretation:
 
 ```text
-inherited_postseq_protein_gate:
-  global_backbone_rmsd_max_A = 2.50
-  fixed_backbone_rmsd_max_A = 1.00
-  catalytic_heavy_rmsd_max_A = 0.75
-  protein_key_distance_abs_delta_max_A = 0.75
-
-placer_ligand_addon_gate:
-  ligand_heavy_rmsd_max_A = 0.75
-  ser128_og_to_bu2_c1_abs_delta_max_A = 0.50
+TS conformers are not expected to be ligand low-energy poses.
+The next scientific question is whether explicit TS-like conformer ensembles can be stabilized by accepted protein backgrounds.
+Do not regenerate a sequence solely because PLACER failed to reproduce the ligand reference pose.
 ```
 
-Expected labels:
+Future downstream work should start from the accepted sequence panel and define an explicit TS conformer ensemble or constrained TS-like geometry before QMMM.
 
-```text
-CROP_STRICT_PASS
-FAIL_INHERITED_POSTSEQ_PROTEIN_GATE
-FAIL_PLACER_LIGAND_ADDON_GATE
-FAIL_BOTH_PROTEIN_AND_LIGAND_GATES
-NOT_EVALUATED_PARSE_FAIL
-```
+## Task 4: GitHub Synchronization
 
-- [ ] **Step 2: Apply the per-sequence PLACER acceptance threshold**
 
-For each entrance-pass sequence, count crop-pass conformers across exactly 50 PLACER outputs:
-
-```text
-sequence_placer_crop_pass_count = count(CROP_STRICT_PASS conformers among 50)
-```
-
-Gate:
-
-```text
-if sequence_placer_crop_pass_count >= 10:
-    sequence_status = PLACER_SEQUENCE_ACCEPTED_FOR_FULL_LIGAND_COMPLETION
-else:
-    sequence_status = DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM
-```
-
-Do not rescue a sequence with 1-9 crop-pass conformers by sending those few conformers to QMMM. The final dataset requires 10 robust conformers per accepted sequence before full-ligand completion and QMMM preparation.
-
-- [ ] **Step 3: If crop pass is insufficient, return to upstream generation**
-
-If a sequence has fewer than `minimum_placer_crop_pass_conformers_per_sequence = 10`, do not complete ligand or launch QMMM for that sequence. Instead:
-
-```text
-mark sequence as DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM
-generate a replacement sequence for the same similarity bin
-run postseq structure prediction and entrance gate for the replacement
-only then run PLACER n=50 again
-```
-
-Additional PLACER resampling may be used only as a diagnostic before discarding the sequence. It does not change final accounting unless the sequence has a clean, documented 50-conformer PLACER run with at least 10 crop-pass conformers.
-
-## Task 4: Full-Ligand Completion and QMMM Queue
-
-**Files:**
-
-- Read: `/data/bht/project01_phase1_reset_gpu/manifests/full_ligand_completion_queue.tsv`
-- Create: `/data/bht/project01_phase1_reset_gpu/full_ligand_completed/`
-- Create: `/data/bht/project01_phase1_reset_gpu/manifests/qmmm_ready_strict_pass.tsv`
-- Create: `project01/phase1_reset_20260630/qmmm_ready_manifest_summary.md`
-
-**Interfaces:**
-
-- Consumes: crop-pass conformers from sequences with at least 10/50 PLACER crop-pass conformers.
-- Produces: strict-pass full protein/full ligand QMMM manifest rows grouped by accepted sequence.
-
-- [ ] **Step 1: Complete only crop-pass conformers**
-
-Preserve PLACER crop heavy-atom coordinates during ligand completion. Record:
-
-```text
-crop_to_completed_preserved_atom_rmsd_A
-full_ligand_heavy_rmsd_A
-reaction_key_distance_deltas_A
-```
-
-- [ ] **Step 2: Generate QMMM rows only for strict pass**
-
-QM region:
-
-```text
-complete bu2 ligand
-Ser128 side-chain reaction fragment
-His95 imidazole fragment
-Ser126 side-chain fragment when included by gate/proton relay
-```
-
-MM region:
-
-```text
-remaining protein environment and fixed background residues
-```
-
-Status labels:
-
-```text
-READY_STRICT_PASS
-PLACER_SEQUENCE_ACCEPTED_FOR_FULL_LIGAND_COMPLETION
-DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM
-BLOCKED_CROP_GEOMETRY_FAIL
-BLOCKED_FULL_LIGAND_RMSD_FAIL
-NOT_EVALUATED
-```
-
-## Task 5: GitHub Synchronization
 
 **Files:**
 

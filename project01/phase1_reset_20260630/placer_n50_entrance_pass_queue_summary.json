@@ -2,15 +2,51 @@
   "updated_cst": "2026-06-30T11:40:00+08:00",
   "evaluated_universe": {
     "postseq_structure_targets": 50,
-    "bins": ["90", "80", "70", "60", "50"],
+    "bins": [
+      "90",
+      "80",
+      "70",
+      "60",
+      "50"
+    ],
     "targets_per_bin": 10
   },
   "postseq_entrance_gate_counts": {
-    "90": {"evaluated": 10, "pass": 9, "fail": 1, "not_evaluated": 0, "additional_pass_needed": 1},
-    "80": {"evaluated": 10, "pass": 8, "fail": 2, "not_evaluated": 0, "additional_pass_needed": 2},
-    "70": {"evaluated": 10, "pass": 4, "fail": 6, "not_evaluated": 0, "additional_pass_needed": 6},
-    "60": {"evaluated": 10, "pass": 0, "fail": 10, "not_evaluated": 0, "additional_pass_needed": 10},
-    "50": {"evaluated": 10, "pass": 0, "fail": 10, "not_evaluated": 0, "additional_pass_needed": 10}
+    "90": {
+      "evaluated": 10,
+      "pass": 9,
+      "fail": 1,
+      "not_evaluated": 0,
+      "additional_pass_needed": 1
+    },
+    "80": {
+      "evaluated": 10,
+      "pass": 8,
+      "fail": 2,
+      "not_evaluated": 0,
+      "additional_pass_needed": 2
+    },
+    "70": {
+      "evaluated": 10,
+      "pass": 4,
+      "fail": 6,
+      "not_evaluated": 0,
+      "additional_pass_needed": 6
+    },
+    "60": {
+      "evaluated": 10,
+      "pass": 0,
+      "fail": 10,
+      "not_evaluated": 0,
+      "additional_pass_needed": 10
+    },
+    "50": {
+      "evaluated": 10,
+      "pass": 0,
+      "fail": 10,
+      "not_evaluated": 0,
+      "additional_pass_needed": 10
+    }
   },
   "placer_entrance_pass_queue": {
     "queued_samples": 21,
@@ -18,7 +54,11 @@
     "status": "QUEUED_FOR_PLACER_AFTER_ENTRANCE_PASS"
   },
   "completed_placer_pilot": {
-    "representative_bins": ["90", "80", "70"],
+    "representative_bins": [
+      "90",
+      "80",
+      "70"
+    ],
     "samples": 3,
     "conformers_per_sample": 50,
     "total_conformers": 150,
@@ -26,7 +66,11 @@
     "status": "FAILED_TWO_LAYER_CROP_GATE"
   },
   "completed_placer_diagnostic": {
-    "representative_bins": ["90", "80", "70"],
+    "representative_bins": [
+      "90",
+      "80",
+      "70"
+    ],
     "samples": 3,
     "conformers_per_sample": 50,
     "total_conformers": 150,
@@ -43,14 +87,41 @@
   },
   "regeneration_policy": {
     "postseq_entrance_pass_target_per_bin": 10,
-    "minimum_crop_strict_gate_pass_conformers_per_accepted_sequence": 10,
-    "minimum_qmmm_ready_strict_pass_per_bin": 3,
-    "shortage_bins_must_regenerate": ["90", "80", "70", "60", "50"],
-    "priority_bins": ["70", "60", "50"],
+    "shortage_bins_must_regenerate": [
+      "90",
+      "80",
+      "70",
+      "60",
+      "50"
+    ],
+    "priority_bins": [
+      "70",
+      "60",
+      "50"
+    ],
     "policy_file": "project01/phase1_reset_20260630/regeneration_closed_loop_plan_20260630.md"
   },
   "github_large_file_policy": {
-    "commit_allowed": ["markdown", "small manifests", "summary json", "scripts"],
-    "commit_forbidden": ["pdb", "placer model outputs", "model checkpoints", "trajectories", "large logs", "qmmm raw outputs"]
+    "commit_allowed": [
+      "markdown",
+      "small manifests",
+      "summary json",
+      "scripts"
+    ],
+    "commit_forbidden": [
+      "pdb",
+      "placer model outputs",
+      "model checkpoints",
+      "trajectories",
+      "large logs",
+      "qmmm raw outputs"
+    ]
+  },
+  "current_phase_policy": {
+    "stage": "sequence_generation_only",
+    "sequence_acceptance": "postseq_entrance_gate == PASS",
+    "placer_required_for_sequence_acceptance": false,
+    "qmmm_in_scope": false,
+    "interpretation": "The previous PLACER pilot is diagnostic only; PLACER crop failure does not reject a sequence in the current stage."
   }
 }

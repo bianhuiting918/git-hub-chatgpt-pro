@@ -4,7 +4,7 @@
 Rows with missing predicted PDB files are marked NOT_EVALUATED, not FAIL.
 Rows with evaluated PDB files receive PASS or FAIL from postseq_entrance_gate.py.
 The output manifest is the authoritative input for deciding which samples can
-enter PLACER n=50.
+enter the current sequence panel. PLACER and QMMM are deferred for this stage.
 """
 
 from __future__ import annotations

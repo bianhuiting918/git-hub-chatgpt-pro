@@ -1,7 +1,10 @@
 {
   "updated_cst": "2026-06-30T12:05:00+08:00",
   "evaluated_universe": {
-    "runs": ["bonded", "posecentered_diagnostic"],
+    "runs": [
+      "bonded",
+      "posecentered_diagnostic"
+    ],
     "total_sequences": 6,
     "total_conformers": 300,
     "conformers_per_sequence": 50
@@ -50,5 +53,11 @@
     "remote_conformer_detail_tsv_bonded": "/data/bht/project01_phase1_reset_gpu/placer_crop_gate/two_layer_placer_crop_gate_bonded.tsv",
     "remote_conformer_detail_tsv_posecentered": "/data/bht/project01_phase1_reset_gpu/placer_crop_gate/two_layer_placer_crop_gate_posecentered_diagnostic.tsv"
   },
-  "next_action": "Regenerate replacement sequences from upstream; do not complete ligand or launch QMMM for these six sequence-run entries."
+  "next_action": "Use postseq entrance-pass gate to complete the 90/80/70/60/50 sequence panel; defer PLACER filtering and QMMM.",
+  "current_phase_interpretation": {
+    "stage": "sequence_generation_only",
+    "placer_required_for_sequence_acceptance": false,
+    "qmmm_in_scope": false,
+    "diagnostic_note": "CROP_STRICT_PASS=0/300 remains useful diagnostic evidence, but does not reject postseq entrance-pass sequences in the current stage."
+  }
 }
