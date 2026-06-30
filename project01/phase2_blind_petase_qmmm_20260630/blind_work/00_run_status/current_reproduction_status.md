@@ -66,5 +66,18 @@ The generator prepares blind Amber/Sander DFTB3 QM/MM inputs from accepted seed 
 - QM/MM masks must be remapped after `tleap`, because Amber atom indices differ from the original seed PDB serials after hydrogen/water/ion addition.
 
 Methodological inspiration from the article is allowed here, but concrete article coordinates, trajectories, reaction-coordinate formulas, selected CVs, windows, barriers, rates, and mechanism conclusions remain blocked until final validation.
+## Latest Amber QM/MM Smoke Evidence
+
+Updated: 2026-07-01 Asia/Shanghai
+
+GitHub main has reached `6526f76` for the Amber/Sander Stage 4 route. On the CPU server, a clean detached worktree at `/Dell/Dell14/bianht/petase_blind_qmmm/repo_verify_6526f76_20260701_060758` verified:
+
+- `python -m unittest discover -s project01/phase2_blind_petase_qmmm_20260630/tests`: `Ran 12 tests ... OK`.
+- Accepted seed `REACTIVE_6EQE_BHET_like_E01_001` generated Amber QM/MM inputs and AmberTools topology-prep inputs.
+- `run_amber_topology_prep.sh` completed with exit `0`, producing `complex.prmtop`, `complex.inpcrd`, `ligand.mol2`, and `ligand.frcmod`.
+- `map_stage4_amber_qmmm_masks_to_topology.py` mapped 76 QM atoms from the original seed selection onto the `tleap` atom indices.
+- `run_sander_qmmm_smoke.sh` completed with exit `0` after auto-setting `AMBERHOME`; Sander entered DFTB3 QM/MM and completed one minimization cycle.
+
+This is a technical smoke pass only. The one-step output reports very large energy and `VDWAALS=*************`, so the structure is not yet a chemically relaxed Michaelis complex and no TS/PMF/barrier result exists. The next compute gate is restrained/nonreactive cleanup minimization and staged QM/MM minimization before any TS search or 200 ps equilibration is treated as production evidence.
 
 
