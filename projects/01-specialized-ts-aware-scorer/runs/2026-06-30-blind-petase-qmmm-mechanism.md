@@ -2,7 +2,7 @@
 
 ## Status
 
-A new blind first-principles PETase QM/MM mechanism task was created.
+A new blind first-principles PETase QM/MM mechanism task was created and Stage 1 structure-only setup has started.
 
 ## Scope correction
 
@@ -12,6 +12,10 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 
 - `projects/01-specialized-ts-aware-scorer/docs/petase_blind_qmmm_mechanism_plan.md`
 - `project01/phase2_blind_petase_qmmm_20260630/README.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/structure_selection.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_system_setup_protocol.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/gs_pose_manifest.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_manifest.tsv`
 
 ## Boundary
 
@@ -36,13 +40,16 @@ Use only:
 
 A previous Zenodo paper-trajectory download on the CPU server was stopped after the boundary correction, because paper shooting trajectories are concrete results and should not enter the blind workflow. The partial archive fragments were not deleted.
 
+## Stage 1 progress
+
+RCSB metadata was queried on 2026-06-30 for PETase structure candidates. The initial blind production template set is:
+
+- primary: `6EQE`;
+- secondary sensitivity templates: `5XJH`, `5YFE`, `6ILW`;
+- backup WT-like templates: `6EQD`, `6EQF`, `6EQG`, `6EQH`, `6QGC`.
+
+Mutant, non-PETase, and failed pre-query IDs were explicitly marked as excluded in `structure_selection.tsv`.
+
 ## Next action
 
-Start Stage 1: structure-only system setup.
-
-Immediate tasks:
-
-1. Select WT PETase structure templates from public structural databases.
-2. Build PET dimer or BHET/MHET-like ester substrate models.
-3. Generate candidate Michaelis complexes using only generic catalytic geometry.
-4. Equilibrate and filter poses before any QM/MM reaction scans.
+Continue Stage 1 by downloading the selected RCSB structures, preparing repaired/protonated models, building PET-like ligand fragments, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
