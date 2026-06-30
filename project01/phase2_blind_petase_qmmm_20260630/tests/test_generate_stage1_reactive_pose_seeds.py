@@ -9,7 +9,11 @@ from pathlib import Path
 class GenerateStage1ReactivePoseSeedsTest(unittest.TestCase):
     def test_generates_complex_that_passes_generic_geometry_scorer(self):
         script = Path("work/generate_stage1_reactive_pose_seeds.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage1_reactive_pose_seeds.py")
         scorer = Path("work/score_stage1_pose_geometry.py")
+        if not scorer.exists():
+            scorer = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/score_stage1_pose_geometry.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             protein = tmpdir / "protein.pdb"
