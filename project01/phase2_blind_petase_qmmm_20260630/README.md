@@ -54,8 +54,10 @@ scripts/generate_stage1_pose_generation_queue.py
 scripts/run_stage1_protonation_gate.sh
 scripts/score_stage1_pose_geometry.py
 scripts/run_blind_stage1_stage2_gates.py
+scripts/launch_blind_stage1_stage2_compute.py
 tests/test_generate_stage1_pose_generation_queue.py
 tests/test_run_blind_stage1_stage2_gates.py
+tests/test_launch_blind_stage1_stage2_compute.py
 ```
 
 Stage 2 has a blind classical-MD queue and conformer-selection gate:
@@ -274,9 +276,9 @@ Tasks:
 Recommended first action on the compute server from the repository root:
 
 ```text
-python project01/phase2_blind_petase_qmmm_20260630/scripts/run_blind_stage1_stage2_gates.py
+python project01/phase2_blind_petase_qmmm_20260630/scripts/launch_blind_stage1_stage2_compute.py
 ```
 
-This writes `blind_work/00_run_status/stage1_stage2_gate_status.tsv` and `blind_work/00_run_status/stage1_stage2_next_actions.md`. Continue manually only at gates that report `completed`; if a gate reports `blocked`, fix that input/tooling issue before moving downstream.
+This runs `run_blind_stage1_stage2_gates.py` and writes `blind_work/00_run_status/compute_launch_summary.md`, `blind_work/00_run_status/stage1_stage2_runner.stdout.log`, `blind_work/00_run_status/stage1_stage2_runner.stderr.log`, `blind_work/00_run_status/stage1_stage2_runner_command.txt`, `blind_work/00_run_status/stage1_stage2_gate_status.tsv`, and `blind_work/00_run_status/stage1_stage2_next_actions.md`. Continue manually only at gates that report `completed`; if a gate reports `blocked`, fix that input/tooling issue before moving downstream.
 
 Do not start mutant ranking until WT acylation/deacylation TS ensembles are chemically validated.
