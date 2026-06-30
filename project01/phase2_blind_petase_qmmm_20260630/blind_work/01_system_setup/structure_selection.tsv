@@ -18,6 +18,6 @@ pdb	title	method	resolution_A	organism	blind_role	decision	reason	source_url	sou
 7SH7	Structure of the SARS-CoV-2 main protease in complex with inhibitor MPI87	X-RAY DIFFRACTION	1.85	Severe acute respiratory syndrome coronavirus 2	not PETase	exclude	Not PETase; pre-query false positive.	https://www.rcsb.org/structure/7SH7	2026-06-30
 7SH8	Structure of the SARS-CoV-2 main protease in complex with inhibitor MPI88	X-RAY DIFFRACTION	1.8	Severe acute respiratory syndrome coronavirus 2	not PETase	exclude	Not PETase; pre-query false positive.	https://www.rcsb.org/structure/7SH8	2026-06-30
 7SH9	Structure of the SARS-CoV-2 main protease in complex with inhibitor MPI86	X-RAY DIFFRACTION	1.85	Severe acute respiratory syndrome coronavirus 2	not PETase	exclude	Not PETase; pre-query false positive.	https://www.rcsb.org/structure/7SH9	2026-06-30
-7SHA	RCSB query returned 404						No RCSB entry returned by official API at query time.	https://www.rcsb.org/structure/7SHA	2026-06-30
-8JY2	RCSB query returned 404						No RCSB entry returned by official API at query time.	https://www.rcsb.org/structure/8JY2	2026-06-30
-8JY3	RCSB query returned 404						No RCSB entry returned by official API at query time.	https://www.rcsb.org/structure/8JY3	2026-06-30
+7SHA	RCSB query returned 404				not_found	exclude	No RCSB entry returned by official API at query time.	https://www.rcsb.org/structure/7SHA	2026-06-30
+8JY2	RCSB query returned 404				not_found	exclude	No RCSB entry returned by official API at query time.	https://www.rcsb.org/structure/8JY2	2026-06-30
+8JY3	RCSB query returned 404				not_found	exclude	No RCSB entry returned by official API at query time.	https://www.rcsb.org/structure/8JY3	2026-06-30
