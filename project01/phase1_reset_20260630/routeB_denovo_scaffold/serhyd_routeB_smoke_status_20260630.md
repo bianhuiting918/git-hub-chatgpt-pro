@@ -166,3 +166,40 @@ batch20 LigandMPNN expansion: 0 PASS / 20 evaluated
 ```
 
 Interpretation: the first RFAA backbone and its current LigandMPNN sequences do not yet preserve the active-site motif after ESMFold prediction. The next regeneration step should sample additional RFAA backbones and screen by pocket-only gate, rather than rejecting based on global fold RMSD.
+
+## RFAA Batch5 x LigandMPNN Seq5 Result - 2026-06-30
+
+After correcting the Route B gate to focus on active-site pocket geometry at the current sequence stage, a new small batch was run on GPU:
+
+```text
+RFAA new backbones: 5
+LigandMPNN sequences: 25, 5 per backbone
+ESMFold predicted structures: 25 OK / 25 submitted
+sequence-stage motif-backbone gate: 2 PASS / 25 evaluated
+strict all-atom pocket sidechain gate: 0 PASS / 25 evaluated
+```
+
+Current stage policy:
+
+```text
+sequence-stage hard gate = motif backbone/CA preservation
+sidechain-heavy/ligand-distance gate = diagnostic until ligand-aware repack or holo model
+full global CA RMSD = diagnostic, not hard gate
+```
+
+Best current candidates:
+
+| sample_id | RFAA backbone | fixed residues | global CA RMSD A | motif CA RMSD A | motif heavy RMSD A | max key-distance delta A | sequence-stage gate | strict all-atom gate |
+| --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
+| routeB_serhyd_sample_2_lmpnn_03 | sample_2 | A40 A49 A56 | 1.0309 | 0.4081 | 1.6668 | 3.7134 | PASS | FAIL_DIAGNOSTIC |
+| routeB_serhyd_sample_2_lmpnn_04 | sample_2 | A40 A49 A56 | 1.0787 | 0.7402 | 2.4429 | 7.2344 | PASS | FAIL_DIAGNOSTIC |
+
+Remote evidence, not uploaded:
+
+```text
+/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/rfaa_batch5_motif_mapping.tsv
+/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_rfaabatch5_seq5_esmfold_summary.json
+/data/bht/project01_phase1_reset_gpu/denovo_scaffold_routeB/serine_hydrolase/manifests/routeB_serhyd_rfaabatch5_seq5_pocket_only_gate_tiered_summary.json
+```
+
+Next action: use RFAA `sample_2` as the first productive motif-backbone seed. Generate more sequences for `sample_2` and/or run ligand-aware sidechain repack/holo validation before deciding whether the sidechain-heavy gate should reject it.
