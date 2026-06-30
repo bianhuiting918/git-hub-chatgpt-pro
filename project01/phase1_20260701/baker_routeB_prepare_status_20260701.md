@@ -98,6 +98,19 @@ MAX_WAIT_MINUTES=360
 
 It writes only lightweight status/log files and invokes `launch_baker_theozyme_smoke.sh` once GPU utilization drops below the threshold.
 
+Current monitor:
+
+```text
+remote_pid = 4100072
+remote_status = /data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_smoke_monitor_status.json
+remote_log = /data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_smoke_monitor.log
+status_at_2026-07-01T00:40:59+08:00 = WAITING_GPU_BUSY
+gpu_util_percent = 99
+gpu_memory_used_mib = 4619
+```
+
+This monitor does not count any candidate as evaluated until the launcher actually starts and RFAA writes output.
+
 ## Launcher Check
 
 The launcher was pulled and syntax-checked on the GPU node from commit `087a779`.

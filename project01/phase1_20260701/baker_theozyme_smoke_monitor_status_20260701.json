@@ -1,0 +1,17 @@
+{
+  "status": "WAITING_GPU_BUSY",
+  "route_label": "baker_theozyme_new_backbone",
+  "root": "/data/bht/project01_baker_serhyd_routeB_20260701",
+  "monitor_pid": "4100072",
+  "attempt": 1,
+  "max_gpu_util_percent": "40",
+  "interval_seconds": "300",
+  "max_wait_minutes": "360",
+  "gpu_util_percent": "99",
+  "gpu_memory_used_mib": "4619",
+  "gpu_memory_total_mib": "81920",
+  "detail": "GPU above threshold; monitor is waiting and has not launched RFAA.",
+  "remote_status": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_smoke_monitor_status.json",
+  "remote_log": "/data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_smoke_monitor.log",
+  "updated_at": "2026-07-01T00:40:59+08:00"
+}
