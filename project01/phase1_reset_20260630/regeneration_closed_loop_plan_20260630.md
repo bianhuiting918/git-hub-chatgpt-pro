@@ -133,6 +133,14 @@ current denovo_SER_hydrolase panel: COMPLETE
 new natural-scaffold panel: NOT_STARTED
 ```
 
+The current seed/queue files are:
+
+```text
+project01/phase1_reset_20260630/phase1_dual_track_seed_manifest.tsv
+project01/phase1_reset_20260630/phase1_next_generation_queue_20260630.md
+project01/phase1_reset_20260630/natural_scaffold_msa_generation_protocol_20260630.md
+```
+
 ### Track B: active-site constrained de novo scaffold generation
 
 For Baker-style serine-hydrolase diversity, fixed active-site/reactive geometry comes before backbone generation. Generate new backbones around the motif, then design sequences for those backbones. Keep these candidates in a separate manifest until the downstream comparison between natural and de novo backgrounds is explicitly defined.
