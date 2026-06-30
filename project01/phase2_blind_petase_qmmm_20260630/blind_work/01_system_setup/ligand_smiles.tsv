@@ -1,0 +1,5 @@
+model_id	formal_charge	stage	role	smiles	notes
+PET_dimer_capped	0	acylation_primary	PET-like dimer substrate	OCCOC(=O)c1ccc(C(=O)OCCOC(=O)c2ccc(C(=O)OCCO)cc2)cc1	Blind PET-like dimer model; ester candidates are enumerated rather than chosen from paper data.
+BHET_like	0	acylation_control	small neutral ester control	OCCOC(=O)c1ccc(C(=O)OCCO)cc1	Small soluble control for pose and geometry sanity checks.
+MHET_like	-1	deacylation_reference	product-side fragment	OCCOC(=O)c1ccc(C(=O)[O-])cc1	Default pH-7 anionic reference; neutral variant only if pKa/protonation gate supports it.
+MHET_like_acyl_enzyme_precursor	pka_dependent	deacylation_covalent	covalent protein-fragment precursor		Covalent Ser160 acyl-enzyme model; must be built from a prepared protein complex, not as a free ligand.
