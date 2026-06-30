@@ -17,6 +17,7 @@ This log records structure-only preparation steps for the blind PETase QM/MM mec
    - His ND1/NE2 to Asp OD1/OD2 <= 4.0 A.
 5. Ran PDB preparation audit for chains, missing residues, missing atoms, alternate conformers, non-water heterogens, crystallographic water, and geometric disulfide candidates.
 6. Wrote explicit template-chain decisions and retained-water candidate tables.
+7. Defined blind substrate model inputs: `PET_dimer_capped`, `BHET_like`, `MHET_like`, and `MHET_like_acyl_enzyme_precursor`.
 
 ## Triad Scan Result
 
@@ -38,6 +39,14 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `5YFE` uses shifted residue numbering, has four missing C-terminal His residues reported, glycerol and sulfate heterogens, two geometric Cys-Cys pairs, and no retained-water candidates within the 4 A triad cutoff.
 - Backup multi-chain structures contain repeated chain copies and should remain sensitivity/backup templates rather than primary production templates.
 
+## Ligand Model Definition Result
+
+- `PET_dimer_capped` is the primary acylation substrate model because it preserves PET-like ester/aromatic repetition while remaining tractable.
+- `BHET_like` is a small neutral control for docking and pose-generation sanity checks.
+- `MHET_like` is the default product-side/deacylation reference fragment, with pH-7 carboxylate state explicit.
+- `MHET_like_acyl_enzyme_precursor` is explicitly a protein-covalent Ser160 acyl-enzyme model, not a standalone free ligand.
+- Stable atom-label files are required before topology conversion so the scissile ester atoms can be traced into QM/MM setup.
+
 ## Current Decisions
 
 1. Primary production template remains `6EQE`, chain A.
@@ -45,6 +54,7 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 3. Geometric disulfide candidates should be kept unless later preparation software contradicts the connectivity.
 4. Water molecules listed in `retained_water_candidates.tsv` should be retained for the first local relaxation pass, then tested by sensitivity runs.
 5. Alternate conformers in `6EQE` must be resolved before ligand placement; default starting policy is highest occupancy, then active-site geometry inspection.
+6. Ligand construction must preserve the named scissile ester atom labels from `ligand_model_manifest.tsv`.
 
 ## Not Yet Done
 
@@ -52,7 +62,7 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - Alternate conformer selection in coordinate files.
 - Crystal-water retention/removal implementation in coordinate files.
 - Protonation-state assignment.
-- Substrate model construction.
+- 3D substrate conformer generation and parameterization.
 - Michaelis-complex generation and relaxation.
 
 ## Evidence Files
@@ -63,4 +73,6 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `pdb_preparation_audit.tsv`
 - `template_chain_decisions.tsv`
 - `retained_water_candidates.tsv`
+- `ligand_model_manifest.tsv`
+- `ligand_model_definitions.md`
 - `stage1_system_setup_protocol.md`
