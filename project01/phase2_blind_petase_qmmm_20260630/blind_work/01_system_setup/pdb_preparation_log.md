@@ -18,6 +18,9 @@ This log records structure-only preparation steps for the blind PETase QM/MM mec
 5. Ran PDB preparation audit for chains, missing residues, missing atoms, alternate conformers, non-water heterogens, crystallographic water, and geometric disulfide candidates.
 6. Wrote explicit template-chain decisions and retained-water candidate tables.
 7. Defined blind substrate model inputs: `PET_dimer_capped`, `BHET_like`, `MHET_like`, and `MHET_like_acyl_enzyme_precursor`.
+8. Generated initial cleaned chain-A PDB files locally with retained catalytic-site waters, non-water heterogens removed, disulfide records written, and altlocs resolved by highest altloc-atom occupancy.
+9. Verified the generated v2 PDB files have zero nonblank altloc indicators after cleaning.
+10. Checked the local ligand-build environment and confirmed RDKit/Open Babel/Biopython are not available in the bundled Python runtime.
 
 ## Triad Scan Result
 
@@ -39,6 +42,12 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `5YFE` uses shifted residue numbering, has four missing C-terminal His residues reported, glycerol and sulfate heterogens, two geometric Cys-Cys pairs, and no retained-water candidates within the 4 A triad cutoff.
 - Backup multi-chain structures contain repeated chain copies and should remain sensitivity/backup templates rather than primary production templates.
 
+## Initial Cleaned Structure Result
+
+- `prepared_structure_manifest.tsv` records nine generated initial-cleaned PDB files and SHA256 checksums.
+- These are not final simulation-ready coordinates: protonation is not assigned, missing residues are not rebuilt, and no local minimization has been run.
+- These files are intended as inputs to the next preparation layer: protonation, hydrogen placement, residue completion where needed, and local relaxation.
+
 ## Ligand Model Definition Result
 
 - `PET_dimer_capped` is the primary acylation substrate model because it preserves PET-like ester/aromatic repetition while remaining tractable.
@@ -46,6 +55,7 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `MHET_like` is the default product-side/deacylation reference fragment, with pH-7 carboxylate state explicit.
 - `MHET_like_acyl_enzyme_precursor` is explicitly a protein-covalent Ser160 acyl-enzyme model, not a standalone free ligand.
 - Stable atom-label files are required before topology conversion so the scissile ester atoms can be traced into QM/MM setup.
+- Ligand 3D conformer generation is blocked in the current local bundled Python because RDKit/Open Babel are unavailable; see `ligand_build_environment_report.md`.
 
 ## Current Decisions
 
@@ -53,16 +63,15 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 2. Secondary sensitivity templates remain `5XJH`, `5YFE`, and `6ILW`, chain A.
 3. Geometric disulfide candidates should be kept unless later preparation software contradicts the connectivity.
 4. Water molecules listed in `retained_water_candidates.tsv` should be retained for the first local relaxation pass, then tested by sensitivity runs.
-5. Alternate conformers in `6EQE` must be resolved before ligand placement; default starting policy is highest occupancy, then active-site geometry inspection.
+5. Alternate conformers in `6EQE` are resolved in the v2 initial-cleaned PDB by highest altloc-atom occupancy; this remains subject to active-site geometry inspection after ligand placement.
 6. Ligand construction must preserve the named scissile ester atom labels from `ligand_model_manifest.tsv`.
 
 ## Not Yet Done
 
-- Actual repaired PDB/mmCIF generation.
-- Alternate conformer selection in coordinate files.
-- Crystal-water retention/removal implementation in coordinate files.
-- Protonation-state assignment.
-- 3D substrate conformer generation and parameterization.
+- Production repaired/protonated PDB/mmCIF generation.
+- Missing-residue rebuilding where needed.
+- Hydrogen placement and protonation-state assignment.
+- 3D substrate conformer generation and parameterization in an environment with RDKit/Open Babel or an equivalent chemistry stack.
 - Michaelis-complex generation and relaxation.
 
 ## Evidence Files
@@ -73,6 +82,9 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `pdb_preparation_audit.tsv`
 - `template_chain_decisions.tsv`
 - `retained_water_candidates.tsv`
+- `prepared_structure_manifest.tsv`
+- `altloc_resolution_decisions.tsv`
 - `ligand_model_manifest.tsv`
 - `ligand_model_definitions.md`
+- `ligand_build_environment_report.md`
 - `stage1_system_setup_protocol.md`
