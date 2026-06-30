@@ -2,7 +2,7 @@
 
 ## Status
 
-A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stages 1 through 9 now have blind workflow scaffolds, manifests, protocols, and generator tests through final paper-validation, including the Stage 2 classical-MD bridge from accepted GS poses to productive conformer clusters. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, classical MD trajectories, productive conformer clusters, low-cost QM/MM scans, refined TS structures, committors, PMFs, barriers, and final paper comparison are not yet complete.
+A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stages 1 through 9 now have blind workflow scaffolds, manifests, protocols, generator tests, and a Stage 1/2 gate runner for compute-server execution. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, classical MD trajectories, productive conformer clusters, low-cost QM/MM scans, refined TS structures, committors, PMFs, barriers, and final paper comparison are not yet complete.
 
 ## Scope correction
 
@@ -88,10 +88,12 @@ Scripts and tests:
 - `scripts/build_stage1_ligands_rdkit.py`
 - `scripts/run_stage1_protonation_gate.sh`
 - `scripts/score_stage1_pose_geometry.py`
+- `scripts/run_blind_stage1_stage2_gates.py`
 - `scripts/generate_stage2_classical_md_manifests.py`
 - `scripts/generate_stage3_mechanism_tree.py`
 - `scripts/generate_stage5_ts_manifests.py`
 - `scripts/generate_stage8_stage9_manifests.py`
+- `tests/test_run_blind_stage1_stage2_gates.py`
 - `tests/test_generate_stage2_classical_md_manifests.py`
 - `tests/test_generate_stage3_mechanism_tree.py`
 - `tests/test_generate_stage5_ts_manifests.py`
@@ -110,6 +112,14 @@ Protonation setup was started from cleaned coordinates. For primary template `6E
 Blind substrate model definitions were added for `PET_dimer_capped`, `BHET_like`, `MHET_like`, and `MHET_like_acyl_enzyme_precursor`.
 
 Executable Stage 1 gates were added for ligand conformer generation, protonation review, and pose geometry scoring. Local verification showed the RDKit ligand script compiles and writes `blocked_missing_rdkit` in the local missing-RDKit environment instead of fabricating coordinates. The pose geometry scorer compiles locally. Bash validation for `run_stage1_protonation_gate.sh` remains server-side because local Windows lacks `bash`.
+
+A Stage 1/2 compute-server runner was added. It records gate status to `blind_work/00_run_status/stage1_stage2_gate_status.tsv` and next actions to `blind_work/00_run_status/stage1_stage2_next_actions.md`; it refuses to queue Stage 2 MD without an accepted GS pose.
+
+A TDD check was used for `run_blind_stage1_stage2_gates.py`:
+
+- Red: `test_run_blind_stage1_stage2_gates.py` failed because the runner did not exist and no status file was produced.
+- Green: after implementation and skip-probe status ordering correction, the test passed with bundled Python: `Ran 1 test in 0.275s OK`.
+- Syntax check: `python -m py_compile work/run_blind_stage1_stage2_gates.py` exited 0.
 
 ## Stage 2 progress
 
@@ -155,4 +165,10 @@ Non-interactive SSH to the known compute server was tested without embedding a p
 
 ## Next action
 
-Continue by running `probe_stage1_compute_environment.sh` on the compute server. If RDKit and pKa/protonation tools are available, run `build_stage1_ligands_rdkit.py`, `run_stage1_protonation_gate.sh`, build accepted/rejected Michaelis or acyl-enzyme poses, score them with `score_stage1_pose_geometry.py`, then use `generate_stage2_classical_md_manifests.py` to queue classical MD replicates from accepted poses. Only after productive conformers exist should Stage 4 low-cost QM/MM scans be activated.
+Run this from the repository root on the compute server:
+
+```text
+python project01/phase2_blind_petase_qmmm_20260630/scripts/run_blind_stage1_stage2_gates.py
+```
+
+If the runner reports a blocked ligand/protonation/GS-pose gate, fix that upstream input or toolchain issue first. Only after an accepted GS pose exists should the runner queue Stage 2 classical MD; only after productive conformers exist should Stage 4 low-cost QM/MM scans be activated.
