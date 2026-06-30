@@ -1,0 +1,2 @@
+pmf_job_id	accepted_ts_id	path_id	reaction_stage	structure_path	reaction_coordinate_source	sampling_method	window_or_string_plan	analysis_method	sampling_status	barrier_kcal_mol	source
+pending	pending	pending	deacylation	pending	not_ready_no_accepted_ts	pending	pending	pending	not_ready	pending	blind_workflow_pending
