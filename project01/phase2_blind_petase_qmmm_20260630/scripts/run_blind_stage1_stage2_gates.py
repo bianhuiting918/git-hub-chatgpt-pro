@@ -56,6 +56,19 @@ def accepted_gs_pose_count(path: Path) -> int:
     return count
 
 
+def ready_ligand_count(path: Path) -> int:
+    count = 0
+    for row in read_tsv(path):
+        if row.get("status") != "built_needs_scissile_candidate_selection":
+            continue
+        if row.get("pdb_path") in {"", "pending", None}:
+            continue
+        if row.get("atom_label_path") in {"", "pending", None}:
+            continue
+        count += 1
+    return count
+
+
 def write_next_actions(path: Path, rows: list[dict[str, str]]) -> None:
     blocked = [row for row in rows if row["status"] == "blocked"]
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -82,9 +95,10 @@ def write_next_actions(path: Path, rows: list[dict[str, str]]) -> None:
             "1. Confirm compute-environment tools and versions.",
             "2. Build ligand conformers and atom-label tables from blind substrate definitions.",
             "3. Run protonation review on cleaned PETase coordinates.",
-            "4. Generate and score Stage 1 ground-state poses.",
-            "5. Queue Stage 2 classical MD only from accepted ground-state poses.",
-            "6. Do not activate Stage 4 QM/MM scans until productive Stage 2 conformers exist.",
+            "4. Generate blind pose-generation queues from prepared structures and ligand atom labels.",
+            "5. Generate and score Stage 1 ground-state poses.",
+            "6. Queue Stage 2 classical MD only from accepted ground-state poses.",
+            "7. Do not activate Stage 4 QM/MM scans until productive Stage 2 conformers exist.",
         ]
     )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -136,6 +150,37 @@ def generate(args: argparse.Namespace) -> int:
         )
         status = "completed" if code == 0 else "blocked"
         append_status(rows, "ligand_build", status, "protonation_gate", f"{sys.executable} {ligand_script}", ligand_out / "ligand_build_manifest.tsv", note)
+
+    pose_script = scripts_dir / "generate_stage1_pose_generation_queue.py"
+    prepared_manifest = phase_root / "blind_work" / "01_system_setup" / "prepared_structure_manifest.tsv"
+    triad_manifest = phase_root / "blind_work" / "01_system_setup" / "ser_his_asp_triad_candidates.tsv"
+    ligand_manifest = ligand_out / "ligand_build_manifest.tsv"
+    fallback_ligand_manifest = phase_root / "blind_work" / "01_system_setup" / "ligand_build" / "ligand_build_manifest.tsv"
+    if not ligand_manifest.exists() and fallback_ligand_manifest.exists():
+        ligand_manifest = fallback_ligand_manifest
+    pose_queue_path = out_root / "01_system_setup" / "pose_generation_queue.tsv"
+    ready_ligands = ready_ligand_count(ligand_manifest)
+    if ready_ligands == 0:
+        append_status(rows, "pose_generation_queue", "blocked", "gs_pose_generation", str(pose_script), pose_queue_path, "requires ready_ligand_build_manifest before pose queue generation")
+    elif not pose_script.exists():
+        append_status(rows, "pose_generation_queue", "blocked", "gs_pose_generation", str(pose_script), pose_queue_path, "pose generation queue script missing")
+    else:
+        code, note = run_command(
+            [
+                sys.executable,
+                str(pose_script),
+                "--prepared-manifest",
+                str(prepared_manifest),
+                "--triad-manifest",
+                str(triad_manifest),
+                "--ligand-build-manifest",
+                str(ligand_manifest),
+                "--out-root",
+                str(out_root),
+            ],
+            project_root,
+        )
+        append_status(rows, "pose_generation_queue", "completed" if code == 0 else "failed", "gs_pose_generation", f"{sys.executable} {pose_script}", pose_queue_path, note)
 
     input_pdb = phase_root / "blind_work" / "01_system_setup" / "prepared_initial_pdbs" / args.primary_pdb
     protonation_out = out_root / "01_system_setup" / "protonation_gate"
