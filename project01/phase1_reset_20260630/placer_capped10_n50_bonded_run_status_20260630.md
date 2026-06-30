@@ -125,6 +125,17 @@ first completed input skipped
 second input started: bin90_rank2_rec3.holo_bu2_refpose
 ```
 
+Status at 2026-06-30 14:24 CST:
+
+```text
+PER_INPUT_DRIVER_VERIFIED
+CSV outputs present: 2
+second input completed: bin90_rank2_rec3.holo_bu2_refpose
+third input started: bin90_rank3_rec4.holo_bu2_refpose
+```
+
+This verifies the per-input recovery path across at least one input boundary after the single-process `75I` registration failure.
+
 ## Gate Caveat
 
 These PLACER outputs are not complete until the downstream crop ligand geometry screen has run. The project strict filter remains:
