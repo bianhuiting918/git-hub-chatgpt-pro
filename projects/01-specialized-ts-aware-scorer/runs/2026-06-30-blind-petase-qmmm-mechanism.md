@@ -17,15 +17,20 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/gs_pose_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_definitions.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_build_environment_report.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/structure_download_manifest.csv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ser_his_asp_triad_candidates.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/pdb_preparation_log.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/pdb_preparation_audit.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/template_chain_decisions.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/retained_water_candidates.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/prepared_structure_manifest.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/altloc_resolution_decisions.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/download_stage1_rcsb_structures.ps1`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/identify_ser_his_asp_triads.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/audit_stage1_pdb_preparation.py`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/prepare_stage1_initial_structures_v2.py`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/write_ligand_build_environment_report.py`
 
 ## Boundary
 
@@ -64,6 +69,8 @@ The selected WT-like/backup RCSB coordinate files were downloaded locally. A coo
 
 A PDB preparation audit was completed. It records selected chain decisions, missing residues/atoms from PDB headers, alternate conformers, non-water heterogens, geometric disulfide candidates, water counts, and crystallographic waters within 4 A of catalytic hetero atoms.
 
+Initial cleaned chain-A PDB files were generated locally from RCSB inputs. The manifest records nine generated files, retained water counts, altloc decision counts, SHA256 hashes, and explicit `not_assigned` protonation status. A validation check found zero nonblank altloc indicators in the v2 cleaned PDB files.
+
 Blind substrate model definitions were added for:
 
 - `PET_dimer_capped` as the primary PET-like acylation substrate;
@@ -71,16 +78,18 @@ Blind substrate model definitions were added for:
 - `MHET_like` as a product-side/deacylation reference fragment with explicit pH-7 carboxylate state;
 - `MHET_like_acyl_enzyme_precursor` as a protein-covalent Ser160 acyl-enzyme precursor for deacylation setup.
 
+Ligand 3D generation was not faked: local bundled Python lacks RDKit/Open Babel/Biopython, so `ligand_build_environment_report.md` marks this as `blocked_missing_chemistry_toolkit` until a chemistry stack is available.
+
 Current structure-prep decisions:
 
 - use chain A for the initial blind setup across selected templates;
 - keep geometric disulfide candidates unless preparation software contradicts connectivity;
 - retain listed catalytic-site water candidates for first local relaxation, then test sensitivity;
-- resolve `6EQE` alternate conformers before substrate placement;
+- use v2 altloc decisions before substrate placement;
 - preserve scissile ester atom labels through ligand 3D generation and topology conversion.
 
 This is structure/substrate-derived preparation evidence and is not a paper-derived mechanism result.
 
 ## Next action
 
-Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
+Continue Stage 1 by implementing repaired/protonation-ready coordinate files, assigning protonation states, exposing RDKit/Open Babel or equivalent ligand-builder tooling, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
