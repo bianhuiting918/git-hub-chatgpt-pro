@@ -51,6 +51,8 @@ scripts/probe_stage1_compute_environment.sh
 scripts/build_stage1_ligands_rdkit.py
 scripts/run_stage1_protonation_gate.sh
 scripts/score_stage1_pose_geometry.py
+scripts/run_blind_stage1_stage2_gates.py
+tests/test_run_blind_stage1_stage2_gates.py
 ```
 
 Stage 2 has a blind classical-MD queue and conformer-selection gate:
@@ -264,10 +266,12 @@ Tasks:
 
 ## First compute action
 
-Recommended first action:
+Recommended first action on the compute server from the repository root:
 
 ```text
-Run the environment probe on the compute server, build RDKit ligand conformers/atom labels, run the protonation gate for 6EQE, generate WT PETase + PET dimer/BHET-like ester GS candidates, score them with score_stage1_pose_geometry.py, then activate supported Stage 3 paths in path_screening_table.tsv.
+python project01/phase2_blind_petase_qmmm_20260630/scripts/run_blind_stage1_stage2_gates.py
 ```
+
+This writes `blind_work/00_run_status/stage1_stage2_gate_status.tsv` and `blind_work/00_run_status/stage1_stage2_next_actions.md`. Continue manually only at gates that report `completed`; if a gate reports `blocked`, fix that input/tooling issue before moving downstream.
 
 Do not start mutant ranking until WT acylation/deacylation TS ensembles are chemically validated.
