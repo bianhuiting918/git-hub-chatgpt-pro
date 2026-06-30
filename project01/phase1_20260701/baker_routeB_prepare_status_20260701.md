@@ -77,3 +77,22 @@ bash project01/phase1_20260701/scripts/launch_baker_theozyme_smoke.sh /data/bht/
 Default behavior: if GPU utilization is above `MAX_GPU_UTIL=40`, the script writes `BLOCKED_GPU_BUSY_OR_UNAVAILABLE` instead of launching.
 
 This remains a compute-resource block, not a biological or design failure.
+
+## Launcher Check
+
+The launcher was pulled and syntax-checked on the GPU node from commit `087a779`.
+
+Result:
+
+```text
+status = BLOCKED_GPU_BUSY_OR_UNAVAILABLE
+gpu_util_percent = 100
+gpu_memory_used_mib = 4617
+max_gpu_util_percent = 40
+```
+
+Remote status file:
+
+```text
+/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_smoke_status.json
+```

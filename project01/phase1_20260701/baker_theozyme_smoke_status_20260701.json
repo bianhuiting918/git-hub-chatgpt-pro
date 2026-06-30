@@ -1,0 +1,11 @@
+{
+  "status": "BLOCKED_GPU_BUSY_OR_UNAVAILABLE",
+  "route_label": "baker_theozyme_new_backbone",
+  "root": "/data/bht/project01_baker_serhyd_routeB_20260701",
+  "input": "/data/bht/project01_baker_serhyd_routeB_20260701/inputs/baker_serhyd/design_pipeline/01_diffusion/inputs/theozyme.pdb",
+  "gpu_util_percent": "100",
+  "gpu_memory_used_mib": "4617",
+  "gpu_memory_total_mib": "81920",
+  "max_gpu_util_percent": "40",
+  "next_action": "Rerun launch_baker_theozyme_smoke.sh when GPU util is below threshold, or set FORCE=1 intentionally."
+}
