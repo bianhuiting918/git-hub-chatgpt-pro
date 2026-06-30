@@ -54,6 +54,7 @@ Active Stage 4 input and topology-preparation generators:
 scripts/generate_stage4_amber_qmmm_inputs.py
 scripts/prepare_stage4_amber_topology_inputs.py
 scripts/map_stage4_amber_qmmm_masks_to_topology.py
+scripts/prepare_stage4_amber_cleanup_inputs.py
 ```
 
 The generator prepares blind Amber/Sander DFTB3 QM/MM inputs from accepted seed structures:
@@ -63,7 +64,7 @@ The generator prepares blind Amber/Sander DFTB3 QM/MM inputs from accepted seed 
 - QM atom selection from catalytic side chains, nearby side chains, and the bound substrate atoms in our own seed structures;
 - status explicitly remains `inputs_ready_needs_amber_prmtop_inpcrd` until Amber topology and coordinate files are built or mapped;
 - topology preparation now writes ligand extraction, GAFF2/AM1-BCC `antechamber`, `parmchk2`, `tleap`, 15 A TIP3P solvation, and `complex.prmtop`/`complex.inpcrd` output checks;
-- QM/MM masks must be remapped after `tleap`, because Amber atom indices differ from the original seed PDB serials after hydrogen/water/ion addition.
+- QM/MM masks must be remapped after `tleap`, because Amber atom indices differ from the original seed PDB serials after hydrogen/water/ion addition;`r`n- cleanup preparation now stages solvent/ion MM minimization, all-atom MM minimization, short DFTB3/MM minimization, and optional longer DFTB3/MM minimization before production equilibration.
 
 Methodological inspiration from the article is allowed here, but concrete article coordinates, trajectories, reaction-coordinate formulas, selected CVs, windows, barriers, rates, and mechanism conclusions remain blocked until final validation.
 ## Latest Amber QM/MM Smoke Evidence
@@ -79,5 +80,6 @@ GitHub main has reached `6526f76` for the Amber/Sander Stage 4 route. On the CPU
 - `run_sander_qmmm_smoke.sh` completed with exit `0` after auto-setting `AMBERHOME`; Sander entered DFTB3 QM/MM and completed one minimization cycle.
 
 This is a technical smoke pass only. The one-step output reports very large energy and `VDWAALS=*************`, so the structure is not yet a chemically relaxed Michaelis complex and no TS/PMF/barrier result exists. The next compute gate is restrained/nonreactive cleanup minimization and staged QM/MM minimization before any TS search or 200 ps equilibration is treated as production evidence.
+
 
 
