@@ -2,7 +2,7 @@
 
 ## Status
 
-A new blind first-principles PETase QM/MM mechanism task was created and Stage 1 structure-only setup has started.
+A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stage 1 has progressed from structure-only setup to executable environment, ligand, and protonation gates. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, QM/MM paths, and TS ensembles are not yet complete.
 
 ## Scope correction
 
@@ -14,9 +14,12 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/README.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/structure_selection.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_system_setup_protocol.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_ligand_and_protonation_execution_protocol.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/gs_pose_manifest.tsv`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/rejected_pose_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_manifest.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_model_definitions.md`
+- `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_smiles.tsv`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/ligand_build_environment_report.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_environment_enablement_status.md`
 - `project01/phase2_blind_petase_qmmm_20260630/blind_work/01_system_setup/stage1_remote_execution_instructions.md`
@@ -38,6 +41,8 @@ The task is not to reproduce the paper by consuming the paper's concrete traject
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/write_ligand_build_environment_report.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/scan_stage1_protonation_sites.py`
 - `project01/phase2_blind_petase_qmmm_20260630/scripts/probe_stage1_compute_environment.sh`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/build_stage1_ligands_rdkit.py`
+- `project01/phase2_blind_petase_qmmm_20260630/scripts/run_stage1_protonation_gate.sh`
 
 ## Boundary
 
@@ -89,7 +94,18 @@ Blind substrate model definitions were added for:
 - `MHET_like` as a product-side/deacylation reference fragment with explicit pH-7 carboxylate state;
 - `MHET_like_acyl_enzyme_precursor` as a protein-covalent Ser160 acyl-enzyme precursor for deacylation setup.
 
-Ligand 3D generation was not faked: local bundled Python lacks RDKit/Open Babel/Biopython, so `ligand_build_environment_report.md` marks this as `blocked_missing_chemistry_toolkit` until a chemistry stack is available.
+Executable Stage 1 gates were added:
+
+- `build_stage1_ligands_rdkit.py` reads `ligand_smiles.tsv`, builds RDKit conformers when RDKit is present, writes SDF/PDB outputs, and enumerates ester atom-label candidates without choosing a paper-derived scissile ester.
+- `run_stage1_protonation_gate.sh` records input hashes and pKa/protonation/hydrogen-tool outputs for manual catalytic Asp/His review.
+- `stage1_ligand_and_protonation_execution_protocol.md` defines pass/fail grill gates for ligand, protonation, and pose acceptance.
+- `rejected_pose_manifest.tsv` is now present so failed Michaelis candidates must be recorded rather than silently discarded.
+
+Local verification completed:
+
+- `build_stage1_ligands_rdkit.py` passed Python compile check with bundled Python.
+- Running it in the local missing-RDKit environment wrote a `blocked_missing_rdkit` manifest instead of generating fake ligand coordinates.
+- Bash syntax validation was not possible locally because `bash` is not installed in the Windows environment; the shell script must be checked on the Linux compute server.
 
 Current structure-prep decisions:
 
@@ -99,10 +115,10 @@ Current structure-prep decisions:
 - use v2 altloc decisions before substrate placement;
 - preserve scissile ester atom labels through ligand 3D generation and topology conversion;
 - run external pKa/protonation tooling before production topology generation and compare against `protonation_hypothesis_manifest.tsv`;
-- do not accept docking/MD/QM-MM inputs until the compute environment probe records exact tool paths and versions.
+- do not accept docking/MD/QM-MM inputs until the compute environment probe, ligand build gate, and protonation gate record exact tool paths, versions, and hashes.
 
 This is structure/substrate-derived preparation evidence and is not a paper-derived mechanism result.
 
 ## Next action
 
-Continue Stage 1 by running `probe_stage1_compute_environment.sh` on the compute server through interactive/key-based login, then implementing repaired/protonation-ready coordinate files, assigning protonation states with external pKa/protonation tooling, generating 3D ligand conformers/parameters, and filling `gs_pose_manifest.tsv` with accepted and rejected Michaelis-complex candidates.
+Continue Stage 1 by running `probe_stage1_compute_environment.sh` on the compute server through interactive/key-based login. If RDKit and pKa/protonation tools are available, run `build_stage1_ligands_rdkit.py` and `run_stage1_protonation_gate.sh`, then generate repaired/protonated coordinate files, ligand conformers/parameters, and accepted/rejected Michaelis-complex manifests.
