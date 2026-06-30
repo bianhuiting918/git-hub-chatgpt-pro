@@ -1,0 +1,11 @@
+{
+  "source_manifest": "phase1_reset_20260630/manifests/postseq_entrance_gate_manifest.tsv",
+  "queue_manifest": "phase1_reset_20260630/manifests/placer_n50_entrance_pass_queue.tsv",
+  "total_rows": 50,
+  "entrance_pass_count": 0,
+  "entrance_gate_status_counts": {
+    "NOT_EVALUATED": 50
+  },
+  "status": "NO_PLACER_LAUNCH_UNTIL_ENTRANCE_PASS",
+  "reason": "No post-sequence predicted PDB files exist yet; missing predicted structures are NOT_EVALUATED, not FAIL."
+}
