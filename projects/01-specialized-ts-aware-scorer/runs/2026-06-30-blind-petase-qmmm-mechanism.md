@@ -2,7 +2,7 @@
 
 ## Status
 
-A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stages 1 through 9 now have blind workflow scaffolds, manifests, protocols, generator tests, and a Stage 1/2 gate runner for compute-server execution. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, classical MD trajectories, productive conformer clusters, low-cost QM/MM scans, refined TS structures, committors, PMFs, barriers, and final paper comparison are not yet complete.
+A blind first-principles PETase QM/MM mechanism task was created and uploaded. Stages 1 through 9 now have blind workflow scaffolds, manifests, protocols, generator tests, a Stage 1/2 gate runner for compute-server execution, and a Stage 1 pose-generation queue generator. The actual ligand 3D structures, protonated production coordinates, Michaelis complexes, classical MD trajectories, productive conformer clusters, low-cost QM/MM scans, refined TS structures, committors, PMFs, barriers, and final paper comparison are not yet complete.
 
 ## Scope correction
 
@@ -25,6 +25,7 @@ Stage 1 setup and gates:
 - `blind_work/01_system_setup/stage1_system_setup_protocol.md`
 - `blind_work/01_system_setup/stage1_ligand_and_protonation_execution_protocol.md`
 - `blind_work/01_system_setup/stage1_pose_geometry_filter_protocol.md`
+- `blind_work/01_system_setup/pose_generation_queue.tsv`
 - `blind_work/01_system_setup/gs_pose_manifest.tsv`
 - `blind_work/01_system_setup/rejected_pose_manifest.tsv`
 - `blind_work/01_system_setup/ligand_model_manifest.tsv`
@@ -86,6 +87,7 @@ Scripts and tests:
 - `scripts/scan_stage1_protonation_sites.py`
 - `scripts/probe_stage1_compute_environment.sh`
 - `scripts/build_stage1_ligands_rdkit.py`
+- `scripts/generate_stage1_pose_generation_queue.py`
 - `scripts/run_stage1_protonation_gate.sh`
 - `scripts/score_stage1_pose_geometry.py`
 - `scripts/run_blind_stage1_stage2_gates.py`
@@ -93,6 +95,7 @@ Scripts and tests:
 - `scripts/generate_stage3_mechanism_tree.py`
 - `scripts/generate_stage5_ts_manifests.py`
 - `scripts/generate_stage8_stage9_manifests.py`
+- `tests/test_generate_stage1_pose_generation_queue.py`
 - `tests/test_run_blind_stage1_stage2_gates.py`
 - `tests/test_generate_stage2_classical_md_manifests.py`
 - `tests/test_generate_stage3_mechanism_tree.py`
@@ -111,7 +114,7 @@ Protonation setup was started from cleaned coordinates. For primary template `6E
 
 Blind substrate model definitions were added for `PET_dimer_capped`, `BHET_like`, `MHET_like`, and `MHET_like_acyl_enzyme_precursor`.
 
-Executable Stage 1 gates were added for ligand conformer generation, protonation review, and pose geometry scoring. Local verification showed the RDKit ligand script compiles and writes `blocked_missing_rdkit` in the local missing-RDKit environment instead of fabricating coordinates. The pose geometry scorer compiles locally. Bash validation for `run_stage1_protonation_gate.sh` remains server-side because local Windows lacks `bash`.
+Executable Stage 1 gates were added for ligand conformer generation, protonation review, pose generation, and pose geometry scoring. Local verification showed the RDKit ligand script compiles and writes `blocked_missing_rdkit` in the local missing-RDKit environment instead of fabricating coordinates. The pose geometry scorer compiles locally. Bash validation for `run_stage1_protonation_gate.sh` remains server-side because local Windows lacks `bash`.
 
 A Stage 1/2 compute-server runner was added. It records gate status to `blind_work/00_run_status/stage1_stage2_gate_status.tsv` and next actions to `blind_work/00_run_status/stage1_stage2_next_actions.md`; it refuses to queue Stage 2 MD without an accepted GS pose.
 
@@ -120,6 +123,13 @@ A TDD check was used for `run_blind_stage1_stage2_gates.py`:
 - Red: `test_run_blind_stage1_stage2_gates.py` failed because the runner did not exist and no status file was produced.
 - Green: after implementation and skip-probe status ordering correction, the test passed with bundled Python: `Ran 1 test in 0.275s OK`.
 - Syntax check: `python -m py_compile work/run_blind_stage1_stage2_gates.py` exited 0.
+
+A TDD check was used for `generate_stage1_pose_generation_queue.py`:
+
+- Red: `test_generate_stage1_pose_generation_queue.py` failed because the pose queue generator did not exist.
+- Green: after implementation, the test passed with bundled Python: `Ran 1 test in 0.508s OK`.
+- The generator builds docking queue rows and Vina-style config files from prepared structures, Ser-His-Asp triad geometry, and ligand atom-label manifests. The docking box center is computed from catalytic Ser OG coordinates in the prepared structure, not from paper coordinates or paper trajectories.
+- With the current local missing-RDKit ligand manifest, the generated `pose_generation_queue.tsv` remains `not_ready` with `no_ready_ligand_build_manifest`; no pose or docking result was fabricated.
 
 ## Stage 2 progress
 
@@ -171,4 +181,4 @@ Run this from the repository root on the compute server:
 python project01/phase2_blind_petase_qmmm_20260630/scripts/run_blind_stage1_stage2_gates.py
 ```
 
-If the runner reports a blocked ligand/protonation/GS-pose gate, fix that upstream input or toolchain issue first. Only after an accepted GS pose exists should the runner queue Stage 2 classical MD; only after productive conformers exist should Stage 4 low-cost QM/MM scans be activated.
+If the runner reports a blocked ligand/protonation/pose/GS-pose gate, fix that upstream input or toolchain issue first. Only after an accepted GS pose exists should the runner queue Stage 2 classical MD; only after productive conformers exist should Stage 4 low-cost QM/MM scans be activated.
