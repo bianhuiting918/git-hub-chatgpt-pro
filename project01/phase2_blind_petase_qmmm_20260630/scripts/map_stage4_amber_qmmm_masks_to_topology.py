@@ -163,6 +163,12 @@ SANDER=${{SANDER:-sander}}
 PRMTOP=${{PRMTOP:-{prmtop}}}
 INPCRD=${{INPCRD:-{inpcrd}}}
 
+if [ -z "${{AMBERHOME:-}}" ]; then
+  SANDER_PATH=$(command -v "${{SANDER}}")
+  AMBERHOME=$(cd "$(dirname "${{SANDER_PATH}}")/.." && pwd)
+  export AMBERHOME
+fi
+
 "${{SANDER}}" -O \
   -i 00_qmmm_smoke_min_1step.in \
   -o 00_qmmm_smoke_min_1step.out \
@@ -259,4 +265,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
 

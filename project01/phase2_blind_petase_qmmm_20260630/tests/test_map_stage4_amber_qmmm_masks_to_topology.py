@@ -126,7 +126,10 @@ class MapStage4AmberQmmmMasksTest(unittest.TestCase):
             self.assertIn("complex.prmtop", runner)
             self.assertIn("complex.inpcrd", runner)
             self.assertIn("sander", runner)
+            self.assertIn("AMBERHOME", runner)
+            self.assertIn("command -v", runner)
 
 
 if __name__ == "__main__":
     unittest.main()
+
