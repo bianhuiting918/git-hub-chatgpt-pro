@@ -9,6 +9,8 @@ from pathlib import Path
 class LaunchBlindStage1Stage2ComputeTest(unittest.TestCase):
     def test_launcher_records_runner_evidence_and_preserves_exit_code(self):
         launcher = Path("work/launch_blind_stage1_stage2_compute.py")
+        if not launcher.exists():
+            launcher = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/launch_blind_stage1_stage2_compute.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             phase_root = tmpdir / "project01" / "phase2_blind_petase_qmmm_20260630"
