@@ -21,6 +21,8 @@ This log records structure-only preparation steps for the blind PETase QM/MM mec
 8. Generated initial cleaned chain-A PDB files locally with retained catalytic-site waters, non-water heterogens removed, disulfide records written, and altlocs resolved by highest altloc-atom occupancy.
 9. Verified the generated v2 PDB files have zero nonblank altloc indicators after cleaning.
 10. Checked the local ligand-build environment and confirmed RDKit/Open Babel/Biopython are not available in the bundled Python runtime.
+11. Scanned v2 cleaned structures for titratable residues near the catalytic triad and all histidines requiring tautomer assignment.
+12. Wrote the primary-template protonation hypothesis manifest for `6EQE`.
 
 ## Triad Scan Result
 
@@ -48,6 +50,14 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - These are not final simulation-ready coordinates: protonation is not assigned, missing residues are not rebuilt, and no local minimization has been run.
 - These files are intended as inputs to the next preparation layer: protonation, hydrogen placement, residue completion where needed, and local relaxation.
 
+## Protonation Setup Result
+
+- Default pH-7 assumptions are explicit: Asp/Glu deprotonated, Lys/Arg protonated, Cys/Tyr neutral, His neutral tautomer to assign.
+- For primary template `6EQE`, catalytic `ASP206` is deprotonated in the primary hypothesis but requires a neutral-Asp sensitivity branch if pKa or the His-Asp network supports it.
+- Catalytic `HIS237` requires HID/HIE tautomer sensitivity before committing to QM/MM reaction scans; HIP is only a branch if pKa/local electrostatics supports cationic histidine.
+- Remote histidines such as `HIS104` and `HIS293` require tautomer naming for topology generation but are not automatically reaction-mechanism sensitivity branches.
+- `CYS203` and `CYS239` are near the triad but treated as disulfide-linked unless preparation software contradicts the geometric disulfide assignment.
+
 ## Ligand Model Definition Result
 
 - `PET_dimer_capped` is the primary acylation substrate model because it preserves PET-like ester/aromatic repetition while remaining tractable.
@@ -65,12 +75,13 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 4. Water molecules listed in `retained_water_candidates.tsv` should be retained for the first local relaxation pass, then tested by sensitivity runs.
 5. Alternate conformers in `6EQE` are resolved in the v2 initial-cleaned PDB by highest altloc-atom occupancy; this remains subject to active-site geometry inspection after ligand placement.
 6. Ligand construction must preserve the named scissile ester atom labels from `ligand_model_manifest.tsv`.
+7. Protonation production setup must run an external pKa/protonation tool and compare its output with `protonation_hypothesis_manifest.tsv` before topology generation.
 
 ## Not Yet Done
 
 - Production repaired/protonated PDB/mmCIF generation.
 - Missing-residue rebuilding where needed.
-- Hydrogen placement and protonation-state assignment.
+- Hydrogen placement and protonation-state assignment with PROPKA/H++/pdb2pqr/Amber reduce or equivalent.
 - 3D substrate conformer generation and parameterization in an environment with RDKit/Open Babel or an equivalent chemistry stack.
 - Michaelis-complex generation and relaxation.
 
@@ -84,6 +95,9 @@ This is a structure-derived active-site assignment, not a paper-derived mechanis
 - `retained_water_candidates.tsv`
 - `prepared_structure_manifest.tsv`
 - `altloc_resolution_decisions.tsv`
+- `protonation_site_scan.tsv`
+- `protonation_hypothesis_manifest.tsv`
+- `protonation_setup_notes.md`
 - `ligand_model_manifest.tsv`
 - `ligand_model_definitions.md`
 - `ligand_build_environment_report.md`
