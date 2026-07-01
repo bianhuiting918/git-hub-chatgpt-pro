@@ -171,6 +171,9 @@ def mm_min_mdin(maxcyc: int) -> str:
   ntpr=10,
   nmropt=1,
 /
+&wt
+  type='END',
+/
 DISANG=reactive_relaxation_restraints.RST
 LISTOUT=POUT
 """

@@ -99,6 +99,8 @@ class PrepareStage1AmberReactiveRelaxationInputsTest(unittest.TestCase):
             mdin = (job_dir / "00_restrained_mm_min.in").read_text(encoding="utf-8")
             self.assertIn("imin=1", mdin)
             self.assertIn("nmropt=1", mdin)
+            self.assertIn("&wt", mdin)
+            self.assertIn("type='END'", mdin)
             self.assertIn("DISANG=reactive_relaxation_restraints.RST", mdin)
             self.assertNotIn("ifqnt=1", mdin)
 
