@@ -68,6 +68,30 @@ def distance(a, b):
     return norm(sub(a, b))
 
 
+def is_heavy_atom(atom: dict[str, object]) -> bool:
+    element = str(atom.get("element", "")).strip().upper()
+    if not element:
+        element = str(atom.get("atom_name", "")).strip().upper()[:1]
+    return element not in {"H", "D"}
+
+
+def min_ligand_protein_heavy_contact(protein_atoms, transformed_ligand) -> float:
+    min_contact = math.inf
+    for protein_atom in protein_atoms:
+        if not is_heavy_atom(protein_atom):
+            continue
+        protein_xyz = protein_atom["xyz"]
+        for ligand_atom, ligand_xyz in transformed_ligand:
+            if not is_heavy_atom(ligand_atom):
+                continue
+            min_contact = min(min_contact, distance(protein_xyz, ligand_xyz))
+    return min_contact
+
+
+def has_ligand_protein_heavy_clash(protein_atoms, transformed_ligand, min_distance: float = 1.2) -> bool:
+    return min_ligand_protein_heavy_contact(protein_atoms, transformed_ligand) < min_distance
+
+
 def angle(a, b, c):
     ba = sub(a, b)
     bc = sub(c, b)
@@ -251,10 +275,16 @@ def generate(args: argparse.Namespace) -> list[dict[str, object]]:
     targets = candidate_targets(protein_atoms, ser_atom, his_atoms, distance(c_atom["xyz"], o_atom["xyz"]), distance(c_atom["xyz"], l_atom["xyz"]))
     rows = []
     out_dir = Path(args.out_dir)
-    for index, (_rank, c_target, o_target, l_target, attack, oxy, relay, donor) in enumerate(targets[: args.max_seeds], start=1):
+    for _rank, c_target, o_target, l_target, attack, oxy, relay, donor in targets:
+        if len(rows) >= args.max_seeds:
+            break
+        transformed = transformed_ligand(ligand_atoms, label, c_target, o_target, l_target)
+        min_heavy_contact = min_ligand_protein_heavy_contact(protein_atoms, transformed)
+        if min_heavy_contact < args.min_ligand_protein_heavy_contact:
+            continue
+        index = len(rows) + 1
         pose_id = f"REACTIVE_{args.template_pdb}_{args.model_id}_{args.candidate_id}_{index:03d}"
         complex_pdb = out_dir / f"{pose_id}.pdb"
-        transformed = transformed_ligand(ligand_atoms, label, c_target, o_target, l_target)
         write_complex(complex_pdb, protein_atoms, transformed)
         rows.append(
             {
@@ -269,7 +299,7 @@ def generate(args: argparse.Namespace) -> list[dict[str, object]]:
                 "leaving_his_target_distance_A": f"{relay:.3f}",
                 "status": "ready_for_geometry_scoring",
                 "source": "blind_reactive_geometry_seed",
-                "note": f"donor={donor['chain']}:{donor['resname']}{donor['resseq']}:{donor['atom_name']};not_relaxed",
+                "note": f"donor={donor['chain']}:{donor['resname']}{donor['resseq']}:{donor['atom_name']};min_ligand_protein_heavy_contact_A={min_heavy_contact:.3f};not_relaxed",
             }
         )
     if not rows:
@@ -286,7 +316,7 @@ def generate(args: argparse.Namespace) -> list[dict[str, object]]:
                 "leaving_his_target_distance_A": "pending",
                 "status": "not_generated",
                 "source": "blind_reactive_geometry_seed",
-                "note": "no generic geometry target satisfied",
+                "note": "no generic geometry target satisfied ligand-protein heavy-atom contact gate",
             }
         )
     write_tsv(out_dir / "reactive_pose_seed_manifest.tsv", rows)
@@ -305,6 +335,7 @@ def main() -> int:
     parser.add_argument("--triad-his", required=True)
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--max-seeds", type=int, default=10)
+    parser.add_argument("--min-ligand-protein-heavy-contact", type=float, default=1.2)
     args = parser.parse_args()
     rows = generate(args)
     print(Path(args.out_dir) / "reactive_pose_seed_manifest.tsv")

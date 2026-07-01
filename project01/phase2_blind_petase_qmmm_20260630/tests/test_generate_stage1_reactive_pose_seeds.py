@@ -82,6 +82,8 @@ class GenerateStage1ReactivePoseSeedsTest(unittest.TestCase):
                     str(out_dir),
                     "--max-seeds",
                     "1",
+                    "--min-ligand-protein-heavy-contact",
+                    "0.0",
                 ],
                 text=True,
                 capture_output=True,
@@ -132,5 +134,25 @@ class GenerateStage1ReactivePoseSeedsTest(unittest.TestCase):
             self.assertEqual(score_rows[0]["pass_fail"], "pass")
 
 
+    def test_rejects_ligand_protein_heavy_atom_clashes(self):
+        import importlib.util
+
+        script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage1_reactive_pose_seeds.py")
+        spec = importlib.util.spec_from_file_location("generate_stage1_reactive_pose_seeds", script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        protein_atoms = [
+            {"element": "C", "xyz": (0.0, 0.0, 0.0)},
+            {"element": "O", "xyz": (5.0, 0.0, 0.0)},
+        ]
+        transformed_ligand = [
+            ({"element": "C"}, (0.4, 0.0, 0.0)),
+            ({"element": "H"}, (0.1, 0.0, 0.0)),
+        ]
+
+        self.assertAlmostEqual(module.min_ligand_protein_heavy_contact(protein_atoms, transformed_ligand), 0.4)
+        self.assertTrue(module.has_ligand_protein_heavy_clash(protein_atoms, transformed_ligand, min_distance=1.2))
 if __name__ == "__main__":
     unittest.main()
+
