@@ -8,8 +8,8 @@ Scope: PETase blind first-principles QM/MM mechanism reproduction. The paper is 
 
 - CPU host: `210.73.40.29`
 - Repository path: `/Dell/Dell14/bianht/petase_blind_qmmm/repo`
-- Conda/micromamba environment: `$HOME/micromamba/envs/petase_stage1`
-- Active GitHub commit after Stage 2 label fix: `7f30793`
+- Conda/micromamba environment: `/Dell/Dell14/bianht/micromamba/envs/petase_stage1`
+- Active GitHub commit: `cd3da25`
 
 ## Verified Gates
 
@@ -44,6 +44,8 @@ blind_work/02_classical_md/productive_conformer_manifest.tsv
 
 Only productive conformer representatives may feed Stage 4 low-cost QM/MM scans. No TS ensemble exists yet.
 
+The current route is Amber/Sander QM/MM. Earlier GMX-CP2K potential-energy work was for a different purpose and is not part of this PETase mechanism-reproduction workflow.
+
 ## QM/MM Engine Route
 
 Use the Amber/Sander route for the current PETase mechanism reproduction. The CPU-server environment has AmberTools with `sander`, `tleap`, `antechamber`, and `parmchk2` available in the PETase micromamba environment.
@@ -64,22 +66,25 @@ The generator prepares blind Amber/Sander DFTB3 QM/MM inputs from accepted seed 
 - QM atom selection from catalytic side chains, nearby side chains, and the bound substrate atoms in our own seed structures;
 - status explicitly remains `inputs_ready_needs_amber_prmtop_inpcrd` until Amber topology and coordinate files are built or mapped;
 - topology preparation now writes ligand extraction, GAFF2/AM1-BCC `antechamber`, `parmchk2`, `tleap`, 15 A TIP3P solvation, and `complex.prmtop`/`complex.inpcrd` output checks;
-- QM/MM masks must be remapped after `tleap`, because Amber atom indices differ from the original seed PDB serials after hydrogen/water/ion addition;`r`n- cleanup preparation now stages solvent/ion MM minimization, all-atom MM minimization, short DFTB3/MM minimization, and optional longer DFTB3/MM minimization before production equilibration.
+- QM/MM masks must be remapped after `tleap`, because Amber atom indices differ from the original seed PDB serials after hydrogen/water/ion addition;
+- cleanup preparation now stages solvent/ion MM minimization, all-atom MM minimization, short DFTB3/MM minimization, and optional longer DFTB3/MM minimization before production equilibration.
 
 Methodological inspiration from the article is allowed here, but concrete article coordinates, trajectories, reaction-coordinate formulas, selected CVs, windows, barriers, rates, and mechanism conclusions remain blocked until final validation.
+
 ## Latest Amber QM/MM Smoke Evidence
 
 Updated: 2026-07-01 Asia/Shanghai
 
-GitHub main has reached `6526f76` for the Amber/Sander Stage 4 route. On the CPU server, a clean detached worktree at `/Dell/Dell14/bianht/petase_blind_qmmm/repo_verify_6526f76_20260701_060758` verified:
+GitHub main has reached `cd3da25` for the Amber/Sander Stage 4 route. On the CPU server, clean detached worktrees verified:
 
 - `python -m unittest discover -s project01/phase2_blind_petase_qmmm_20260630/tests`: `Ran 12 tests ... OK`.
 - Accepted seed `REACTIVE_6EQE_BHET_like_E01_001` generated Amber QM/MM inputs and AmberTools topology-prep inputs.
 - `run_amber_topology_prep.sh` completed with exit `0`, producing `complex.prmtop`, `complex.inpcrd`, `ligand.mol2`, and `ligand.frcmod`.
 - `map_stage4_amber_qmmm_masks_to_topology.py` mapped 76 QM atoms from the original seed selection onto the `tleap` atom indices.
 - `run_sander_qmmm_smoke.sh` completed with exit `0` after auto-setting `AMBERHOME`; Sander entered DFTB3 QM/MM and completed one minimization cycle.
+- After adding staged cleanup inputs at `cd3da25`, the full local test suite reported `Ran 13 tests ... OK`.
+- In `/Dell/Dell14/bianht/petase_blind_qmmm/repo_verify_cd3da25_20260701_061947`, 50 solvent/ion MM minimization cycles plus 25 all-atom MM minimization cycles completed and removed the initial `VDWAALS=*************` overflow to finite MM values (`11994.4488`, then `11648.1807`).
+- From the cleaned MM restart, a one-step Sander DFTB3/MM minimization completed with `FINAL RESULTS`, `Run done at 06:27:44.185 on 07/01/2026`, `VDWAALS = 11575.5319`, and `DFTBESCF = -7994.4898`.
+- A deliberately too-short cleanup test using 10 solvent/ion MM cycles, 5 all-atom MM cycles, and 1 QM/MM cycle crashed in Sander with exit `139` while the starting structure still showed `VDWAALS=*************`. Do not use that ultra-short cleanup as the production route.
 
-This is a technical smoke pass only. The one-step output reports very large energy and `VDWAALS=*************`, so the structure is not yet a chemically relaxed Michaelis complex and no TS/PMF/barrier result exists. The next compute gate is restrained/nonreactive cleanup minimization and staged QM/MM minimization before any TS search or 200 ps equilibration is treated as production evidence.
-
-
-
+This is still a technical smoke/cleanup pass only. The structure is not yet a chemically relaxed Michaelis complex and no TS/PMF/barrier result exists. The next compute gate is the default or longer staged Amber cleanup, followed by 200 ps DFTB3/MM equilibration before any TS search is treated as production evidence.
