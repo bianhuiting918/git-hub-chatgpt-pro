@@ -201,7 +201,7 @@ def readme(row: dict[str, str]) -> str:
             "",
             "This is a classical restrained MM preparation step, not a transition-state search.",
             "It uses generic serine-hydrolase restraints only: Ser attack distance, attack angle, oxyanion contact, and His relay contact.",
-            "Build Amber topology and coordinates from `complex_for_amber.pdb`; the restraint atom indices are based on that renumbered PDB order.",
+            "Build Amber topology and coordinates from `complex_for_amber.pdb`, then run `map_stage1_amber_reactive_relaxation_restraints_to_topology.py` before Sander so restraint atom indices match the post-tleap Amber topology.",
             "",
             "Boundary: no paper TS coordinates, paper reaction-coordinate terms, umbrella windows, barriers, or mechanism conclusions are used.",
         ]

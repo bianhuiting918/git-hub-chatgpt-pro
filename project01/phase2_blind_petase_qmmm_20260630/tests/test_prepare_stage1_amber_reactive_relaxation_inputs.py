@@ -112,6 +112,7 @@ class PrepareStage1AmberReactiveRelaxationInputsTest(unittest.TestCase):
 
             readme = (job_dir / "00_README.md").read_text(encoding="utf-8")
             self.assertIn("complex_for_amber.pdb", readme)
+            self.assertIn("map_stage1_amber_reactive_relaxation_restraints_to_topology.py", readme)
 
 
 if __name__ == "__main__":
