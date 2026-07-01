@@ -9,6 +9,8 @@ from pathlib import Path
 class GenerateStage8Stage9ManifestsTest(unittest.TestCase):
     def test_generates_free_energy_and_final_validation_manifests(self):
         script = Path("work/generate_stage8_stage9_manifests.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage8_stage9_manifests.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             accepted = tmpdir / "accepted_ts_manifest.tsv"

@@ -9,6 +9,8 @@ from pathlib import Path
 class GenerateStage2ClassicalMdManifestsTest(unittest.TestCase):
     def test_generates_md_queue_only_from_accepted_gs_poses(self):
         script = Path("work/generate_stage2_classical_md_manifests.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage2_classical_md_manifests.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             gs_manifest = tmpdir / "gs_pose_manifest.tsv"
@@ -68,6 +70,46 @@ class GenerateStage2ClassicalMdManifestsTest(unittest.TestCase):
                 productive_rows = list(csv.DictReader(handle, delimiter="\t"))
             self.assertEqual(productive_rows[0]["source"], "awaiting_md_replicates")
             self.assertEqual(productive_rows[0]["selection_status"], "not_ready")
+
+    def test_labels_reactive_geometry_seeds_as_preacylation_ensemble(self):
+        script = Path("work/generate_stage2_classical_md_manifests.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage2_classical_md_manifests.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmpdir = Path(tmp)
+            gs_manifest = tmpdir / "gs_pose_manifest.tsv"
+            gs_manifest.write_text(
+                "\n".join(
+                    [
+                        "pose_id\ttemplate_pdb\tsubstrate_model\tgeneration_method\trelaxed_structure_path\tser_og_to_c_A\tattack_angle_deg\toxyanion_hbond_count\this_acceptor_distance_A\tleaving_group_relay_distance_A\ttrp_rotamer_label\tpass_fail\trejection_reason\tnext_step",
+                        "REACTIVE_6EQE_PET_dimer_capped_E03_001\t6EQE\tPET_dimer_capped\treactive_geometry_seed\twork/reactive_seed.pdb\t3.1\t100\t3\t2.9\t1.0\ttrans\tpass\tnone\tclassical_md_candidate",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            out_root = tmpdir / "blind_work"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(script),
+                    "--gs-pose-manifest",
+                    str(gs_manifest),
+                    "--out-root",
+                    str(out_root),
+                    "--replicates",
+                    "1",
+                ],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            queue = out_root / "02_classical_md" / "md_replicate_queue.tsv"
+            with queue.open("r", encoding="utf-8", newline="") as handle:
+                rows = list(csv.DictReader(handle, delimiter="\t"))
+            self.assertEqual(rows[0]["stage"], "preacylation_michaelis_complex")
 
 
 if __name__ == "__main__":

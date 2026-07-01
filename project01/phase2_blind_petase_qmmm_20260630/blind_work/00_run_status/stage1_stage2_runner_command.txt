@@ -1,0 +1,1 @@
+/Dell/Dell14/bianht/micromamba/envs/petase_stage1/bin/python project01/phase2_blind_petase_qmmm_20260630/scripts/run_blind_stage1_stage2_gates.py --project-root . --phase-subdir project01/phase2_blind_petase_qmmm_20260630 --out-root project01/phase2_blind_petase_qmmm_20260630/blind_work --conformers 20 --replicates 3

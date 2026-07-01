@@ -9,6 +9,8 @@ from pathlib import Path
 class GenerateStage5TsManifestsTest(unittest.TestCase):
     def test_generates_ts_refinement_and_ensemble_manifests_from_verified_guesses(self):
         script = Path("work/generate_stage5_ts_manifests.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage5_ts_manifests.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             guesses = tmpdir / "ts_like_guess_manifest.tsv"

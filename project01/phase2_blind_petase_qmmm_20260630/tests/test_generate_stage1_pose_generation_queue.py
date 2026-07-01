@@ -9,6 +9,8 @@ from pathlib import Path
 class GenerateStage1PoseGenerationQueueTest(unittest.TestCase):
     def test_generates_docking_queue_from_structure_triad_and_ligand_manifest(self):
         script = Path("work/generate_stage1_pose_generation_queue.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage1_pose_generation_queue.py")
         with tempfile.TemporaryDirectory() as tmp:
             tmpdir = Path(tmp)
             prepared_dir = tmpdir / "prepared"
@@ -49,7 +51,8 @@ class GenerateStage1PoseGenerationQueueTest(unittest.TestCase):
             triads = tmpdir / "ser_his_asp_triad_candidates.tsv"
             triads.write_text(
                 "pdb\tser\this\tasp\tser_his_min_A\tser_his_atoms\this_asp_min_A\this_asp_atoms\n"
-                "6EQE\tA:SER160\tA:HIS237\tA:ASP206\t2.94\tOG-NE2\t2.66\tND1-OD2\n",
+                "6EQE\tA:SER160\tA:HIS237\tA:ASP206\t2.94\tOG-NE2\t2.66\tND1-OD2\n"
+                "6EQE\tB:SER160\tB:HIS237\tB:ASP206\t2.94\tOG-NE2\t2.66\tND1-OD2\n",
                 encoding="utf-8",
             )
             ligand_manifest = tmpdir / "ligand_build_manifest.tsv"
@@ -91,6 +94,7 @@ class GenerateStage1PoseGenerationQueueTest(unittest.TestCase):
             self.assertEqual(rows[0]["box_center_x"], "10.000")
             self.assertEqual(rows[0]["box_center_y"], "20.000")
             self.assertEqual(rows[0]["box_center_z"], "30.000")
+            self.assertEqual(rows[0]["triad_ser"], "A:SER160")
             self.assertEqual(rows[0]["status"], "ready_for_docking")
             self.assertEqual(rows[0]["source"], "blind_structure_geometry")
 

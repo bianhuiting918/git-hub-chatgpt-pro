@@ -1,2 +1,2 @@
 conformer_id	source_pose_id	md_job_id	stage	cluster_id	representative_structure_path	frame_count	geometry_pass_fraction	selection_status	source
-pending	pending	pending	pending	pending	pending	pending	pending	not_ready	awaiting_accepted_gs_pose
+pending	pending	pending	pending	pending	pending	pending	pending	not_ready	awaiting_md_replicates

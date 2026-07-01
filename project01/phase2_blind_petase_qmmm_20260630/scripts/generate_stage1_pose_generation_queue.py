@@ -128,6 +128,21 @@ def label_candidates(path: Path, model_id: str) -> list[dict[str, str]]:
     return rows
 
 
+def triad_chain(row: dict[str, str]) -> str:
+    if not row.get("ser"):
+        return ""
+    chain, _resname, _resseq = parse_triad_residue(row["ser"])
+    return chain
+
+
+def select_triad(pdb_id: str, selected_chain: str, triads_by_pdb: dict[str, list[dict[str, str]]]) -> dict[str, str] | None:
+    candidates = triads_by_pdb.get(pdb_id, [])
+    for row in candidates:
+        if selected_chain and triad_chain(row) == selected_chain:
+            return row
+    return candidates[0] if candidates else None
+
+
 def write_config(path: Path, protein: Path, ligand: Path, center: tuple[float, float, float], box_size: float) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -177,7 +192,10 @@ def pending_row(note: str) -> dict[str, str]:
 
 def generate(prepared_manifest: Path, triad_manifest: Path, ligand_manifest: Path, out_root: Path, box_size: float) -> list[Path]:
     prepared_rows = ready_prepared_structures(read_tsv(prepared_manifest))
-    triads = {row["pdb"]: row for row in read_tsv(triad_manifest) if row.get("pdb")}
+    triads_by_pdb: dict[str, list[dict[str, str]]] = {}
+    for row in read_tsv(triad_manifest):
+        if row.get("pdb"):
+            triads_by_pdb.setdefault(row["pdb"], []).append(row)
     ligands = ready_ligands(read_tsv(ligand_manifest))
     output_rows: list[dict[str, str]] = []
     config_dir = out_root / "01_system_setup" / "docking_inputs"
@@ -189,7 +207,7 @@ def generate(prepared_manifest: Path, triad_manifest: Path, ligand_manifest: Pat
     else:
         for prep in prepared_rows:
             pdb_id = prep["pdb"]
-            triad = triads.get(pdb_id)
+            triad = select_triad(pdb_id, prep.get("selected_chain", ""), triads_by_pdb)
             if not triad:
                 continue
             protein = Path(prep["prepared_path"])

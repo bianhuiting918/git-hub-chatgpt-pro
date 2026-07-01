@@ -37,6 +37,12 @@ projects/01-specialized-ts-aware-scorer/docs/petase_blind_qmmm_mechanism_plan.md
 
 ## Active Gate Artifacts
 
+Current execution status:
+
+```text
+blind_work/00_run_status/current_reproduction_status.md
+```
+
 Stage 1 has executable gates for environment readiness, ligand construction, protonation, pose generation, pose scoring, and pose acceptance:
 
 ```text
@@ -80,7 +86,9 @@ blind_work/03_mechanism_tree/stage3_stage4_mechanism_qmmm_protocol.md
 blind_work/04_qmmm_exploration/path_screening_table.tsv
 blind_work/04_qmmm_exploration/ts_like_guess_manifest.tsv
 scripts/generate_stage3_mechanism_tree.py
+scripts/generate_stage4_gmx_cp2k_qmmm_inputs.py
 tests/test_generate_stage3_mechanism_tree.py
+tests/test_generate_stage4_gmx_cp2k_qmmm_inputs.py
 ```
 
 Stage 5/6/7 has TS refinement, TS ensemble, and committor-queue scaffolds:

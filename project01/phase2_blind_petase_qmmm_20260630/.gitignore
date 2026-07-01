@@ -1,0 +1,40 @@
+# Local and generated Python files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Molecular dynamics and QM/MM heavy outputs
+*.nc
+*.dcd
+*.xtc
+*.trr
+*.rst7
+*.ncrst
+*.mdcrd
+*.mdout
+*.prmtop
+*.inpcrd
+*.parm7
+*.netcdf
+mdinfo
+info_err.out
+
+# ATESA/Ambersander generated work directories and scheduler scratch
+blind_work/**/work/
+blind_work/**/not_thread_process_safe*
+*.slurm.local_sbatch.log
+
+# Large prepared/simulation directories kept on the compute server, not GitHub
+blind_work/01_system_setup/amber_reactive_relaxation*/
+blind_work/01_system_setup/docking_runs/
+blind_work/01_system_setup/docking_reruns_high_exh/
+blind_work/01_system_setup/ligand_build/
+blind_work/01_system_setup/prepared_initial_pdbs/
+blind_work/04_qmmm_rank021_reactant_prep/
+blind_work/04_qmmm_rank022_reactant_prep/
+blind_work/05_atesa_acylation/
+
+# Generated structure files from early-stage gates; regenerate on the compute server
+blind_work/01_system_setup/protonation_gate/*.pdb
+blind_work/01_system_setup/protonation_gate/*.pqr
+blind_work/01_system_setup/reactive_pose_seeds/**/*.pdb

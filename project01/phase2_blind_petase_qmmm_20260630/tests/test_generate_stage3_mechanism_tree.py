@@ -9,6 +9,8 @@ from pathlib import Path
 class GenerateStage3MechanismTreeTest(unittest.TestCase):
     def test_generates_blind_stage3_and_stage4_files(self):
         script = Path("work/generate_stage3_mechanism_tree.py")
+        if not script.exists():
+            script = Path("project01/phase2_blind_petase_qmmm_20260630/scripts/generate_stage3_mechanism_tree.py")
         with tempfile.TemporaryDirectory() as tmp:
             out_root = Path(tmp) / "blind_work"
 

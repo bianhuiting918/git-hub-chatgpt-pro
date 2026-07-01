@@ -1,0 +1,10 @@
+rank	state	rst7	SerO_C	attack_to_O006	attack_to_O004	C_O004	O006_MetN	SerH_HisNE2	SerO_HisNE2	HisNE2_O004	nearWAT_HisNE2	nearWAT_LigC	gate_note
+002	00_restrained_mm_min_mapped_100step	00_restrained_mm_min_mapped_100step.rst7	3.169	47.7	129.6	1.322	3.005	3.627	2.819	5.743	3.263/res273	4.668/res273	SerC_ok,oxyanion_possible,His_accessible
+021	00_restrained_mm_min_stage300	00_restrained_mm_min_stage300.rst7	2.840	68.3	77.8	1.355	2.899	3.838	3.065	3.094	3.276/res273	4.332/res273	SerC_ok,angle_possible,oxyanion_possible,His_accessible
+021	00_restrained_mm_min_mapped_100step	00_restrained_mm_min_mapped_100step.rst7	2.861	56.5	90.4	1.403	3.076	3.807	2.937	4.200	3.143/res273	3.825/res273	SerC_ok,angle_possible,oxyanion_possible,His_accessible
+022	00_mm_min_release100	00_mm_min_release100.rst7	3.462	67.1	113.8	1.349	3.196	3.767	3.607	4.084	3.398/res273	3.869/res273	SerC_ok,angle_possible,oxyanion_possible
+022	00_restrained_mm_min_weakback200	00_restrained_mm_min_weakback200.rst7	2.940	80.3	87.2	1.387	2.964	3.640	3.445	3.009	3.318/res273	3.788/res273	SerC_ok,angle_possible,oxyanion_possible
+022	00_restrained_mm_min_stage300	00_restrained_mm_min_stage300.rst7	2.779	90.1	87.5	1.388	2.936	3.488	3.297	3.113	3.219/res273	3.815/res273	SerC_ok,angle_possible,oxyanion_possible
+022	00_restrained_mm_min_mapped_100step	00_restrained_mm_min_mapped_100step.rst7	2.784	61.4	112.4	1.355	2.814	3.857	2.950	4.401	3.082/res273	3.519/res273	SerC_ok,angle_possible,oxyanion_possible,His_accessible
+027	00_restrained_mm_min_mapped_100step	00_restrained_mm_min_mapped_100step.rst7	2.969	62.8	110.5	1.320	3.048	3.718	2.916	4.473	3.123/res273	3.536/res273	SerC_ok,angle_possible,oxyanion_possible,His_accessible
+031	00_restrained_mm_min_mapped_100step	00_restrained_mm_min_mapped_100step.rst7	3.538	53.0	143.8	1.394	3.375	3.246	2.909	5.923	3.298/res273	5.697/res273	SerC_ok,oxyanion_possible,His_accessible
