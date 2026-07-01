@@ -23,7 +23,7 @@ class AnalyzeStage4AmberQmmmOutputsTest(unittest.TestCase):
             )
             incomplete = tmpdir / "incomplete.out"
             incomplete.write_text(
-                """QMMM: SINGLET STATE CALCULATION\n   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER\n      1      -1.6217E+05     2.0795E+00     3.7811E+02     NE2      2991\n VDWAALS =    23525.9538  EEL     =  -213867.8381  HBOND      =        0.0000\n DFTBESCF=     2650.4126\n""",
+                """TESTING RELATIVE ERROR over r ranging from 0.0 to cutoff\nQMMM: SINGLET STATE CALCULATION\n   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER\n      1      -1.6217E+05     2.0795E+00     3.7811E+02     NE2      2991\n VDWAALS =    23525.9538  EEL     =  -213867.8381  HBOND      =        0.0000\n DFTBESCF=     2650.4126\n""",
                 encoding="utf-8",
             )
             stderr = tmpdir / "stderr.log"
@@ -63,3 +63,4 @@ class AnalyzeStage4AmberQmmmOutputsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

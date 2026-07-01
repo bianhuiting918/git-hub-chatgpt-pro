@@ -53,7 +53,7 @@ def analyze_case(case_id: str, out_path: Path, stderr_path: Path) -> dict[str, s
         status = "completed_with_scc_warnings"
     elif run_done and final_results:
         status = "completed"
-    elif stderr_nonempty or "ERROR" in out_text or "Error" in out_text:
+    elif stderr_nonempty or "ERROR TERMINATION" in out_text or "Error: " in out_text:
         status = "failed_or_error_output"
     else:
         status = "running_or_incomplete"
@@ -106,6 +106,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
