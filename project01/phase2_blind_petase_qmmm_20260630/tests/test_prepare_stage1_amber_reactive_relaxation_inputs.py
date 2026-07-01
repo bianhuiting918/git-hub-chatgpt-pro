@@ -83,6 +83,13 @@ class PrepareStage1AmberReactiveRelaxationInputsTest(unittest.TestCase):
             self.assertEqual(rows[0]["status"], "reactive_relaxation_inputs_ready_requires_amber_topology")
 
             job_dir = Path(rows[0]["relaxation_job_dir"])
+            complex_for_amber = Path(rows[0]["complex_for_amber_pdb_path"])
+            self.assertTrue(complex_for_amber.exists())
+            self.assertEqual(
+                [line[6:11] for line in complex_for_amber.read_text(encoding="utf-8").splitlines() if line.startswith(("ATOM  ", "HETATM"))],
+                ["    1", "    2", "    3", "    4", "    5", "    6"],
+            )
+
             restraints = (job_dir / "reactive_relaxation_restraints.RST").read_text(encoding="utf-8")
             self.assertIn("iat=1,4", restraints)
             self.assertIn("iat=1,4,5", restraints)
@@ -100,6 +107,9 @@ class PrepareStage1AmberReactiveRelaxationInputsTest(unittest.TestCase):
             self.assertIn("PRMTOP", runner)
             self.assertIn("INPCRD", runner)
             self.assertIn("00_restrained_mm_min.rst7", runner)
+
+            readme = (job_dir / "00_README.md").read_text(encoding="utf-8")
+            self.assertIn("complex_for_amber.pdb", readme)
 
 
 if __name__ == "__main__":

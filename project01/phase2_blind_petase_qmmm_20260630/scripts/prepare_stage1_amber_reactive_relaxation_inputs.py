@@ -20,6 +20,7 @@ FIELDS = [
     "substrate_model",
     "generation_method",
     "source_complex_pdb",
+    "complex_for_amber_pdb_path",
     "relaxation_job_dir",
     "restraint_path",
     "mm_min_mdin_path",
@@ -48,6 +49,21 @@ def sanitize_id(raw: str) -> str:
 def parse_atom_selector(text: str) -> tuple[str, int, str]:
     chain, resseq, atom_name = text.split(":", 2)
     return chain, int(resseq), atom_name
+
+
+def renumber_pdb_for_amber(source: Path, destination: Path) -> None:
+    lines = []
+    serial = 1
+    with source.open("r", encoding="utf-8", errors="replace") as handle:
+        for line in handle:
+            if line.startswith(("ATOM  ", "HETATM")):
+                lines.append(f"{line[:6]}{serial:5d}{line[11:].rstrip()}")
+                serial += 1
+            elif line.startswith(("TER", "END")):
+                lines.append(line.rstrip())
+    if not lines or lines[-1] != "END":
+        lines.append("END")
+    destination.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def parse_pdb(path: Path) -> list[dict[str, object]]:
@@ -182,6 +198,7 @@ def readme(row: dict[str, str]) -> str:
             "",
             "This is a classical restrained MM preparation step, not a transition-state search.",
             "It uses generic serine-hydrolase restraints only: Ser attack distance, attack angle, oxyanion contact, and His relay contact.",
+            "Build Amber topology and coordinates from `complex_for_amber.pdb`; the restraint atom indices are based on that renumbered PDB order.",
             "",
             "Boundary: no paper TS coordinates, paper reaction-coordinate terms, umbrella windows, barriers, or mechanism conclusions are used.",
         ]
@@ -218,17 +235,19 @@ def write_job(
 ) -> dict[str, str]:
     pose_id = row["pose_id"]
     source_complex = Path(row["complex_pdb"])
-    atoms = parse_pdb(source_complex)
+    job_id = f"AMBER_RELAX_{sanitize_id(pose_id)}"
+    job_dir = out_dir / job_id
+    job_dir.mkdir(parents=True, exist_ok=True)
+    complex_for_amber = job_dir / "complex_for_amber.pdb"
+    renumber_pdb_for_amber(source_complex, complex_for_amber)
+
+    atoms = parse_pdb(complex_for_amber)
     ser_og = find_protein_atom_serial(atoms, ser_og_selector)
     his_acceptor = find_protein_atom_serial(atoms, his_acceptor_selector)
     oxyanion_donor = find_protein_atom_serial(atoms, oxyanion_donor_selector)
     carbonyl_c = find_ligand_atom_serial(atoms, label["scissile_carbonyl_c_atom_name"])
     carbonyl_o = find_ligand_atom_serial(atoms, label["scissile_carbonyl_o_atom_name"])
     leaving_o = find_ligand_atom_serial(atoms, label["leaving_o_atom_name"])
-
-    job_id = f"AMBER_RELAX_{sanitize_id(pose_id)}"
-    job_dir = out_dir / job_id
-    job_dir.mkdir(parents=True, exist_ok=True)
 
     restraint_path = job_dir / "reactive_relaxation_restraints.RST"
     restraint_path.write_text(
@@ -262,6 +281,7 @@ def write_job(
         "substrate_model": row.get("substrate_model", ""),
         "generation_method": row.get("generation_method", ""),
         "source_complex_pdb": str(source_complex),
+        "complex_for_amber_pdb_path": str(complex_for_amber),
         "relaxation_job_dir": str(job_dir),
         "restraint_path": str(restraint_path),
         "mm_min_mdin_path": str(mdin_path),
