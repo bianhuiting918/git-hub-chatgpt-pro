@@ -103,11 +103,12 @@ run_id	route_label	input_pdb	ckpt	ligand	contig	num_designs	design_startnum	diff
 $RUN_ID	baker_theozyme_new_backbone_public_ca_rfdiffusion	$INPUT	$CKPT	bn1	$CONTIG	$NUM_DESIGNS	$DESIGN_STARTNUM	50	LAUNCHED	PENDING	$LOGFILE	$OUTDIR/sample
 TSV
 
-cd "$CA_RFD/rf_diffusion"
+cd "$CA_RFD"
 export CUDA_VISIBLE_DEVICES=0
 export HYDRA_FULL_ERROR=1
+export PYTHONPATH="$CA_RFD${PYTHONPATH:+:$PYTHONPATH}"
 
-nohup "$PY" run_inference.py \
+nohup "$PY" rf_diffusion/run_inference.py \
   --config-name=RFdiffusion_CA_inference \
   inference.deterministic=True \
   inference.input_pdb="$INPUT" \
