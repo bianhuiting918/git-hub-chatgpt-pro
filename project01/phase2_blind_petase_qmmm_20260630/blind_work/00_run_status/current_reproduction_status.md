@@ -9,7 +9,7 @@ Scope: PETase blind first-principles QM/MM mechanism reproduction. The paper is 
 - CPU host: `210.73.40.29`
 - Repository path: `/Dell/Dell14/bianht/petase_blind_qmmm/repo`
 - Conda/micromamba environment: `/Dell/Dell14/bianht/micromamba/envs/petase_stage1`
-- Active GitHub commit: `80de3ae`
+- Active GitHub branch: `main`
 
 ## Verified Gates
 
@@ -75,7 +75,7 @@ Methodological inspiration from the article is allowed here, but concrete articl
 
 Updated: 2026-07-01 Asia/Shanghai
 
-GitHub main has reached `80de3ae` for the Amber/Sander Stage 4 route. On the CPU server, clean detached worktrees verified:
+GitHub main records the Amber/Sander Stage 4 route. On the CPU server, clean detached worktrees verified:
 
 - `python -m unittest discover -s project01/phase2_blind_petase_qmmm_20260630/tests`: `Ran 12 tests ... OK`.
 - Accepted seed `REACTIVE_6EQE_BHET_like_E01_001` generated Amber QM/MM inputs and AmberTools topology-prep inputs.
@@ -94,5 +94,6 @@ Additional science-critical evidence from 2026-07-01:
 - However, the QMMM-relaxed geometry is not a productive acylation TS-search start: Ser132 OG to LIG C005 is 4.754 A and Ser132 HG to His209 NE2 is 4.979 A. Direct TS scanning from this frame is blocked until a productive conformer gate supplies a closer Ser-His-substrate arrangement.
 
 No TS/PMF/barrier result exists yet. The next compute gate is productive conformer generation/selection before any Stage 4 reaction-coordinate scan is treated as meaningful.
+
 
 
