@@ -563,3 +563,41 @@ Gate status:
 - NOT_EVALUATED: pending medium output.
 
 Next action remains to run `scripts/gate_ca_rfdiffusion_pocket4.py` immediately after the medium PDB appears.
+
+## 2026-07-02 Pocket4 Medium Gate PASS And Expanded Launch
+
+Remote check and gate at `2026-07-02T22:51:45+08:00`:
+
+Medium scaffold result:
+
+- Run ID: `ca_rfd_baker_pocket4_layered_medium_n1_20260702`.
+- Output files: `sample_7300.pdb` (`30426` bytes) and `sample_7300.trb` (`23615` bytes).
+- Log evidence: `Finished design in 54.59 minutes` and wrote `sample_7300.pdb`.
+- Gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_medium_n1_20260702_pocket4_gate.tsv`.
+- Gate summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_medium_n1_20260702_pocket4_gate_summary.json`.
+- Evaluated universe: `1` present PDB.
+- PASS: `1`.
+- FAIL: `0`.
+- `sample_7300` pocket CA count: `16`.
+- `sample_7300` pocket CA RMSD: `0.1418 A`.
+- `sample_7300` max pocket pair-distance delta: `0.3340 A`.
+- `sample_7300` mean pocket pair-distance delta: `0.1042 A`.
+- `sample_7300` ligand atom records: `22`.
+
+Expanded scaffold launch:
+
+- Command: `ALLOW_SHARED_GPU=1 FORCE=1 NUM_DESIGNS=1 DESIGN_STARTNUM=7400 CONTIG_SET=pocket4_expanded RUN_ID=ca_rfd_baker_pocket4_layered_expanded_n1_20260702 scripts/launch_baker_pocket4_layered_smoke.sh`.
+- Status: `LAUNCHED`.
+- PID: `920129`.
+- Contig set: `pocket4_expanded`.
+- Contig: `10,A35-37,2,A40-40,17,A58-59,2,A62-62,10,A73-73,2,A76-77,6,A84-84,3,A88-88,10,B145-148,10`.
+- `ij_visible`: `abcdefghij`.
+- Log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/ca_rfd_baker_pocket4_layered_expanded_n1_20260702.log`.
+- Status JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_expanded_n1_20260702_status.json`.
+- Output prefix: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_pocket4_layered_expanded_n1_20260702/sample`.
+
+Next action:
+
+1. Monitor PID `920129` until `sample_7400.pdb` appears or the process fails.
+2. Gate `pocket4_expanded` with `scripts/gate_ca_rfdiffusion_pocket4.py` immediately after output appears.
+3. If expanded passes, use compact/medium/expanded pocket4 PASS scaffolds as the parent universe for the 90/80/70/60/50 sequence panels.
