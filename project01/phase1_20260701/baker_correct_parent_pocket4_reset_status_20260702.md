@@ -80,3 +80,13 @@ Remote output paths:
 ## Next Action
 
 Run candidate generation on the GPU host, then run ESMFold with a low memory fraction. After gating, expand any bin with fewer than 10 `FINAL_QUALIFIED_ACTIVE` sequences.
+
+## Correction During Run - 2026-07-02
+
+A temporary `pocket10_round02` candidate-generation test was created on the GPU host after the first 90%/80% pocket4 pass rates looked low. This is now explicitly marked as exploratory and not counted.
+
+Formal target remains unchanged:
+
+- fixed residues are the `bn1` 4.0 A pocket plus SER15, LEU16, HIS55, ASP73, LEU149
+- no 8 A or 10 A expanded fixed-pocket result can be counted toward the requested 10 final-qualified sequences per bin unless the project target is explicitly changed
+- if any bin has fewer than 10 `FINAL_QUALIFIED_ACTIVE` sequences, expand only under the same 4.0 A fixed-pocket definition by changing seeds, temperatures, and mutation-position sampling
