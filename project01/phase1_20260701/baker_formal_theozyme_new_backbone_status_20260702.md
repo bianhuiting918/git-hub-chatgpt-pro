@@ -300,3 +300,41 @@ Updated sequence candidate status from `sample_1000_refined_0`:
 - log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_sample1000_refined_ligandmpnn_bin70_20260702.log`
 
 Reminder: these are sequence candidate manifests. Final-qualified status still requires post-sequence structure prediction and pocket/motif gates.
+
+## Sequence-Bin Candidate Pool Complete - 2026-07-02 14:12 CST
+
+The Baker-theozyme new-backbone sample1000 refined route now has the requested
+candidate sequence pool size:
+
+- 90% identity bin: `200/200` selected; exact mutation count `16/160`
+- 80% identity bin: `1000/1000` selected; exact mutation count `32/160`
+- 70% identity bin: `1000/1000` selected; exact mutation count `48/160`
+- 60% identity bin: `1000/1000` selected; exact mutation count `64/160`
+- 50% identity bin: `1000/1000` selected; exact mutation count `80/160`
+- total selected sequence candidates: `4200`
+
+Remote evidence:
+
+- summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_ligandmpnn_bins_summary.json`
+- selected TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_ligandmpnn_bins_selected.tsv`
+
+Bin-level generation evidence:
+
+- 90%: `records=401`, initial `pass_filter_count=59`; supplemented at temperature `0.20`, final selected `200`
+- 80%: `records=1251`, `pass_filter_count=1162`, selected `1000`
+- 70%: `records=1251`, `pass_filter_count=1250`, selected `1000`
+- 60%: `records=1251`, `pass_filter_count=1250`, selected `1000`
+- 50%: `records=1251`, `pass_filter_count=1250`, selected `1000`
+
+Important audit note: these are sequence-similarity-bin candidates only. They are
+not final-qualified enzyme designs until structure prediction, side-chain/ligand
+rebuild as needed, and Baker motif/pocket geometry gates pass. The fixed residues
+for this new-backbone route are the Baker theozyme contig motif positions only
+(`A13-A17`, `A54-A56`, `A72-A74`, `A148-A150`); this route does not lock the
+full ligand-4A shell.
+
+Concurrent backbone generation status:
+
+- CA_RFDiffusion batch50 PID `413631` was still running at 2026-07-02 14:14 CST
+- current written PDBs in batch50 output: `sample_1000.pdb`, `sample_1000_refined_0.pdb`, `sample_1001.pdb`
+- post-sequence structure prediction and final pocket/motif gates remain pending
