@@ -154,3 +154,21 @@ Route B L2 ESMFold structure screening was launched:
 | current status | running/loading at first check; no PDB yet |
 
 Audit note: Route A FAIL counts are for evaluated ESMFold outputs only. Unpredicted rows remain NOT_EVALUATED. Route B raw sequence counts are not final accepted sequence counts until ESMFold/core gate is run.
+
+## Live Progress Update 2026-07-03 01:51 Asia/Shanghai
+
+Route B L2 ESMFold run `routeB_l2_esmfold_lpb10_20260703_0140` has started producing structures.
+
+Current partial status:
+
+| metric | value |
+|---|---:|
+| ESMFold status rows | 3 |
+| PDB outputs | 3 |
+| evaluated bin | 50 only so far |
+| bin50 PASS | 0 |
+| bin50 FAIL | 3 |
+
+The first three Route B bin50 failures are due to strict core geometry and pLDDT filters, with core CA RMSD about 13-14 A, pair max delta about 35-40 A, and core mean pLDDT about 42.
+
+Audit note: this does not evaluate bins 60/70/80/90 yet, and all unpredicted rows remain NOT_EVALUATED.
