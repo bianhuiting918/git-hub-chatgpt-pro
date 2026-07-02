@@ -366,3 +366,47 @@ successfully detected CUDA/A100 and was loading ESMFold weights from
 this is currently `RUNNING_MODEL_LOAD`, not a structure/gate failure. The active
 heartbeat should continue monitoring PID `441949`, the status TSV, and the final
 post-ESMFold motif/pocket gates.
+
+## Interleaved ESMFold Pilot And Ligand-Reference Gate - 2026-07-02 14:35 CST
+
+The first ESMFold pilot manifest was found to be ordered by bin, with all 50%
+identity candidates first. That ordering delayed evidence for the 90/80/70/60%
+bins. The ordered pilot was stopped intentionally:
+
+- stopped PID: `441949`
+- completed before stop: at least `15` existing/written bin50 structures
+- early gate result: evaluated bin50 structures failed active and strict gates;
+  motif CA RMSD values were far above the `1.0 A` active-pocket cutoff
+
+A new interleaved manifest was created so every rank cycles through all bins:
+
+- manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_manifest.tsv`
+- manifest summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_manifest_summary.json`
+- rows: `250`, `50` per bin
+- order: `90,80,70,60,50` repeated by rank
+
+The interleaved ESMFold run was launched:
+
+- run id: `baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_20260702`
+- PID: `444542`
+- log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_20260702.log`
+- status TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_20260702_status.tsv`
+- summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_20260702_summary.json`
+
+A new ligand-reference gate script was added:
+
+- script: `project01/phase1_20260701/scripts/gate_baker_sample1000_esmfold_ligand_reference.py`
+- remote copy: `/data/bht/project01_baker_serhyd_routeB_20260701/scripts/gate_baker_sample1000_esmfold_ligand_reference.py`
+- reference: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000_refined_0.pdb`
+
+Gate definition: apo ESMFold protein is aligned to the ligand-bound
+`sample_1000_refined_0` reference using the 14 fixed Baker motif CA atoms. The
+strict gate then evaluates catalytic heavy atoms, protein key distances,
+reference-bn1 ligand key distances, motif pLDDT, and ligand clash. This avoids a
+false failure from requiring ESMFold PDBs to contain ligand HETATM records.
+
+At the last manual check, interleaved ESMFold PID `444542` was still in model
+initialization/loading and had not yet produced new per-bin predictions. Its
+status TSV contained `15` `SKIP_EXISTS` rows from existing bin50 PDBs. This is
+`RUNNING_MODEL_LOAD`, not a structure gate failure. The heartbeat should continue
+monitoring PID `444542` and run the new gate as soon as new status rows appear.
