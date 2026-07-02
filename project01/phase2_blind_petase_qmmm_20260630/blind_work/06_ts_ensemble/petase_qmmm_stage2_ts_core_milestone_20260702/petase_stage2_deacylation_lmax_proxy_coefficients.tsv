@@ -1,0 +1,11 @@
+parameter	value	note
+optimizer_success	True	Optimization terminated successfully.
+ridge_lambda	0.2	ridge penalty on standardized slopes
+intercept_original_space	2.4204950254126762	eta = intercept + b1*CV1 + b2*CV2 + b3*CV3
+slope_CV1_original_space	4.847281751932339	original CV units
+slope_CV2_original_space	1.9318524948351175	original CV units
+slope_CV3_original_space	-9.056854076511913	original CV units
+intercept_standardized	0.7367617492603794	standardized features
+slope_CV1_standardized	0.4887132441868514	standardized feature units
+slope_CV2_standardized	0.31071983973995393	standardized feature units
+slope_CV3_standardized	-2.639810742789613	standardized feature units

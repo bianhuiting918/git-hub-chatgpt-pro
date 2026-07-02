@@ -1,0 +1,7 @@
+eta_bin	n_candidates	product	reactant	undecided	pB_excluding_undecided	candidates
+[-4,-2)	0	0	0	0		
+[-2,-1)	0	0	0	0		
+[-1,0)	7	9	18	17	0.3333333333333333	bridge_cser244_h150,n00_center,n01_more_attack,n02_less_attack,n03_more_break,n04_less_break,n05_proton_late
+[0,1)	4	17	10	17	0.6296296296296297	attempt041_w04,w239,bridge_cser240_h145,bridge_cser242_h148
+[1,2)	0	0	0	0		
+[2,4)	1	4	0	0	1.0	w241

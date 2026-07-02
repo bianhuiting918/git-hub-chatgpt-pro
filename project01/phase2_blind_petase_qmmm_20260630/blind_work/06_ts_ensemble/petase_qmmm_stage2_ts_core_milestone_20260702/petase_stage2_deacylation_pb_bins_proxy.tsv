@@ -1,0 +1,7 @@
+step	rc_bin	n_candidates	product	reactant	undecided	pB_excluding_undecided	candidates
+deacylation	[-10,-5)	0	0	0	0		
+deacylation	[-5,-2)	0	0	0	0		
+deacylation	[-2,0)	12	30	28	34	0.5172413793103449	attempt041_w04,w239,w241,bridge_cser240_h145,bridge_cser242_h148,bridge_cser244_h150,n00_center,n01_more_attack,n02_less_attack,n03_more_break,n04_less_break,n05_proton_late
+deacylation	[0,2)	1	4	0	0	1.0	w243
+deacylation	[2,5)	0	0	0	0		
+deacylation	[5,10)	0	0	0	0		
