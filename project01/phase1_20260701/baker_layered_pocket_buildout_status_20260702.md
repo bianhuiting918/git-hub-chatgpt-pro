@@ -258,3 +258,49 @@ Evidence files on GPU host:
 - Queue status: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_queue_status.json`.
 
 Next action: keep the compact L1 run active until more PDBs accumulate; re-run the dynamic gate on the present PDB universe and then let the queue advance to the next layered contig set according to `scripts/run_baker_layered_l1_queue.sh`.
+## 2026-07-02 First PASS Scaffold Sequence Panel
+
+Remote check at `2026-07-02T18:26:18+08:00`:
+
+- Sequence generation was started from the first motif-gated compact L1 PASS scaffold, `sample_3000`.
+- Parent gate evidence: compact L1 gate TSV `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_motif_gate.tsv`, where `sample_3000` is `PASS`.
+- Sequence panel run ID: `baker_layered_multiscaffold_ligandmpnn_from_compact_sample3000_20260702_182250`.
+- Sequence generation route: `generate_baker_layered_multiscaffold_ligandmpnn_bins.py` using parent-limit `1`, rounds `2`, bins `90/80/70/60/50`.
+- Fixed motif positions in generated scaffold numbering: `14` residues from contig `6,A56-60,18,A83-85,8,A113-115,32,B145-147,6`.
+- Parent scaffold sequence length: `84` residues.
+- Status: `DONE`, started `2026-07-02T18:22:50`, finished `2026-07-02T18:25:17`.
+
+Selected sequence counts by target identity bin:
+
+- `90`: `23` selected sequences.
+- `80`: `212` selected sequences.
+- `70`: `350` selected sequences.
+- `60`: `399` selected sequences.
+- `50`: `400` selected sequences.
+- Total selected: `1384` sequences.
+
+Per-round selected counts:
+
+- Round 01: 90=`12`, 80=`109`, 70=`177`, 60=`199`, 50=`200`.
+- Round 02: 90=`11`, 80=`103`, 70=`173`, 60=`200`, 50=`200`.
+
+Audit interpretation:
+
+- Evaluated universe for this sequence panel is one motif-gated parent scaffold, `sample_3000`.
+- These are LigandMPNN sequence-layer candidates that pass the script filter for fixed motif/no-native constraints and target mutation binning.
+- These are not yet structure-gated final candidates. They still need structure prediction and pocket/motif geometry screening before being counted as final per-bin accepted designs.
+- The 90% bin has fewer than the nominal `100` selected target because the filter found only `23` passing records across two rounds for this compact parent.
+
+Remote evidence files:
+
+- Summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_layered_multiscaffold_ligandmpnn_from_compact_sample3000_20260702_182250_summary.json`.
+- Selected sequence TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_layered_multiscaffold_ligandmpnn_from_compact_sample3000_20260702_182250_selected.tsv`.
+- Sequence design directory: `/data/bht/project01_baker_serhyd_routeB_20260701/sequence_design/baker_layered_multiscaffold_ligandmpnn_from_compact_sample3000_20260702_182250`.
+
+Current scaffold generation status remains active:
+
+- Compact L1 CA_RFDiffusion PID `555939` is still running.
+- Current compact L1 evaluated PDB universe remains `1` PDB; PASS=`1`, FAIL=`0`, future compact outputs are `NOT_EVALUATED`.
+- Queue status remains `GATED_RUNNING` and will re-gate as additional compact L1 PDBs are written.
+
+Next action: keep monitoring compact L1; when more compact PASS scaffolds appear, rerun/extend multiscaffold LigandMPNN panels and then advance to structure prediction plus motif/pocket gate for selected sequences.
