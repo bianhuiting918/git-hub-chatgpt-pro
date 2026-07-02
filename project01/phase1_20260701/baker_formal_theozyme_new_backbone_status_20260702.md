@@ -218,3 +218,24 @@ A corrected single-sample refinement was relaunched:
 - manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_refine_sample1000_publicckpt_v2_20260702_manifest.tsv`
 
 Latest v2 log showed successful import/config startup and checkpoint loading; completion still pending at this status update.
+
+## Sample1000 Refined Motif Gate - 2026-07-02 13:30 CST
+
+The corrected v2 refinement completed successfully:
+
+- run id: `ca_rfd_baker_theozyme_refine_sample1000_publicckpt_v2_20260702`
+- runtime: 14.57 minutes
+- refined PDB: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000_refined_0.pdb`
+- refined TRB: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000_refined_0.trb`
+
+Updated motif/theozyme gate evaluated 2 written PDBs in the batch50 output directory:
+
+- `sample_1000`: `PASS`, motif CA RMSD `0.1041 A`, max pair-distance delta `0.1532 A`, ligand `bn1` records `22`
+- `sample_1000_refined_0`: `PASS`, motif CA RMSD `0.0865 A`, max pair-distance delta `0.1922 A`, ligand `bn1` records `22`
+
+Remote gate files:
+
+- TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702_motif_gate.tsv`
+- JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702_motif_gate_summary.json`
+
+This proves refinement preserved the Baker motif gate for the first backbone. It still does not complete any sequence-similarity bin; next action is sequence design/binning from `sample_1000_refined_0` while batch50 continues producing more backbones.
