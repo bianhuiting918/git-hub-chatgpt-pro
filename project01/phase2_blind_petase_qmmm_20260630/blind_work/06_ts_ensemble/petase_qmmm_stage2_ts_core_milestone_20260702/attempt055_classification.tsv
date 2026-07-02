@@ -1,0 +1,33 @@
+candidate	rep	status	OW_C	H2_His	C_SerO	C_Oleave
+n00_center	1	reactant	3.868	4.830	1.357	4.018
+n00_center	2	product	1.427	1.050	2.968	3.641
+n00_center	3	undecided	2.665	2.731	2.059	3.945
+n00_center	4	undecided	2.354	2.207	2.126	3.704
+n01_more_attack	1	product	1.375	1.007	3.953	3.777
+n01_more_attack	2	undecided	2.727	2.211	2.646	3.709
+n01_more_attack	3	product	1.356	1.094	2.965	3.738
+n01_more_attack	4	reactant	3.511	3.175	1.330	4.047
+n02_less_attack	1	reactant	3.157	4.979	1.279	3.768
+n02_less_attack	2	reactant	3.516	4.716	1.564	3.566
+n02_less_attack	3	undecided	2.291	1.619	2.324	3.907
+n02_less_attack	4	undecided	2.273	1.849	2.386	3.677
+n03_more_break	1	reactant	3.365	3.133	1.416	3.998
+n03_more_break	2	reactant	3.339	3.409	1.369	3.885
+n03_more_break	3	undecided	3.200	2.683	2.105	3.450
+n03_more_break	4	reactant	2.897	2.915	1.390	3.927
+n04_less_break	1	undecided	2.290	1.857	2.144	3.697
+n04_less_break	2	undecided	2.242	2.007	2.251	3.766
+n04_less_break	3	undecided	2.450	1.738	2.278	3.969
+n04_less_break	4	reactant	3.492	5.083	1.483	3.801
+n05_proton_late	1	product	1.405	1.009	4.222	3.759
+n05_proton_late	2	undecided	2.163	1.969	2.200	3.561
+n05_proton_late	3	reactant	3.584	4.946	1.432	3.735
+n05_proton_late	4	undecided	2.455	1.731	2.461	3.684
+
+summary
+n00_center 4 {'reactant': 1, 'product': 1, 'undecided': 2}
+n01_more_attack 4 {'product': 2, 'undecided': 1, 'reactant': 1}
+n02_less_attack 4 {'reactant': 2, 'undecided': 2}
+n03_more_break 4 {'reactant': 3, 'undecided': 1}
+n04_less_break 4 {'undecided': 3, 'reactant': 1}
+n05_proton_late 4 {'product': 1, 'undecided': 2, 'reactant': 1}

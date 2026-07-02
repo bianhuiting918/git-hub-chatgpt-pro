@@ -1,0 +1,38 @@
+candidate	rep	status	OW_C	H2_His	C_SerO	C_Oleave
+bridge_cser240_h145	10	reactant	3.620	4.122	1.357	3.996
+bridge_cser240_h145	11	product	1.373	0.978	3.672	3.660
+bridge_cser240_h145	12	product	1.437	0.952	2.776	3.737
+bridge_cser240_h145	13	undecided	3.625	3.056	2.166	3.801
+bridge_cser240_h145	14	undecided	1.825	1.088	2.402	3.873
+bridge_cser240_h145	15	product	1.409	1.019	3.919	3.793
+bridge_cser240_h145	16	undecided	2.216	2.053	2.323	3.767
+bridge_cser240_h145	1	undecided	2.955	2.185	2.288	3.888
+bridge_cser240_h145	2	reactant	3.735	5.575	1.640	3.402
+bridge_cser240_h145	3	undecided	2.418	4.101	2.169	3.758
+bridge_cser240_h145	4	undecided	2.794	2.186	2.200	3.736
+bridge_cser240_h145	5	product	1.394	1.016	3.071	3.682
+bridge_cser240_h145	6	product	1.406	1.082	4.131	3.825
+bridge_cser240_h145	7	reactant	3.755	5.214	1.515	4.128
+bridge_cser240_h145	8	reactant	2.908	4.258	1.601	4.059
+bridge_cser240_h145	9	product	1.352	1.009	3.640	3.729
+bridge_cser242_h148	1	undecided	2.179	1.838	2.564	3.998
+bridge_cser242_h148	2	product	1.472	1.213	2.388	3.527
+bridge_cser242_h148	3	reactant	3.527	4.055	1.327	3.732
+bridge_cser242_h148	4	product	1.379	0.961	2.900	3.394
+bridge_cser242_h148	5	product	1.358	1.052	3.406	3.770
+bridge_cser242_h148	6	product	1.357	1.049	3.246	3.881
+bridge_cser242_h148	7	reactant	4.542	5.310	1.341	3.971
+bridge_cser242_h148	8	product	1.373	1.045	2.579	3.681
+bridge_cser244_h150	1	product	1.371	0.966	2.499	3.377
+bridge_cser244_h150	2	reactant	3.197	4.294	1.302	3.759
+bridge_cser244_h150	3	undecided	2.666	2.751	2.321	3.588
+bridge_cser244_h150	4	product	1.348	0.997	3.481	3.479
+bridge_cser244_h150	5	reactant	3.332	4.375	1.500	3.879
+bridge_cser244_h150	6	reactant	4.375	4.891	1.492	3.746
+bridge_cser244_h150	7	reactant	4.678	5.856	1.479	3.917
+bridge_cser244_h150	8	undecided	2.223	1.959	2.409	3.862
+
+summary
+bridge_cser240_h145 16 {'reactant': 4, 'product': 6, 'undecided': 6}
+bridge_cser242_h148 8 {'undecided': 1, 'product': 5, 'reactant': 2}
+bridge_cser244_h150 8 {'product': 2, 'reactant': 4, 'undecided': 2}
