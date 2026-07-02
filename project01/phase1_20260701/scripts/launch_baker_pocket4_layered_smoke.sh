@@ -41,15 +41,26 @@ if [ ! -f "$PREP" ]; then echo "Missing pocket4 prep script: $PREP" >&2; exit 2;
   --out-tsv "$ROOT/manifests/pocket4_first_layered_fixed_residues.tsv" \
   --contig-tsv "$CONTIG_TSV" >/dev/null
 
-CONTIG="$("$PY_JSON" - "$CONTIG_TSV" "$CONTIG_SET" <<'PY'
+CONTIG_INFO="$("$PY_JSON" - "$CONTIG_TSV" "$CONTIG_SET" <<'PY'
 from __future__ import annotations
 import csv, sys
 path, target = sys.argv[1], sys.argv[2]
 for row in csv.DictReader(open(path), delimiter="\t"):
     if row["contig_set"] == target:
-        print(row["contig"])
+        print(row["contig"] + "\t" + row["fixed_segment_count"])
         raise SystemExit(0)
 raise SystemExit(f"contig_set not found: {target}")
+PY
+)"
+IFS=$'\t' read -r CONTIG FIXED_SEGMENT_COUNT <<< "$CONTIG_INFO"
+IJ_VISIBLE_COUNT=$((FIXED_SEGMENT_COUNT + 1))
+IJ_VISIBLE="$("$PY_JSON" - "$IJ_VISIBLE_COUNT" <<'PY'
+import string, sys
+n = int(sys.argv[1])
+letters = string.ascii_lowercase + string.ascii_uppercase
+if n > len(letters):
+    raise SystemExit(f"Too many chunks for ij_visible alphabet: {n}")
+print(letters[:n])
 PY
 )"
 
@@ -70,6 +81,8 @@ if [ "$FORCE" != "1" ] && [ "$ALLOW_SHARED_GPU" != "1" ] && [ "$compute_process_
   "route_label": "pocket4_first_layered_public_ca_rfdiffusion",
   "contig_set": "$CONTIG_SET",
   "contig": "$CONTIG",
+  "fixed_segment_count": "$FIXED_SEGMENT_COUNT",
+  "ij_visible": "$IJ_VISIBLE",
   "num_designs": "$NUM_DESIGNS",
   "design_startnum": "$DESIGN_STARTNUM",
   "gpu_util_percent": "$gpu_util",
@@ -92,6 +105,8 @@ if [ "$FORCE" != "1" ] && [ "$gpu_util" != "NA" ] && [ "$gpu_util" -gt "$MAX_GPU
   "route_label": "pocket4_first_layered_public_ca_rfdiffusion",
   "contig_set": "$CONTIG_SET",
   "contig": "$CONTIG",
+  "fixed_segment_count": "$FIXED_SEGMENT_COUNT",
+  "ij_visible": "$IJ_VISIBLE",
   "gpu_util_percent": "$gpu_util",
   "gpu_memory_used_mib": "$gpu_mem_used",
   "gpu_memory_total_mib": "$gpu_mem_total",
@@ -104,8 +119,8 @@ JSON
 fi
 
 cat > "$MANIFEST" <<TSV
-run_id	route_label	input_pdb	pocket_manifest	ckpt	ligand	contig_set	contig	num_designs	design_startnum	diffuser_T	status	pid	log	output_prefix
-$RUN_ID	pocket4_first_layered_public_ca_rfdiffusion	$INPUT	$POCKET_MANIFEST	$CKPT	bn1	$CONTIG_SET	$CONTIG	$NUM_DESIGNS	$DESIGN_STARTNUM	50	LAUNCHED	PENDING	$LOGFILE	$OUTDIR/sample
+run_id	route_label	input_pdb	pocket_manifest	ckpt	ligand	contig_set	contig	fixed_segment_count	ij_visible	num_designs	design_startnum	diffuser_T	status	pid	log	output_prefix
+$RUN_ID	pocket4_first_layered_public_ca_rfdiffusion	$INPUT	$POCKET_MANIFEST	$CKPT	bn1	$CONTIG_SET	$CONTIG	$FIXED_SEGMENT_COUNT	$IJ_VISIBLE	$NUM_DESIGNS	$DESIGN_STARTNUM	50	LAUNCHED	PENDING	$LOGFILE	$OUTDIR/sample
 TSV
 
 cd "$CA_RFD"
@@ -120,7 +135,7 @@ nohup "$PY" rf_diffusion/run_inference.py \
   inference.ckpt_path="$CKPT" \
   inference.output_prefix="$OUTDIR/sample" \
   inference.ligand=bn1 \
-  inference.ij_visible=abcde \
+  inference.ij_visible="$IJ_VISIBLE" \
   inference.num_designs="$NUM_DESIGNS" \
   inference.design_startnum="$DESIGN_STARTNUM" \
   inference.cautious=true \
@@ -150,6 +165,8 @@ cat > "$STATUS" <<JSON
   "route_label": "pocket4_first_layered_public_ca_rfdiffusion",
   "contig_set": "$CONTIG_SET",
   "contig": "$CONTIG",
+  "fixed_segment_count": "$FIXED_SEGMENT_COUNT",
+  "ij_visible": "$IJ_VISIBLE",
   "input": "$INPUT",
   "pocket_manifest": "$POCKET_MANIFEST",
   "ckpt": "$CKPT",
