@@ -93,3 +93,26 @@ This is a downstream project gate, not a native CA_RFDiffusion binary criterion.
 5. Compare Route A versus Route B by per-bin accepted sequence counts and pocket geometry stability.
 
 Do not upload PDB/TRB/model/trajectory/log files to GitHub.
+
+## Live Progress Update 2026-07-03 00:55 Asia/Shanghai
+
+Route A L1-direct ESMFold structure-screening smoke has been launched:
+
+| field | value |
+|---|---|
+| run_id | routeA_l1_direct_esmfold_lpb10_20260703_0052 |
+| PID | 966399 |
+| input panel | manifests/pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350_combined_selected.tsv |
+| intended evaluated universe | 50 rows, 10 per bin from 90/80/70/60/50 |
+| current output count | 0 PDB at first check |
+| current status | running/loading; no PASS/FAIL assigned yet |
+
+Route B L2 extension remains active:
+
+| field | value |
+|---|---|
+| PID | 959968 |
+| current log evidence | denoising reached at least t=39/50 |
+| current status | running; no L2 output PDB yet |
+
+Audit note: unevaluated Route A rows and unfinished Route B output are NOT_EVALUATED, not FAIL.
