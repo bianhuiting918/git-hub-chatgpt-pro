@@ -124,3 +124,23 @@ New layered route launch:
 - PDB count immediately after launch: 0, so no L1 motif gate has been evaluated yet.
 
 Heartbeat policy was updated accordingly: do not restart old original-contig batch50; monitor/advance only the new L1 queue with `FORCE=1 ALLOW_SHARED_GPU=1`.
+## 2026-07-02 Compact L1 Running Check
+
+Remote check at `2026-07-02T17:36:51+08:00`:
+
+- Active new-route PID: `555939`.
+- Run ID: `ca_rfd_baker_layered_l1_compact_publicckpt_20260702`.
+- State: running (`STAT=Rl`), elapsed `08:58`, CPU about `95.9%`, RSS about `763808 KB`.
+- GPU evidence: PID `555939` is present in `nvidia-smi --query-compute-apps` and uses about `1056 MiB`.
+- Output directory: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_layered_l1_compact_publicckpt_20260702`.
+- Current compact L1 PDB count: `0`.
+- Current log still shows `Making design ... sample_3000` and checkpoint load, with no traceback observed.
+
+Screening/evaluation status:
+
+- Evaluated universe for compact L1 motif gate: `0` PDB files, because no compact L1 PDB has been written yet.
+- PASS: not evaluated.
+- FAIL: not evaluated.
+- NOT_EVALUATED: future compact L1 outputs that do not exist yet; these are not failures.
+
+Next action remains: keep monitoring PID `555939`; when at least one compact L1 PDB appears, run the dynamic motif gate and then let the queue advance to `medium` / `near_original` or to sequence generation if enough PASS scaffolds exist.
