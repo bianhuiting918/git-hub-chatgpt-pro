@@ -44,3 +44,31 @@ This reset is successful only when evidence files show:
 - At least one contig family has enough L1 PASS structures to justify L2 or sequence generation.
 - Sequence panels are regenerated from multiple L1/L2 PASS scaffolds with per-bin counts, not from one scaffold only.
 - Downstream reports distinguish sequence pool count from structure-gated accepted count.
+## 2026-07-02 Current Execution Update
+
+The active target is now explicitly: regenerate sequences only after motif-gated layered scaffolds exist, using larger multi-round candidate pools and repeated attempts until each 90/80/70/60/50 bin has enough accepted sequences for downstream structural evaluation.
+
+Sequence-generation policy after L1/L2 PASS scaffolds:
+
+- Parent universe: PASS rows from an L1/L2 motif gate TSV; non-existent future outputs are NOT_EVALUATED, not FAIL.
+- Multi-scaffold input: use up to 5 parent scaffolds per launch by default, not one scaffold.
+- Multi-round attempts: run at least 2 seed rounds by default; increase rounds if a bin lacks enough accepted sequences.
+- Candidate pool size per parent and round: select up to 100 records for 90% and 200 records for each of 80/70/60/50 before downstream structure checks.
+- Identity targets are computed from each parent scaffold's actual sequence length. If the scaffold has fewer mutable residues than requested, the target mutation count is capped at the actual redesignable positions and recorded as `target_mutations`; the original request is recorded as `requested_mutations`.
+- The practical acceptance target remains 10 final accepted sequences per bin, but the raw generated sequence pool is intentionally larger so failed structure gates can be replaced by more attempts.
+
+Remote evidence from `bht@192.168.10.38:/data/bht/project01_baker_serhyd_routeB_20260701` at `2026-07-02T17:15:29+08:00`:
+
+- GPU state: utilization 100%, memory 30403 MiB / 81920 MiB, compute process count 10.
+- Existing old batch50 process: PID 413631 still running, elapsed 05:10:13 at check time.
+- Existing old batch50 PDB count: 8 present PDB files.
+- L1 medium launch attempt: `CONTIG_SET=medium NUM_DESIGNS=20 DESIGN_STARTNUM=2000 scripts/launch_baker_layered_l1_contig_sweep.sh` wrote `BLOCKED_GPU_COMPUTE_PROCESS_PRESENT`; no new L1 job was started.
+- L1 status file: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_medium_publicckpt_20260702_status.json`.
+- Dynamic original-contig precheck on present old batch50 outputs: evaluated 8 PDB files, counts `PASS=8`, status `DONE`.
+- Dynamic precheck summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702_motif_gate_layered_dynamic_precheck_summary.json`.
+
+Remote script verification:
+
+- `scripts/gate_ca_rfdiffusion_theozyme_motif.py` supports dynamic motif maps through `--contig`.
+- `scripts/generate_baker_layered_multiscaffold_ligandmpnn_bins.py` is installed on the GPU host, executable, UTF-8 without BOM, and passed `py_compile` together with the gate script.
+- The generator is prepared but should not be run against the old original-contig precheck unless explicitly choosing that as a fallback. The intended next run is from L1/L2 PASS scaffold gate TSVs.

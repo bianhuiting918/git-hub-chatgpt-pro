@@ -9,15 +9,40 @@ from pathlib import Path
 
 import numpy as np
 
-# Baker design_pipeline contig used for Project 01 formal new-backbone route:
-# 12,A56-60,36,A83-85,15,A113-115,73,B145-147,10
+DEFAULT_CONTIG = "12,A56-60,36,A83-85,15,A113-115,73,B145-147,10"
+
+# Baker design_pipeline contig used for Project 01 formal new-backbone route.
 # Output positions are sequential after each generated segment.
-MOTIF_MAP = [
+DEFAULT_MOTIF_MAP = [
     (("A", 56), 13), (("A", 57), 14), (("A", 58), 15), (("A", 59), 16), (("A", 60), 17),
     (("A", 83), 54), (("A", 84), 55), (("A", 85), 56),
     (("A", 113), 72), (("A", 114), 73), (("A", 115), 74),
     (("B", 145), 148), (("B", 146), 149), (("B", 147), 150),
 ]
+
+
+def motif_map_from_contig(contig: str) -> list[tuple[tuple[str, int], int]]:
+    """Map reference motif residues to output chain-A residue numbers."""
+    if contig == DEFAULT_CONTIG:
+        return list(DEFAULT_MOTIF_MAP)
+    out_pos = 1
+    motif_map: list[tuple[tuple[str, int], int]] = []
+    for token in [item.strip() for item in contig.split(",") if item.strip()]:
+        if token.isdigit():
+            out_pos += int(token)
+            continue
+        chain = token[0]
+        bounds = token[1:]
+        if "-" not in bounds:
+            raise ValueError(f"Unsupported contig motif token: {token}")
+        start_s, end_s = bounds.split("-", 1)
+        start = int(start_s)
+        end = int(end_s)
+        step = 1 if end >= start else -1
+        for resid in range(start, end + step, step):
+            motif_map.append(((chain, resid), out_pos))
+            out_pos += 1
+    return motif_map
 
 
 def ca_atoms(path: Path) -> dict[tuple[str, int], np.ndarray]:
@@ -66,13 +91,13 @@ def pair_delta(ref_points: list[np.ndarray], cand_points: list[np.ndarray]) -> t
     return float(max(values)), float(np.mean(values))
 
 
-def evaluate_pdb(ref_coords: dict[tuple[str, int], np.ndarray], pdb: Path, ligand: str, rmsd_cutoff: float, pair_cutoff: float) -> dict[str, str]:
+def evaluate_pdb(ref_coords: dict[tuple[str, int], np.ndarray], pdb: Path, ligand: str, rmsd_cutoff: float, pair_cutoff: float, motif_map: list[tuple[tuple[str, int], int]]) -> dict[str, str]:
     cand_coords = ca_atoms(pdb)
     missing_ref = []
     missing_out = []
     ref_points = []
     cand_points = []
-    for ref_key, out_resid in MOTIF_MAP:
+    for ref_key, out_resid in motif_map:
         out_key = ("A", out_resid)
         if ref_key not in ref_coords:
             missing_ref.append(f"{ref_key[0]}{ref_key[1]}")
@@ -131,6 +156,7 @@ def main() -> int:
     parser.add_argument("--ligand", default="bn1")
     parser.add_argument("--rmsd-cutoff", type=float, default=1.0)
     parser.add_argument("--pair-cutoff", type=float, default=1.0)
+    parser.add_argument("--contig", default=DEFAULT_CONTIG, help="CA_RFDiffusion contig used to compute output motif residue numbers")
     args = parser.parse_args()
 
     reference = Path(args.reference_pdb)
@@ -139,6 +165,7 @@ def main() -> int:
     summary_json = Path(args.summary_json)
 
     ref_coords = ca_atoms(reference)
+    motif_map = motif_map_from_contig(args.contig)
     pdbs = sorted(p for p in output_dir.glob("*.pdb") if p.is_file() and "traj" not in p.name.lower())
     rows = []
     for pdb in pdbs:
@@ -147,7 +174,7 @@ def main() -> int:
             "pdb": str(pdb),
             "gate_definition": f"14 motif CA Kabsch RMSD <= {args.rmsd_cutoff} A and max pair-distance delta <= {args.pair_cutoff} A; ligand {args.ligand} present",
         }
-        row.update(evaluate_pdb(ref_coords, pdb, args.ligand, args.rmsd_cutoff, args.pair_cutoff))
+        row.update(evaluate_pdb(ref_coords, pdb, args.ligand, args.rmsd_cutoff, args.pair_cutoff, motif_map))
         rows.append(row)
 
     out_tsv.parent.mkdir(parents=True, exist_ok=True)
@@ -171,12 +198,13 @@ def main() -> int:
         "evaluated_universe": "CA_RFDiffusion output PDB files present in output_dir; absent future samples are NOT_EVALUATED, not FAIL",
         "reference_pdb": str(reference),
         "output_dir": str(output_dir),
+        "contig": args.contig,
         "out_tsv": str(out_tsv),
         "evaluated_pdb_count": len(rows),
         "counts": counts,
         "best_passes": passes[:20],
         "best_fails": fails[:20],
-        "motif_map": [{"reference": f"{chain}{resid}", "output": f"A{out_resid}"} for (chain, resid), out_resid in MOTIF_MAP],
+        "motif_map": [{"reference": f"{chain}{resid}", "output": f"A{out_resid}"} for (chain, resid), out_resid in motif_map],
         "thresholds": {"motif_ca_rmsd_max_A": args.rmsd_cutoff, "motif_pair_max_delta_A": args.pair_cutoff},
     }
     summary_json.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
