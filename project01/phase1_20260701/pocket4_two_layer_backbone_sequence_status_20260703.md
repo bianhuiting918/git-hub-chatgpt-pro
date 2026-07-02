@@ -116,3 +116,41 @@ Route B L2 extension remains active:
 | current status | running; no L2 output PDB yet |
 
 Audit note: unevaluated Route A rows and unfinished Route B output are NOT_EVALUATED, not FAIL.
+
+## Live Progress Update 2026-07-03 01:42 Asia/Shanghai
+
+Route A L1-direct ESMFold smoke completed 50/50 structures and strict pocket gate was run.
+
+Project strict filter result for Route A run `routeA_l1_direct_esmfold_lpb10_20260703_0052`:
+
+| bin | evaluated | PASS | FAIL | NOT_EVALUATED |
+|---:|---:|---:|---:|---:|
+| 50 | 10 | 0 | 10 | 2990 |
+| 60 | 10 | 0 | 10 | 2990 |
+| 70 | 10 | 0 | 10 | 2770 |
+| 80 | 10 | 0 | 10 | 1657 |
+| 90 | 10 | 0 | 10 | 163 |
+
+Route B L2 extension completed and passed parent-core gate:
+
+| sample | gate | parent_core_CA_RMSD_A | parent_core_pair_max_delta_A | ligand_records | best_n_flank |
+|---|---|---:|---:|---:|---:|
+| sample_7500 | PASS | 0.1212 | 0.3864 | 22 | 27 |
+
+Route B L2 LigandMPNN raw panel completed:
+
+| selected_tsv | total | 90 | 80 | 70 | 60 | 50 |
+|---|---:|---:|---:|---:|---:|---:|
+| manifests/pocket4_l2_ligandmpnn_from_sample7500_20260703_0135_selected.tsv | 1701 | 102 | 399 | 400 | 400 | 400 |
+
+Route B L2 ESMFold structure screening was launched:
+
+| field | value |
+|---|---|
+| run_id | routeB_l2_esmfold_lpb10_20260703_0140 |
+| PID | 983495 |
+| intended evaluated universe | 50 rows, 10 per bin from 90/80/70/60/50 |
+| gate script | scripts/gate_pocket4_l2_esmfold_core.py |
+| current status | running/loading at first check; no PDB yet |
+
+Audit note: Route A FAIL counts are for evaluated ESMFold outputs only. Unpredicted rows remain NOT_EVALUATED. Route B raw sequence counts are not final accepted sequence counts until ESMFold/core gate is run.
