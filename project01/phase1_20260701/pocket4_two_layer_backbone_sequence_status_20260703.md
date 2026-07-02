@@ -1,18 +1,23 @@
-# Project 01 Serine Hydrolase Pocket4 Two-Layer Backbone Route
+# Project 01 Serine Hydrolase Pocket4 L1/L2 Backbone And Sequence Routes
 
-Updated: 2026-07-03 00:35 Asia/Shanghai
+Updated: 2026-07-03 00:47 Asia/Shanghai
 
 ## Current Decision
 
-Do not continue the premature branch that designs Ala-rich sequences directly on the L1 mini-scaffolds and sends them to ESMFold.
+The target is now a two-route comparison, not a single L2-only route.
 
-The route is now capped at two backbone layers:
+Route A and Route B are both formal work products:
 
-1. L1: generate and gate pocket-core scaffolds around the Baker serine hydrolase theozyme.
-2. L2: use a PASS L1 scaffold as the fixed core and directly extend it into the final designable backbone.
-3. Sequence design: only after an L2 backbone passes parent-core/pocket geometry gate, run LigandMPNN to generate complete sequences and bin them at 90/80/70/60/50 percent identity.
+1. Route A, L1-direct: use pocket4 PASS L1 scaffolds directly as designable backbones, then run complete sequence design on those L1 backbones.
+2. Route B, L2-extended: use a pocket4 PASS L1 scaffold as the fixed core, extend it once into a larger L2 backbone, then run complete sequence design on the L2 backbone.
 
-No L3/full third layer is planned unless L2 repeatedly fails.
+For both routes, the output target is:
+
+- 90/80/70/60/50 percent identity bins.
+- At least 10 structure/pocket-gated sequences per bin if the route can support them.
+- Explicit PASS/FAIL/NOT_EVALUATED accounting, with no un-evaluated rows counted as biological failures.
+
+No L3/full third layer is planned unless both L1-direct and L2-extended routes fail to produce enough acceptable sequence/structure candidates.
 
 ## Hard Evidence So Far
 
@@ -24,9 +29,15 @@ L1 pocket4 PASS scaffolds:
 | medium | ca_rfd_baker_pocket4_layered_medium_n1_20260702 | sample_7300.pdb | 82 | 22 | PASS |
 | expanded | ca_rfd_baker_pocket4_layered_expanded_n1_20260702 | sample_7400.pdb | 88 | 22 | PASS |
 
-The earlier LigandMPNN panel from these L1 scaffolds had 10620 sequence-layer candidates, but these are **not final accepted sequences** because the parent scaffolds are only 76/82/88 aa and are not the complete backbone target.
+The earlier LigandMPNN panel from these L1 scaffolds had 10620 sequence-layer candidates. Under the revised goal, this panel is the raw Route A L1-direct sequence panel, not the final accepted set. It still requires structure prediction and pocket/core gate before any per-bin success count can be claimed.
 
-## Active L2 Smoke
+Route A existing raw panel:
+
+| manifest | total | 90 | 80 | 70 | 60 | 50 |
+|---|---:|---:|---:|---:|---:|---:|
+| manifests/pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350_combined_selected.tsv | 10620 | 173 | 1667 | 2780 | 3000 | 3000 |
+
+## Route B Active L2 Smoke
 
 Remote root:
 
@@ -46,9 +57,16 @@ Active run:
 | output_prefix | outputs/ca_rfd_baker_pocket4_l2_extend_expanded_n1_20260703/sample |
 | checkpoint caveat | public `ca_rfd_diffusion.pt`, not Baker `BFF_7.pt` |
 
-This run fixes the whole L1 expanded core and extends both termini in one step. If this passes gate, it is treated as the final backbone layer for sequence design.
+This run fixes the whole L1 expanded core and extends both termini in one step. If this passes gate, it is treated as the final backbone layer for Route B sequence design.
 
-## Gate For L2
+Observed progress as of 2026-07-03 00:47 Asia/Shanghai:
+
+- PID 959968 is still running.
+- The log has entered denoising and reached at least t=48/50.
+- Runtime is slow because GPU 0 is shared and already heavily occupied.
+- This is still a valid active run; no second L2 job should be launched in parallel.
+
+## Gate For Route B L2
 
 Because the N-terminal extension length is sampled from `24-36`, the parent core offset in the L2 output is not fixed. The L2 gate therefore scans possible offsets and selects the best parent-core alignment.
 
@@ -68,9 +86,10 @@ This is a downstream project gate, not a native CA_RFDiffusion binary criterion.
 
 ## Next Actions
 
-1. Monitor PID 959968 until `sample_7500.pdb`/`.trb` appear or the log reports failure.
-2. Run `gate_pocket4_l2_parent_core.py` against the L2 output directory.
-3. If PASS, run LigandMPNN on the L2 backbone and generate 90/80/70/60/50 sequence bins.
-4. Only after L2 sequence design, evaluate predicted structures/pocket geometry and count accepted final sequences.
+1. Route A: use the existing L1-direct raw LigandMPNN panel as input for structure prediction and pocket/core gate; report accepted counts per bin.
+2. Route B: monitor PID 959968 until `sample_7500.pdb`/`.trb` appear or the log reports failure.
+3. Route B: run `gate_pocket4_l2_parent_core.py` against the L2 output directory.
+4. Route B: if L2 gate PASS, run LigandMPNN on the L2 backbone and generate 90/80/70/60/50 sequence bins.
+5. Compare Route A versus Route B by per-bin accepted sequence counts and pocket geometry stability.
 
 Do not upload PDB/TRB/model/trajectory/log files to GitHub.
