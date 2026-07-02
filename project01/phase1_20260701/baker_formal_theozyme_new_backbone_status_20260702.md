@@ -274,3 +274,29 @@ Batch50 backbone motif gate also advanced:
 - log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_sample1000_refined_ligandmpnn_bin80_20260702.log`
 
 These are sequence candidates only. They are not final-qualified structures until post-sequence structure prediction and pocket/motif gates pass.
+
+## Sequence-Bin Generation Continued - 2026-07-02 13:58 CST
+
+Updated sequence candidate status from `sample_1000_refined_0`:
+
+- 90% bin: `200/200` selected, target met
+- 80% bin: `1000/1000` selected, target met
+- selected manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_ligandmpnn_bins_selected.tsv`
+- summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_ligandmpnn_bins_summary.json`
+
+80% bin details:
+
+- records generated: 1251
+- pass filter count: 1162
+- selected count: 1000
+- exact mutation count: 32 mutations over 160 residues
+- fixed motif mutations: 0 in selected records by filter definition
+
+70% identity bin was launched next:
+
+- target candidate count: 1000
+- launched run: `baker_theozyme_sample1000_refined_ligandmpnn_bin70_20260702`
+- PID at launch: `438180`
+- log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_sample1000_refined_ligandmpnn_bin70_20260702.log`
+
+Reminder: these are sequence candidate manifests. Final-qualified status still requires post-sequence structure prediction and pocket/motif gates.
