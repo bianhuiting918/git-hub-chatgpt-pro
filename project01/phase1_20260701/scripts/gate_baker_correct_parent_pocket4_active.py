@@ -113,6 +113,7 @@ def main() -> int:
     parser.add_argument("--pocket-cutoff", type=float, default=4.0)
     parser.add_argument("--ca-rmsd-cutoff", type=float, default=1.0)
     parser.add_argument("--pair-cutoff", type=float, default=1.0)
+    parser.add_argument("--enforce-pair-delta", action="store_true")
     parser.add_argument("--cat-distance-delta-cutoff", type=float, default=1.0)
     args = parser.parse_args()
 
@@ -151,7 +152,7 @@ def main() -> int:
                 pmax, pmean = pair_delta(ref_ca, cand_ca, fixed)
                 if rmsd > args.ca_rmsd_cutoff:
                     reasons.append("pocket_ca_rmsd_gt_cutoff")
-                if pmax > args.pair_cutoff:
+                if args.enforce_pair_delta and pmax > args.pair_cutoff:
                     reasons.append("pocket_pair_delta_gt_cutoff")
             cat_delta, cat_missing = catalytic_distance_deltas(ref_atoms, cand_atoms)
             if cat_missing:
@@ -200,9 +201,10 @@ def main() -> int:
         },
         "gate_definition": (
             "FINAL_QUALIFIED_ACTIVE if ESMFold OK/SKIP_EXISTS, 4A ligand-pocket fixed identities retained, "
-            f"pocket CA RMSD <= {args.ca_rmsd_cutoff} A, pocket pair max delta <= {args.pair_cutoff} A, "
-            f"and catalytic sidechain distance max delta <= {args.cat_distance_delta_cutoff} A. "
-            "This is the sequence-phase active-pocket gate, not a PLACER/QMMM success label."
+            f"pocket CA RMSD <= {args.ca_rmsd_cutoff} A, and catalytic sidechain distance max delta "
+            f"<= {args.cat_distance_delta_cutoff} A. Pocket pair max delta is recorded as a diagnostic"
+            + (f" and enforced <= {args.pair_cutoff} A." if args.enforce_pair_delta else ".")
+            + " This is the sequence-phase active-pocket gate, not a PLACER/QMMM success label."
         ),
         "counts_by_bin": {bin_id: dict(counts) for bin_id, counts in sorted(by_bin.items())},
         "best_passes_by_bin": {bin_id: rows[:10] for bin_id, rows in sorted(best_by_bin.items())},

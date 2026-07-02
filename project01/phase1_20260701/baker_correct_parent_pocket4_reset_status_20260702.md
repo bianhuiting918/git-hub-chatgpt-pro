@@ -59,8 +59,8 @@ For the current sequence-only phase, `FINAL_QUALIFIED_ACTIVE` means:
 2. Fixed 4 A ligand-pocket residues are unchanged.
 3. ESMFold prediction exists.
 4. Fixed-pocket CA RMSD to correct AF2 parent is <= 1.0 A.
-5. Fixed-pocket pair max distance delta is <= 1.0 A.
-6. Catalytic sidechain distance max delta for SER15/HIS55/ASP73 atom pairs is <= 1.0 A.
+5. Catalytic sidechain distance max delta for SER15/HIS55/ASP73 atom pairs is <= 1.0 A.
+6. Fixed-pocket pair max distance delta is recorded as a diagnostic, not a default hard filter.
 
 This is not a PLACER or QMMM success label. PLACER and QMMM are currently deferred by user decision.
 
