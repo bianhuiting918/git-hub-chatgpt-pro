@@ -239,3 +239,38 @@ Remote gate files:
 - JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702_motif_gate_summary.json`
 
 This proves refinement preserved the Baker motif gate for the first backbone. It still does not complete any sequence-similarity bin; next action is sequence design/binning from `sample_1000_refined_0` while batch50 continues producing more backbones.
+
+## Sequence-Bin Generation From Sample1000 Refined - 2026-07-02 13:53 CST
+
+Sequence design has started from the first refined Baker-theozyme backbone:
+
+- source backbone: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000_refined_0.pdb`
+- fixed residues: Baker theozyme contig motif positions only, `A13,A14,A15,A16,A17,A54,A55,A56,A72,A73,A74,A148,A149,A150`
+- fixed policy: no ligand-4A shell lock for this new-backbone route
+- output summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_ligandmpnn_bins_summary.json`
+- selected manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_ligandmpnn_bins_selected.tsv`
+
+90% identity bin:
+
+- target candidate count: 200
+- status: `TARGET_MET`
+- selected: `200/200`
+- exact mutation count: 16 mutations over 160 residues
+- fixed motif mutations: 0 in selected records
+- first pass at temperature 0.10 produced only 59 unique pass records due to duplicate sequences
+- supplement at temperature 0.20 with seed `991101` added enough unique pass records; the final selected count is 200
+
+Batch50 backbone motif gate also advanced:
+
+- evaluated PDBs: 3
+- PASS: `sample_1000`, `sample_1000_refined_0`, `sample_1001`
+- `sample_1001` motif CA RMSD: `0.1015 A`; max pair-distance delta: `0.1465 A`; ligand `bn1` records: `22`
+
+80% identity bin:
+
+- target candidate count: 1000
+- launched run: `baker_theozyme_sample1000_refined_ligandmpnn_bin80_20260702`
+- PID at launch: `437140`
+- log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_sample1000_refined_ligandmpnn_bin80_20260702.log`
+
+These are sequence candidates only. They are not final-qualified structures until post-sequence structure prediction and pocket/motif gates pass.
