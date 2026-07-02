@@ -99,3 +99,28 @@ Remote verification at `2026-07-02T17:22:32+08:00`:
 - Compact launcher status file: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_status.json`.
 
 The active heartbeat now calls the queue driver first. It will move from `compact` to `medium` to `near_original` as each run either produces gateable PDBs or remains unevaluated due to GPU blocking.
+
+## 2026-07-02 New-Route-Only Switch
+
+The user clarified that previous Project 01 routes can stop and only the new layered route should run.
+
+Remote process action at `2026-07-02T17:26:59+08:00`:
+
+- Matched old Project 01 process: PID `413631`, old original-contig `ca_rfd_baker_theozyme_formal_constraints_batch50_20260702` batch50 run.
+- Action: sent `TERM` with `kill 413631`.
+- Verification: `ps -p 413631` returned no process; PID `413631` disappeared from `nvidia-smi --query-compute-apps`.
+- Other GPU Python processes `209606` and `523038` were inspected and belong to other users/directories, so they were not touched.
+
+New layered route launch:
+
+- Command: `FORCE=1 ALLOW_SHARED_GPU=1 CONTIG_SET=compact NUM_DESIGNS=20 DESIGN_STARTNUM=3000 scripts/launch_baker_layered_l1_contig_sweep.sh`.
+- Result: `LAUNCHED`.
+- Run ID: `ca_rfd_baker_layered_l1_compact_publicckpt_20260702`.
+- PID: `555939`.
+- Log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/ca_rfd_baker_layered_l1_compact_publicckpt_20260702.log`.
+- Output prefix: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_layered_l1_compact_publicckpt_20260702/sample`.
+- Status file: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_status.json`.
+- Queue status after launch: `MONITORING`, current set `compact`, PID `555939`.
+- PDB count immediately after launch: 0, so no L1 motif gate has been evaluated yet.
+
+Heartbeat policy was updated accordingly: do not restart old original-contig batch50; monitor/advance only the new L1 queue with `FORCE=1 ALLOW_SHARED_GPU=1`.
