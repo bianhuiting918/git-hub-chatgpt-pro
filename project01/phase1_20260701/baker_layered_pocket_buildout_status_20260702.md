@@ -184,3 +184,26 @@ Screening/evaluation status remains strict:
 - NOT_EVALUATED: compact L1 outputs not yet written.
 
 Next action: continue monitoring until the first compact L1 PDB appears, then run dynamic motif gate on the present PDB universe immediately.
+## 2026-07-02 Queue Early-Gate Fix
+
+A queue-driver logic issue was fixed: the previous queue checked whether a CA_RFDiffusion PID was alive before checking whether any PDB had already been written. That could delay motif gating until all 20 compact designs finished.
+
+New queue behavior:
+
+- For each contig run, count present PDB files first.
+- If `pdb_count > 0`, run the dynamic motif gate immediately on the present PDB universe.
+- If the CA_RFDiffusion PID is still alive after gating, write queue status `GATED_RUNNING` and keep monitoring/regating as more PDBs appear.
+- If `pdb_count = 0` and the PID is alive, write `MONITORING` with `pdb_count=0`.
+
+Remote verification at `2026-07-02T17:56:59+08:00`:
+
+- Remote script: `/data/bht/project01_baker_serhyd_routeB_20260701/scripts/run_baker_layered_l1_queue.sh`.
+- `bash -n scripts/run_baker_layered_l1_queue.sh` passed.
+- Queue execution: `FORCE=1 ALLOW_SHARED_GPU=1 CONTIG_SETS='compact medium near_original' NUM_DESIGNS=20 START_BASE=3000 scripts/run_baker_layered_l1_queue.sh`.
+- Current queue status: `MONITORING`.
+- Current set: `compact`.
+- Current PID: `555939`.
+- Current `pdb_count`: `0`.
+- Next action in queue status: `wait_for_current_l1_to_write_pdb_or_finish`.
+
+This preserves the strict evaluated/not-evaluated rule: no PDB means compact L1 motif gate evaluated universe remains `0`, not FAIL.

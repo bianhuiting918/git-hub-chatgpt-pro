@@ -91,9 +91,9 @@ for set_name in $CONTIG_SETS; do
     pid="$(json_value "$status_file" pid || true)"
   fi
 
+  pid_alive=0
   if [ "$status" = "LAUNCHED" ] && [ -n "$pid" ] && ps -p "$pid" >/dev/null 2>&1; then
-    write_queue_status status=MONITORING current_set="$set_name" current_run_id="$run_id" pid="$pid" status_file="$status_file" next_action="wait_for_current_l1_to_finish"
-    exit 0
+    pid_alive=1
   fi
 
   pdb_count=0
@@ -102,8 +102,17 @@ for set_name in $CONTIG_SETS; do
   fi
   if [ "$pdb_count" -gt 0 ]; then
     gate_line="$(run_gate_for_set "$set_name" "$run_id" "$contig" "$outdir")"
-    write_queue_status status=GATED current_set="$set_name" current_run_id="$run_id" pdb_count="$pdb_count" gate="$gate_line" next_action="continue_to_next_contig_or_sequence_generation_if_enough_PASS"
+    if [ "$pid_alive" -eq 1 ]; then
+      write_queue_status status=GATED_RUNNING current_set="$set_name" current_run_id="$run_id" pid="$pid" pdb_count="$pdb_count" gate="$gate_line" status_file="$status_file" next_action="continue_monitoring_current_l1_and_regate_present_pdbs"
+      exit 0
+    fi
+    write_queue_status status=GATED current_set="$set_name" current_run_id="$run_id" pdb_count="$pdb_count" gate="$gate_line" status_file="$status_file" next_action="continue_to_next_contig_or_sequence_generation_if_enough_PASS"
     continue
+  fi
+
+  if [ "$pid_alive" -eq 1 ]; then
+    write_queue_status status=MONITORING current_set="$set_name" current_run_id="$run_id" pid="$pid" pdb_count="$pdb_count" status_file="$status_file" next_action="wait_for_current_l1_to_write_pdb_or_finish"
+    exit 0
   fi
 
   CONTIG_SET="$set_name" NUM_DESIGNS="$NUM_DESIGNS" DESIGN_STARTNUM="$startnum" "$LAUNCHER" "$ROOT" >/tmp/${run_id}_launch_path.txt
