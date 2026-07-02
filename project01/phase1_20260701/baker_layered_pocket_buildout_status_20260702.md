@@ -464,3 +464,38 @@ Audit interpretation:
 - This is not a final failure of the whole `4307`-sequence pool; only `50` rows have structural evidence.
 - It does show that the current limited LigandMPNN-to-apo-ESMFold route does not preserve the layered motif under the strict apo motif gate.
 - The next work should stay within the new layered route, but should not blindly expand ESMFold on the same selection strategy. It should either adjust sequence design constraints around the motif and local shell, or use a structure-prediction/refinement route that respects the CA_RFDiffusion parent scaffold before screening more rows.
+
+## 2026-07-02 Goal Reset: Pocket4-First Layered Route
+
+The active Project 01 goal was reset to a pocket4-first route:
+
+- Fix the ligand `bn1` 4 A active-site pocket from the theozyme input.
+- Generate scaffolds layer by layer outward with CA_RFDiffusion.
+- Gate only this pocket4 route with strict evaluated/not-evaluated evidence.
+- Generate 90/80/70/60/50 sequence panels only after pocket4 scaffold gates pass.
+
+Route correction:
+
+- Earlier motif-only compact outputs (`sample_3000` and later under `ca_rfd_baker_layered_l1_compact_publicckpt_20260702`) are diagnostic only.
+- They are not counted as pocket4-first route PASS scaffolds.
+- The motif-only CA_RFDiffusion process was stopped before starting the corrected route.
+
+Initial pocket definition from `/data/bht/project01_baker_serhyd_routeB_20260701/inputs/baker_serhyd/design_pipeline/01_diffusion/inputs/theozyme.pdb`:
+
+- Ligand: `bn1`.
+- Ligand heavy atom count: `22`.
+- Pocket definition: protein residue has at least one heavy atom within `4.0 A` of any `bn1` heavy atom.
+- Initial extracted pocket residue count: `16`.
+- Pocket residues: `A35`, `A36`, `A37`, `A40`, `A58`, `A59`, `A62`, `A73`, `A76`, `A77`, `A84`, `A88`, `B145`, `B146`, `B147`, `B148`.
+
+New lightweight route scripts:
+
+- `scripts/prepare_pocket4_layered_route.py`: extracts the `bn1` 4 A pocket and writes fixed-residue and layered-contig manifests.
+- `scripts/gate_ca_rfdiffusion_pocket4.py`: gates CA_RFDiffusion outputs against the pocket4 reference-to-output mapping.
+- `scripts/launch_baker_pocket4_layered_smoke.sh`: launches a small public-checkpoint CA_RFDiffusion smoke run for the pocket4-first route.
+
+Gate policy for the corrected route:
+
+- Evaluated universe: only CA_RFDiffusion output PDB files from the pocket4-first run output directory.
+- Missing or not-yet-generated outputs remain `NOT_EVALUATED`, not FAIL.
+- PASS requires ligand records and all mapped pocket CA atoms, with pocket CA RMSD `<= 1.0 A` and max pocket pair-distance delta `<= 1.0 A`.
