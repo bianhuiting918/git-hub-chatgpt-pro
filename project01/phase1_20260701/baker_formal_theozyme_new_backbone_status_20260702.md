@@ -410,3 +410,48 @@ initialization/loading and had not yet produced new per-bin predictions. Its
 status TSV contained `15` `SKIP_EXISTS` rows from existing bin50 PDBs. This is
 `RUNNING_MODEL_LOAD`, not a structure gate failure. The heartbeat should continue
 monitoring PID `444542` and run the new gate as soon as new status rows appear.
+
+## Interleaved ESMFold Early Gate Result - 2026-07-02 14:42 CST
+
+The interleaved ESMFold run reached `model_loaded` and began writing new
+predictions:
+
+- active PID: `444542`
+- status rows at manual gate time: `25` observed before gate execution; gate saw
+  `27` evaluated rows as new predictions continued to be written
+- new OK examples included early 90/80/70/60% rows; existing bin50 PDBs were
+  reused as `SKIP_EXISTS`
+
+Current gate files on the GPU host:
+
+- gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_gate.tsv`
+- accepted TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_gate_accepted.tsv`
+- summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_gate_summary.json`
+
+Current evaluated universe and gate counts:
+
+- total manifest rows: `250`
+- evaluated by structure/gate so far: `27`
+- NOT_EVALUATED so far: `223` pending or absent ESMFold output, not structural fail
+- 90% bin: evaluated `3`, active pass `0`, strict pass `0`
+- 80% bin: evaluated `3`, active pass `0`, strict pass `0`
+- 70% bin: evaluated `3`, active pass `0`, strict pass `0`
+- 60% bin: evaluated `3`, active pass `0`, strict pass `0`
+- 50% bin: evaluated `15`, active pass `0`, strict pass `0`
+
+Best early motif CA RMSD values were still far above the `1.0 A` active-pocket
+cutoff. Examples:
+
+- 90% best early sample: motif CA RMSD `8.8008 A`, max pair delta `21.2537 A`, motif pLDDT `50.29`
+- 80% best early sample: motif CA RMSD `9.6515 A`, max pair delta `19.1275 A`, motif pLDDT `47.49`
+- 70% best early sample: motif CA RMSD `10.3009 A`, max pair delta `21.9930 A`, motif pLDDT `41.99`
+- 60% best early sample: motif CA RMSD `13.6919 A`, max pair delta `36.8835 A`, motif pLDDT `51.89`
+- 50% best early sample: motif CA RMSD `9.5219 A`, max pair delta `28.7307 A`, motif pLDDT `44.65`
+
+Interpretation: the early failures are real structural gate failures for the
+27 evaluated PDBs, not missing-ligand artifacts. However, the remaining `223`
+manifest rows are still NOT_EVALUATED. The active heartbeat should keep PID
+`444542` running and rerun the ligand-reference gate as additional ESMFold rows
+arrive. If the full pilot remains at `0` active-pass, the next scientific action
+should be to change the design/validation route rather than keep expanding this
+same sequence-only ESMFold screen blindly.
