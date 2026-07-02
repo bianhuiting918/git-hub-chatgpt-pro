@@ -207,3 +207,24 @@ Remote verification at `2026-07-02T17:56:59+08:00`:
 - Next action in queue status: `wait_for_current_l1_to_write_pdb_or_finish`.
 
 This preserves the strict evaluated/not-evaluated rule: no PDB means compact L1 motif gate evaluated universe remains `0`, not FAIL.
+## 2026-07-02 New-Route-Only Confirmation
+
+Remote check at `2026-07-02T18:00:30+08:00`:
+
+- Old original-contig batch50 route remains stopped; no matching `formal_constraints_batch50` Project 01 process was present.
+- Active new-route PID remains `555939`.
+- Run ID: `ca_rfd_baker_layered_l1_compact_publicckpt_20260702`.
+- State: running (`STAT=Rl`), elapsed `32:37`, CPU about `115%`, RSS about `1897496 KB`.
+- Current compact L1 PDB count: `0`.
+- Log progress: denoising advanced to `t=21`, about `29/50` denoising steps complete for `sample_3000`.
+- Queue command rerun with the new-route-only settings:
+  `FORCE=1 ALLOW_SHARED_GPU=1 CONTIG_SETS='compact medium near_original' NUM_DESIGNS=20 START_BASE=3000 scripts/run_baker_layered_l1_queue.sh`.
+- Queue status remains `MONITORING`, current set `compact`, current PID `555939`, `pdb_count=0`, next action `wait_for_current_l1_to_write_pdb_or_finish`.
+
+Current interpretation:
+
+- Previous Project 01 routes are no longer being advanced.
+- Only the layered pocket-first compact L1 route is active.
+- Evaluated universe for compact L1 motif gate is still `0` PDB files, so there is no PASS/FAIL result yet.
+
+Next action: continue monitoring PID `555939`; as soon as the first compact L1 PDB is written, run the dynamic motif gate on that present output universe and record PASS/FAIL counts.
