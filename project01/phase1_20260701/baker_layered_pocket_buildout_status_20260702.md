@@ -601,3 +601,40 @@ Next action:
 1. Monitor PID `920129` until `sample_7400.pdb` appears or the process fails.
 2. Gate `pocket4_expanded` with `scripts/gate_ca_rfdiffusion_pocket4.py` immediately after output appears.
 3. If expanded passes, use compact/medium/expanded pocket4 PASS scaffolds as the parent universe for the 90/80/70/60/50 sequence panels.
+
+## 2026-07-02 Pocket4 Expanded Gate PASS And Sequence Panel Launch
+
+Remote check and gate at `2026-07-02T23:47:37+08:00`:
+
+Expanded scaffold result:
+
+- Run ID: `ca_rfd_baker_pocket4_layered_expanded_n1_20260702`.
+- Output files: `sample_7400.pdb` (`32436` bytes) and `sample_7400.trb` (`23902` bytes).
+- Log evidence: `Finished design in 54.68 minutes` and wrote `sample_7400.pdb`.
+- Gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_expanded_n1_20260702_pocket4_gate.tsv`.
+- Gate summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_expanded_n1_20260702_pocket4_gate_summary.json`.
+- Evaluated universe: `1` present PDB.
+- PASS: `1`.
+- FAIL: `0`.
+- `sample_7400` pocket CA count: `16`.
+- `sample_7400` pocket CA RMSD: `0.1548 A`.
+- `sample_7400` max pocket pair-distance delta: `0.3762 A`.
+- `sample_7400` mean pocket pair-distance delta: `0.1110 A`.
+- `sample_7400` ligand atom records: `22`.
+
+Sequence panel launch:
+
+- Run ID: `pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350`.
+- PID: `944271`.
+- Wrapper: `/tmp/run_pocket4_sequence_panels_20260702.sh`.
+- Log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350.log`.
+- Parent scaffold universe: three pocket4-gated PASS scaffolds, one each from `compact`, `medium`, and `expanded`.
+- Generation policy per parent scaffold: one LigandMPNN round, bins `90/80/70/60/50`, selected target `90=200`, selected target `80/70/60/50=1000`.
+- Output manifests: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350_*_selected.tsv`.
+- Output summaries: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350_*_summary.json`.
+
+Interpretation:
+
+- All three current pocket4 layered scaffold smoke runs have passed the strict pocket4 CA/ligand gate.
+- The newly launched LigandMPNN sequence panel produces sequence-layer candidates only.
+- These candidates are not final accepted sequences until downstream structure prediction and pocket4 geometry screening are run.
