@@ -44,6 +44,7 @@ This reset is successful only when evidence files show:
 - At least one contig family has enough L1 PASS structures to justify L2 or sequence generation.
 - Sequence panels are regenerated from multiple L1/L2 PASS scaffolds with per-bin counts, not from one scaffold only.
 - Downstream reports distinguish sequence pool count from structure-gated accepted count.
+
 ## 2026-07-02 Current Execution Update
 
 The active target is now explicitly: regenerate sequences only after motif-gated layered scaffolds exist, using larger multi-round candidate pools and repeated attempts until each 90/80/70/60/50 bin has enough accepted sequences for downstream structural evaluation.
@@ -72,3 +73,29 @@ Remote script verification:
 - `scripts/gate_ca_rfdiffusion_theozyme_motif.py` supports dynamic motif maps through `--contig`.
 - `scripts/generate_baker_layered_multiscaffold_ligandmpnn_bins.py` is installed on the GPU host, executable, UTF-8 without BOM, and passed `py_compile` together with the gate script.
 - The generator is prepared but should not be run against the old original-contig precheck unless explicitly choosing that as a fallback. The intended next run is from L1/L2 PASS scaffold gate TSVs.
+
+## 2026-07-02 L1 Queue Driver Update
+
+A lightweight L1 queue driver was added so repeated heartbeats can progress through multiple pocket-support contig attempts instead of repeatedly trying only `medium`.
+
+Queue policy:
+
+- Default contig order: `compact medium near_original`.
+- Default designs per contig: `NUM_DESIGNS=20`.
+- Default start numbers: `compact=3000`, `medium=4000`, `near_original=5000`.
+- Fixed run IDs are used for resumability: `ca_rfd_baker_layered_l1_<contig_set>_publicckpt_20260702`.
+- If a run is already `LAUNCHED` and its PID is alive, the queue writes `MONITORING` and does not start a duplicate.
+- If a run has PDB outputs, the queue runs the dynamic motif gate and writes `<run_id>_motif_gate.tsv` plus `<run_id>_motif_gate_summary.json`.
+- If the GPU is busy, the queue records `BLOCKED_*` and exits cleanly.
+
+Remote verification at `2026-07-02T17:22:32+08:00`:
+
+- Remote script: `/data/bht/project01_baker_serhyd_routeB_20260701/scripts/run_baker_layered_l1_queue.sh`.
+- Syntax check: `bash -n scripts/run_baker_layered_l1_queue.sh` passed.
+- Queue execution: `CONTIG_SETS='compact medium near_original' NUM_DESIGNS=20 START_BASE=3000 scripts/run_baker_layered_l1_queue.sh`.
+- Queue status: `BLOCKED_GPU_COMPUTE_PROCESS_PRESENT`.
+- Current attempted set: `compact`.
+- Queue status file: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_queue_status.json`.
+- Compact launcher status file: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_status.json`.
+
+The active heartbeat now calls the queue driver first. It will move from `compact` to `medium` to `near_original` as each run either produces gateable PDBs or remains unevaluated due to GPU blocking.
