@@ -148,3 +148,29 @@ Latest GPU check:
 - output files: none yet under the batch50 output directory
 
 Next action: continue monitoring until the first PDB/TRB is written, then run a motif/theozyme CA gate before any sequence-bin generation is counted.
+
+## First Batch50 Motif Gate Result - 2026-07-02 12:57 CST
+
+The first CA_RFDiffusion output from the formal Baker-theozyme batch was written while the batch continued to `sample_1001`.
+
+Remote output files:
+
+- PDB: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000.pdb`
+- TRB: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000.trb`
+
+Motif/theozyme gate output:
+
+- TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702_motif_gate.tsv`
+- JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702_motif_gate_summary.json`
+
+Evaluated universe at this check: 1 written PDB. Future samples not yet written are `NOT_EVALUATED`, not failures.
+
+Result for `sample_1000`:
+
+- gate: `PASS`
+- motif CA Kabsch RMSD: `0.1041 A`
+- max motif pair-distance delta: `0.1532 A`
+- mean motif pair-distance delta: `0.0525 A`
+- ligand `bn1` atom records: `22`
+
+This is a first-layer Baker theozyme/motif pass for a generated backbone. It is not a final sequence-bin pass. The next stage is to accumulate additional motif-pass backbones from the running batch and prepare the refinement/sequence-design stage using the user-confirmed candidate scale: 90%=200; 80/70/60/50=1000 each.
