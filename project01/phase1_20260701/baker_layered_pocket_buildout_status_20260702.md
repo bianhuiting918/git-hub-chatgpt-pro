@@ -392,3 +392,75 @@ Remote deployment evidence:
   `/data/bht/design_tools/envs/ligandmpnn_venv/bin/python scripts/gate_layered_esmfold_motif.py --help`.
 
 Next action: once either GPU availability is acceptable or a small representative batch is selected, run `run_esmfold_layered_selected.py` on a limited per-bin subset from the two-parent sequence panel, then run `gate_layered_esmfold_motif.py` to select structure-gated candidates.
+
+## 2026-07-02 Scope Reset: Only The New Layered Route Remains Active
+
+Remote process audit at `2026-07-02T19:57:11+08:00`:
+
+- Old route processes matching `sample21`, `original`, `refine`, `PLACER`, `QMMM`, `cp2k`, or `gmx` were not running under the Project 01 process audit.
+- Current Project 01 active processes are only the new layered route:
+  - PID `555939`: `ca_rfd_baker_layered_l1_compact_publicckpt_20260702`, compact L1 CA_RFDiffusion scaffold generation.
+  - PID `668450`: `layered_pass3_esmfold_lpb10_rfaa_20260702_194610`, limited ESMFold structure prediction for the layered pass3 sequence panel.
+- Other GPU compute processes present in `nvidia-smi` belonged to other users/jobs and are outside Project 01.
+
+Operational rule from this point:
+
+- Do not restart old original-contig, sample21/refine, PLACER, QMMM, CP2K, or GROMACS workflows as part of the current objective.
+- Continue only the layered pocket-first scaffold/sequence regeneration route.
+- Keep strict evidence categories: evaluated structures can be PASS or FAIL; missing, pending, or not-yet-predicted structures are `NOT_EVALUATED`, not FAIL.
+
+## 2026-07-02 Pass3 Sequence Panel And ESMFold Smoke Gate
+
+Three-parent sequence panel:
+
+- Sequence panel run ID: `baker_layered_multiscaffold_ligandmpnn_from_compact_pass3_20260702_193133`.
+- Parent scaffold universe: motif-gated compact L1 PASS parents `sample_3000`, `sample_3001`, and `sample_3002`.
+- Selected sequence TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_layered_multiscaffold_ligandmpnn_from_compact_pass3_20260702_193133_selected.tsv`.
+- Summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_layered_multiscaffold_ligandmpnn_from_compact_pass3_20260702_193133_summary.json`.
+
+Selected sequence counts by target identity bin:
+
+- `90`: `121` selected sequences.
+- `80`: `654` selected sequences.
+- `70`: `1134` selected sequences.
+- `60`: `1198` selected sequences.
+- `50`: `1200` selected sequences.
+- Total selected: `4307` sequences.
+
+Limited ESMFold run:
+
+- Run ID: `layered_pass3_esmfold_lpb10_rfaa_20260702_194610`.
+- Python environment: `/data/bht/design_tools/envs/rfaa_venv/bin/python`.
+- Reason for environment switch: the first attempt under `ligandmpnn_venv` failed because its Python 3.12 runtime triggers an ESMFold dataclass mutable-default error; `rfaa_venv` uses Python 3.10 and completed the run.
+- Evaluated universe for this ESMFold smoke: `50` selected rows, exactly `10` rows per bin from `50/60/70/80/90`.
+- Status: `DONE`, started `2026-07-02T19:50:41`, finished `2026-07-02T19:58:16`.
+- ESMFold output count: `50` PDBs.
+- ESMFold status counts: `OK=50`.
+- ESMFold summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/layered_pass3_esmfold_lpb10_rfaa_20260702_194610_summary.json`.
+- ESMFold status TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/layered_pass3_esmfold_lpb10_rfaa_20260702_194610_status.tsv`.
+
+Motif gate result for this limited ESMFold run:
+
+- Gate script: `scripts/gate_layered_esmfold_motif.py`.
+- Gate summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/layered_pass3_esmfold_lpb10_rfaa_20260702_194610_motif_gate_summary.json`.
+- Gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/layered_pass3_esmfold_lpb10_rfaa_20260702_194610_motif_gate.tsv`.
+- Accepted TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/layered_pass3_esmfold_lpb10_rfaa_20260702_194610_motif_accepted.tsv`.
+- Thresholds: motif CA RMSD `<= 1.0 A`, max motif pair-distance delta `<= 1.0 A`, motif mean pLDDT `>= 70`.
+- Evaluated universe: only the `50` rows with OK ESMFold outputs.
+- PASS: `0/50`.
+- FAIL: `50/50`.
+- NOT_EVALUATED: remaining selected-sequence rows without ESMFold output, not structural FAIL.
+
+Counts by bin from the gate summary:
+
+- `50`: evaluated `10`, PASS `0`, FAIL `10`, NOT_EVALUATED `1190`.
+- `60`: evaluated `10`, PASS `0`, FAIL `10`, NOT_EVALUATED `1188`.
+- `70`: evaluated `10`, PASS `0`, FAIL `10`, NOT_EVALUATED `1124`.
+- `80`: evaluated `10`, PASS `0`, FAIL `10`, NOT_EVALUATED `644`.
+- `90`: evaluated `10`, PASS `0`, FAIL `10`, NOT_EVALUATED `111`.
+
+Audit interpretation:
+
+- This is not a final failure of the whole `4307`-sequence pool; only `50` rows have structural evidence.
+- It does show that the current limited LigandMPNN-to-apo-ESMFold route does not preserve the layered motif under the strict apo motif gate.
+- The next work should stay within the new layered route, but should not blindly expand ESMFold on the same selection strategy. It should either adjust sequence design constraints around the motif and local shell, or use a structure-prediction/refinement route that respects the CA_RFDiffusion parent scaffold before screening more rows.
