@@ -174,3 +174,47 @@ Result for `sample_1000`:
 - ligand `bn1` atom records: `22`
 
 This is a first-layer Baker theozyme/motif pass for a generated backbone. It is not a final sequence-bin pass. The next stage is to accumulate additional motif-pass backbones from the running batch and prepare the refinement/sequence-design stage using the user-confirmed candidate scale: 90%=200; 80/70/60/50=1000 each.
+
+## Sample1000 Public Refinement Launch - 2026-07-02 13:10 CST
+
+Because `sample_1000` passed the Baker theozyme/motif gate, a single small public-checkpoint refinement task was launched while the main batch50 continued.
+
+Refinement run:
+
+- run id: `ca_rfd_baker_theozyme_refine_sample1000_publicckpt_20260702`
+- PID at launch: `426780`
+- input: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000.pdb`
+- checkpoint: `/data/bht/design_tools/models/ca_rf_diffusion/ca_rfd_refinement.pt`
+- checkpoint caveat: public `ca_rfd_refinement.pt`, not unavailable Baker `refine_BFF_3.pt`
+- log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/ca_rfd_baker_theozyme_refine_sample1000_publicckpt_20260702.log`
+- status: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_refine_sample1000_publicckpt_20260702_status.json`
+- manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_refine_sample1000_publicckpt_20260702_manifest.tsv`
+
+Launch policy: only one small refinement was started, not a parallel refinement batch. The main batch50 CA_RFDiffusion PID `413631` continued running.
+
+Next gate after refinement: run the same Baker theozyme motif CA gate on the refined output before using it for sequence-bin generation.
+
+## Sample1000 Refinement Debug And Relaunch - 2026-07-02 13:14 CST
+
+The first refinement launch failed before model inference:
+
+- failed run id: `ca_rfd_baker_theozyme_refine_sample1000_publicckpt_20260702`
+- failure: `ModuleNotFoundError: No module named 'rf_diffusion'`
+- root cause: `run_inference.py` was launched from the `rf_diffusion` package directory without the CA_RFDiffusion repository root on `PYTHONPATH`
+
+Minimal environment test passed:
+
+`PYTHONPATH=/data/bht/design_tools/src/CA_RFDiffusion python -c 'import rf_diffusion'`
+
+A corrected single-sample refinement was relaunched:
+
+- run id: `ca_rfd_baker_theozyme_refine_sample1000_publicckpt_v2_20260702`
+- PID at launch: `427624`
+- input: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_theozyme_formal_constraints_batch50_20260702/sample_1000.pdb`
+- checkpoint: `/data/bht/design_tools/models/ca_rf_diffusion/ca_rfd_refinement.pt`
+- environment fix: `PYTHONPATH=/data/bht/design_tools/src/CA_RFDiffusion`
+- log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/ca_rfd_baker_theozyme_refine_sample1000_publicckpt_v2_20260702.log`
+- status: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_refine_sample1000_publicckpt_v2_20260702_status.json`
+- manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_theozyme_refine_sample1000_publicckpt_v2_20260702_manifest.tsv`
+
+Latest v2 log showed successful import/config startup and checkpoint loading; completion still pending at this status update.
