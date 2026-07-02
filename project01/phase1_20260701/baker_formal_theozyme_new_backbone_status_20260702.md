@@ -338,3 +338,31 @@ Concurrent backbone generation status:
 - CA_RFDiffusion batch50 PID `413631` was still running at 2026-07-02 14:14 CST
 - current written PDBs in batch50 output: `sample_1000.pdb`, `sample_1000_refined_0.pdb`, `sample_1001.pdb`
 - post-sequence structure prediction and final pocket/motif gates remain pending
+
+## Post-Sequence Structure Prediction Pilot - 2026-07-02 14:20 CST
+
+A pilot ESMFold structure-prediction manifest was prepared from the completed
+4200 sequence-candidate pool:
+
+- manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_manifest.tsv`
+- manifest summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_manifest_summary.json`
+- rows: `250`, selected as first `50` records per bin from the completed selected TSV
+- purpose: pilot post-sequence structure prediction before scaling to more candidates
+
+The pilot ESMFold run was launched on the GPU host:
+
+- run id: `baker_theozyme_sample1000_refined_esmfold_pilot50perbin_20260702`
+- PID: `441949`
+- log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_20260702.log`
+- status TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_20260702_status.tsv`
+- summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_20260702_summary.json`
+- Python env: `/data/bht/design_tools/envs/rfaa_venv/bin/python`
+- memory fraction cap: `0.20`
+- chunk size: `128`
+
+At the last manual check, the process had not yet produced status rows. It had
+successfully detected CUDA/A100 and was loading ESMFold weights from
+`/Dell/Dell9/bht/.cache/torch/hub/checkpoints/esm2_t36_3B_UR50D.pt`; therefore
+this is currently `RUNNING_MODEL_LOAD`, not a structure/gate failure. The active
+heartbeat should continue monitoring PID `441949`, the status TSV, and the final
+post-ESMFold motif/pocket gates.
