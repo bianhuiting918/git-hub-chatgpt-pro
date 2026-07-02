@@ -122,3 +122,29 @@ A later check confirmed the batch50 job is not stuck at launch. It entered denoi
 - output files at check time: `0`
 
 Interpretation: the Baker-theozyme constrained batch is running normally, but the first backbone has not completed yet. Do not start a second CA_RFDiffusion batch until this one has produced enough output or is intentionally stopped.
+
+## Candidate Scale Rule - 2026-07-02 User-Confirmed
+
+After a Baker-theozyme constrained new backbone passes the motif/refinement gate, sequence generation will use the following candidate counts per identity bin:
+
+- 90% identity bin: 200 candidate sequences
+- 80% identity bin: 1000 candidate sequences
+- 70% identity bin: 1000 candidate sequences
+- 60% identity bin: 1000 candidate sequences
+- 50% identity bin: 1000 candidate sequences
+
+These numbers are candidate-generation denominators, not final pass counts. The final target remains 10 structure/pocket-qualified sequences per identity bin.
+
+## Batch50 Runtime Progress - 2026-07-02 12:44 CST
+
+Latest GPU check:
+
+- run id: `ca_rfd_baker_theozyme_formal_constraints_batch50_20260702`
+- PID: `413631`
+- process state: still running
+- elapsed: about 38 minutes
+- GPU: A100 80 GB, 100% utilization; this CA_RFDiffusion process used about 3700 MiB
+- log progress: first design `sample_1000`, denoising reached `34/50`
+- output files: none yet under the batch50 output directory
+
+Next action: continue monitoring until the first PDB/TRB is written, then run a motif/theozyme CA gate before any sequence-bin generation is counted.
