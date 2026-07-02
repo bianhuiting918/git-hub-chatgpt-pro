@@ -638,3 +638,38 @@ Interpretation:
 - All three current pocket4 layered scaffold smoke runs have passed the strict pocket4 CA/ligand gate.
 - The newly launched LigandMPNN sequence panel produces sequence-layer candidates only.
 - These candidates are not final accepted sequences until downstream structure prediction and pocket4 geometry screening are run.
+
+## 2026-07-02 Pocket4 Sequence Panel DONE
+
+Remote sequence panel completion at `2026-07-02T23:54:47+08:00`:
+
+- Run ID: `pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350`.
+- Parent scaffold universe: three pocket4-gated PASS scaffolds: `sample_7200` compact, `sample_7300` medium, and `sample_7400` expanded.
+- Combined selected TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350_combined_selected.tsv`.
+- Combined summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/pocket4_layered_pass_scaffolds_ligandmpnn_20260702_2350_combined_summary.json`.
+- Sequence-layer selected total: `10620`.
+
+Selected sequence-layer candidate counts by target identity bin:
+
+| target identity bin | selected candidates |
+|---:|---:|
+| 90 | 173 |
+| 80 | 1667 |
+| 70 | 2780 |
+| 60 | 3000 |
+| 50 | 3000 |
+
+Counts by parent layer:
+
+| parent layer | parent sample | selected total | 90 | 80 | 70 | 60 | 50 |
+|---|---|---:|---:|---:|---:|---:|---:|
+| compact | `sample_7200` | 3440 | 24 | 433 | 983 | 1000 | 1000 |
+| medium | `sample_7300` | 3676 | 21 | 823 | 832 | 1000 | 1000 |
+| expanded | `sample_7400` | 3504 | 128 | 411 | 965 | 1000 | 1000 |
+
+Interpretation:
+
+- This completes the requested pocket4 scaffold-gated sequence-panel generation stage.
+- These are sequence-layer candidates only, selected after LigandMPNN fixed-pocket/no-native filtering.
+- They are not yet structure-gated final accepted sequences.
+- The next scientific step, if continuing beyond this goal, is structure prediction and pocket4 geometry screening of representative candidates from each identity bin, not PLACER/QMMM.
