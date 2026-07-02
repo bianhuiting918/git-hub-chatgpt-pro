@@ -109,3 +109,16 @@ Downstream sequence-bin scale requested by user:
 | 50% | 1000 |
 
 These bins apply after Baker-constrained backbones are generated/refined and sequence design begins. The CA_RFDiffusion backbone stage itself does not have sequence-identity bins.
+
+## Batch50 Runtime Check - 2026-07-02
+
+A later check confirmed the batch50 job is not stuck at launch. It entered denoising for the first backbone:
+
+- PID: `413631`
+- current design: `sample_1000`
+- log evidence: `making design 1000 of 1000:1050`
+- denoising reached at least `t=tensor(43)` / about `7/50` steps
+- observed speed: about 48 seconds per denoising step on the shared GPU
+- output files at check time: `0`
+
+Interpretation: the Baker-theozyme constrained batch is running normally, but the first backbone has not completed yet. Do not start a second CA_RFDiffusion batch until this one has produced enough output or is intentionally stopped.
