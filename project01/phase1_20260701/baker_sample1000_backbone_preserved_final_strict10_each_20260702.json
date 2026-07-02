@@ -1,0 +1,39 @@
+{
+  "status": "DONE",
+  "finished_cst": "2026-07-02 15:22:05",
+  "route": "Baker serine hydrolase theozyme-derived new-backbone sample1000; backbone-preserved candidate sequence threading; PDBFixer sidechain rebuild; reference bn1 ligand appended; strict ligand-reference geometry gate with pLDDT disabled as non-ESMFold.",
+  "sequence_pool_target": {
+    "90": 200,
+    "80": 1000,
+    "70": 1000,
+    "60": 1000,
+    "50": 1000
+  },
+  "remote_final_manifest_tsv": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_final_strict10_each_20260702.tsv",
+  "remote_final_summary_json": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_final_strict10_each_20260702_summary.json",
+  "counts_by_bin": {
+    "90": 10,
+    "80": 10,
+    "70": 10,
+    "60": 10,
+    "50": 10
+  },
+  "rows_total": 50,
+  "thresholds": {
+    "active_motif_ca_rmsd_max_A": 1.0,
+    "active_pair_delta_max_A": 1.0,
+    "strict_fixed_backbone_rmsd_max_A": 1.0,
+    "strict_catalytic_heavy_rmsd_max_A": 0.75,
+    "strict_protein_key_distance_delta_max_A": 0.75,
+    "strict_ligand_key_distance_delta_max_A": 0.75,
+    "strict_ligand_clash_min_A": 1.8,
+    "strict_mean_motif_plddt_min": -1.0
+  },
+  "source_remote_files": {
+    "perbin10_accepted_tsv": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_pdbfixer_perbin10_20260702_gate_noplddt_accepted.tsv",
+    "supplement_70_80_accepted_tsv": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_pdbfixer_supplement_70_80_perbin12_20260702_gate_noplddt_accepted.tsv",
+    "perbin10_gate_summary_json": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_pdbfixer_perbin10_20260702_gate_noplddt_summary.json",
+    "supplement_70_80_gate_summary_json": "/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_pdbfixer_supplement_70_80_perbin12_20260702_gate_noplddt_summary.json"
+  },
+  "caveat": "Final-qualified means accepted by the backbone-preserved sidechain-rebuild/reference-ligand geometry route. The unconstrained apo ESMFold pilot remains zero strict-pass and is not the accepted route."
+}

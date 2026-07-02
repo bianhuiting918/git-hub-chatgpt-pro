@@ -504,3 +504,43 @@ prepare a backbone-preserved validation path from the CA_RFDiffusion/refined
 structure, using sidechain rebuild/packing plus ligand-reference pocket gates,
 rather than relying on unconstrained sequence-to-structure prediction to recover
 the designed theozyme geometry.
+
+## Final Backbone-Preserved Strict 10-Each Checkpoint - 2026-07-02 15:22 CST
+
+The sequence-pool target remains:
+
+- 90% sequence-similarity bin: `200` LigandMPNN candidates
+- 80%, 70%, 60%, 50% sequence-similarity bins: `1000` LigandMPNN candidates each
+- total candidate pool: `4200`
+
+The accepted final route is not the unconstrained apo ESMFold route. The accepted route threads candidate sequences onto the Baker theozyme-derived `sample_1000_refined_0` backbone, keeps the designed motif/backbone geometry, uses PDBFixer to rebuild sidechains, appends the reference `bn1` ligand coordinates, and then applies the strict ligand-reference geometry gate.
+
+Remote hard-evidence files:
+
+- final accepted manifest: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_final_strict10_each_20260702.tsv`
+- final summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_final_strict10_each_20260702_summary.json`
+- per-bin10 gate summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_pdbfixer_perbin10_20260702_gate_noplddt_summary.json`
+- 70/80 supplement gate summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_backbone_preserved_pdbfixer_supplement_70_80_perbin12_20260702_gate_noplddt_summary.json`
+
+Evaluated universe and results:
+
+- per-bin10 backbone-preserved structures generated: `50`; PDBFixer status `OK=50`
+- per-bin10 strict selected: 50%=`10`, 60%=`10`, 70%=`9`, 80%=`9`, 90%=`10`
+- supplement generated for 70/80: `24`; PDBFixer status `OK=24`
+- supplement strict selected: 70%=`10`, 80%=`10`
+- consolidated final accepted manifest: 50%=`10`, 60%=`10`, 70%=`10`, 80%=`10`, 90%=`10`; total `50`
+
+Strict gate thresholds used:
+
+- active motif CA RMSD <= `1.0 A`
+- active motif pair-distance max delta <= `1.0 A`
+- fixed backbone RMSD <= `1.0 A`
+- catalytic heavy atom RMSD <= `0.75 A`
+- protein key-distance max delta <= `0.75 A`
+- ligand key-distance max delta <= `0.75 A`
+- ligand clash minimum distance >= `1.8 A`
+- motif pLDDT gate disabled with `--motif-plddt-min -1` because these are backbone-preserved PDBFixer structures, not de novo ESMFold predictions with a meaningful pLDDT confidence field.
+
+Caveat:
+
+These are final-qualified for the backbone-preserved sidechain-rebuild/reference ligand geometry route. The unconstrained sequence-only apo ESMFold route remains zero strict-pass in the evaluated pilot and should not be treated as the accepted validation route.

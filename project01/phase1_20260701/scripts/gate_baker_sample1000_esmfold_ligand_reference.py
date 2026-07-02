@@ -73,6 +73,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--accepted-tsv", required=True)
     parser.add_argument("--summary-json", required=True)
     parser.add_argument("--target-per-bin", type=int, default=10)
+    parser.add_argument("--motif-plddt-min", type=float, default=70.0, help="Set below 0 to disable pLDDT/B-factor gate for non-ESMFold backbone-preserved structures")
     return parser.parse_args()
 
 
@@ -339,8 +340,9 @@ def evaluate(row: dict[str, str], status: dict[str, str], ref_atoms: list[dict[s
         strict_reasons.append("protein_key_distance_delta_gt_0p75A")
     if ligand_missing or ligand_max > THRESH["strict_ligand_key_distance_delta_max_A"]:
         strict_reasons.append("ligand_key_distance_delta_gt_0p75A")
-    if mean_plddt is None or mean_plddt < THRESH["strict_mean_motif_plddt_min"]:
-        strict_reasons.append("motif_plddt_lt_70")
+    plddt_min = THRESH["strict_mean_motif_plddt_min"]
+    if plddt_min >= 0 and (mean_plddt is None or mean_plddt < plddt_min):
+        strict_reasons.append("motif_plddt_lt_threshold")
     if clash is None or clash < THRESH["strict_ligand_clash_min_A"]:
         strict_reasons.append("ligand_clash_lt_1p8A")
 
@@ -371,6 +373,7 @@ def evaluate(row: dict[str, str], status: dict[str, str], ref_atoms: list[dict[s
 
 def main() -> None:
     args = parse_args()
+    THRESH["strict_mean_motif_plddt_min"] = args.motif_plddt_min
     reference_pdb = Path(args.reference_pdb)
     selected_rows = read_tsv(Path(args.selected_tsv))
     status_rows = read_tsv(Path(args.esmfold_status_tsv))
@@ -455,3 +458,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+
