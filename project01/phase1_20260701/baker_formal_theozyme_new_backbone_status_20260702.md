@@ -455,3 +455,52 @@ manifest rows are still NOT_EVALUATED. The active heartbeat should keep PID
 arrive. If the full pilot remains at `0` active-pass, the next scientific action
 should be to change the design/validation route rather than keep expanding this
 same sequence-only ESMFold screen blindly.
+
+## Interleaved ESMFold Gate Checkpoint - 2026-07-02 14:49 CST
+
+The interleaved ESMFold run continued normally and the ligand-reference gate was
+rerun on the current status rows.
+
+Remote running processes:
+
+- CA_RFDiffusion batch50: PID `413631`, still running
+- interleaved ESMFold: PID `444542`, still running
+
+Current ESMFold status:
+
+- status TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_20260702_status.tsv`
+- rows: `52`
+- `OK`: `37`
+- `SKIP_EXISTS`: `15`
+- by bin: 90=`10 OK`, 80=`9 OK`, 70=`9 OK`, 60=`9 OK`, 50=`15 SKIP_EXISTS`
+
+Current ligand-reference gate result:
+
+- gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_gate.tsv`
+- summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_theozyme_sample1000_refined_esmfold_pilot50perbin_interleaved_gate_summary.json`
+- evaluated structures: `52`
+- active pass: `0`
+- strict pass: `0`
+- NOT_EVALUATED: remaining rows in the 250-row pilot manifest, not counted as structural failures
+
+Per-bin gate counts at this checkpoint:
+
+- 90%: evaluated `10`, active pass `0`, strict pass `0`; best motif CA RMSD `8.4217 A`
+- 80%: evaluated `9`, active pass `0`, strict pass `0`; best motif CA RMSD `9.3249 A`
+- 70%: evaluated `9`, active pass `0`, strict pass `0`; best motif CA RMSD `10.3009 A`
+- 60%: evaluated `9`, active pass `0`, strict pass `0`; best motif CA RMSD `6.9594 A`
+- 50%: evaluated `15`, active pass `0`, strict pass `0`; best motif CA RMSD `9.5219 A`
+
+Interpretation and next action:
+
+The failure is now better localized. ESMFold is running and producing PDBs, and
+the new gate no longer requires ligand HETATM records in the ESMFold PDB. The
+problem is that sequence-only apo ESMFold predictions are not preserving the
+Baker theozyme motif geometry; even the best early motif CA RMSD remains far
+above the `1.0 A` active-pocket cutoff. ESMFold should be allowed to finish the
+pilot for evidence, but this screen should not be blindly expanded to all 4200
+candidates if the full pilot remains zero-pass. The next productive route is to
+prepare a backbone-preserved validation path from the CA_RFDiffusion/refined
+structure, using sidechain rebuild/packing plus ligand-reference pocket gates,
+rather than relying on unconstrained sequence-to-structure prediction to recover
+the designed theozyme geometry.
