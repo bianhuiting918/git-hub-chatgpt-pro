@@ -228,3 +228,33 @@ Current interpretation:
 - Evaluated universe for compact L1 motif gate is still `0` PDB files, so there is no PASS/FAIL result yet.
 
 Next action: continue monitoring PID `555939`; as soon as the first compact L1 PDB is written, run the dynamic motif gate on that present output universe and record PASS/FAIL counts.
+## 2026-07-02 First Compact L1 Gate PASS
+
+Remote check at `2026-07-02T18:18:09+08:00`:
+
+- Active new-route PID remains `555939`; the same compact L1 run is still generating additional designs.
+- First compact L1 output appeared:
+  `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_layered_l1_compact_publicckpt_20260702/sample_3000.pdb`.
+- Output sizes: `sample_3000.pdb` about `31230` bytes; `sample_3000.trb` about `23508` bytes.
+- Queue script ran the dynamic motif gate immediately on the present PDB universe.
+- Queue status changed to `GATED_RUNNING`, with `pdb_count=1` and next action `continue_monitoring_current_l1_and_regate_present_pdbs`.
+
+Compact L1 motif gate result:
+
+- Evaluated universe: `1` present compact L1 PDB file; absent future samples remain `NOT_EVALUATED`.
+- PASS: `1` (`sample_3000`).
+- FAIL: `0` among evaluated outputs.
+- Gate definition: 14 motif CA Kabsch RMSD `<= 1.0 A`, max pair-distance delta `<= 1.0 A`, and ligand `bn1` present.
+- `sample_3000` metrics:
+  - motif CA RMSD: `0.0776 A`.
+  - max pair-distance delta: `0.2107 A`.
+  - mean pair-distance delta: `0.0547 A`.
+  - ligand atom records: `22`.
+
+Evidence files on GPU host:
+
+- Summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_motif_gate_summary.json`.
+- Gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_motif_gate.tsv`.
+- Queue status: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_queue_status.json`.
+
+Next action: keep the compact L1 run active until more PDBs accumulate; re-run the dynamic gate on the present PDB universe and then let the queue advance to the next layered contig set according to `scripts/run_baker_layered_l1_queue.sh`.
