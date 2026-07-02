@@ -304,3 +304,61 @@ Current scaffold generation status remains active:
 - Queue status remains `GATED_RUNNING` and will re-gate as additional compact L1 PDBs are written.
 
 Next action: keep monitoring compact L1; when more compact PASS scaffolds appear, rerun/extend multiscaffold LigandMPNN panels and then advance to structure prediction plus motif/pocket gate for selected sequences.
+## 2026-07-02 Compact L1 Second PASS and Two-Parent Sequence Panel
+
+Remote check at `2026-07-02T18:53:06+08:00` and sequence panel check at `2026-07-02T19:01:29+08:00`:
+
+Compact L1 scaffold gate:
+
+- Active compact L1 CA_RFDiffusion PID remains `555939` and is continuing to generate later samples.
+- Current compact L1 output PDB universe: `2` present PDB files, `sample_3000` and `sample_3001`.
+- Evaluated universe: those `2` present PDB files only; future compact outputs remain `NOT_EVALUATED`.
+- PASS: `2`.
+- FAIL: `0` among evaluated outputs.
+- Gate definition: 14 motif CA Kabsch RMSD `<= 1.0 A`, max pair-distance delta `<= 1.0 A`, ligand `bn1` present.
+- `sample_3000`: motif CA RMSD `0.0776 A`, max pair-distance delta `0.2107 A`, mean pair-distance delta `0.0547 A`, ligand atom records `22`.
+- `sample_3001`: motif CA RMSD `0.0762 A`, max pair-distance delta `0.1946 A`, mean pair-distance delta `0.0479 A`, ligand atom records `22`.
+
+Evidence files on GPU host:
+
+- Gate summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_motif_gate_summary.json`.
+- Gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_compact_publicckpt_20260702_motif_gate.tsv`.
+- Queue status: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_layered_l1_queue_status.json`.
+
+Two-parent sequence panel:
+
+- Sequence panel run ID: `baker_layered_multiscaffold_ligandmpnn_from_compact_pass2_20260702_185358`.
+- Parent scaffold universe for this panel: two motif-gated compact L1 PASS parents, `sample_3000` and `sample_3001`.
+- Route: `generate_baker_layered_multiscaffold_ligandmpnn_bins.py`, parent-limit `2`, rounds `2`, bins `90/80/70/60/50`.
+- Fixed motif positions: `14` scaffold-numbered motif residues from contig `6,A56-60,18,A83-85,8,A113-115,32,B145-147,6`.
+- Parent scaffold length: `84` residues.
+- Status: `DONE`, started `2026-07-02T18:53:59`, finished `2026-07-02T18:58:59`.
+
+Selected sequence counts by target identity bin:
+
+- `90`: `59` selected sequences.
+- `80`: `441` selected sequences.
+- `70`: `750` selected sequences.
+- `60`: `799` selected sequences.
+- `50`: `800` selected sequences.
+- Total selected: `2849` sequences.
+
+Selected sequence counts by parent and bin:
+
+- `sample_3000`: 90=`23`, 80=`212`, 70=`350`, 60=`399`, 50=`400`.
+- `sample_3001`: 90=`36`, 80=`229`, 70=`400`, 60=`400`, 50=`400`.
+
+Audit interpretation:
+
+- The scaffold gate PASS/FAIL denominator is the current present compact L1 PDB universe: `2` structures.
+- The sequence panel denominator is the two PASS parent scaffolds used by the LigandMPNN panel run.
+- These `2849` records are sequence-layer candidates passing the script's fixed motif/no-native and target mutation bin filters. They are not final structure-gated candidates.
+- The 90% bin remains below the nominal high-diversity target because the current two compact parents yielded `59` filtered 90% records across two rounds. More PASS parents or additional rounds are needed for a larger 90% pool.
+
+Remote sequence evidence files:
+
+- Summary JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_layered_multiscaffold_ligandmpnn_from_compact_pass2_20260702_185358_summary.json`.
+- Selected sequence TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/baker_layered_multiscaffold_ligandmpnn_from_compact_pass2_20260702_185358_selected.tsv`.
+- Sequence design directory: `/data/bht/project01_baker_serhyd_routeB_20260701/sequence_design/baker_layered_multiscaffold_ligandmpnn_from_compact_pass2_20260702_185358`.
+
+Next action: continue monitoring compact L1 while `sample_3002` and later outputs are generated; each new PDB must be motif-gated before being added as a parent scaffold for additional sequence panel rounds.
