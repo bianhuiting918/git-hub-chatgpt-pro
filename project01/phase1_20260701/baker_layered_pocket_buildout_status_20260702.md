@@ -499,3 +499,47 @@ Gate policy for the corrected route:
 - Evaluated universe: only CA_RFDiffusion output PDB files from the pocket4-first run output directory.
 - Missing or not-yet-generated outputs remain `NOT_EVALUATED`, not FAIL.
 - PASS requires ligand records and all mapped pocket CA atoms, with pocket CA RMSD `<= 1.0 A` and max pocket pair-distance delta `<= 1.0 A`.
+
+## 2026-07-02 Pocket4 Goal Active And Compact Gate PASS
+
+The Codex thread goal is now active for the corrected pocket4-first route:
+
+- Fix ligand `bn1` 4 A active-site pocket from the theozyme input.
+- Generate backbone scaffolds layer by layer outward with CA_RFDiffusion.
+- Gate only this pocket4 route with strict evaluated/not-evaluated evidence.
+- Generate 90/80/70/60/50 sequence panels only after pocket4 scaffold gates pass.
+
+The first incorrect pocket4 smoke failed before generation because `ij_visible=abcde` did not match the 9 fixed pocket segments plus the ligand chunk. The launcher was corrected to derive `ij_visible` from `fixed_segment_count + 1`; for the current pocket4 contigs this is `abcdefghij`.
+
+Compact pocket4 smoke result:
+
+- Run ID: `ca_rfd_baker_pocket4_layered_compact_n1_v2_20260702`.
+- Output: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_pocket4_layered_compact_n1_v2_20260702/sample_7200.pdb`.
+- Log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/ca_rfd_baker_pocket4_layered_compact_n1_v2_20260702.log`.
+- Gate summary: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_compact_n1_v2_20260702_pocket4_gate_summary.json`.
+- Gate TSV: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_compact_n1_v2_20260702_pocket4_gate.tsv`.
+- Evaluated universe: `1` present PDB.
+- PASS: `1`.
+- FAIL: `0`.
+- `sample_7200` pocket CA count: `16`.
+- `sample_7200` pocket CA RMSD: `0.1457 A`.
+- `sample_7200` max pocket pair-distance delta: `0.3821 A`.
+- `sample_7200` ligand atom records: `22`.
+
+Current next-layer run:
+
+- Contig set: `pocket4_medium`.
+- Run ID: `ca_rfd_baker_pocket4_layered_medium_n1_20260702`.
+- PID at `2026-07-02T21:57:50+08:00`: `852908`, running.
+- Log: `/data/bht/project01_baker_serhyd_routeB_20260701/logs/ca_rfd_baker_pocket4_layered_medium_n1_20260702.log`.
+- Output directory: `/data/bht/project01_baker_serhyd_routeB_20260701/outputs/ca_rfd_baker_pocket4_layered_medium_n1_20260702`.
+- Status JSON: `/data/bht/project01_baker_serhyd_routeB_20260701/manifests/ca_rfd_baker_pocket4_layered_medium_n1_20260702_status.json`.
+- GPU evidence at check time: A100 80GB total memory, 34089 MiB used, 100 percent utilization; Project 01 PID `852908` used about `790 MiB`.
+- Output PDB count at check time: `0`, so medium gate evaluated universe is still `0` and pending outputs are `NOT_EVALUATED`.
+
+Next action:
+
+1. Monitor PID `852908` until `sample_7300.pdb` is written or the process fails.
+2. Immediately run `scripts/gate_ca_rfdiffusion_pocket4.py` on the `pocket4_medium` output directory after a PDB appears.
+3. If `pocket4_medium` passes the same pocket4 gate, launch `pocket4_expanded`.
+4. Start 90/80/70/60/50 sequence panels only after pocket4 scaffold gates provide accepted parent scaffolds.
