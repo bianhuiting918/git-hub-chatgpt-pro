@@ -543,3 +543,23 @@ Next action:
 2. Immediately run `scripts/gate_ca_rfdiffusion_pocket4.py` on the `pocket4_medium` output directory after a PDB appears.
 3. If `pocket4_medium` passes the same pocket4 gate, launch `pocket4_expanded`.
 4. Start 90/80/70/60/50 sequence panels only after pocket4 scaffold gates provide accepted parent scaffolds.
+
+## 2026-07-02 Pocket4 Medium Denoising Started
+
+Remote check at `2026-07-02T22:08:26+08:00`:
+
+- Current run ID: `ca_rfd_baker_pocket4_layered_medium_n1_20260702`.
+- PID: `852908`, still running.
+- Elapsed at check: `12:54`.
+- Log evidence: `Denoising t=tensor(50)` at `2026-07-02 22:08:23`.
+- Project 01 GPU memory for PID `852908`: about `2540 MiB`.
+- Output PDB count in `outputs/ca_rfd_baker_pocket4_layered_medium_n1_20260702`: `0`.
+
+Gate status:
+
+- Evaluated universe: `0` PDB files because `sample_7300.pdb` has not been written yet.
+- PASS: not evaluated.
+- FAIL: not evaluated.
+- NOT_EVALUATED: pending medium output.
+
+Next action remains to run `scripts/gate_ca_rfdiffusion_pocket4.py` immediately after the medium PDB appears.
