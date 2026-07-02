@@ -362,3 +362,33 @@ Remote sequence evidence files:
 - Sequence design directory: `/data/bht/project01_baker_serhyd_routeB_20260701/sequence_design/baker_layered_multiscaffold_ligandmpnn_from_compact_pass2_20260702_185358`.
 
 Next action: continue monitoring compact L1 while `sample_3002` and later outputs are generated; each new PDB must be motif-gated before being added as a parent scaffold for additional sequence panel rounds.
+## 2026-07-02 Layered ESMFold/Gate Script Preparation
+
+Remote check at `2026-07-02T19:04:52+08:00`:
+
+- Compact L1 CA_RFDiffusion PID `555939` remains active.
+- Current compact L1 evaluated PDB universe remains `2`: `sample_3000` and `sample_3001`.
+- Current compact L1 gate status remains PASS=`2`, FAIL=`0`; future compact outputs remain `NOT_EVALUATED`.
+- `sample_3002` is in progress and had reached denoising `t=32` at the check.
+
+New lightweight scripts prepared for the next structural screening stage:
+
+- `scripts/run_esmfold_layered_selected.py`: generic ESMFold runner for layered selected-sequence TSV files. It supports `--limit-per-bin` and `--max-total` so small structure-prediction batches can be run without committing to all sequence-layer candidates at once.
+- `scripts/gate_layered_esmfold_motif.py`: generic apo-ESMFold motif geometry gate for layered outputs. It compares predicted motif CA geometry against the parent CA_RFDiffusion scaffold motif positions derived from the layered contig.
+
+Gate interpretation for `gate_layered_esmfold_motif.py`:
+
+- Evaluated universe: rows in a selected-sequence TSV with OK/SKIP_EXISTS ESMFold outputs.
+- Missing or failed ESMFold predictions are `NOT_EVALUATED`, not structural FAIL.
+- PASS requires motif CA RMSD `<= 1.0 A`, max motif pair-distance delta `<= 1.0 A`, and motif mean pLDDT `>= 70`.
+- This is an apo protein motif-geometry screen, not a ligand/QMMM-ready full active-site validation.
+
+Remote deployment evidence:
+
+- Scripts were copied to `/data/bht/project01_baker_serhyd_routeB_20260701/scripts/`.
+- Remote syntax check passed:
+  `/data/bht/design_tools/envs/ligandmpnn_venv/bin/python -m py_compile scripts/run_esmfold_layered_selected.py scripts/gate_layered_esmfold_motif.py`.
+- Remote interface check passed:
+  `/data/bht/design_tools/envs/ligandmpnn_venv/bin/python scripts/gate_layered_esmfold_motif.py --help`.
+
+Next action: once either GPU availability is acceptable or a small representative batch is selected, run `run_esmfold_layered_selected.py` on a limited per-bin subset from the two-parent sequence panel, then run `gate_layered_esmfold_motif.py` to select structure-gated candidates.
