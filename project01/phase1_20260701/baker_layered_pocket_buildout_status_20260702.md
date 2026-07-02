@@ -164,3 +164,23 @@ Screening/evaluation status:
 - NOT_EVALUATED: compact L1 outputs that have not been written yet; these are not failures.
 
 Next action: keep monitoring PID `555939`; run the compact L1 dynamic motif gate immediately after any PDB appears, even before all 20 designs complete.
+## 2026-07-02 Compact L1 Denoising t40 Check
+
+Remote check at `2026-07-02T17:46:43+08:00`:
+
+- Active new-route PID: `555939`.
+- Run ID: `ca_rfd_baker_layered_l1_compact_publicckpt_20260702`.
+- State: running (`STAT=Rl`), elapsed `18:36`, CPU about `115%`, RSS about `1894952 KB`.
+- Old original-contig batch50 process remains absent.
+- Current compact L1 PDB count: `0`.
+- Log progress: denoising advanced to `t=40`, about `10/50` denoising steps complete for `sample_3000`.
+- Queue status refreshed to `MONITORING` at `2026-07-02T17:46:43`.
+
+Screening/evaluation status remains strict:
+
+- Evaluated universe for compact L1 motif gate: `0` PDB files.
+- PASS: not evaluated.
+- FAIL: not evaluated.
+- NOT_EVALUATED: compact L1 outputs not yet written.
+
+Next action: continue monitoring until the first compact L1 PDB appears, then run dynamic motif gate on the present PDB universe immediately.
