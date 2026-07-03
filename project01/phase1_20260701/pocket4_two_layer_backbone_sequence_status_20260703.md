@@ -200,3 +200,28 @@ Observed ranges by evaluated bin:
 | 90 | 11.3258-15.3237 | 31.53-39.01 |
 
 Audit note: this means the current L2 LigandMPNN-to-ESMFold route did not preserve the L2 core for the evaluated 50 structures. It does not mean all 1701 raw L2 sequences were structurally evaluated; unevaluated rows remain NOT_EVALUATED. The next step should not be blind continuation of the same sampling policy; it should tighten sequence design around the fixed core or use a structure-conditioned model that preserves the L2 backbone more explicitly.
+
+## Live Progress Update 2026-07-03 09:45 Asia/Shanghai
+
+Route B2 was added after diagnosing why Route B failed. The L2 parent sequence is almost entirely Ala (`148 A + 1 S + 1 H`), so the previous Route B design incorrectly preserved an Ala-rich core sequence. Route B2 fixes only catalytic output residues A61 and A87 during LigandMPNN and redesigns the other 148 positions.
+
+Route B2 raw sequence design completed:
+
+| run_id | total candidates | selected total | 90 | 80 | 70 | 60 | 50 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| pocket4_l2_refseq_ligandmpnn_20260703_0315 | 3360 | 491 | 11 | 120 | 120 | 120 | 120 |
+
+Identity bins are now measured against a designed reference sequence, not against the all-Ala L2 scaffold sequence.
+
+Route B2 ESMFold screening launched:
+
+| field | value |
+|---|---|
+| run_id | routeB2_l2_refseq_esmfold_lpb10_20260703_0320 |
+| PID | 1131895 |
+| selected_tsv | manifests/pocket4_l2_refseq_ligandmpnn_20260703_0315_selected.tsv |
+| intended evaluated universe | 50 rows, 10 per bin |
+| gate script | scripts/gate_pocket4_l2_esmfold_pocket.py |
+| current status | running/loading at first check; no PDB yet |
+
+Route B2 gate is pocket-only by default over L2 residues `38,39,40,43,61,62,65,76,79,80,87,91,102,103,104,105`, with RMSD <= 1.0 A, pair max delta <= 1.0 A, and mean pLDDT >= 70. This is a project strict pocket gate, not an ESMFold native classifier.
