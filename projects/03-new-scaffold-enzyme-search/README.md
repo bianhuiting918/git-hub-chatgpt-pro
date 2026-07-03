@@ -6,79 +6,17 @@
 - NylC / nylon hydrolase / 6-aminohexanoate oligomer hydrolase 等 polyamide 降解酶；
 - 未来可扩展到其他明确催化机制、底物和活性位点的酶类。
 
-修订后的核心思想是：
+当前版本的核心思想：
 
-> **序列搜索和 Foldseek 先建立高召回候选池；Folddisco 对该候选池做机制筛选；同时 Folddisco 独立扫描更大结构库以发现 sequence/Foldseek 漏掉的新骨架；随后合并、去重，并用 GRASE / Pythia-Pocket 做口袋级和稳定性重排序。**
+> **Sequence search 和 Foldseek 主要负责召回；Folddisco 不再是单个 motif 硬筛选器，而是多层 active-site / pocket constellation 证据系统；Folddisco 同时承担 after-recall 机制验证和 de-novo 新骨架扫库；Pythia-Pocket / GRASE 对 Folddisco 支持的候选做口袋环境、活性潜力和稳定性重排序。**
 
-这不是单纯的并联流程，也不是严格的串行漏斗，而是 **双层 Folddisco 策略**：
-
-```text
-Layer 1: Folddisco-after-recall
-  对 C_sequence ∪ C_foldseek 做活性位点几何验证，提高精度。
-
-Layer 2: Folddisco-de-novo
-  直接用 active-site constellation 扫大结构库，寻找序列和整体 fold 都不明显相似的新骨架。
-```
-
-不要执行：
-
-```text
-sequence/Foldseek → Folddisco fail → 直接删除
-```
-
-更稳妥的逻辑是：
-
-```text
-sequence/Foldseek → Folddisco 机制证据标注 → Pythia-Pocket/GRASE → 几何/实验优先级
-```
-
-因为 Folddisco fail 可能来自 loop 构象、低置信 AlphaFold 局部区域、缺少诱导契合构象或 motif 定义过窄。
+详细 motif 规范见：[`MOTIF_STRATEGY.md`](MOTIF_STRATEGY.md)。
 
 ---
 
-## 1. 目标定义
+## 1. 总体流程
 
-### 1.1 项目目标
-
-给定一组已知功能酶，构建一个可复用 pipeline：
-
-1. 从已知酶出发扩展序列同源空间；
-2. 用整体结构相似性搜索低序列相似候选；
-3. 用 Folddisco 对 `C_sequence ∪ C_foldseek` 做机制筛选，检查候选是否真正保留催化残基空间几何；
-4. 用 Folddisco 直接扫描大结构库，寻找序列和整体 fold 检索漏掉的新骨架；
-5. 用口袋级模型和稳定性/活性推荐模型重排序；
-6. 输出实验优先级候选板，包括保守阳性、远缘候选、新骨架探索候选、边界候选和负控。
-
-### 1.2 非目标
-
-本项目第一阶段不直接保证：
-
-- 精确预测 `kcat` 或 `kcat/KM`；
-- 替代 docking、MD、QM/MM 或湿实验；
-- 自动提交大规模结构库、模型 checkpoint、原始轨迹或大型 docking 输出。
-
-第一阶段的产物是 **可解释、可追踪、可实验验证的候选排序系统**。
-
----
-
-## 2. 工具分工
-
-| 层级 | 工具 | 主要职责 | 输出证据 |
-|---|---|---|---|
-| 序列同源 | BLAST / MMseqs2 / HMMER / jackhmmer | 找近缘和远缘同源，建立 MSA、HMM、保守残基图谱 | `sequence_score`、保守催化残基、家族分支、同源正负例 |
-| 整体结构相似 | Foldseek | 搜索低序列相似但整体 fold 或 domain 相似的候选 | `fold_score`、coverage、TM-score-like 指标、domain alignment |
-| 召回后机制筛选 | Folddisco-after-recall | 对序列/Foldseek 召回候选检查催化 motif、口袋关键残基和局部几何 | `motif_validation_score`、`validated_required_residues`、`residue_mapping` |
-| 新骨架 de novo 召回 | Folddisco-de-novo | 直接扫大结构库，寻找 sequence/Foldseek 可能漏掉的局部功能位点 | `motif_denovo_score`、`motif_source=de_novo`、新骨架候选 |
-| 口袋/活性/稳定性 | GRASE / Pythia-Pocket / Pythia | 识别更可能具有目标底物口袋、可表达稳定且活性的候选 | `pocket_embedding_similarity`、`active_site_confidence`、`stability_score` |
-| 物理合理性检查 | docking / PLACER / MD / 几何规则 | 检查底物 pose、亲核攻击距离、氧阴离子洞、入口开放性 | `substrate_pose_score`、`mechanistic_sanity_score` |
-
----
-
-## 3. 候选召回与筛选策略
-
-### 3.1 总体数据流
-
-推荐数据流：
+不要把流程做成单一路径。推荐数据流是：
 
 ```text
 Known functional enzymes
@@ -89,255 +27,193 @@ Known functional enzymes
   ├─ Foldseek global/local structure search
   │    → C_foldseek
   │
-  └─ Active-site motif ensemble construction
-       → M_target
+  └─ Layered Folddisco motif ensemble construction
+       → M_target = {L0, L1, L2, L3}
 
 C_recalled = C_sequence ∪ C_foldseek
 
-Layer 1:
+Layer A: Folddisco-after-recall
   Folddisco(M_target, structures_of_C_recalled)
-    → E_motif_validated_on_recalled_candidates
+    → E_folddisco_after_recall
 
-Layer 2:
+Layer B: Folddisco-de-novo
   Folddisco(M_target, broad_structure_database)
     → C_folddisco_de_novo
 
 C_total = C_recalled ∪ C_folddisco_de_novo
 
-C_total + motif evidence
+C_total + all evidence
   → merge / cluster / deduplicate
   → Pythia-Pocket / GRASE ranking
   → docking / geometry sanity check
   → experimental panel
 ```
 
-### 3.2 序列搜索线
+当前阶段 **不需要重新跑全部 sequence search 和 Foldseek**。优先工作是：
 
-用途：
+1. 重新定义 layered Folddisco motif ensemble；
+2. 将已有 sequence / Foldseek / Folddisco 结果映射到新 evidence schema；
+3. 对已有 `C_sequence ∪ C_foldseek` 补跑缺失的 `after_recall` 层级；
+4. 对大结构库或代表性 subset 跑 `de_novo`；
+5. 重新合并、分类、排序。
 
-- 构建已知功能酶家族边界；
-- 标注高度保守的催化残基；
-- 产生可靠正例和负例；
-- 给 Pythia-Pocket / GRASE 校准提供训练或验证集合。
+---
 
-不要只保留高 identity hit。应保存两类结果：
+## 2. 工具分工
 
-1. **高置信同源候选**：用于实验阳性和 family anchor；
-2. **边界候选**：低 identity 但保留核心 motif，用于结构和口袋重排序。
+| 层级 | 工具 | 主要职责 | 输出证据 |
+|---|---|---|---|
+| 召回 | BLAST / MMseqs2 / HMMER / jackhmmer | 找近缘和远缘同源，建立 MSA、HMM、保守残基图谱 | `sequence_score`、家族分支、同源正负例 |
+| 召回 | Foldseek | 搜索低序列相似但整体 fold 或 domain 相似的候选 | `fold_score`、coverage、TM-score-like 指标、domain alignment |
+| 机制验证 | Folddisco-after-recall | 对 `C_sequence ∪ C_foldseek` 做分层 active-site / pocket motif 验证 | `folddisco_mode=after_recall`、L0–L3 分数、残基映射 |
+| 新骨架召回 | Folddisco-de-novo | 用 layered motif 直接扫大结构库，寻找 sequence/Foldseek 漏掉的新骨架 | `folddisco_mode=de_novo`、`motif_source=de_novo` |
+| 口袋/活性/稳定性重排序 | GRASE / Pythia-Pocket / Pythia | 对 Folddisco 支持或边界保留候选做口袋级和稳定性排序 | `pocket_score`、`active_site_confidence`、`stability_score` |
+| 物理合理性检查 | docking / PLACER / MD / 几何规则 | 检查底物 pose、亲核攻击距离、过渡态稳定、入口开放性 | `substrate_pose_score`、`mechanistic_sanity_score` |
 
-序列搜索输出不直接等于最终候选。所有可用结构的 sequence hit 都应进入 Folddisco-after-recall 做机制筛选。
+---
 
-### 3.3 Foldseek 结构线
+## 3. Layered Folddisco motif / pocket 定义
 
-用途：
+Folddisco motif 应从“单个 rigid motif”升级为 **多层 active-site / pocket constellation**。
 
-- 找低序列相似但 domain fold 相近的候选；
-- 构建结构邻域和 fold cluster；
-- 区分“同 fold 新序列”和“真正不同 fold 的新骨架”。
+| 层级 | 名称 | 内容 | 作用 | 是否硬筛 |
+|---|---|---|---|---|
+| L0 | catalytic core | 必需催化残基、亲核残基、general acid/base、关键金属配位残基等 | 判断是否具备最小反应机制 | 通常硬筛，但允许 seed-specific exception |
+| L1 | catalytic environment | oxyanion hole、acidic network、amide-binding polar residues、过渡态稳定残基 | 判断反应几何是否完整 | 半硬筛 / 强加权 |
+| L2 | substrate pocket | 底物 4–6 Å 接触残基、polymer/polyamide groove、hydrophobic/aromatic clamp、口袋入口 | 判断底物是否可进入和被正确定位 | 加权，不直接淘汰 |
+| L3 | processing / interface / dynamics | NylC processing site、可能影响成熟加工的残基、寡聚界面、lid loop、远端 allosteric residues | 辅助解释表达、成熟、组装和活性状态 | 辅助证据，不硬筛 |
 
-Foldseek 应执行两种搜索：
-
-1. **global/domain search**：关注整体 domain 或全长结构相似；
-2. **local active-domain search**：只用携带活性位点的 domain，避免多结构域蛋白的无关区域干扰。
-
-记录至少以下字段：
+关键规则：
 
 ```text
-query_id
-target_id
-query_coverage
-target_coverage
-alignment_score
-tm_like_score_or_equivalent
-evalue
-aligned_catalytic_residues
-active_site_rmsd_if_available
-active_site_plddt_mean
-pae_or_domain_confidence
-source_database
+L0/L1 = 机制核心与反应环境
+L2/L3 = 口袋、底物定位、processing、interface、dynamics 上下文
 ```
 
-Foldseek hit 也不直接等于最终候选。所有可用结构的 Foldseek hit 都应进入 Folddisco-after-recall。
+不要把 L2/L3 残基当成 L0 strict required residue。比如 T227 这类可能影响口袋、processing 或界面的残基，应进入 L2/L3，而不应与 catalytic core 一样作为 strict 必需点。
 
-### 3.4 Folddisco-after-recall：对序列/Foldseek 候选做机制筛选
+---
 
-这是用户提出并确认的主流程之一，应作为 pipeline 的标准步骤。
+## 4. Folddisco-after-recall
 
 输入：
 
 ```text
 C_recalled = C_sequence ∪ C_foldseek
-M_target = target-specific active-site motif ensemble
+structures_of_C_recalled
+M_target = layered motif ensemble
 ```
 
-输出：
+目的：
 
-```text
-E_motif_validated_on_recalled_candidates
-```
-
-该层 Folddisco 的目标不是寻找所有可能蛋白，而是回答：
-
-> 序列搜索或 Foldseek 召回的候选，是否真的保留目标催化几何和底物定位环境？
-
-检查内容包括：
-
-- required catalytic residues 是否存在；
-- catalytic residues 的三维距离和方向是否合理；
-- oxyanion hole、amide-binding groove、metal coordination 或其他反应稳定结构是否存在；
-- 底物定位残基是否在空间上匹配；
-- active-site pLDDT / PAE 是否支持该局部几何；
-- 若命中失败，是缺少关键残基、几何错误，还是局部结构不可信。
+- 验证 sequence / Foldseek hit 是否保留目标催化几何；
+- 区分“同源但可能失活”、“同 fold 但底物谱不对”和“机制上仍然可信”的候选；
+- 给 Pythia-Pocket / GRASE 提供更干净的候选池；
+- 形成可解释证据，而不是一刀切过滤。
 
 候选处理规则：
 
 ```text
-Folddisco high:
-  强化候选证据。
+L0 STRICT_PASS:
+  保留并强化机制证据。
 
-Folddisco partial:
-  保留为 needs_review 或 boundary candidate，尤其当 pocket/GRASE 分数高时。
+L0 PARTIAL + L1/L2 strong:
+  保留为 needs_review 或 exploration candidate。
 
-Folddisco fail + active-site confidence high + required residue missing:
+L0 NO_HIT + active_site_confidence high:
   降级为 negative_or_boundary_control。
 
-Folddisco fail + active-site confidence low:
-  不直接删除，标记为 needs_review / 需要重新建模或替代构象。
+L0 NO_HIT + active_site_confidence low:
+  标记为 needs_review，不直接删除。
 ```
 
-### 3.5 Folddisco-de-novo：独立扫库找新骨架
+禁止实现为：
 
-Folddisco 还必须有一条独立分支，不能只作为 sequence/Foldseek 的后置过滤器。
+```text
+full motif fail → delete
+```
+
+必须实现为：
+
+```text
+layered motif evidence → classify / downgrade / review
+```
+
+---
+
+## 5. Folddisco-de-novo
 
 输入：
 
 ```text
-M_target = target-specific active-site motif ensemble
+M_target = layered motif ensemble
 broad_structure_database = PDB / AFDB subset / ESMAtlas subset / metagenome structure set
 ```
 
-输出：
+目的：
 
-```text
-C_folddisco_de_novo
-```
+- 直接搜索大结构库；
+- 找 sequence / Foldseek 低分但局部机制几何强的新骨架；
+- 产生 `novel_scaffold_explorer` 候选。
 
-该层目标是寻找：
+典型目标模式：
 
 ```text
 sequence_score low
 fold_score low
-motif_geometry high
-pocket_score potentially high
+l0_core_score high
+l1_environment_score medium/high
+l2_pocket_score medium/high
+pocket_score high after Pythia/GRASE
 ```
 
-这类候选对应真正的新骨架探索。若只筛 `C_sequence ∪ C_foldseek`，这些候选会被提前漏掉。
+如果 Folddisco 只作为 `C_sequence ∪ C_foldseek` 的后置筛选器，这类候选会被漏掉。因此 de-novo 分支必须保留。
 
-### 3.6 Motif ensemble 要求
+---
 
-Folddisco query 不应只包含最小 catalytic triad。必须设计为 **active-site constellation**，包含催化残基、底物定位残基、氧阴离子洞或 amide-binding groove 等。
+## 6. 推荐 Folddisco 输出字段
 
-建议为每个酶类准备多个 motif ensemble：
+最终 ranking 表和中间 evidence 表都应支持以下字段：
 
 ```text
-motifs/
-  petase_cutinase/
-    ser_his_asp_oxyanion_v1.yaml
-    ser_his_asp_oxyanion_aromatic_clamp_v2.yaml
-    substrate_bound_pose_ensemble_v3.yaml
-  nylon_nylc/
-    ntn_thr_asp_asp_v1.yaml
-    ntn_thr_processing_site_groove_v2.yaml
-    oligomer_binding_groove_v3.yaml
+candidate_id
+target_id
+motif_id
+motif_version
+folddisco_mode                 # after_recall | de_novo | both
+motif_source                   # validated_recall | de_novo | both | none
+core_motif_status              # STRICT_PASS | PARTIAL | NO_HIT | NOT_EVALUATED
+l0_core_score
+l1_environment_score
+l2_pocket_score
+l3_context_score
+folddisco_score
+core_rmsd
+required_match_fraction
+context_match_fraction
+pocket_context_score
+best_motif_layer
+residue_mapping
+missing_required_labels
+partial_match_labels
+active_site_confidence
+hit_status                     # pass | partial | fail | low_confidence | not_run
+notes
 ```
 
-每个 motif 命中都要保存残基映射，而不是只保存分数。`motif_source` 必须标记为：
+第一版 Folddisco 分层评分：
 
 ```text
-validated_recall
-de_novo
-both
+folddisco_score =
+  0.45 × l0_core_score
++ 0.25 × l1_environment_score
++ 0.20 × l2_pocket_score
++ 0.10 × l3_context_score
 ```
 
 ---
 
-## 4. PET/PUR 塑料降解酶特化规则
-
-### 4.1 PETase / cutinase / esterase 类
-
-优先关注：
-
-- catalytic Ser-His-Asp/Glu；
-- oxyanion hole；
-- 疏水浅槽；
-- 芳香或疏水夹持残基；
-- 可接近的 polymer-binding surface；
-- active-site loop/lid 的构象可信度；
-- 高温或溶剂条件下稳定性。
-
-对 PETase/cutinase 类，Folddisco-after-recall 必须用于清洗普通 α/β hydrolase 候选。序列搜索和 Foldseek 会召回大量 fold 类似但底物谱不对的 esterase/lipase；只有保留 Ser-His-Asp/Glu、oxyanion hole 和 polymer-binding groove 的候选才应高优先级进入 Pythia-Pocket/GRASE 排序。
-
-Folddisco-de-novo 负责搜索整体 fold 不明显相似但具有相似 ester-hydrolysis active-site constellation 的结构。此分支假阳性会较多，必须通过 pocket openness、polymer-surface accessibility、docking geometry 和稳定性分数再过滤。
-
-### 4.2 Polyurethane urethanase 类
-
-优先关注：
-
-- urethane bond 定位能力；
-- glycolysis / solvent 条件兼容性；
-- 高稳定性和可表达性；
-- 反应口袋对商业 polyurethane 片段的可接近性。
-
-GRASE 类模型在这里应作为主要 ranker 之一，但不能替代 Folddisco 机制几何和实验验证。
-
----
-
-## 5. NylC / nylon hydrolase 特化规则
-
-NylC 不应被当作普通丝氨酸水解酶处理。它更接近 Ntn hydrolase 语境，需要关注成熟链 N-terminal nucleophile 和自加工/组装相关因素。
-
-优先关注：
-
-- N-terminal Thr 等价亲核残基；
-- Asp-Asp-Thr 或等价酸性残基网络；
-- 自切割/成熟加工位点；
-- polyamide oligomer binding groove；
-- 是否能容纳 6-aminohexanoate oligomer；
-- scissile amide bond 是否能被放置到正确亲核攻击几何；
-- 可能的寡聚状态和界面稳定性。
-
-NylC 的 Folddisco motif 应至少包含：
-
-```text
-nucleophile_thr_equivalent
-acidic_residue_1_equivalent
-acidic_residue_2_equivalent_or_general_base_network
-processing_site_context
-amide_binding_groove_residues
-optional_oligomer_interface_contacts
-```
-
-NylC 的 Folddisco-after-recall 应用于检查 NylC-like / Ntn-hydrolase-like 候选是否真的保留：
-
-- N-terminal Thr nucleophile；
-- Asp/Glu acidic network；
-- processing site context；
-- amide-binding groove；
-- polyamide oligomer 进入路径。
-
-NylC 的 Folddisco-de-novo 用于寻找整体 fold 不明显相似、但局部 Ntn-like amide hydrolysis geometry 相似的结构。该分支必须经过 Pythia-Pocket/GRASE、底物 pose 和组装状态检查。
-
-NylC 的 Pythia-Pocket/GRASE 重排序应强调：
-
-- 口袋长度；
-- 极性/疏水分布是否适合 polyamide；
-- amide chain 是否能以 productive pose 进入；
-- 活性位点附近 pLDDT / PAE 是否可信；
-- 组装状态是否可能影响活性。
-
----
-
-## 6. 推荐评分框架
+## 7. 总评分框架
 
 第一版采用可解释加权评分。后续可替换为学习型 ranker。
 
@@ -345,51 +221,142 @@ NylC 的 Pythia-Pocket/GRASE 重排序应强调：
 S_total =
   0.15 × sequence_evidence
 + 0.15 × fold_evidence
-+ 0.30 × motif_geometry
++ 0.30 × folddisco_score
 + 0.20 × pocket_embedding_similarity
 + 0.10 × predicted_stability
 + 0.05 × substrate_accessibility
 + 0.05 × novelty
-- penalty_missing_required_catalytic_residue
+- penalty_missing_l0_core_when_confident
 - penalty_low_active_site_confidence
 - penalty_incompatible_oligomeric_state
 - penalty_bad_expression_or_solubility_proxy
 ```
 
-其中 `motif_geometry` 应由两类证据合并：
+`folddisco_score` 由 `after_recall` 和 `de_novo` 两类证据合并：
 
 ```text
-motif_geometry = max(
-  motif_validation_score_from_recalled_candidates,
-  motif_denovo_score
+folddisco_score = max(
+  folddisco_after_recall_score,
+  folddisco_denovo_score
 )
 ```
 
-并保留 `motif_source`：
+并保留：
 
 ```text
-validated_recall | de_novo | both | none
+motif_source = validated_recall | de_novo | both | none
 ```
-
-按目标调整权重：
-
-- 快速得到可测活性：提高 `sequence_evidence`、`fold_evidence` 和 `motif_validation_score`；
-- 发现新骨架：提高 `motif_denovo_score`、`pocket_embedding_similarity`、`novelty`；
-- 工业条件：提高 `predicted_stability`、溶剂/温度相关 proxy。
-
-候选最终分五类输出：
-
-| 类别 | 定义 | 用途 |
-|---|---|---|
-| conservative_positive | 高序列/结构相似，Folddisco-after-recall 支持或至少不冲突，高稳定性 | 确保实验板有阳性 |
-| remote_homolog_or_remote_fold | 低序列相似但 Foldseek 强，并通过 Folddisco-after-recall | 远缘扩展 |
-| novel_scaffold_explorer | sequence/Foldseek 弱，但 Folddisco-de-novo + pocket 高分 | 主攻新骨架 |
-| needs_review | Folddisco partial/fail 但局部置信度低或 pocket/GRASE 支持 | 重新建模、人工审查或小比例探索 |
-| negative_or_boundary_control | 缺关键残基、口袋不合理或机制几何冲突 | 校准模型和实验背景 |
 
 ---
 
-## 7. 推荐仓库结构
+## 8. 进入 Pythia-Pocket / GRASE 的候选规则
+
+进入 Pythia-Pocket / GRASE 的候选不应只限于 full strict pass。建议包括：
+
+1. L0 strict pass 的候选；
+2. Folddisco-de-novo 直接扫库命中的候选；
+3. L0 partial 但 L1/L2 很强的候选；
+4. sequence / Foldseek 强召回但 Folddisco 不完整的边界候选；
+5. 少量 negative / boundary controls，用于校准模型和实验背景。
+
+这保证 GRASE/Pythia-Pocket 不会只看到“完美 motif”，也能学习或校准边界情况。
+
+---
+
+## 9. PET/PUR 塑料降解酶特化规则
+
+### PETase / cutinase / esterase
+
+L0 catalytic core：
+
+- Ser nucleophile；
+- His general base；
+- Asp/Glu acid；
+- Ser-His-Asp/Glu 距离和方向约束。
+
+L1 catalytic environment：
+
+- oxyanion hole；
+- backbone NH 或 side-chain donor；
+- tetrahedral intermediate stabilization environment；
+- catalytic loop 局部可信度。
+
+L2 substrate pocket：
+
+- 疏水浅槽；
+- aromatic clamp；
+- polymer-binding surface；
+- 底物 scissile bond 定位残基；
+- 入口开放性。
+
+L3 processing / dynamics / interface：
+
+- lid loop 或 flexible loop；
+- 热稳定相关远端区域；
+- 可能影响界面吸附的 surface patch；
+- 多聚体或晶体接触导致的口袋遮挡风险。
+
+### Polyurethane urethanase
+
+重点增加：
+
+- urethane bond 定位；
+- glycolysis / solvent 条件兼容性；
+- 高稳定性和可表达性；
+- 商业 polyurethane 片段可接近性。
+
+GRASE 类模型可作为强 ranker，但不能替代 L0/L1 机制几何检查。
+
+---
+
+## 10. NylC / nylon hydrolase 特化规则
+
+NylC 不应被当作普通 Ser-His-Asp esterase 处理。NylC residue labels 必须来自 seed-specific annotation，不要在代码中硬编码某个编号。不同 NylC-like 蛋白的成熟链编号、processing site 和结构域边界可能不同。
+
+L0 catalytic core：
+
+- N-terminal Thr 或等价亲核残基；
+- 直接参与亲核攻击或 general acid/base 网络的核心残基；
+- 用户或 seed annotation 指定的最小 catalytic core，例如某些项目中可用 `A189/A219/A267` 这类 seed-specific label 表示。
+
+L1 catalytic environment：
+
+- Asp/Glu acidic network；
+- amide bond polarization residues；
+- oxyanion-like stabilization environment；
+- processing-site-proximal polar residues。
+
+L2 substrate pocket：
+
+- polyamide / 6-aminohexanoate oligomer binding groove；
+- 4–6 Å 底物接触残基；
+- 适合 amide chain 的极性/疏水分布；
+- oligomer 入口和通道宽度。
+
+L3 processing / interface：
+
+- processing site；
+- T227 这类可能影响局部口袋、processing 或界面的残基；
+- 寡聚界面；
+- 成熟链稳定性和组装状态相关区域。
+
+---
+
+## 11. 候选分类
+
+最终候选至少分为：
+
+| 类别 | 定义 | 用途 |
+|---|---|---|
+| conservative_positive | sequence/Foldseek 强，Folddisco-after-recall 支持或不冲突 | 确保实验板有阳性 |
+| remote_homolog_or_remote_fold | sequence 较弱，Foldseek 强，L0/L1 支持 | 远缘扩展 |
+| novel_scaffold_explorer | sequence/Foldseek 弱，但 Folddisco-de-novo + pocket 高分 | 主攻新骨架 |
+| needs_review | L0 partial/fail 但 L1/L2/pocket 支持，或 active-site confidence 低 | 重新建模、人工审查、小比例探索 |
+| negative_or_boundary_control | 缺关键 L0 且局部结构可信，或口袋/机制明显不合理 | 校准模型和实验背景 |
+
+---
+
+## 12. 推荐仓库结构
 
 Codex 实现时优先建立如下轻量结构。不要提交大型数据库、checkpoint 或原始轨迹。
 
@@ -397,6 +364,7 @@ Codex 实现时优先建立如下轻量结构。不要提交大型数据库、ch
 projects/03-new-scaffold-enzyme-search/
   README.md
   CODEX_TASKS.md
+  MOTIF_STRATEGY.md
   configs/
     targets.example.yaml
     scoring.default.yaml
@@ -404,9 +372,14 @@ projects/03-new-scaffold-enzyme-search/
   data/
     seed_enzymes.example.tsv
     catalytic_residues.example.tsv
+    toy_sequence_hits.tsv
+    toy_foldseek_hits.tsv
+    toy_folddisco_after_recall_hits.tsv
+    toy_folddisco_denovo_hits.tsv
+    toy_pocket_hits.tsv
   motifs/
-    petase_cutinase.example.yaml
-    nylc_ntn_hydrolase.example.yaml
+    petase_cutinase.layered.example.yaml
+    nylc_ntn_hydrolase.layered.example.yaml
   src/
     scaffold_search/
       __init__.py
@@ -433,81 +406,7 @@ External databases should be referenced by manifest files only.
 
 ---
 
-## 8. 最小可运行产物
-
-Codex 第一轮不要追求完整跑通真实 AFDB / PDB / metagenome 全库。先完成：
-
-1. schema；
-2. config examples；
-3. wrapper interfaces；
-4. toy input；
-5. deterministic scoring；
-6. candidate merge and report generation；
-7. tests for scoring and schema validation。
-
-真实工具调用通过 wrappers 接入：
-
-```text
-MMseqs2 / HMMER wrappers
-Foldseek wrapper
-Folddisco-after-recall wrapper
-Folddisco-de-novo wrapper
-Pythia-Pocket / Pythia / GRASE wrapper
-Docking / geometry sanity wrapper
-```
-
-如果外部工具不可用，wrapper 必须给出清晰错误，并允许读取预先生成的 TSV/JSON 结果继续后续步骤。
-
----
-
-## 9. 输出文件标准
-
-最终 ranking 表至少包含：
-
-```text
-candidate_id
-source_id
-source_database
-sequence_identity_to_best_seed
-sequence_score
-foldseek_score
-foldseek_coverage
-motif_validation_score
-motif_denovo_score
-motif_score
-motif_source
-motif_name
-motif_residue_mapping
-folddisco_after_recall_status
-folddisco_denovo_status
-pocket_score
-pocket_id
-stability_score
-substrate_accessibility_score
-active_site_confidence
-novelty_score
-penalties
-total_score
-candidate_class
-recommended_panel
-explanation
-```
-
-每个候选必须有可解释理由。例如：
-
-```text
-Candidate X is classified as novel_scaffold_explorer because it lacks detectable sequence homology to seed PETase enzymes and has weak global Foldseek similarity, but was recovered by Folddisco-de-novo with a strong Ser-His-Asp + oxyanion-hole + aromatic-clamp motif and has a high Pythia-Pocket similarity score for the shallow hydrophobic PET-binding groove.
-```
-
-或：
-
-```text
-Candidate Y is classified as remote_homolog_or_remote_fold because Foldseek finds a strong active-domain alignment to known cutinases, and Folddisco-after-recall validates the catalytic Ser-His-Asp geometry and oxyanion-hole context, despite low sequence identity.
-```
-
----
-
-## 10. 实验板设计建议
+## 13. 实验板设计建议
 
 每轮实验建议 96-well 或 384-well 板中至少包含：
 
@@ -537,8 +436,8 @@ assay_results.tsv
 回流后更新：
 
 1. HMM profiles；
-2. motif ensemble；
-3. scoring weights；
+2. layered motif ensemble；
+3. L0/L1/L2/L3 权重；
 4. Folddisco-after-recall 阈值；
 5. Folddisco-de-novo motif ensemble；
 6. pocket ranker calibration；
@@ -546,14 +445,16 @@ assay_results.tsv
 
 ---
 
-## 11. Codex 工作原则
+## 14. Codex 工作原则
 
-1. 先读本 `README.md`，再读 `CODEX_TASKS.md`。
+1. 先读本 `README.md`，再读 `MOTIF_STRATEGY.md`，最后读 `CODEX_TASKS.md`。
 2. 第一轮只实现轻量 pipeline 和数据格式，不下载大数据库。
 3. 所有外部工具都通过 wrapper 隔离。
-4. Folddisco 必须实现两种证据模式：`after_recall` 和 `de_novo`。
-5. `after_recall` 用于验证序列/Foldseek 候选，`de_novo` 用于发现 sequence/Foldseek 漏掉的新骨架。
-6. 每一步必须输出可追踪中间文件。
-7. 所有 ranking 都必须能解释，不允许只有黑箱分数。
-8. 不提交大型二进制、checkpoint、结构库、trajectory、docking ensemble 或 scratch notebook。
-9. 新增代码需有基本测试，尤其是 schema validation、score aggregation、candidate classification、Folddisco evidence merge。
+4. Folddisco 必须支持 `after_recall` 和 `de_novo` 两种模式。
+5. Folddisco evidence 必须支持 L0/L1/L2/L3 分层。
+6. 不把 T227 或类似环境残基默认当作 L0 strict required。
+7. 不因 full motif fail 直接删除候选。
+8. 每一步必须输出可追踪中间文件。
+9. 所有 ranking 都必须能解释，不允许只有黑箱分数。
+10. 不提交大型二进制、checkpoint、结构库、trajectory、docking ensemble 或 scratch notebook。
+11. 新增代码需有基本测试，尤其是 schema validation、score aggregation、candidate classification、Folddisco evidence merge 和 layered motif parsing。
