@@ -225,3 +225,17 @@ Route B2 ESMFold screening launched:
 | current status | running/loading at first check; no PDB yet |
 
 Route B2 gate is pocket-only by default over L2 residues `38,39,40,43,61,62,65,76,79,80,87,91,102,103,104,105`, with RMSD <= 1.0 A, pair max delta <= 1.0 A, and mean pLDDT >= 70. This is a project strict pocket gate, not an ESMFold native classifier.
+
+## Live Progress Update 2026-07-03 09:54 Asia/Shanghai
+
+Route B2 ESMFold has started producing structures. Current partial pocket-gate result for `routeB2_l2_refseq_esmfold_lpb10_20260703_0320`:
+
+| bin | evaluated | PASS | FAIL | NOT_EVALUATED |
+|---:|---:|---:|---:|---:|
+| 50 | 3 | 0 | 3 | 117 |
+| 60 | 0 | 0 | 0 | 120 |
+| 70 | 0 | 0 | 0 | 120 |
+| 80 | 0 | 0 | 0 | 120 |
+| 90 | 0 | 0 | 0 | 11 |
+
+The first three bin50 failures still fail pocket RMSD, pair delta, and pLDDT filters. This is not yet evidence for bins 60/70/80/90, which remain NOT_EVALUATED. The current ESMFold run should continue rather than launching a duplicate high-bin test on the shared GPU.
