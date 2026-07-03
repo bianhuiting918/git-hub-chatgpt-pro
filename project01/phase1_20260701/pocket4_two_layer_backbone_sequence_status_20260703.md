@@ -239,3 +239,18 @@ Route B2 ESMFold has started producing structures. Current partial pocket-gate r
 | 90 | 0 | 0 | 0 | 11 |
 
 The first three bin50 failures still fail pocket RMSD, pair delta, and pLDDT filters. This is not yet evidence for bins 60/70/80/90, which remain NOT_EVALUATED. The current ESMFold run should continue rather than launching a duplicate high-bin test on the shared GPU.
+
+## Stop Notice 2026-07-03 Asia/Shanghai
+
+User requested to stop the current run. The active Route B2 ESMFold process was terminated.
+
+Stopped process:
+
+| field | value |
+|---|---|
+| run_id | routeB2_l2_refseq_esmfold_lpb10_20260703_0320 |
+| PID | 1131895 |
+| action | killed by request |
+| residual Project 01 processes | none found by process audit |
+
+Partial data already written before stopping remains on disk. Do not treat the partial Route B2 ESMFold run as a completed 50-row evaluation.
