@@ -172,3 +172,31 @@ Current partial status:
 The first three Route B bin50 failures are due to strict core geometry and pLDDT filters, with core CA RMSD about 13-14 A, pair max delta about 35-40 A, and core mean pLDDT about 42.
 
 Audit note: this does not evaluate bins 60/70/80/90 yet, and all unpredicted rows remain NOT_EVALUATED.
+
+## Live Progress Update 2026-07-03 03:04 Asia/Shanghai
+
+Route B L2 ESMFold run `routeB_l2_esmfold_lpb10_20260703_0140` completed 50/50 structures and full strict core gate was run.
+
+Project strict filter result:
+
+| bin | evaluated | PASS | FAIL | NOT_EVALUATED |
+|---:|---:|---:|---:|---:|
+| 50 | 10 | 0 | 10 | 390 |
+| 60 | 10 | 0 | 10 | 390 |
+| 70 | 10 | 0 | 10 | 390 |
+| 80 | 10 | 0 | 10 | 389 |
+| 90 | 10 | 0 | 10 | 92 |
+
+All 50 evaluated Route B structures failed all three strict gates: core CA RMSD > 1.0 A, core pair max delta > 1.0 A, and core mean pLDDT < 70.
+
+Observed ranges by evaluated bin:
+
+| bin | core RMSD A range | core mean pLDDT range |
+|---:|---|---|
+| 50 | 12.9746-14.5380 | 36.66-42.39 |
+| 60 | 12.9680-13.9993 | 39.98-45.00 |
+| 70 | 11.0349-14.9578 | 39.38-50.28 |
+| 80 | 11.4667-13.7589 | 30.87-40.12 |
+| 90 | 11.3258-15.3237 | 31.53-39.01 |
+
+Audit note: this means the current L2 LigandMPNN-to-ESMFold route did not preserve the L2 core for the evaluated 50 structures. It does not mean all 1701 raw L2 sequences were structurally evaluated; unevaluated rows remain NOT_EVALUATED. The next step should not be blind continuation of the same sampling policy; it should tighten sequence design around the fixed core or use a structure-conditioned model that preserves the L2 backbone more explicitly.
