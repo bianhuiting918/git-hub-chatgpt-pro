@@ -67,3 +67,32 @@ Snapshot at 2026-07-03 12:49 Asia/Shanghai:
 
 Large PDB, model, trajectory, and raw log files are intentionally not uploaded
 to GitHub.
+
+## 2026-07-03 14:50 Asia/Shanghai Update
+
+ESMFold final status:
+
+- Evaluated universe: 300 sequence-filter-pass rows.
+- OK: 300.
+- FAIL: 0.
+- NOT_EVALUATED: 0.
+- Summary JSON: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/manifests/routeA_90_80_x1000_esmfold_summary.json`
+
+Post-sequence fixed-pocket/entrance gate:
+
+- Evaluated universe: 300 ESMFold OK rows.
+- PASS: 15.
+- FAIL: 285.
+- NOT_EVALUATED: 0.
+- PASS by bin: 90% = 15, 80% = 0.
+- Gate manifest: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/manifests/routeA_90_80_x1000_postseq_gate.tsv`
+
+PLACER n50:
+
+- Holo PLACER inputs were prepared only from the 15 postseq PASS rows.
+- The 285 postseq gate FAIL rows are not PLACER FAIL.
+- PLACER ifile: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/manifests/routeA_90_80_x1000_placer.ifile`
+- PLACER queue manifest: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/manifests/routeA_90_80_x1000_placer_queue.tsv`
+- PLACER serial driver PID: 1415493.
+- PLACER status TSV: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/manifests/routeA_90_80_x1000_placer_n50_status.tsv`
+- Expected maximum PLACER conformer denominator: 15 inputs x 50 = 750.
