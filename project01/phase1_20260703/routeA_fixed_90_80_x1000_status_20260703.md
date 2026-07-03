@@ -96,3 +96,46 @@ PLACER n50:
 - PLACER serial driver PID: 1415493.
 - PLACER status TSV: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/manifests/routeA_90_80_x1000_placer_n50_status.tsv`
 - Expected maximum PLACER conformer denominator: 15 inputs x 50 = 750.
+
+## 2026-07-03 17:55 Asia/Shanghai Final PLACER Crop-Gate Update
+
+PLACER n50 driver final status:
+
+- PLACER holo inputs: 15.
+- Expected conformer denominator: 15 inputs x 50 = 750 conformers.
+- PLACER input status: OK = 15, FAIL = 0, NOT_EVALUATED = 0.
+- PLACER output files: 15 CSV score files and 15 model PDB files on the GPU host.
+- PLACER status TSV: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/manifests/routeA_90_80_x1000_placer_n50_status.tsv`
+
+Crop ligand geometry screen:
+
+- Evaluated conformers: 750/750.
+- Conformer strict-pass: 0/750.
+- Conformer status: `FAIL_BOTH_PROTEIN_AND_LIGAND_GATES` = 750.
+- Evaluated sequences: 15/15.
+- Sequence strict-pass: 0/15.
+- Sequence status: `DISCARD_SEQUENCE_REGENERATE_FROM_UPSTREAM` = 15.
+- Summary JSON: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/placer_crop_gate/two_layer_placer_crop_gate_summary.json`
+- Sequence summary TSV: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/placer_crop_gate/two_layer_placer_crop_gate_sequence_summary.tsv`
+- Conformer TSV: `/data/bht/project01_phase1_reset_gpu/routeA_fixed_90_80_x1000/routeA_90_80_x1000_20260703_123422/placer_crop_gate/two_layer_placer_crop_gate_routeA_90_80_x1000.tsv`
+
+Important denominator notes:
+
+- The 285 postseq gate FAIL rows are not PLACER FAIL.
+- The 80% bin has no postseq PASS rows in this run, so it has no PLACER-evaluated conformers.
+- The PLACER crop-gate result applies to the 15 postseq PASS rows from the 90% bin only.
+
+Applied crop thresholds:
+
+- global backbone RMSD <= 2.5 A.
+- fixed backbone RMSD <= 1.0 A.
+- catalytic heavy RMSD <= 0.75 A.
+- protein key-distance max absolute delta <= 0.75 A.
+- ligand heavy RMSD <= 0.75 A.
+- Ser128-OG to bu2-C1 delta <= 0.5 A.
+- sequence-level pass requires at least 10 crop-pass conformers out of 50.
+
+Interpretation:
+
+- This run did not produce any sequence that should proceed downstream from PLACER.
+- The correct next action is upstream regeneration or altered constraints, not QMMM.
