@@ -1,32 +1,10 @@
 # CODEX_TASKS: 同功能新骨架酶搜索 pipeline
 
-本文件给 Codex 执行。目标是把 `README.md` 中的科学流程变成可运行、可扩展、可测试的轻量 pipeline。
+本文件给 Codex 执行。目标是把 `README.md` 和 `MOTIF_STRATEGY.md` 中的科学流程变成可运行、可扩展、可测试的轻量 pipeline。
 
-修订后的第一轮实现重点：**数据结构、wrapper 接口、双层 Folddisco 证据、候选合并、可解释评分、报告生成**。不要下载或提交大型数据库。
+当前实现重点：**Sequence / Foldseek 负责召回；Folddisco 负责分层 active-site / pocket constellation 证据；Folddisco 同时支持 after-recall 验证和 de-novo 扫库；Pythia-Pocket / GRASE 做口袋、活性潜力和稳定性重排序。**
 
-核心流程必须按以下思路实现：
-
-```text
-C_sequence = sequence search hits
-C_foldseek = Foldseek hits
-C_recalled = C_sequence ∪ C_foldseek
-
-E_folddisco_after_recall = Folddisco(M_target, structures_of_C_recalled)
-C_folddisco_denovo = Folddisco(M_target, broad_structure_database)
-
-C_total = C_recalled ∪ C_folddisco_denovo
-C_total + all evidence → merge → score → classify → report
-```
-
-Folddisco 有两种不同用途，不能混为一个字段：
-
-```text
-after_recall:
-  对序列搜索和 Foldseek 已召回候选做机制验证，提高精度。
-
-de_novo:
-  独立扫大结构库，发现 sequence/Foldseek 漏掉的新骨架。
-```
+不要下载或提交大型数据库。
 
 ---
 
@@ -71,7 +49,7 @@ src/scaffold_search/pocket_rank.py
 
 ---
 
-## Phase 1 — 定义输入配置和 schema
+## Phase 1 — 配置文件
 
 ### Task 1.1 `configs/targets.example.yaml`
 
@@ -83,50 +61,46 @@ targets:
     function_label: PET/cutin/polyester ester bond hydrolysis
     enzyme_family_hint: alpha_beta_hydrolase
     substrate_class: polyester
-    required_motif_groups:
-      - ser_his_asp_or_glu
-      - oxyanion_hole
-      - polymer_binding_groove
-    folddisco_modes:
-      - after_recall
-      - de_novo
+    folddisco_modes: [after_recall, de_novo]
+    motif_layers: [L0_catalytic_core, L1_catalytic_environment, L2_substrate_pocket, L3_processing_interface]
     novelty_goal: remote_or_new_scaffold
 
   - target_id: nylc_ntn_hydrolase
     function_label: nylon oligomer / polyamide amide bond hydrolysis
     enzyme_family_hint: N-terminal nucleophile hydrolase
     substrate_class: polyamide
-    required_motif_groups:
-      - n_terminal_thr_nucleophile
-      - acidic_residue_network
-      - amide_binding_groove
-    folddisco_modes:
-      - after_recall
-      - de_novo
+    folddisco_modes: [after_recall, de_novo]
+    motif_layers: [L0_catalytic_core, L1_catalytic_environment, L2_substrate_pocket, L3_processing_interface]
     novelty_goal: new_scaffold_or_remote_ntn
 ```
 
 ### Task 1.2 `configs/scoring.default.yaml`
 
-创建默认评分权重。注意 motif 被拆成两个来源，但最终 `motif_geometry` 可取两者最大值或带权融合。
+创建默认评分权重：
 
 ```yaml
 weights:
   sequence_evidence: 0.15
   fold_evidence: 0.15
-  motif_geometry: 0.30
+  folddisco_score: 0.30
   pocket_embedding_similarity: 0.20
   predicted_stability: 0.10
   substrate_accessibility: 0.05
   novelty: 0.05
 
-motif_merge:
+folddisco_layer_weights:
+  l0_core_score: 0.45
+  l1_environment_score: 0.25
+  l2_pocket_score: 0.20
+  l3_context_score: 0.10
+
+folddisco_evidence_merge:
   strategy: max
   after_recall_weight: 1.0
   de_novo_weight: 1.0
 
 penalties:
-  missing_required_catalytic_residue: 0.50
+  missing_l0_core_when_confident: 0.50
   low_active_site_confidence: 0.25
   incompatible_oligomeric_state: 0.15
   bad_expression_or_solubility_proxy: 0.10
@@ -138,17 +112,19 @@ classification_thresholds:
   remote_homolog_or_remote_fold:
     max_sequence_evidence: 0.60
     min_fold_evidence: 0.60
-    min_motif_geometry: 0.55
+    min_l0_core_score: 0.60
     min_total_score: 0.60
   novel_scaffold_explorer:
     max_sequence_evidence: 0.35
     max_fold_evidence: 0.50
-    min_motif_denovo_score: 0.65
+    min_denovo_l0_core_score: 0.65
+    min_l1_environment_score: 0.45
     min_pocket_embedding_similarity: 0.60
     min_total_score: 0.55
   needs_review:
     min_total_score: 0.45
-    allow_partial_motif: true
+    allow_l0_partial: true
+    allow_low_active_site_confidence: true
   negative_or_boundary_control:
     max_total_score: 0.45
 ```
@@ -172,9 +148,13 @@ databases:
     enzyme_annotation_table: /path/to/enzyme_annotations.tsv
 ```
 
-### Task 1.4 示例 seed 数据
+---
 
-创建 `data/seed_enzymes.example.tsv`，列：
+## Phase 2 — 示例 seed 数据
+
+### Task 2.1 `data/seed_enzymes.example.tsv`
+
+列：
 
 ```text
 target_id	seed_id	protein_name	organism	accession	sequence	structure_id_or_path	known_activity_note
@@ -182,18 +162,31 @@ target_id	seed_id	protein_name	organism	accession	sequence	structure_id_or_path	
 
 至少放 4 行 toy examples。可以使用占位序列，但必须标注为 toy。
 
-创建 `data/catalytic_residues.example.tsv`，列：
+### Task 2.2 `data/catalytic_residues.example.tsv`
+
+列：
 
 ```text
-target_id	seed_id	residue_label	chain	residue_number	residue_name	role	required
+target_id	seed_id	residue_label	chain	residue_number	residue_name	role	motif_layer	required
 ```
 
 示例：
 
-- PETase/cutinase：`Ser_nucleophile`, `His_general_base`, `Asp_or_Glu_acid`, `oxyanion_hole_residue`；
-- NylC：`Thr_nucleophile`, `Asp_network_1`, `Asp_network_2`, `processing_site_context`。
+- PETase/cutinase L0：`Ser_nucleophile`, `His_general_base`, `Asp_or_Glu_acid`；
+- PETase/cutinase L1：`oxyanion_hole_residue`；
+- PETase/cutinase L2：`aromatic_clamp`, `hydrophobic_groove_contact`；
+- NylC L0：`Thr_nucleophile` 或 seed-specific catalytic-core labels；
+- NylC L1：`Asp_or_Glu_network`, `amide_polarizer`；
+- NylC L2：`polyamide_groove_contact`；
+- NylC L3：`processing_or_interface_context`, including T227-like environmental residues where applicable。
 
-### Task 1.5 `schema.py`
+不要把 T227-like 环境残基默认标为 L0 strict required。
+
+---
+
+## Phase 3 — Schema
+
+### Task 3.1 `schema.py`
 
 实现 dataclass 或 TypedDict：
 
@@ -201,25 +194,37 @@ target_id	seed_id	residue_label	chain	residue_number	residue_name	role	required
 Candidate
 SequenceHit
 FoldseekHit
-MotifHit
+LayeredMotifHit
 PocketHit
 ScoredCandidate
 ```
 
-`MotifHit` 必须区分 Folddisco 证据来源：
+`LayeredMotifHit` 必须包含：
 
 ```text
 candidate_id
-motif_name
-motif_mode              # after_recall | de_novo
-motif_source            # validated_recall | de_novo | both | none; merge 后使用
+target_id
+motif_id
+motif_version
+folddisco_mode                 # after_recall | de_novo
+motif_source                   # validated_recall | de_novo | both | none; merge 后使用
+core_motif_status              # STRICT_PASS | PARTIAL | NO_HIT | NOT_EVALUATED
+l0_core_score
+l1_environment_score
+l2_pocket_score
+l3_context_score
+folddisco_score
+core_rmsd
+required_match_fraction
+context_match_fraction
+pocket_context_score
+best_motif_layer               # L0 | L1 | L2 | L3
 residue_mapping
-rmsd_or_geometry_error
-required_residue_match_fraction
-optional_context_match_fraction
+missing_required_labels
+partial_match_labels
 active_site_confidence
-hit_status              # pass | partial | fail | low_confidence | not_run
-score
+hit_status                     # pass | partial | fail | low_confidence | not_run
+notes
 ```
 
 `ScoredCandidate` 至少包含：
@@ -232,14 +237,19 @@ sequence_identity_to_best_seed
 sequence_score
 foldseek_score
 foldseek_coverage
-motif_validation_score
-motif_denovo_score
-motif_score
+folddisco_after_recall_score
+folddisco_denovo_score
+folddisco_score
+folddisco_mode
 motif_source
-motif_name
+core_motif_status
+l0_core_score
+l1_environment_score
+l2_pocket_score
+l3_context_score
+best_motif_layer
+motif_id
 motif_residue_mapping
-folddisco_after_recall_status
-folddisco_denovo_status
 pocket_score
 pocket_id
 stability_score
@@ -255,7 +265,147 @@ explanation
 
 ---
 
-## Phase 2 — 外部工具 wrappers
+## Phase 4 — Layered motif YAML 模板
+
+### Task 4.1 `motifs/petase_cutinase.layered.example.yaml`
+
+创建 PETase/cutinase layered motif 示例：
+
+```yaml
+motif_id: petase_cutinase_layered_active_site_pocket
+version: toy_v1
+target_id: petase_cutinase
+intended_modes: [after_recall, de_novo]
+
+layers:
+  L0_catalytic_core:
+    hard_filter: true
+    weight: 0.45
+    residues:
+      - label: Ser_nucleophile
+        allowed_residue_names: [SER]
+        role: nucleophile
+        required: true
+      - label: His_general_base
+        allowed_residue_names: [HIS]
+        role: general_base
+        required: true
+      - label: Asp_or_Glu_acid
+        allowed_residue_names: [ASP, GLU]
+        role: acid
+        required: true
+    geometry_constraints:
+      - pair: [Ser_nucleophile, His_general_base]
+        distance_angstrom: [2.5, 4.2]
+      - pair: [His_general_base, Asp_or_Glu_acid]
+        distance_angstrom: [2.5, 4.5]
+
+  L1_catalytic_environment:
+    hard_filter: false
+    weight: 0.25
+    residues:
+      - label: Oxyanion_hole_1
+        allowed_residue_names: [SER, THR, GLY, ASN, GLN, TYR, BACKBONE_NH]
+        role: oxyanion_stabilization
+        required: false
+
+  L2_substrate_pocket:
+    hard_filter: false
+    weight: 0.20
+    residues:
+      - label: Aromatic_clamp_1
+        allowed_residue_names: [TRP, TYR, PHE]
+        role: polymer_binding
+        required: false
+      - label: Hydrophobic_groove_1
+        allowed_residue_names: [LEU, ILE, VAL, MET, PHE, TYR, TRP]
+        role: hydrophobic_groove
+        required: false
+
+  L3_processing_interface:
+    hard_filter: false
+    weight: 0.10
+    residues:
+      - label: Lid_or_surface_context_1
+        allowed_residue_names: [GLY, ALA, SER, THR, LEU, ILE, VAL, TYR, TRP, PHE]
+        role: dynamics_or_surface_binding
+        required: false
+```
+
+### Task 4.2 `motifs/nylc_ntn_hydrolase.layered.example.yaml`
+
+创建 NylC layered motif 示例。不要硬编码真实编号；用 seed annotation 映射。
+
+```yaml
+motif_id: nylc_layered_polyamide_pocket_constellation
+version: toy_v1
+target_id: nylc_ntn_hydrolase
+intended_modes: [after_recall, de_novo]
+
+layers:
+  L0_catalytic_core:
+    hard_filter: true
+    weight: 0.45
+    residues:
+      - label: Thr_nucleophile_or_seed_core_1
+        allowed_residue_names: [THR, SER, CYS]
+        role: nucleophile_or_seed_core
+        required: true
+      - label: Core_acid_base_or_seed_core_2
+        allowed_residue_names: [ASP, GLU, HIS, SER, THR]
+        role: acid_base_network_or_seed_core
+        required: true
+      - label: Core_acid_base_or_seed_core_3
+        allowed_residue_names: [ASP, GLU, HIS, SER, THR]
+        role: acid_base_network_or_seed_core
+        required: false
+    geometry_constraints:
+      - pair: [Thr_nucleophile_or_seed_core_1, Core_acid_base_or_seed_core_2]
+        distance_angstrom: [2.5, 5.5]
+
+  L1_catalytic_environment:
+    hard_filter: false
+    weight: 0.25
+    residues:
+      - label: Amide_polarizer_1
+        allowed_residue_names: [ASN, GLN, SER, THR, TYR, HIS, BACKBONE_NH]
+        role: amide_polarization
+        required: false
+      - label: Acidic_network_context_1
+        allowed_residue_names: [ASP, GLU]
+        role: acidic_network_context
+        required: false
+
+  L2_substrate_pocket:
+    hard_filter: false
+    weight: 0.20
+    residues:
+      - label: Polyamide_groove_contact_1
+        allowed_residue_names: [LEU, ILE, VAL, MET, PHE, TYR, TRP, ASN, GLN, SER, THR]
+        role: substrate_groove
+        required: false
+      - label: Polyamide_groove_contact_2
+        allowed_residue_names: [LEU, ILE, VAL, MET, PHE, TYR, TRP, ASN, GLN, SER, THR]
+        role: substrate_groove
+        required: false
+
+  L3_processing_interface:
+    hard_filter: false
+    weight: 0.10
+    residues:
+      - label: Processing_or_interface_context_1
+        allowed_residue_names: [GLY, ALA, SER, THR, ASP, GLU, ASN, GLN]
+        role: processing_or_interface
+        required: false
+      - label: T227_like_environmental_context
+        allowed_residue_names: [THR, SER, ALA, GLY, ASP, GLU, ASN, GLN]
+        role: environmental_context_not_strict_core
+        required: false
+```
+
+---
+
+## Phase 5 — 外部工具 wrappers
 
 所有 wrapper 必须支持两种模式：
 
@@ -268,7 +418,7 @@ explanation
 ExternalToolUnavailable: foldseek executable not found. Provide --precomputed-hits to continue.
 ```
 
-### Task 2.1 `sequence_search.py`
+### Task 5.1 `sequence_search.py`
 
 实现接口：
 
@@ -279,17 +429,7 @@ def load_sequence_hits(path: str) -> list[SequenceHit]: ...
 def score_sequence_hit(hit: SequenceHit) -> float: ...
 ```
 
-评分建议：
-
-```text
-sequence_score = max(
-  normalized_identity,
-  normalized_hmm_bitscore,
-  conserved_required_residue_fraction
-)
-```
-
-### Task 2.2 `structure_search.py`
+### Task 5.2 `structure_search.py`
 
 实现接口：
 
@@ -301,22 +441,13 @@ def score_foldseek_hit(hit: FoldseekHit) -> float: ...
 
 必须支持 `mode="global"` 和 `mode="local_active_domain"`。
 
-评分建议：
+### Task 5.3 `motif_search.py`: 双模式 + 分层 Folddisco
 
-```text
-fold_evidence = weighted_mean(
-  alignment_score_norm,
-  coverage_norm,
-  active_site_alignment_bonus,
-  active_site_confidence
-)
-```
-
-### Task 2.3 `motif_search.py`: 双层 Folddisco wrapper
-
-实现以下接口，不要只做一个 `run_folddisco_search`：
+实现以下接口：
 
 ```python
+def load_layered_motif_yaml(path: str) -> dict: ...
+
 def run_folddisco_after_recall(
     motif_yaml: str,
     candidate_structure_manifest: str,
@@ -329,56 +460,48 @@ def run_folddisco_denovo(
     out_tsv: str,
 ) -> str: ...
 
-def load_motif_hits(path: str, *, motif_mode: str | None = None) -> list[MotifHit]: ...
-def score_motif_hit(hit: MotifHit) -> float: ...
-def merge_motif_evidence(after_recall_hits: list[MotifHit], denovo_hits: list[MotifHit]) -> dict[str, MotifHit]: ...
+def load_layered_motif_hits(path: str, *, folddisco_mode: str | None = None) -> list[LayeredMotifHit]: ...
+
+def score_layered_motif_hit(hit: LayeredMotifHit, layer_weights: dict) -> float: ...
+
+def merge_folddisco_evidence(
+    after_recall_hits: list[LayeredMotifHit],
+    denovo_hits: list[LayeredMotifHit],
+) -> dict[str, LayeredMotifHit]: ...
 ```
 
 `run_folddisco_after_recall` 的输入是 sequence/Foldseek 已召回候选的结构 manifest，不是全库。
 
 `run_folddisco_denovo` 的输入是 broad structure database，用于发现 sequence/Foldseek 漏掉的新骨架。
 
-Motif hit 必须保存：
+评分公式：
 
 ```text
-motif_name
-motif_mode
-candidate_id
-residue_mapping
-rmsd_or_geometry_error
-required_residue_match_fraction
-optional_context_match_fraction
-active_site_confidence
-hit_status
-```
-
-评分建议：
-
-```text
-motif_geometry = 0.45 * required_residue_match_fraction \
-               + 0.25 * geometry_score \
-               + 0.20 * optional_context_match_fraction \
-               + 0.10 * active_site_confidence
+folddisco_score =
+  0.45 × l0_core_score
++ 0.25 × l1_environment_score
++ 0.20 × l2_pocket_score
++ 0.10 × l3_context_score
 ```
 
 合并规则：
 
 ```text
-motif_validation_score = best score among after_recall hits
-motif_denovo_score = best score among de_novo hits
-motif_score = max(motif_validation_score, motif_denovo_score)
+folddisco_after_recall_score = best score among after_recall hits
+folddisco_denovo_score = best score among de_novo hits
+folddisco_score = max(folddisco_after_recall_score, folddisco_denovo_score)
 
 if both scores exist:
     motif_source = both
-elif motif_validation_score exists:
+elif after_recall score exists:
     motif_source = validated_recall
-elif motif_denovo_score exists:
+elif de_novo score exists:
     motif_source = de_novo
 else:
     motif_source = none
 ```
 
-### Task 2.4 `pocket_rank.py`
+### Task 5.4 `pocket_rank.py`
 
 实现接口：
 
@@ -408,81 +531,9 @@ model_version
 
 ---
 
-## Phase 3 — Motif 模板
+## Phase 6 — 候选合并和去重
 
-### Task 3.1 `motifs/petase_cutinase.example.yaml`
-
-示例内容：
-
-```yaml
-motif_id: petase_cutinase_ser_his_asp_oxyanion_aromatic_clamp
-version: toy_v1
-description: Toy PETase/cutinase active-site constellation. Coordinates are placeholders.
-intended_modes: [after_recall, de_novo]
-required_residues:
-  - label: Ser_nucleophile
-    allowed_residue_names: [SER]
-    role: nucleophile
-  - label: His_general_base
-    allowed_residue_names: [HIS]
-    role: general_base
-  - label: Asp_or_Glu_acid
-    allowed_residue_names: [ASP, GLU]
-    role: acid
-  - label: Oxyanion_hole_1
-    allowed_residue_names: [SER, THR, GLY, ASN, GLN, TYR, BACKBONE_NH]
-    role: oxyanion_stabilization
-optional_context_residues:
-  - label: aromatic_clamp_1
-    allowed_residue_names: [TRP, TYR, PHE]
-  - label: hydrophobic_groove_1
-    allowed_residue_names: [LEU, ILE, VAL, MET, PHE, TYR, TRP]
-geometry_constraints:
-  - pair: [Ser_nucleophile, His_general_base]
-    distance_angstrom: [2.5, 4.2]
-  - pair: [His_general_base, Asp_or_Glu_acid]
-    distance_angstrom: [2.5, 4.5]
-```
-
-### Task 3.2 `motifs/nylc_ntn_hydrolase.example.yaml`
-
-示例内容：
-
-```yaml
-motif_id: nylc_ntn_thr_asp_asp_amide_groove
-version: toy_v1
-description: Toy NylC/Ntn hydrolase motif. Coordinates are placeholders.
-intended_modes: [after_recall, de_novo]
-required_residues:
-  - label: Thr_nucleophile
-    allowed_residue_names: [THR]
-    role: n_terminal_nucleophile
-  - label: Acidic_network_1
-    allowed_residue_names: [ASP, GLU]
-    role: acid_or_base_network
-  - label: Acidic_network_2
-    allowed_residue_names: [ASP, GLU]
-    role: acid_or_base_network
-  - label: Amide_binding_polar_1
-    allowed_residue_names: [ASN, GLN, SER, THR, TYR, HIS, BACKBONE_NH]
-    role: amide_binding
-optional_context_residues:
-  - label: processing_site_context
-    allowed_residue_names: [GLY, ALA, SER, THR, ASP, GLU]
-  - label: oligomer_groove_hydrophobic_1
-    allowed_residue_names: [LEU, ILE, VAL, MET, PHE, TYR, TRP]
-geometry_constraints:
-  - pair: [Thr_nucleophile, Acidic_network_1]
-    distance_angstrom: [2.5, 5.0]
-  - pair: [Thr_nucleophile, Amide_binding_polar_1]
-    distance_angstrom: [3.0, 7.0]
-```
-
----
-
-## Phase 4 — 候选合并和去重
-
-### Task 4.1 `io.py`
+### Task 6.1 `io.py`
 
 实现：
 
@@ -493,16 +544,16 @@ def read_yaml(path: str): ...
 def write_json(obj, path: str): ...
 ```
 
-### Task 4.2 candidate merge
+### Task 6.2 candidate merge
 
-在 `scoring.py` 或单独文件中实现：
+实现：
 
 ```python
 def merge_evidence(
     sequence_hits,
     foldseek_hits,
-    motif_after_recall_hits,
-    motif_denovo_hits,
+    folddisco_after_recall_hits,
+    folddisco_denovo_hits,
     pocket_hits,
 ) -> list[Candidate]: ...
 ```
@@ -516,7 +567,7 @@ def merge_evidence(
 5. Folddisco-de-novo 独有候选必须进入 `C_total`，即使没有 sequence/Foldseek 证据；
 6. Folddisco-after-recall 只作为 recalled candidate 的机制证据，不应创建与原 recalled candidate 重复的新 candidate。
 
-### Task 4.3 novelty score
+### Task 6.3 novelty score
 
 实现：
 
@@ -534,44 +585,21 @@ if known_family_flag:
 return clamp(base, 0, 1)
 ```
 
-### Task 4.4 Folddisco evidence merge
-
-实现：
-
-```python
-def combine_folddisco_scores(
-    motif_validation_score: float | None,
-    motif_denovo_score: float | None,
-    strategy: str = "max",
-) -> tuple[float, str]: ...
-```
-
-返回：
-
-```text
-motif_score
-motif_source
-```
-
-其中 `motif_source` 必须是：
-
-```text
-validated_recall | de_novo | both | none
-```
-
 ---
 
-## Phase 5 — 可解释评分和分类
+## Phase 7 — 可解释评分和分类
 
-### Task 5.1 `scoring.py`
+### Task 7.1 `scoring.py`
 
 实现：
 
 ```python
 def clamp(x: float, low: float = 0.0, high: float = 1.0) -> float: ...
+def combine_folddisco_scores(after_recall_score: float | None, denovo_score: float | None, strategy: str = "max") -> tuple[float, str]: ...
 def weighted_score(candidate: Candidate, weights: dict, penalties: dict) -> float: ...
 def classify_candidate(candidate: Candidate, thresholds: dict) -> str: ...
 def build_explanation(candidate: Candidate) -> str: ...
+def should_send_to_pocket_ranker(candidate: Candidate) -> bool: ...
 ```
 
 评分必须满足：
@@ -580,9 +608,10 @@ def build_explanation(candidate: Candidate) -> str: ...
 - penalty 不允许让总分小于 0；
 - 缺失证据不能自动当 0，除非该证据为该类别必需；
 - explanation 必须说明进入类别的原因；
-- explanation 必须指出 Folddisco 证据来自 `after_recall`、`de_novo`、`both` 或 `none`。
+- explanation 必须指出 Folddisco 证据来自 `after_recall`、`de_novo`、`both` 或 `none`；
+- explanation 必须展示 L0/L1/L2/L3 简要证据。
 
-### Task 5.2 classification 规则
+### Task 7.2 classification 规则
 
 实现五类：
 
@@ -596,28 +625,36 @@ negative_or_boundary_control
 
 默认逻辑：
 
-1. 缺失 required catalytic residue 且 active-site confidence 高 → 优先 `negative_or_boundary_control`；
-2. sequence high + total high → `conservative_positive`，但若 Folddisco-after-recall 明确冲突，应降为 `needs_review`；
-3. sequence low/moderate + fold high + Folddisco-after-recall high + total high → `remote_homolog_or_remote_fold`；
-4. sequence low + fold low + Folddisco-de-novo high + pocket high → `novel_scaffold_explorer`；
-5. Folddisco partial/fail 但 pocket/GRASE 高，或 active-site confidence 低 → `needs_review`；
+1. `L0 NO_HIT` 且 `active_site_confidence` 高 → 优先 `negative_or_boundary_control`；
+2. sequence high + total high → `conservative_positive`，但若 Folddisco-after-recall 明确 L0 冲突，应降为 `needs_review` 或 `negative_or_boundary_control`；
+3. sequence low/moderate + fold high + L0/L1 支持 + total high → `remote_homolog_or_remote_fold`；
+4. sequence low + fold low + Folddisco-de-novo L0 high + L1/L2 支持 + pocket high → `novel_scaffold_explorer`；
+5. L0 partial 但 L1/L2/pocket 强，或 active-site confidence 低 → `needs_review`；
 6. total low 或机制明显不合理 → `negative_or_boundary_control`。
 
 不要实现为：
 
 ```text
-Folddisco fail → delete
+full motif fail → delete
 ```
 
-必须实现为分类和降级逻辑。
+### Task 7.3 Pythia/GRASE routing
+
+`should_send_to_pocket_ranker` 应返回 true 的候选包括：
+
+1. L0 strict pass；
+2. Folddisco-de-novo 直接命中；
+3. L0 partial 但 L1/L2 强；
+4. sequence / Foldseek 强召回但 Folddisco 不完整的边界候选；
+5. 少量 negative / boundary controls。
 
 ---
 
-## Phase 6 — CLI scripts
+## Phase 8 — CLI scripts
 
 创建以下脚本。所有脚本都必须有 `--help`。
 
-### Task 6.1 `scripts/run_sequence_search.py`
+### Task 8.1 `scripts/run_sequence_search.py`
 
 参数：
 
@@ -629,7 +666,7 @@ Folddisco fail → delete
 --precomputed-hits
 ```
 
-### Task 6.2 `scripts/run_foldseek_search.py`
+### Task 8.2 `scripts/run_foldseek_search.py`
 
 参数：
 
@@ -641,7 +678,7 @@ Folddisco fail → delete
 --precomputed-hits
 ```
 
-### Task 6.3 `scripts/run_folddisco_after_recall.py`
+### Task 8.3 `scripts/run_folddisco_after_recall.py`
 
 参数：
 
@@ -652,15 +689,18 @@ Folddisco fail → delete
 --precomputed-hits
 ```
 
-用途：
+输出必须包含：
 
 ```text
-对 C_sequence ∪ C_foldseek 的结构候选做 active-site motif validation。
+folddisco_mode=after_recall
+l0_core_score
+l1_environment_score
+l2_pocket_score
+l3_context_score
+core_motif_status
 ```
 
-输出必须包含 `motif_mode=after_recall`。
-
-### Task 6.4 `scripts/run_folddisco_denovo.py`
+### Task 8.4 `scripts/run_folddisco_denovo.py`
 
 参数：
 
@@ -671,15 +711,18 @@ Folddisco fail → delete
 --precomputed-hits
 ```
 
-用途：
+输出必须包含：
 
 ```text
-直接扫 broad structure database，生成 C_folddisco_denovo。
+folddisco_mode=de_novo
+l0_core_score
+l1_environment_score
+l2_pocket_score
+l3_context_score
+core_motif_status
 ```
 
-输出必须包含 `motif_mode=de_novo`。
-
-### Task 6.5 `scripts/run_pocket_ranking.py`
+### Task 8.5 `scripts/run_pocket_ranking.py`
 
 参数：
 
@@ -691,15 +734,15 @@ Folddisco fail → delete
 --precomputed-hits
 ```
 
-### Task 6.6 `scripts/merge_and_rank_candidates.py`
+### Task 8.6 `scripts/merge_and_rank_candidates.py`
 
 参数：
 
 ```text
 --sequence-hits
 --foldseek-hits
---motif-after-recall-hits
---motif-denovo-hits
+--folddisco-after-recall-hits
+--folddisco-denovo-hits
 --pocket-hits
 --scoring-config
 --out-ranking
@@ -715,15 +758,17 @@ reports/candidate_report.md
 
 ---
 
-## Phase 7 — 报告生成
+## Phase 9 — 报告生成
 
-### Task 7.1 `reporting.py`
+### Task 9.1 `reporting.py`
 
 实现：
 
 ```python
 def render_candidate_table(scored_candidates) -> str: ...
 def render_top_candidates(scored_candidates, top_n: int = 50) -> str: ...
+def render_layered_motif_summary(scored_candidates) -> str: ...
+def render_pocket_ranker_routing(scored_candidates) -> str: ...
 def render_panel_design(scored_candidates) -> str: ...
 def write_markdown_report(scored_candidates, path: str) -> None: ...
 ```
@@ -735,21 +780,23 @@ def write_markdown_report(scored_candidates, path: str) -> None: ...
 3. `C_foldseek` 数量；
 4. Folddisco-after-recall pass / partial / fail 数量；
 5. Folddisco-de-novo 新候选数量；
-6. 每类候选数量；
-7. Top candidates；
-8. novel scaffold explorer 列表；
-9. needs_review 列表；
-10. negative/boundary controls；
-11. 每个 top 候选 explanation；
-12. 下一步实验建议。
+6. L0/L1/L2/L3 分数分布摘要；
+7. 进入 Pythia/GRASE 的候选数量和理由；
+8. 每类候选数量；
+9. Top candidates；
+10. novel scaffold explorer 列表；
+11. needs_review 列表；
+12. negative/boundary controls；
+13. 每个 top 候选 explanation；
+14. 下一步实验建议。
 
-### Task 7.2 `reports/README.md`
+### Task 9.2 `reports/README.md`
 
 说明报告目录只保存轻量 summary，不保存大型原始结果。
 
 ---
 
-## Phase 8 — 测试
+## Phase 10 — 测试
 
 创建 `tests/`：
 
@@ -759,26 +806,31 @@ tests/test_classification.py
 tests/test_io.py
 tests/test_merge.py
 tests/test_folddisco_modes.py
+tests/test_layered_motif_schema.py
 ```
 
 测试必须覆盖：
 
 - score clamp；
 - penalty；
+- layered motif YAML parsing；
+- L0/L1/L2/L3 score aggregation；
 - conservative_positive 分类；
 - remote_homolog_or_remote_fold 分类；
 - novel_scaffold_explorer 分类；
 - needs_review 分类；
-- missing required catalytic residue 进入 negative/boundary；
+- L0 no-hit + high confidence 进入 negative/boundary；
+- L0 partial + L1/L2 strong 进入 needs_review 或 exploration；
 - 多来源证据合并；
 - Folddisco-after-recall 不创建重复 candidate；
 - Folddisco-de-novo 独有候选进入 `C_total`；
 - `motif_source=both` 的合并逻辑；
-- explanation 非空且提到 Folddisco 证据来源。
+- Pythia/GRASE routing；
+- explanation 非空且提到 Folddisco mode 和 L0/L1/L2/L3 evidence。
 
 ---
 
-## Phase 9 — Toy end-to-end demo
+## Phase 11 — Toy end-to-end demo
 
 添加一个最小 demo：
 
@@ -790,16 +842,18 @@ data/toy_folddisco_denovo_hits.tsv
 data/toy_pocket_hits.tsv
 ```
 
-要求包含至少 8 个候选：
+要求包含至少 10 个候选：
 
-1. 高同源 PETase-like，并通过 Folddisco-after-recall；
+1. 高同源 PETase-like，L0/L1 通过；
 2. 高同源但缺 catalytic Ser 的 PETase-like 负控；
-3. 低序列但 Foldseek 高的 cutinase-like，并通过 Folddisco-after-recall；
-4. Foldseek 高但 Folddisco-after-recall fail 的 needs_review 或边界候选；
-5. Folddisco-de-novo + pocket 高但 sequence/fold 低的新骨架候选；
-6. Folddisco-de-novo 高但 pocket 不合理的边界候选；
-7. NylC-like Ntn hydrolase 远缘候选，并通过 Folddisco-after-recall；
-8. NylC motif partial hit 且 active-site confidence 低的 needs_review 候选。
+3. 低序列但 Foldseek 高的 cutinase-like，L0/L1 通过；
+4. Foldseek 高但 L0 no-hit 且 active-site confidence 高的负控；
+5. Foldseek 高但 L0 partial、L1/L2 强的 needs_review；
+6. Folddisco-de-novo L0/L1/L2 高、sequence/fold 低的新骨架候选；
+7. Folddisco-de-novo L0 高但 L2 pocket 不合理的边界候选；
+8. NylC-like Ntn hydrolase 远缘候选，L0/L1 通过；
+9. NylC motif partial hit 且 active-site confidence 低的 needs_review；
+10. T227-like L3 mismatch 但 L0/L1/L2 合理的候选，验证不会被误判为 L0 fail。
 
 运行命令示例写入 `README.md` 或 `reports/README.md`：
 
@@ -807,8 +861,8 @@ data/toy_pocket_hits.tsv
 python scripts/merge_and_rank_candidates.py \
   --sequence-hits data/toy_sequence_hits.tsv \
   --foldseek-hits data/toy_foldseek_hits.tsv \
-  --motif-after-recall-hits data/toy_folddisco_after_recall_hits.tsv \
-  --motif-denovo-hits data/toy_folddisco_denovo_hits.tsv \
+  --folddisco-after-recall-hits data/toy_folddisco_after_recall_hits.tsv \
+  --folddisco-denovo-hits data/toy_folddisco_denovo_hits.tsv \
   --pocket-hits data/toy_pocket_hits.tsv \
   --scoring-config configs/scoring.default.yaml \
   --out-ranking reports/candidate_ranking.tsv \
@@ -817,7 +871,7 @@ python scripts/merge_and_rank_candidates.py \
 
 ---
 
-## Phase 10 — 后续真实数据接入
+## Phase 12 — 后续真实数据接入
 
 第一轮完成后再接入真实数据。
 
@@ -827,14 +881,16 @@ python scripts/merge_and_rank_candidates.py \
 2. 跑 MMseqs2/HMMER，生成 sequence hits；
 3. 准备 seed structures 和 candidate structures；
 4. 跑 Foldseek global/local；
-5. 将 `C_sequence ∪ C_foldseek` 结构化为 recalled candidate structure manifest；
-6. 从已知结构和复合物构建 Folddisco motif ensemble；
-7. 跑 Folddisco-after-recall，对 recalled candidates 做机制筛选；
+5. 重新定义 layered Folddisco motif ensemble；
+6. 将 `C_sequence ∪ C_foldseek` 结构化为 recalled candidate structure manifest；
+7. 跑 Folddisco-after-recall，对 recalled candidates 做 L0/L1/L2/L3 机制筛选；
 8. 跑 Folddisco-de-novo，直接扫 PDB / AFDB subset / ESMAtlas subset / metagenome structure set；
-9. 跑 Pythia-Pocket/GRASE 或读取预计算结果；
-10. 合并排序；
-11. 手动审查 top 50；
-12. 输出实验板。
+9. 将已有 sequence / Foldseek / Folddisco 结果映射到新 schema；
+10. 选择进入 Pythia-Pocket/GRASE 的候选；
+11. 跑 Pythia-Pocket/GRASE 或读取预计算结果；
+12. 合并排序；
+13. 手动审查 top 50；
+14. 输出实验板。
 
 ---
 
@@ -844,11 +900,14 @@ python scripts/merge_and_rank_candidates.py \
 
 - [ ] 项目目录完整；
 - [ ] 示例配置和 toy 数据存在；
+- [ ] layered motif YAML 示例存在；
+- [ ] schema 支持 L0/L1/L2/L3；
 - [ ] wrapper 接口存在且有清晰错误；
 - [ ] `run_folddisco_after_recall.py` 存在；
 - [ ] `run_folddisco_denovo.py` 存在；
 - [ ] candidate merge 可运行；
 - [ ] Folddisco-after-recall 和 Folddisco-de-novo 证据能合并；
+- [ ] Pythia/GRASE routing 可解释；
 - [ ] scoring 可运行；
 - [ ] classification 可解释；
 - [ ] toy demo 可生成 `reports/candidate_ranking.tsv` 和 `reports/candidate_report.md`；
@@ -859,10 +918,12 @@ python scripts/merge_and_rank_candidates.py \
 
 ## 注意事项
 
-- 序列搜索和 Foldseek 的结果必须进入 Folddisco-after-recall 做机制筛选。
-- Folddisco 不应只作为后置过滤器；还必须有 de novo 扫库分支。
-- Folddisco motif 必须包含催化残基之外的口袋/底物定位信息，否则假阳性会很多。
+- Sequence search 和 Foldseek 的结果必须进入 Folddisco-after-recall 做机制筛选。
+- Folddisco 不应只作为后置过滤器；还必须有 de-novo 扫库分支。
+- Folddisco motif 必须分 L0/L1/L2/L3，不能只定义一个 strict full motif。
+- L0 是 catalytic core；L2/L3 是口袋和上下文，不要混用。
+- T227-like 环境残基不能默认作为 L0 strict required。
 - Pythia-Pocket/GRASE 是 ranker，不是唯一真值。
 - NylC 要按 Ntn hydrolase 和 polyamide groove 处理，不要简单套 Ser-His-Asp esterase 模式。
-- Folddisco fail 不等于直接删除；需要结合 active-site confidence、required residue、pocket/GRASE 分数和人工审查策略。
-- 每个 top candidate 必须保留证据链：sequence、fold、Folddisco-after-recall、Folddisco-de-novo、pocket、stability、novelty、penalty、explanation。
+- Folddisco fail 不等于直接删除；需要结合 L0/L1/L2/L3、active-site confidence、pocket/GRASE 分数和人工审查策略。
+- 每个 top candidate 必须保留证据链：sequence、fold、Folddisco mode、L0/L1/L2/L3、pocket、stability、novelty、penalty、explanation。
