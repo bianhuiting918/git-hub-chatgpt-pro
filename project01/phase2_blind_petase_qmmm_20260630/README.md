@@ -47,13 +47,16 @@ Long-form reproducibility record for the 2026-07-06 PETase QM/MM run:
 ```text
 blind_work/00_run_status/petase_blind_qmmm_reproduction_runbook_20260706.md
 blind_work/00_run_status/petase_qmmm_attempt_ledger_20260706.tsv
+blind_work/00_run_status/petase_qmmm_reproduction_guide_zh_20260706.md
 ```
 
-These two files are the main handoff records for reproducing the blind PETase
+These files are the main handoff records for reproducing the blind PETase
 mechanism work from structure setup through ATESA/committor, deacylation PMF,
 and the currently running acylation long-production PMF. They intentionally
 record remote paths, atom indices, CV definitions, restraint-analysis formulas,
 attempt outcomes, and decision logic, but not passwords or raw trajectories.
+The Chinese guide explains which result files to inspect, which columns matter,
+and how each decision should be interpreted.
 
 Stage 1 has executable gates for environment readiness, ligand construction, protonation, pose generation, pose scoring, and pose acceptance:
 
