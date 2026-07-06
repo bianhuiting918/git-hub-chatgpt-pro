@@ -124,6 +124,159 @@ ESMFold 生成的 PDB 不是终点。每一批新 PDB 同步回 CPU 后，需要
 | 寡聚体界面 | ColabFold-Multimer / AlphaFold-Multimer / template assembly | 判断尼龙酶候选是否形成 NylC/Nyl50-like functional interface | 不问“任意二聚体”，而问“正确界面是否形成” |
 | 界面口袋/通道 | P2Rank / fpocket / CAVER / POVME / docking | 判断二聚体/四聚体界面是否构成 PA6/PA66 可进入的 catalytic pocket/tunnel | 放在 monomer 初筛之后、实验候选之前 |
 
+## 5A. 关键搜索与打分参数
+
+本节记录当前已经在服务器脚本或日志中确认的参数。没有日志证据的参数不写成已执行标准，统一标为 `TO_VERIFY`。
+
+### 5A.1 序列大库搜索参数
+
+数据来源：`scripts/07_run_broad_sequence_recall.sh`、`scripts/05_run_hmmer_swissprot.sh`、`scripts/06_prepare_large_sequence_dbs.sh`。
+
+| 项目 | 当前参数 |
+|---|---|
+| 大库 | UniRef90；UniProtKB/TrEMBL complete FASTA |
+| 初始 HMM 构建库 | UniProt Swiss-Prot |
+| BLASTP | `-evalue 1e-3 -max_target_seqs 4000 -num_threads $THREADS` |
+| BLASTP output | `qseqid sseqid pident length qlen slen evalue bitscore qcovs stitle` |
+| MMseqs2 | `mmseqs search -s 9.5 -e 1e-3 --max-seqs 4000 --threads $THREADS` |
+| MMseqs2 output | `query,target,pident,alnlen,qlen,tlen,evalue,bits,qcov,tcov,theader` |
+| HMM 构建 | seed FASTA 先用 `mafft --auto --quiet` 比对，再 `hmmbuild` |
+| Swiss-Prot HMMER 初筛 | `hmmsearch --cpu 16 -E 1e-5 --domE 1e-5` |
+| UniRef90/TrEMBL HMMER broad recall | `hmmsearch --cpu $THREADS --noali -E 1e-3 --domE 1e-3` |
+| broad recall 合并 | 按 class + normalized target 合并，保留 method、database、best e-value、best bitscore、best qcov/tcov |
+
+解释：`max_target_seqs / max-seqs = 4000` 是每个 seed/class/database/method 的召回上限，不是最终候选上限。最终 unique candidates 需要跨 seed、method、database 去重后统计。
+
+### 5A.2 Foldseek 参数
+
+数据来源：`scripts/13_prepare_foldseek_target_dbs.sh`、`scripts/14_run_foldseek_seed_search.sh`、`scripts/16_run_online_foldseek_seed_search.py`。
+
+| 场景 | 当前参数 |
+|---|---|
+| 本地 Foldseek DB 下载/构建 | `foldseek databases <DB_NAME> <OUT_DB> <TMP_DIR> --threads ${THREADS:-32}` |
+| 本地 Foldseek target DB | PDB；Alphafold/Swiss-Prot；Alphafold/UniProt50-minimal；以及按需其他 Foldseek databases |
+| 本地 Foldseek search | `foldseek search <query_db> <target_db> <out_db> <tmp> --threads ${THREADS:-32} -e 1e-2 --max-seqs 10000` |
+| 本地 Foldseek output | `query,target,evalue,bits,alntmscore,qtmscore,ttmscore,lddt,prob,qcov,tcov,qaln,taln,taxid,taxname` |
+| 在线 Foldseek endpoint | `https://search.foldseek.com/api/ticket` |
+| 在线 Foldseek mode | `3diaa` |
+| 在线 Foldseek databases | `afdb50,mgnify_esm30,BFVD,gmgcl_id,pdb100,cath50` |
+| 在线 Foldseek submit sleep | 8 s |
+| 在线 Foldseek poll interval | 30 s |
+| 在线 Foldseek timeout | 120 s |
+| 在线 Foldseek rate-limit sleep | 300 s |
+
+解释：Foldseek hit 是结构召回证据；后续表格需要区分 raw alignment、unique target、可下载结构、可评估结构四个层级。
+
+### 5A.3 Folddisco direct search 参数
+
+数据来源：`scripts/19_run_online_folddisco_pet_triads.py`、`results/layered_folddisco/runs/direct_search/online_missing_l0_l3/submissions/online_folddisco_tickets.tsv`。
+
+| 项目 | 当前参数 |
+|---|---|
+| 在线 Folddisco endpoint | `https://search.foldseek.com/api/ticket/folddisco` |
+| 提交字段 | query PDB file + `motif` + `database[]` |
+| direct Folddisco databases | `afdb50_folddisco,afdb-proteome_folddisco,esm30_folddisco,BFVD_folddisco,pdb_folddisco` |
+| submit sleep | 60 s |
+| poll interval | 60 s |
+| timeout | 120 s |
+| result download | `/api/result/folddisco/download/{ticket}` |
+| direct query motif | 使用 L0、L0+L1、L0+L2、L0+L1+L2 分层 residue 列表分别提交 |
+
+解释：direct Folddisco 的 hit 是“在线数据库中按 motif 返回的结构命中”。这不是最终 pass/fail；后续还要合并去重、计算 layer support、Pythia-pocket 和 RMSD。
+
+### 5A.4 Folddisco after-recall scoring 参数
+
+数据来源：`results/layered_folddisco/runs/after_recall/query_result_manifest.tsv`、`scripts/21_run_foldseek_only_folddisco_batch.py`。
+
+| 项目 | 当前参数 |
+|---|---|
+| index command | `folddisco index -p <candidate_structure_dir> -i <index_path> -r -t 16 --id relpath` |
+| query command | `folddisco query -p <seed_pdb> -q <motif_residues> -i <index_path> -t 16 --per-structure` |
+| output fields | `tid,total_match_count,node_count,idf,nres,plddt,max_node_cov,min_rmsd,matching_residues,query_residues` |
+| sort rule | `--sort-by max_node_count:desc,idf:desc,min_rmsd:asc` |
+| after-recall candidate_count example | PETase Foldseek-derived set: 4,059 structures per class-level index |
+| foldseek-only batch download workers | `--download-workers 16` default |
+| foldseek-only batch timeout | 60 s default |
+| foldseek-only batch all mode | `--limit-per-class 0` means all rows |
+
+解释：after-recall Folddisco 是“拿我们已有候选结构作为数据库，再用 Folddisco 计算 motif support”。它不受在线数据库 top 返回条数影响，适合对 sequence/Foldseek 得到的候选做统一结构 motif 打分。
+
+### 5A.5 Layer motif 参数
+
+当前项目实际执行时使用分层 motif，而不是单一 strict motif。代表性 PETase 参数示例：
+
+| Seed | Layer | Motif residue list | Motif size |
+|---|---|---|---:|
+| PET_01_6ILW | L0 | `A160,A206,A237` | 3 |
+| PET_01_6ILW | L1 | `A87,A161,A236` | 3 |
+| PET_01_6ILW | L2 | `A159,A185,A238` | 3 |
+| PET_01_6ILW | L0+L1 | `A160,A206,A237,A87,A161,A236` | 6 |
+| PET_01_6ILW | L0+L2 | `A160,A206,A237,A159,A185,A238` | 6 |
+| PET_01_6ILW | L0+L1+L2 | `A160,A206,A237,A87,A161,A236,A159,A185,A238` | 9 |
+
+所有 seed 都按同一思想生成 L0、L1、L2、L0+L1、L0+L2、L0+L1+L2；具体 residue list 以 `results/layered_folddisco/runs/after_recall/query_result_manifest.tsv` 和 layered definitions 文件为准。
+
+### 5A.6 ESMFold 结构预测参数
+
+数据来源：`scripts/predict_failed_targets_esmfold.py` 和 GPU 运行命令。
+
+| 项目 | 当前参数 |
+|---|---|
+| 模型 | `esm.pretrained.esmfold_v1()` |
+| 设备 | `.eval().cuda()`，GPU A100 80GB 当前在跑 |
+| 输入 | FASTA records |
+| 输出 | `<outdir>/pdb/<candidate_id>.pdb` + `esmfold_prediction_manifest.tsv` |
+| 当前尼龙酶第一批运行参数 | `--sort-by-length --chunk-size 64` |
+| 脚本默认 chunk-size | 128 |
+| 当前 batch size | 脚本逐条 `model.infer_pdb(seq)`，不是多序列 batch |
+| 可选限制 | `--max-count`、`--max-len`，默认 0 表示不限制 |
+
+解释：ESMFold 只负责把 sequence-only candidate 变成 predicted structure；结构质量、pLDDT、pocket 是否可用，要在后续 Pythia/RMSD/Folddisco 阶段再判断。
+
+### 5A.7 Pythia-pocket 参数
+
+数据来源：`scripts/run_predicted_pocket_pythia_cosine.py`、`scripts/run_structure_merged_layer_pythia_pocket_cosine.py`。
+
+| 场景 | 当前参数 |
+|---|---|
+| predicted-pocket 模式 | Pythia-pocket 预测 residue probability，按阈值选 pocket residues |
+| predicted-pocket threshold | `--threshold 0.6` 默认 |
+| predicted-pocket model | `tools/src/Pythia/pythia-pocket/model-fl-b.pt` |
+| cosine | 对 seed pocket embedding 与 candidate pocket embedding 做 cosine similarity |
+| no pocket label | seed 或 candidate 在阈值下无 residue 时标记 `NO_PREDICTED_POCKET` |
+| resume | `--resume` 可跳过已完成 candidate/seed pairs |
+| flush | `--flush-every 25` 默认 |
+| CPU threads | `PYTHIA_TORCH_THREADS`，脚本默认 64 或 32；实际高核脚本曾设置 96，但当前 CPU 使用应受 64 核限制 |
+| layer-specific 模式 | `PYTHIA_POCKET_LAYER=L0_L1_L2` 时使用 mapped seed/target residues pooled embedding |
+
+解释：predicted-pocket Pythia 与 L0-L3 手工 layer 是两种不同口袋定义。前者由模型预测 pocket residue；后者由我们指定 catalytic/environment residues。报告和主表必须分别保留这两类字段。
+
+### 5A.8 全局序列相似性参数
+
+当前用户要求的最终序列相似性指标是全局比对，而不是 BLAST 局部相似性：
+
+```text
+PID_global = identical_residues / alignment_columns_including_gaps
+global_sequence_difference = 1 - PID_global
+query_coverage = aligned_query_residues / query_length
+target_coverage = aligned_target_residues / target_length
+gap_fraction = gap_columns / alignment_columns
+```
+
+其中用于散点图颜色的核心值是 `PID_global`，避免局部高相似片段导致“序列相似度很高但 coverage 很低”的误读。
+
+### 5A.9 Cluster 参数
+
+当前报告建议但尚需统一执行的 cluster 参数：
+
+| Cluster level | 参数 | 目的 |
+|---|---|---|
+| cluster90 | sequence identity 90% | 工程去冗余，删除近重复 |
+| cluster50 | sequence identity 50% | subfamily 代表选择，对应 NylC 文献 diversity panel 的 30%-50% 区间 |
+| cluster30 | sequence identity 30% | family/scaffold SSN，识别远缘 scaffold |
+
+建议执行时使用 MMseqs2 cluster/linclust 或 CD-HIT，并在结果表中写入具体命令，例如 `--min-seq-id`、coverage mode、coverage cutoff。当前文档中 cluster90/50/30 是项目决策参数，不应误写成已经全部完成的过滤结果。
+
 ## 6. Layer 与口袋定义
 
 当前 layer 是项目定义的分层口袋描述，不是 Folddisco 自带的唯一标准。Folddisco 自身负责按给定 motif 和数据库参数返回结构命中；我们另外统计不同 layer 下候选对 motif 的支持情况。
