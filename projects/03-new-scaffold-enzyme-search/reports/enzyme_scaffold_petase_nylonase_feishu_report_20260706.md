@@ -3,36 +3,128 @@
 生成日期：2026-07-06  
 更新日期：2026-07-06  
 项目服务器路径：`/Dell/Dell14/bianht/enzyme_scaffold_search_v2`  
-适用范围：PETase 与尼龙酶（NylC / Nyl50 / Nyl10）骨架搜索、口袋分层统计、Pythia-pocket 评分、cluster 筛选、二聚体/四聚体界面口袋筛选前的交接报告。
+GPU 项目路径：`/data/bht/enzyme_scaffold_search_v2_gpu`  
+适用范围：PETase 与尼龙酶（NylC / Nyl50 / Nyl10）骨架搜索、序列候选合并、缺结构序列预测、口袋分层统计、Pythia-pocket 评分、cluster 筛选、二聚体/四聚体界面口袋筛选前的交接报告。
 
 ## 1. 研究目标
 
-本项目的目标不是只找到与已知酶序列相似的同源蛋白，而是尽可能系统地召回可能具有相似催化口袋或可迁移功能环境的新骨架。当前策略以“高召回、分层描述、后续再排序”为原则：
+本项目的目标不是只找到与已知酶序列相似的同源蛋白，而是尽可能系统地召回可能具有相似催化口袋或可迁移功能环境的新骨架。当前策略以“高召回、分层描述、生成缺失结构、后续再排序”为原则：
 
 1. 用序列搜索扩大同源和远缘同源候选。
-2. 用 Foldseek 从整体结构相似性角度召回已知或预测结构。
+2. 用 Foldseek 从整体结构相似性角度召回已有结构或预测结构。
 3. 用 Folddisco 从活性残基和周围口袋 motif 的结构几何角度召回候选。
 4. 将 sequence / Foldseek / Folddisco 的候选合并去重，避免过早用单一方法排除潜在新骨架。
-5. 对合并后的候选计算全局序列相似性、整体结构 RMSD、Pythia-pocket embedding cosine similarity，再进行多指标排序和人工审查。
-6. 对尼龙酶候选增加 oligomer-aware 判断：二聚体/四聚体倾向、界面口袋、跨链 substrate tunnel 与 PA6/PA66 productive docking。
+5. 对“有序列但没有结构”的候选建立 ESMFold 预测队列，生成结构后再回流到结构搜索和打分流程。
+6. 对合并候选计算全局序列相似性、整体结构 RMSD、Pythia-pocket embedding cosine similarity，再进行 cluster、oligomer-aware pocket 和人工审查。
+7. 对尼龙酶候选增加 oligomer-aware 判断：二聚体/四聚体倾向、界面口袋、跨链 substrate tunnel 与 PA6/PA66 productive docking。
 
-关键原则：Folddisco、Foldseek、BLAST/MMseqs2 都是召回工具。工具返回 hit 不能直接等同于功能确认；下载失败、缺结构、缺序列、没有 predicted pocket 也不能写成生物学失败，应标记为 `NOT_EVALUATED` 或对应技术状态。
+关键原则：Folddisco、Foldseek、BLAST/MMseqs2 都是召回工具。工具返回 hit 不能直接等同于功能确认；下载失败、缺结构、缺序列、没有 predicted pocket、尚未排队预测结构，都不能写成生物学失败，应标记为 `NOT_EVALUATED` 或对应技术状态。
 
-## 2. 总体筛选流程
+## 2. 证据宇宙与 denominator
+
+当前项目至少有三类不同 denominator，必须分开报告：
+
+| Universe | 含义 | 能做什么 | 不能直接做什么 |
+|---|---|---|---|
+| sequence recall candidates | BLAST/MMseqs/HMMER 从大库召回的序列 | 全局序列比对、cluster、判断是否需要结构预测 | 没有结构时不能做 pocket RMSD、Foldseek、Folddisco、Pythia-pocket |
+| structure recall candidates | Foldseek / direct Folddisco 返回的结构候选 | 结构 RMSD、layer motif、Pythia-pocket、Foldseek/Folddisco 证据 | 不代表覆盖了所有序列搜索结果 |
+| predicted-structure candidates | sequence recall 中有序列但缺结构，经过 ESMFold/ColabFold 生成结构的候选 | 回流到结构搜索、Pythia-pocket、RMSD、Folddisco 评分 | 预测前不能当作结构搜索已评估 |
+
+因此，报告中不能写“所有序列都已经结构评估”。准确说法应是：
+
+```text
+所有候选先合并为 candidate universe；
+已有结构的候选进入结构评估；
+只有序列但缺结构的候选进入结构预测队列；
+结构预测完成后再回流到结构评估。
+```
+
+## 3. 完整数据流
+
+当前应按下面的数据流推进，而不是把序列搜索和结构搜索看成两个互不相干的结果表。
+
+```text
+Seed set
+  ↓
+Sequence recall: BLASTP / MMseqs2 / HMMER
+  ↓
+标准化 ID: UniProt / UniParc / MGYP / PDB / AFDB / sequence hash
+  ↓
+与 Foldseek / Folddisco structure candidates 合并去重
+  ↓
+分三类：
+  A. 已有结构：PDB / AFDB / Foldseek / Folddisco 可用结构
+  B. 有序列但没有结构：进入 ESMFold / ColabFold 预测队列
+  C. 没有序列或 ID 无法解析：NOT_EVALUATED，进入 sequence recovery
+  ↓
+A 和 B 生成的结构统一进入：
+  Foldseek / Folddisco after-recall scoring
+  L0 / L0+L1 / L0+L2 / L0+L1+L2 layer 统计
+  Pythia-pocket embedding cosine
+  global RMSD
+  ↓
+所有有序列候选统一计算：
+  Needleman-Wunsch global PID
+  cluster90 / cluster50 / cluster30
+  ↓
+尼龙酶额外进入：
+  oligomer-aware interface pocket / tunnel / docking
+  ↓
+candidate-level final table
+```
+
+## 4. 去重与回流规则
+
+### 4.1 合并去重 key
+
+不同来源的 ID 格式不一致，不能只按 accession 字符串去重。建议按以下优先级建立 candidate key：
+
+1. 精确 accession：UniProt / UniParc / MGYP / PDB chain / AFDB accession。
+2. sequence hash：同一氨基酸序列来自不同数据库时合并为同一 candidate。
+3. structure ID mapping：Foldseek / Folddisco 返回结构 ID 能映射到 accession 时并入已有 candidate。
+4. 近重复 cluster：不能替代 exact dedupe，但可用于后续 90% 去冗余。
+
+### 4.2 去重后的状态标签
+
+| 状态 | 含义 | 后续动作 |
+|---|---|---|
+| `STRUCTURE_AVAILABLE` | 已有 PDB/AFDB/预测结构可用 | 进入 Pythia-pocket、RMSD、Folddisco scoring |
+| `SEQUENCE_ONLY_NEEDS_STRUCTURE` | 有序列，但没有可用结构 | 进入 ESMFold/ColabFold 队列 |
+| `SEQUENCE_RECOVERY_NEEDED` | 有候选 ID，但序列未取回 | 继续 UniProt/UniParc/MGYP recovery |
+| `PREDICTION_RUNNING` | 结构预测已排队或正在运行 | 等待 PDB 产出，不能写成 fail |
+| `PREDICTION_DONE` | ESMFold/ColabFold PDB 已生成 | 回流结构评估 |
+| `NOT_EVALUATED` | 缺结构、缺序列、下载/解析失败或尚未排队 | 技术未评估，不是生物学失败 |
+
+### 4.3 结构生成后的回流
+
+ESMFold 生成的 PDB 不是终点。每一批新 PDB 同步回 CPU 后，需要重新执行：
+
+1. 更新 structure manifest。
+2. 运行 Pythia-pocket predicted-pocket embedding。
+3. 计算与所有对应 seed 的 pocket cosine。
+4. 计算整体 backbone RMSD。
+5. 对该结构运行 layer motif scoring：L0、L0+L1、L0+L2、L0+L1+L2。
+6. 将结果并回 candidate-level 主表。
+7. 对新增序列纳入 cluster90 / cluster50 / cluster30。
+
+## 5. 总体筛选流程
 
 | 阶段 | 工具/方法 | 目的 | 当前解释口径 |
 |---|---|---|---|
 | 序列大库召回 | BLASTP / MMseqs2 / HMMER | 从 UniRef90、UniProtKB/TrEMBL 等大库召回同源和远缘同源序列 | tool-native hit，只作为候选来源 |
+| 序列标准化 | accession mapping + sequence hash | 把不同数据库命中的同一蛋白合并 | exact dedupe，不能替代 cluster |
 | 结构召回 | Foldseek | 通过整体或局部结构相似性召回结构候选 | raw alignment 与 unique target 分开统计 |
 | 口袋/基序召回 | Folddisco | 用催化残基和周围 residue layer 定义 motif，检索结构库 | Folddisco hit 是检索命中，不是最终功能 pass |
+| 缺结构预测 | ESMFold / ColabFold | 给 sequence-only 候选生成结构 | 预测完成后再进入结构评估 |
 | Layer 统计 | L0、L0+L1、L0+L2、L0+L1+L2 | 描述候选对核心催化残基及周围口袋的支持程度 | 先统计，不作为进入 Pythia 前的硬筛 |
 | Pocket embedding | Pythia-pocket | 由模型预测 pocket residues，并计算 pocket embedding cosine | 当前使用 `prob_threshold = 0.6` |
 | 全局序列相似性 | Needleman-Wunsch global alignment | 计算全长序列差异 | 使用 `PID_global = identical_residues / alignment_columns_including_gaps` |
+| Cluster | MMseqs2 / CD-HIT | 去冗余与 scaffold diversity | 建议 cluster90 / cluster50 / cluster30 |
 | 整体骨架差异 | Foldseek/TM-align 类 RMSD 统计 | 评估候选整体骨架是否与 seed 接近或偏离 | 用于散点图和排序解释 |
 | 寡聚体界面 | ColabFold-Multimer / AlphaFold-Multimer / template assembly | 判断尼龙酶候选是否形成 NylC/Nyl50-like functional interface | 不问“任意二聚体”，而问“正确界面是否形成” |
 | 界面口袋/通道 | P2Rank / fpocket / CAVER / POVME / docking | 判断二聚体/四聚体界面是否构成 PA6/PA66 可进入的 catalytic pocket/tunnel | 放在 monomer 初筛之后、实验候选之前 |
 
-## 3. Layer 与口袋定义
+## 6. Layer 与口袋定义
 
 当前 layer 是项目定义的分层口袋描述，不是 Folddisco 自带的唯一标准。Folddisco 自身负责按给定 motif 和数据库参数返回结构命中；我们另外统计不同 layer 下候选对 motif 的支持情况。
 
@@ -47,9 +139,9 @@
 
 这里的“通过 layer”应理解为“该候选在对应 layer 下有结构映射/几何支持”，而不是功能已确认。后续 Pythia-pocket cosine、整体 RMSD、全局序列差异、cluster 与 oligomer-aware pocket geometry 会一起用于排序。
 
-## 4. PETase 种子与搜索
+## 7. PETase：seed、搜索与缺结构序列状态
 
-### 4.1 PETase seed 来源
+### 7.1 PETase seed 来源
 
 当前 PETase 有 5 个结构 seed。早期序列大库搜索使用了 4 个有明确 UniProt accession 的 seed；后续已补跑 PET_05_3VIS 的 PDB-derived sequence。五个 seed 不是互相替代关系，而是用于覆盖不同 PET hydrolase / cutinase scaffold。
 
@@ -61,7 +153,7 @@
 | PET_04 | W0TJ64 | 4WFI / 4WFJ | Cut190，Ca2+ regulated PET-active scaffold | accepted |
 | PET_05 | PDB-derived sequence | 3VIS | Est119/TaCut-like cutinase，用于补充 thermophilic actinobacterial cutinase 多样性 | accession 待最终确认 |
 
-### 4.2 PETase 序列搜索统计
+### 7.2 PETase 序列搜索统计
 
 | 搜索集合 | 方法/数据库 | 初步统计 |
 |---|---|---:|
@@ -79,7 +171,7 @@ PET_05_3VIS 补充搜索的细分结果：
 | MMseqs2 | TrEMBL | 2,218 | 2,218 |
 | 合并去重 | UniRef90 + TrEMBL | - | 6,358 |
 
-### 4.3 PETase 结构候选统计
+### 7.3 PETase 结构候选统计
 
 当前 PETase 结构候选来自 Foldseek 与 direct Folddisco 的合并结果。RMSD 报告中每个 PETase seed 对应 10,089 个候选行。
 
@@ -90,11 +182,40 @@ PET_05_3VIS 补充搜索的细分结果：
 | Foldseek and Folddisco overlap | 100 |
 | 每个 PETase seed 可评估结构候选行 | 10,089 |
 
-解释：这里的行数是结构/RMSD 可评估集合，不等同于序列搜索全集。PETase 后续需要把 PET_05_3VIS 补充搜索结果合并到 PETase broad recall 后再去重，并将新增候选进入结构预测和 embedding 队列。
+这里的行数是结构/RMSD 可评估集合，不等同于序列搜索全集。
 
-## 5. 尼龙酶种子与搜索
+### 7.4 PETase sequence-only no-structure 当前状态
 
-### 5.1 尼龙酶 seed 来源
+截至 2026-07-06 22:34 +08:00，PETase 的 sequence-only no-structure 预测队列还没有真正建立完成：
+
+| 检查项 | 状态 |
+|---|---|
+| CPU `results/petase_sequence_available_no_structure_prediction/` | 目录存在 |
+| CPU `esmfold_top5000/pdb` | 0 个 PDB |
+| CPU `top5000_sequence_available_no_structure.fasta` | 不存在 |
+| CPU `petase_sequence_available_no_structure.fasta` | 不存在 |
+| GPU PETase ESMFold 输入 FASTA | 不存在 |
+| GPU PETase ESMFold 进程 | 未运行 |
+
+因此 PETase 需要补做一个明确步骤：
+
+```text
+PETase sequence recall candidates
+  ↓
+与 PETase structure merged candidates exact dedupe
+  ↓
+筛出 sequence_available && !structure_available
+  ↓
+生成 PETase sequence-only no-structure FASTA
+  ↓
+上传 GPU，排队 ESMFold
+  ↓
+PDB 回流 Pythia-pocket / RMSD / Folddisco scoring
+```
+
+## 8. 尼龙酶：seed、搜索与缺结构序列状态
+
+### 8.1 尼龙酶 seed 来源
 
 尼龙酶当前以 NylC、Nyl50、Nyl10 三类为核心。NylC 的 WT / GYAQ / HP 多数属于同一大骨架背景；Nyl50 和 Nyl10 是更需要关注的新 scaffold / 功能方向。
 
@@ -106,7 +227,7 @@ PET_05_3VIS 补充搜索的细分结果：
 | Nyl50_9CXR_9DYS | Nyl50-like | sequence + structure | PA66-selective new scaffold candidate |
 | Nyl10_A0A1M5P6R3 | Nyl10-like | sequence + structure/model | PA66-selective purified enzyme；AFDB v6 model 用于结构搜索 |
 
-### 5.2 尼龙酶序列搜索统计
+### 8.2 尼龙酶序列搜索统计
 
 | 搜索集合 | 方法/数据库 | 初步统计 |
 |---|---|---:|
@@ -117,7 +238,7 @@ PET_05_3VIS 补充搜索的细分结果：
 
 Nyl10 不是完全搜不到。它在大库序列搜索中有 self-hit，Nyl50 与 NylC 搜索也能命中 Nyl10，但相似度层级不同：Nyl50 到 Nyl10 的 BLAST pident 约 40.6%，query coverage 约 93%；NylC 到 Nyl10 的 BLAST pident 约 30-31%，query coverage 约 76%。这说明 Nyl10 与 NylC-like seed 的序列距离较远，不能只用序列相似性判断是否同类。
 
-### 5.3 尼龙酶结构合并集合与 layer 统计
+### 8.3 尼龙酶结构合并集合与 layer 统计
 
 当前重新定义 layer 后的 nylonase merged candidate universe：
 
@@ -150,9 +271,29 @@ Layer 支持统计：
 | sequence;foldseek | 275 |
 | sequence;foldseek;direct_folddisco | 21 |
 
-解释：上表中 direct_folddisco 是 Folddisco 数据库直接检索返回的候选；foldseek 是结构相似性检索返回的候选；sequence 代表序列搜索召回后进入结构相关流程的候选。各 route 的候选后续需要按 accession / sequence / structure ID 合并去重。
+### 8.4 尼龙酶 sequence-only no-structure 当前状态
 
-## 6. Pythia-pocket embedding 与相似性
+截至 2026-07-06 22:34 +08:00，尼龙酶“序列有了但没有结构”的候选已经进入 GPU ESMFold 队列，且第一批正在运行。
+
+| 队列 | 输入序列数 | GPU 已生成 PDB | CPU 已同步 PDB | 状态 |
+|---|---:|---:|---:|---|
+| `failed_structure_targets_with_sequences.fasta` | 5,606 | 4,296 | 3,876 | GPU 正在跑 |
+| `remote_fetched_missing_sequences.fasta` | 3,633 | 0 | 0 | waiter 等第一批结束后自动开始 |
+| MGYP partial / incremental ready | 若干批 | 0 | 0 | waiter 等前序 ESMFold 结束 |
+
+当前 GPU 进程：
+
+```text
+predict_failed_targets_esmfold.py
+--fasta failed_structure_targets_with_sequences.fasta
+--outdir structure_prediction/esmfold_failed_structure_targets
+--sort-by-length
+--chunk-size 64
+```
+
+解释：尼龙酶这边不是没排队，而是 GPU 正在跑第一批；后续 remote-fetched / MGYP 补回序列已经有 waiter，但要等前序任务结束。
+
+## 9. Pythia-pocket embedding 与相似性
 
 当前 Pythia-pocket 的使用方式是：不直接用我们手工定义的 L0-L3 residue 作为最终 pocket，而是让 Pythia 按模型预测 pocket residues，然后提取 predicted-pocket embedding。我们使用 seed 的核心口袋作为比较对象，计算候选与 seed pocket embedding 的 cosine similarity。
 
@@ -189,7 +330,7 @@ Layer 支持统计：
 | NylC_WT_5XYO vs Nyl50_9DYS | 0.925020 | Pythia predicted pocket, prob_threshold 0.6 |
 | NylC_WT_5XYO vs NylC_WT_5XYO | 1.000000 | self |
 
-### 6.1 Nylonase-specific pocket cosine 分层
+### 9.1 Nylonase-specific pocket cosine 分层
 
 GRASE 在 Aes72-centered urethanase discovery 中使用的是 key catalytic residue embedding cosine 1.00-0.97 四个 tier。但 nylonase 已知有效 seed 之间本身更分散：NylC vs Nyl50 为 0.925020，NylC vs Nyl10 为 0.860980。因此不能把 0.97-1.00 直接作为 nylonase 硬阈值，否则会把 Nyl50-like 和 Nyl10-like 已知有效方向排除。
 
@@ -212,71 +353,19 @@ max_pocket_cosine = max(
 | Nyl-pCOS-low-but-salvageable | `0.80 <= max_pocket_cosine < 0.86` | 探索区间 | 需要 strong motif、Folddisco、二聚体界面或 CAVER tunnel 支持 |
 | Nyl-pCOS-exploratory | `< 0.80` | 低相似探索区间 | 一般不进首轮实验，除非 cluster novelty 或几何证据很强 |
 
-## 7. 当前结果应如何解读
+## 10. 文献筛选策略对本项目的约束
 
-1. PETase 的 5 个结构 seed 已经在结构/口袋层面使用；早期序列大库层面原本只有 4 个明确 UniProt accession seed，PET_05_3VIS 已补跑。
-2. 尼龙酶中 NylC、Nyl50、Nyl10 均已经进行大库序列搜索。Nyl10 不是大库中不存在，而是与 NylC-like 的序列距离较远，且结构/embedding 可评估集合与原始序列搜索全集不是同一个 denominator。
-3. Folddisco 的结果要区分：
-   - `FOLDDISCO_HIT`：Folddisco 在给定 motif 和数据库下返回了 hit。
-   - `STRICT_PASS`：我们定义的完整 motif 覆盖和 RMSD 阈值满足。
-   - `PARTIAL_OR_LOOSE_HIT`：有命中但不满足完整严格标准。
-   - `NO_HIT`：结构被评估但没有命中。
-   - `NOT_EVALUATED`：缺结构、下载失败、解析失败或尚未进入队列。
-4. 目前不建议在进入 Pythia-pocket 前用 L0+L1+L2 做硬筛，因为这样可能丢掉有保守核心口袋但周围环境发生变化的新 scaffold。
-5. 后续应统一输出 candidate-level 主表：candidate_id、enzyme_class、route、best_seed、sequence_available、structure_available、global_PID、global_RMSD、Pythia-pocket cosine、layer support、cluster ID、oligomer/interface status、status label。
-
-## 7A. 文献筛选策略对本项目的约束
-
-### 7A.1 GRASE 查找聚氨酯酶：高 embedding 阈值适合 Aes72-centered urethanase，不宜直接套到 nylonase
+### 10.1 GRASE 查找聚氨酯酶：高 embedding 阈值适合 Aes72-centered urethanase，不宜直接套到 nylonase
 
 GRASE 的 template 是 Aes72。作者先实验测试 14 个文献或专利来源的 PURase/urethane hydrolase，只有 Aes72、GatA、SP1 对 N-aryl carbamates 有明显活性，其中 Aes72 对 2,4-TDA-DEG 的活性最高，因此被选为后续搜索模板。
 
-GRASE 前先做了两个 baseline：
-
-1. **传统序列/结构搜索。** 用 Aes72 序列通过 BLASTp 搜 NCBI nonredundant protein database；用 Aes72 结构通过 Foldseek 搜 AlphaFold Protein Structure Database。按 sequence identity 或 structural identity 选 top-ranked candidates，最终 B1-B5 和 F1-F5 上实验。只有 4 个能产生 TDA monomer，F4/F5 不能产生 TAC 或 TDA，说明全局序列/结构相似性不足以判断 urethanase 活性。
-2. **cluster + complex prediction。** 从 126 个 clusters 中采样 216 条 representative sequences，预测每条与 2,4-TDA-DEG 的 complex，按 Rosetta energy 选 12 个 CP candidates 上实验。只有 2 个产生 TDA monomer，说明 docking/complex energy 可以辅助，但不能单独作为主筛选指标。
-
-最终有效路线是 GRASE：Pythia-Pocket 对 Aes72 和候选结构的 key catalytic residues 生成 residue-level embeddings，计算 cosine similarity；Pythia 同时用 NLL 估计稳定性。作者把候选与 Aes72 的 Pythia-Pocket cosine similarity 分成 **1.00-0.97 的四个 tier**，每个 tier 内选 Pythia-predicted stability 最高的 3 条，最终得到 GB1-GB12 和 GF1-GF12 共 24 个 GRASE candidates。24 个候选中 21 个表达且有 urethanase activity，17 个能产生 TDA monomers，8 个优于 Aes72，GB6/AbPURase 最强。
+GRASE 前先做了两个 baseline：传统序列/结构搜索，以及 cluster + complex prediction。最终有效路线是 GRASE：Pythia-Pocket 对 Aes72 和候选结构的 key catalytic residues 生成 residue-level embeddings，计算 cosine similarity；Pythia 同时用 NLL 估计稳定性。作者把候选与 Aes72 的 Pythia-Pocket cosine similarity 分成 1.00-0.97 的四个 tier，最终得到 24 个 GRASE candidates，其中 21 个表达且有 urethanase activity。
 
 对本项目的关键判断：**GRASE 的 0.97-1.00 threshold 不能直接套到 nylonase。** 当前 nylonase 统计中 NylC-WT vs Nyl10 的 predicted-pocket cosine 为 0.860980，NylC-WT vs Nyl50 为 0.925020。如果使用 `cosine >= 0.97` 作为硬阈值，Nyl10 和 Nyl50 这两个已知有效方向都会被排除。nylonase 应使用 multi-seed tier，而不是单 seed 高阈值过滤。
 
-### 7A.2 Metal-coordination mining：机制几何 motif 先定义功能类型，cluster 和底物假说决定实验序列
+### 10.2 Metal-coordination mining：机制几何 motif 先定义功能类型，cluster 和底物假说决定实验序列
 
-该 Nature 工作研究的是 **Fe(II)/αKG radical halogenase**，更准确说是“卤化酶发现”，不是一般意义的卤代烃脱卤酶。其核心不是 embedding，而是机制驱动的金属配位几何筛选。
-
-作者先从 cupin / Fe(II)-αKG structural space 出发，整理得到约 530,814 个 AF2 structural models。搜索 motif 是：
-
-```text
-2His metal-binding site
-+
-缺失 nearby Asp/Glu 酸性第三配体
-+
-Gly/Ala 小残基形成开放配位位点
-```
-
-原因是 radical halogenase 需要开放金属配位位点让 Cl- / Br- 等卤离子结合；普通 Fe/αKG hydroxylase 通常是 2His-1Asp/Glu facial triad。几何筛选后得到 putative radical halogenase candidates，再通过 UniProt annotation filtering、30% identity SSN、人工去除明显假阳性 cluster，得到 curated cluster atlas。
-
-关键实验序列不是“每个 cluster 都挑一个”，而是：
-
-```text
-几何 motif 大规模筛选
-↓
-30% SSN 识别 family / cluster
-↓
-选择 genomic context 最有解释力的 Cluster X
-↓
-对 Cluster X 做 BLAST 扩展与 >50% identity SSN
-↓
-结合 genome neighborhood / PaperBLAST 推断底物
-↓
-从有明确底物假说的 subcluster 中选 AspX 和 BtnX
-```
-
-AspX 选择逻辑：Cluster X 的某个 subcluster 邻近 amino acid transporter、ATP-grasp / amino-acid-modifying genes，因此推测底物可能是 free amino acids；作者筛 20 种 canonical L-amino acids，发现 AspX 氯化 L-aspartic acid。
-
-BtnX 选择逻辑：另一个 subfamily 与 CurA-like ACP-dependent halogenase 有远缘关系，但缺少典型 ACP-dependent gene context；PaperBLAST / genome context 指向 ECF biotin transporter 和 killer plasmid context，因此推测底物是 biotin，最终验证为 2R-chlorobiotin 生成。
-
-对本项目的可迁移逻辑：
+该 Nature 工作研究的是 Fe(II)/alphaKG radical halogenase，核心不是 embedding，而是机制驱动的金属配位几何筛选。其可迁移逻辑是：
 
 ```text
 motif / pocket / geometry
@@ -292,43 +381,21 @@ annotation / closest characterized homolog / genome context
 负责判断“实验应该测 PA6、PA66 还是更具体的 oligomer/product panel”
 ```
 
-### 7A.3 NylC / Nyl10 / Nyl50 文献：不是 GRASE 式高 embedding 筛选，而是 diversity panel + 实验读出
+### 10.3 NylC / Nyl10 / Nyl50 文献：不是 GRASE 式高 embedding 筛选，而是 diversity panel + 实验读出
 
-Nyl10 / Nyl50 文献的路线和 GRASE 完全不同。作者没有先用 pocket embedding 或 docking 筛选，而是以 NylC-GYAQ 氨基酸序列作为 query，在 ColabFold 的 MMseqs2-based sequence search 中搜索 UniRef100，得到 2,839 条 homologous sequences；随后用 HHfilter 要求与 NylC-GYAQ 的 coverage >= 50%，留下 2,643 条。
+Nyl10 / Nyl50 文献的路线和 GRASE 完全不同。作者以 NylC-GYAQ 氨基酸序列作为 query，在 ColabFold 的 MMseqs2-based sequence search 中搜索 UniRef100，得到 2,839 条 homologous sequences；随后用 HHfilter 要求与 NylC-GYAQ 的 coverage >= 50%，留下 2,643 条。
 
-为了构建 96-well plate，作者从 2,643 条中选择 95 条 maximally diverse homologs，核心标准是 lowest maximum pairwise sequence identity，而不是最像 NylC。6 条有 fragment、不以 Met 起始或含 unknown amino acids 的序列用 UniProtKB 中最近 BLASTp match 替换，最终 panel 为 89 条 UniRef100 + 6 条 UniProtKB，两两 identity 在 30%-50%。随后全部合成表达，用 PA6 / PA66 粗筛直接读出活性和产物谱，最终识别 Nyl10、Nyl12、Nyl50 等代表。
-
-这说明 NylC/Nyl10/Nyl50 的策略不是：
-
-```text
-选 pocket embedding 最像 NylC 的序列
-```
-
-而是：
-
-```text
-在 NylC homolog space 中最大化序列多样性
-↓
-用实验直接读出 PA6/PA66 活性与产物谱
-```
+为了构建 96-well plate，作者从 2,643 条中选择 95 条 maximally diverse homologs，核心标准是 lowest maximum pairwise sequence identity，而不是最像 NylC。最终 panel 的两两 identity 在 30%-50%。随后全部合成表达，用 PA6 / PA66 粗筛直接读出活性和产物谱，最终识别 Nyl10、Nyl12、Nyl50 等代表。
 
 对本项目的含义：当前 Nyl10 与 NylC 的 BLAST pident 只有约 30-31%，Nyl50 与 Nyl10 约 40.6%，而 NylC vs Nyl10 pocket cosine 也只有 0.861。因此 Nyl10-like scaffold 很容易被高 identity 或高 pocket cosine 筛法排除。必须保留 30%-50% identity 的远缘 cluster 代表。
 
-### 7A.4 Nylonase 需要引入二聚体/四聚体-aware 筛选
+## 11. Nylonase 需要引入二聚体/四聚体-aware 筛选
 
 NylC/Nyl50-like nylonase 与 PETase 不同。PETase 通常可按 monomer active-site pocket 处理；NylC/Nyl50-like 系统可能依赖 oligomeric interface 形成完整底物通道或活性口袋。
 
 Nyl50 结构分析显示，Nyl50 的 putative substrate access tunnel 是跨两个 monomers 的 U-shaped tunnel；入口半径约 2.5 Å，active-site 附近 bottleneck radius 约 1.5 Å，tunnel volume 约 631 Å³，并且一个 large subpocket 位于 monomer interface，含有来自两个亚基的残基。文献还指出 NylC-GYAQ 和 Nyl50 的 putative active sites 跨越 A/D dimer interface，提示 oligomerization 对活性很可能重要。
 
-因此，本项目后续不应只做：
-
-```text
-monomer Pythia-pocket embedding
-monomer CAVER
-monomer docking
-```
-
-这些可以作为高召回初筛，但不能作为最终实验排序依据。nylonase 最终应新增：
+因此，本项目后续不应只做 monomer Pythia-pocket embedding、monomer CAVER、monomer docking。这些可以作为高召回初筛，但不能作为最终实验排序依据。nylonase 最终应新增：
 
 ```text
 oligomer-aware pocket / tunnel / interface screening
@@ -341,9 +408,18 @@ oligomer-aware pocket / tunnel / interface screening
 该界面是否参与 catalytic pocket / substrate access tunnel。
 ```
 
-## 8. 下一步筛选决策
+## 12. 下一步筛选决策
 
-### 8.1 必须进行 cluster，建议使用 90%、50%、30% 三层 identity
+### 12.1 P0：补齐 sequence recall 到 structure prediction 的缺口
+
+| 酶类 | 当前状态 | P0 动作 |
+|---|---|---|
+| PETase | sequence-only no-structure FASTA 未生成，GPU 未排队 | 生成 PETase sequence-only no-structure FASTA，和 structure merged candidates 去重后上传 GPU 排队 ESMFold |
+| 尼龙酶 | 第一批 5,606 正在 GPU ESMFold；第二批 3,633 已 waiter | 等第一批完成并同步 CPU；第一批 PDB 回流 embedding/RMSD/Folddisco；第二批自动开始后继续同步 |
+
+PETase 不能只停留在已有结构候选。需要把序列搜索得到但缺结构的候选也纳入 ESMFold，否则 sequence recall 的新增多样性不会进入 Pythia-pocket 或 RMSD 图。
+
+### 12.2 必须进行 cluster，建议使用 90%、50%、30% 三层 identity
 
 当前 nylonase 候选规模已经较大：broad recall 33,675 unique candidates，candidate FASTA 15,083 sequences，structure merged candidates 21,211，predicted all-seed embedding 3,106 unique candidates。这个规模下如果不 cluster，近重复序列会占据 top rank，实验候选会缺乏 family/scaffold 多样性。
 
@@ -361,7 +437,7 @@ oligomer-aware pocket / tunnel / interface screening
 cluster90 + cluster50 + cluster30
 ```
 
-### 8.2 不建议直接使用 GRASE 的 0.97-1.00 embedding 阈值
+### 12.3 不建议直接使用 GRASE 的 0.97-1.00 embedding 阈值
 
 GRASE 的 0.97-1.00 是 Aes72-centered urethanase discovery 的经验阈值。nylonase 已知有效 seed 更分散，因此应使用：
 
@@ -382,45 +458,33 @@ best_pocket_seed
 pocket_cosine_tier
 ```
 
-### 8.3 引入二聚体/四聚体预测，但不要全量跑 AlphaFold-Multimer
+### 12.4 引入二聚体/四聚体预测，但不要全量跑 AlphaFold-Multimer
 
 建议漏斗：
 
 ```text
-Step 1
-sequence QC:
+Step 1: sequence QC
 去 fragment、去 X、去长度异常、保留 Ntn-hydrolase / Nyl-like motif
 
-Step 2
-MMseqs2 cluster:
+Step 2: MMseqs2 cluster
 90%, 50%, 30%
 
-Step 3
-每个 50% cluster 选 1-3 条代表：
+Step 3: 每个 50% cluster 选 1-3 条代表
 优先 Pythia-pocket OK
 优先 layer support 强
 优先 structure pLDDT 高
 优先多 route 支持 sequence + Foldseek + Folddisco
 
-Step 4
-对 top 500-1000 representative candidates 做 homodimer prediction
+Step 4: 对 top 500-1000 representative candidates 做 homodimer prediction
 必要时做 homotetramer prediction
 
-Step 5
-计算 oligomer confidence:
-ipTM
-interface PAE
-pDockQ / pDockQ2
-buried SASA
-interface contact number
-multi-seed consistency
-A/D or A/B contact-map similarity to Nyl50/NylC
+Step 5: 计算 oligomer confidence
+ipTM、interface PAE、pDockQ / pDockQ2、buried SASA、interface contact number、multi-seed consistency、A/D or A/B contact-map similarity to Nyl50/NylC
 
-Step 6
-只对 oligomer confidence 高，或 confidence 中等但 motif/tunnel 很强的候选，做 interface-pocket analysis
+Step 6: 只对 oligomer confidence 高，或 confidence 中等但 motif/tunnel 很强的候选，做 interface-pocket analysis
 ```
 
-### 8.4 口袋几何匹配应从 monomer pocket 升级到 interface-pocket geometry
+### 12.5 口袋几何匹配应从 monomer pocket 升级到 interface-pocket geometry
 
 建议新增一个 `interface_pocket_geometry_score`，并与 Pythia-pocket cosine 并列，而不是替代它。建议指标：
 
@@ -436,18 +500,7 @@ Step 6
 9. PA66-like / PA6-like substrate channel 是否有差异
 ```
 
-Nyl50 可作为 tunnel 参考：
-
-```text
-Nyl50 reference tunnel:
-entrance radius ≈ 2.5 Å
-bottleneck radius ≈ 1.5 Å
-tunnel volume ≈ 631 Å³
-tunnel spans both monomers
-one large subpocket is at monomer interface
-```
-
-### 8.5 首轮实验候选应按 group 分层抽样，而不是按单一总分 top N
+### 12.6 首轮实验候选应按 group 分层抽样，而不是按单一总分 top N
 
 如果首轮实验规模为 24-48 条，建议：
 
@@ -459,9 +512,9 @@ one large subpocket is at monomer interface
 | D. low-cosine but strong-geometry candidates | cosine 0.80-0.86，但 Folddisco motif、CAVER tunnel、dimer interface 强 | 4-8 |
 | E. cluster novelty representatives | 30% cluster 中远离 NylC/Nyl50/Nyl10，但 motif 和结构可信 | 4-8 |
 
-## 9. Candidate-level 主表建议字段
+## 13. Candidate-level 主表建议字段
 
-后续统一主表不应只包括 route、RMSD 和 pocket cosine。建议新增 cluster、multi-seed pocket、oligomer 与 interface pocket 字段：
+后续统一主表不应只包括 route、RMSD 和 pocket cosine。建议新增 sequence/structure 队列状态、cluster、multi-seed pocket、oligomer 与 interface pocket 字段：
 
 ```text
 candidate_id
@@ -469,6 +522,11 @@ enzyme_class
 route
 sequence_available
 structure_available
+sequence_source
+structure_source
+structure_prediction_status
+structure_prediction_batch
+structure_prediction_pdb_path
 cluster90_id
 cluster50_id
 cluster30_id
@@ -509,13 +567,16 @@ final_priority_group
 status_label
 ```
 
-## 10. 推荐状态标签
+## 14. 推荐状态标签
 
 | 标签 | 含义 |
 |---|---|
 | TOOL_HIT | 工具原生检索命中，例如 Foldseek/Folddisco/BLAST/MMseqs 返回 hit |
-| STRUCTURE_AVAILABLE | 已有可用于 RMSD/Pythia 的结构 |
 | SEQUENCE_AVAILABLE | 已有可用于全局序列比对的序列 |
+| STRUCTURE_AVAILABLE | 已有可用于 RMSD/Pythia 的结构 |
+| SEQUENCE_ONLY_NEEDS_STRUCTURE | 序列可用但无结构，需要 ESMFold/ColabFold |
+| PREDICTION_RUNNING | 结构预测已排队或正在运行 |
+| PREDICTION_DONE | 预测结构已生成，等待或已回流结构评估 |
 | PREDICTED_POCKET_OK | Pythia-pocket 在阈值下得到 pocket embedding |
 | NO_PREDICTED_POCKET | Pythia-pocket 阈值下无 pocket residue，不等于生物学失败 |
 | NOT_EVALUATED | 缺结构、缺序列、下载/解析失败或尚未进入队列 |
@@ -526,10 +587,13 @@ status_label
 | PRODUCTIVE_DOCKING_POSE | PA6/PA66 fragment docking 形成可反应构象 |
 | PROJECT_PRIORITY | 后续根据多指标综合排序得到的候选优先级，不是工具原生标签 |
 
-## 11. 当前结论
+## 15. 当前结论
 
-1. **GRASE 的 0.97-1.00 pocket cosine 阈值不能直接用于 nylonase。** NylC vs Nyl50 为 0.925020，NylC vs Nyl10 为 0.860980；直接套用会漏掉已知有效 scaffold。
-2. **Nylonase 应使用 multi-seed pocket cosine。** 以 NylC、Nyl50、Nyl10 三类 seed 的 max cosine 分层，保留 0.86-0.93 的远缘有效候选区间。
-3. **必须 cluster。** 建议同时做 90%、50%、30% identity：90% 去冗余，50% 选 subfamily 代表，30% 做 family/scaffold SSN。
-4. **monomer-only pocket 只能作为初筛。** NylC/Nyl50-like enzyme 很可能依赖 A/D dimer interface 或四聚体中的跨链 tunnel，最终排序必须引入 oligomer-aware pocket / tunnel / docking。
-5. **实验候选不应按单一总分 top N。** 应按 NylC-like、Nyl50-like、Nyl10-like、low-cosine strong-geometry、cluster novelty 分组抽样。
+1. **必须把 sequence recall 的新增候选回流到结构流程。** 已有结构候选只能覆盖结构数据库中的部分 candidate；序列搜索得到但缺结构的候选需要先 ESMFold/ColabFold，再做 Pythia-pocket、RMSD、Folddisco layer scoring。
+2. **尼龙酶 sequence-only no-structure 已经排队并正在跑。** 第一批 5,606 条中 GPU 已生成约 4,296 个 PDB；第二批 3,633 条已排 waiter。
+3. **PETase sequence-only no-structure 还没有排队成功。** 需要立刻生成 PETase sequence-only no-structure FASTA，与已有 structure merged candidates 去重后上传 GPU。
+4. **GRASE 的 0.97-1.00 pocket cosine 阈值不能直接用于 nylonase。** NylC vs Nyl50 为 0.925020，NylC vs Nyl10 为 0.860980；直接套用会漏掉已知有效 scaffold。
+5. **Nylonase 应使用 multi-seed pocket cosine。** 以 NylC、Nyl50、Nyl10 三类 seed 的 max cosine 分层，保留 0.86-0.93 的远缘有效候选区间。
+6. **必须 cluster。** 建议同时做 90%、50%、30% identity：90% 去冗余，50% 选 subfamily 代表，30% 做 family/scaffold SSN。
+7. **monomer-only pocket 只能作为初筛。** NylC/Nyl50-like enzyme 很可能依赖 A/D dimer interface 或四聚体中的跨链 tunnel，最终排序必须引入 oligomer-aware pocket / tunnel / docking。
+8. **实验候选不应按单一总分 top N。** 应按 NylC-like、Nyl50-like、Nyl10-like、low-cosine strong-geometry、cluster novelty 分组抽样。
