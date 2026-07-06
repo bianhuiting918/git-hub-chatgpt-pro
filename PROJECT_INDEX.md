@@ -28,6 +28,12 @@ Project 02: predicted-TS student
 ## Project 01 — Enzyme-specific true-TS barrier scorer
 
 Path: `projects/01-specialized-ts-aware-scorer/`
+Active PETase blind QM/MM execution record:
+
+```text
+project01/phase2_blind_petase_qmmm_20260630/blind_work/00_run_status/petase_blind_qmmm_reproduction_runbook_20260706.md
+project01/phase2_blind_petase_qmmm_20260630/blind_work/00_run_status/petase_qmmm_attempt_ledger_20260706.tsv
+```
 
 Purpose: build a high-confidence **true-TS teacher model** for a specific enzyme, enzyme family, or well-defined catalytic class where GS and true/refined TS states are available or can be generated consistently.
 
