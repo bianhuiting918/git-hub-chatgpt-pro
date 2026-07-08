@@ -169,6 +169,11 @@ pocket_score high after Pythia/GRASE
 
 如果 Folddisco 只作为 `C_sequence ∪ C_foldseek` 的后置筛选器，这类候选会被漏掉。因此 de-novo 分支必须保留。
 
+
+### 5.1 Folddisco 命中结构找回
+
+当 de-novo Folddisco 命中存在，但 AFDB/RCSB/ESMAtlas 直接 URL 下载失败时，不要直接判定为缺结构。先按 [`reports/FOLDDISCO_STRUCTURE_RECOVERY_RUNBOOK.md`](reports/FOLDDISCO_STRUCTURE_RECOVERY_RUNBOOK.md) 使用 Folddisco result API 通过 `ticket + database + dbkey/id` 找回结构，并对 API 返回的 PDB-like 文件做 fixed-column 标准化后再进入 Pythia-Pocket、RMSD 或 docking 分析。
+
 ---
 
 ## 6. 推荐 Folddisco 输出字段
@@ -400,6 +405,7 @@ projects/03-new-scaffold-enzyme-search/
     merge_and_rank_candidates.py
   reports/
     README.md
+    FOLDDISCO_STRUCTURE_RECOVERY_RUNBOOK.md
 ```
 
 External databases should be referenced by manifest files only.

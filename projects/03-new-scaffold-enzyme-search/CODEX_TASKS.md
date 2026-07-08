@@ -927,3 +927,4 @@ python scripts/merge_and_rank_candidates.py \
 - NylC 要按 Ntn hydrolase 和 polyamide groove 处理，不要简单套 Ser-His-Asp esterase 模式。
 - Folddisco fail 不等于直接删除；需要结合 L0/L1/L2/L3、active-site confidence、pocket/GRASE 分数和人工审查策略。
 - 每个 top candidate 必须保留证据链：sequence、fold、Folddisco mode、L0/L1/L2/L3、pocket、stability、novelty、penalty、explanation。
+- Folddisco de-novo 命中但直接结构下载失败时，必须先按 `reports/FOLDDISCO_STRUCTURE_RECOVERY_RUNBOOK.md` 尝试 Folddisco result API 的 `ticket + database + dbkey/id` 结构找回；只有该路径也失败后，才进入 proxy 或 ESMFold。

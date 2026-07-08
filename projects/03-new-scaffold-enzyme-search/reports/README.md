@@ -18,3 +18,7 @@ Reports should include:
 - proposed experimental panel design.
 
 Do not commit large raw search outputs, structure databases, docking ensembles, trajectories, or model checkpoints.
+
+Operational runbooks kept here:
+
+- [`FOLDDISCO_STRUCTURE_RECOVERY_RUNBOOK.md`](FOLDDISCO_STRUCTURE_RECOVERY_RUNBOOK.md): how to recover structures from Folddisco online result API when direct AFDB/RCSB/ESMAtlas downloads fail.
