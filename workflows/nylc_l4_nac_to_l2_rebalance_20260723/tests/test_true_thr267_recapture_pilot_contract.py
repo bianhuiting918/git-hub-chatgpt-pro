@@ -12,6 +12,7 @@ SBATCH4 = FLOW / "slurm" / "run_true_thr267_recapture_response4_array.sbatch"
 SBATCH5 = FLOW / "slurm" / "run_true_thr267_recapture_response5_c18.sbatch"
 SBATCH6 = FLOW / "slurm" / "run_true_thr267_recapture_response6_c18.sbatch"
 SBATCH7 = FLOW / "slurm" / "run_true_thr267_recapture_response7_c18.sbatch"
+SBATCH8 = FLOW / "slurm" / "run_true_thr267_recapture_response8_c18.sbatch"
 
 
 def load_audit():
@@ -195,3 +196,19 @@ def test_response7_slurm_uses_response6_reference():
     assert '-deffnm "$work/response7"' in text
     assert "recapture_response6/response6.gro" in text
     assert "--min-response 0.15" in text
+
+
+def test_response8_slows_final_approach():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181274, protocol="response8")
+    assert "continuation             = yes" in mdp
+    assert "pull-coord1-rate         = -0.001500" in mdp
+    assert "pull-coord1-k            = 2000" in mdp
+    assert m.PROTOCOLS["response8"]["parent_stem"] == "response7"
+
+
+def test_response8_slurm_uses_response7_reference():
+    text = SBATCH8.read_text(encoding="utf-8")
+    assert '-deffnm "$work/response8"' in text
+    assert "recapture_response7/response7.gro" in text
+    assert "--min-response 0.05" in text
