@@ -48,3 +48,5 @@ def test_slurm_requires_preflight_and_true_thr267_contract():
     assert "mpirun -np 1" in text
     assert "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY" in text
     assert "8896" not in text
+    assert r"\\${" not in text
+    assert 'candidate="${candidates[${SLURM_ARRAY_TASK_ID:?}]}\"' in text
