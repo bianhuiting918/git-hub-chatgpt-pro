@@ -1,0 +1,41 @@
+{
+  "atom_count": 133589,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "checks": {
+    "atom_count_133589": true,
+    "cg_converged": true,
+    "cg_integrator": true,
+    "double_precision": true,
+    "finished_mdrun": true,
+    "flexible_water": true,
+    "fmax_within_threshold": true,
+    "gromacs_2023_1": true,
+    "no_hard_numerical_issues": true
+  },
+  "flexible_water": true,
+  "fmax_kj_mol_nm": 419.978114876091,
+  "gromacs_version": "2023.1",
+  "integrator": "cg",
+  "note": "Technical EM gate only; no restrained or minimized structure is scientific NAC evidence.",
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "nan": 0,
+    "settle_problem": 0
+  },
+  "potential_energy_kj_mol": -2307725.86301368,
+  "precision": "double",
+  "scheduler_disposition": "FAILED_POSTPROCESS_ONLY",
+  "schema_version": 1,
+  "scientific_nac_evidence": false,
+  "sha256": {
+    "run.gro": "e3714bd8a88792bfa164799d175ecfc55d156ff39194b1a3f8b014b3ec381679",
+    "run.log": "673e928baadd290a5d413f6240c1e2895c98099d605040223623f22ba39c324f",
+    "run.processed.mdp": "6f8410b75697dde44cfb0b13162d2d082d4eacbe31f3d3c354d448a351c7b05b",
+    "run.tpr": "ae26ddf5cce34c2514e4f2c80f93cb2139ad3c6d27ece8cf4e3930bdb7ee1296"
+  },
+  "source_slurm_job_id": "61708647",
+  "stage": "em_cg_flexible_double",
+  "status": "PASS_TECHNICAL_EM",
+  "threshold_kj_mol_nm": 500.0
+}
