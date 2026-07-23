@@ -329,6 +329,16 @@ def prepare_one(
         target_topology,
         target_coordinates,
     )
+    source_charge = sum(atom.charge for atom in source_topology.atoms.values())
+    target_charge = sum(atom.charge for atom in target_topology.atoms.values())
+    rewritten_topology = rewrite_topology(
+        source_top_path.read_text(encoding="utf-8"),
+        candidate["source_itp"],
+        candidate["source_molecule_type"],
+    )
+    rebuilt, rewritten_topology, ion_neutralization = neutralize_ligand_charge_change(
+        rebuilt, rewritten_topology, source_charge, target_charge
+    )
     rebuilt_path = build_dir / "rebuilt.gro"
     write_gro(rebuilt, rebuilt_path)
     rebuilt_roundtrip = parse_gro(rebuilt_path)
@@ -337,11 +347,6 @@ def prepare_one(
     shutil.copy2(l2_itp_path, build_dir / "PA66_L2_GMX.itp")
     for force_constant in POSRE_LEVELS:
         make_posre(build_dir / f"posre_l2_{force_constant}.itp", force_constant)
-    rewritten_topology = rewrite_topology(
-        source_top_path.read_text(encoding="utf-8"),
-        candidate["source_itp"],
-        candidate["source_molecule_type"],
-    )
     (build_dir / "topol.top").write_text(rewritten_topology, encoding="utf-8")
 
     mapping_payload = _mapping_payload(
@@ -379,9 +384,12 @@ def prepare_one(
         }
 
     atom_count_expected = (
-        len(source_system.atoms) - candidate["source_atom_count"] + len(target_topology.atoms)
+        len(source_system.atoms)
+        - candidate["source_atom_count"]
+        + len(target_topology.atoms)
+        - (1 if ion_neutralization["removed_ion"] is not None else 0)
     )
-    charge = sum(atom.charge for atom in target_topology.atoms.values())
+    charge = target_charge
     min_environment = minimum_ligand_environment_distance(
         rebuilt_roundtrip, first, len(target_topology.atoms)
     )
@@ -416,6 +424,9 @@ def prepare_one(
         "reaction_angle_matches_selected_frame": (
             geometry_delta["angle_abs_error_deg"] <= 0.75
         ),
+        "system_charge_change_neutralized": abs(
+            ion_neutralization["net_charge_change_relative_to_source"]
+        ) < 1e-5,
     }
     audit = {
         "schema_version": 1,
@@ -430,6 +441,7 @@ def prepare_one(
             "topology_sha256": sha256(source_top_path),
             "atom_count": len(source_system.atoms),
             "molecule_atom_count": candidate["source_atom_count"],
+            "molecule_charge_e": source_charge,
         },
         "target": {
             "gro": str(rebuilt_path),
@@ -452,6 +464,7 @@ def prepare_one(
         "reaction_geometry_delta": geometry_delta,
         "minimum_ligand_environment_distance_nm": min_environment,
         "mapping_file": str(mapping_path),
+        "ion_neutralization": ion_neutralization,
         "checks": checks,
     }
     audit_path = audit_dir / "build_audit.json"
