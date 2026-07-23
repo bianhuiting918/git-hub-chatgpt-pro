@@ -56,16 +56,19 @@ def main():
     parser.add_argument("--run-root", required=True, type=pathlib.Path)
     parser.add_argument("--seed", required=True, type=int)
     parser.add_argument("--array-job-id", required=True)
+    parser.add_argument("--stem", default="free_npt100")
+    parser.add_argument("--window-type", default="fully_unrestrained_NPT_100ps")
+    parser.add_argument("--output-name", default="unrestrained_pilot_audit.json")
     args = parser.parse_args()
     root = args.run_root
     series = json.loads((root / "nac_energy_series.json").read_text())
-    log_text = (root / "free_npt100.log").read_text(errors="replace")
+    log_text = (root / f"{args.stem}.log").read_text(errors="replace")
     counts = numerical_counts(log_text)
     finished = bool(re.search(r"Finished mdrun", log_text))
-    atoms, box, _ = geom.read_gro(root / "free_npt100.gro")
+    atoms, box, _ = geom.read_gro(root / f"{args.stem}.gro")
     contact = recapture.minimum_ligand_protein_distance(atoms, box)
     distance, angle = recapture.geometry(
-        root / "free_npt100.gro", geom.CANDIDATES["nylc_C18_trueT267_recapture"]
+        root / f"{args.stem}.gro", geom.CANDIDATES["nylc_C18_trueT267_recapture"]
     )
     gate_rows = read_xvg(root / "gate_core_vector.xvg")
     gate = []
@@ -91,7 +94,7 @@ def main():
         "candidate_id": "nylc_C18_trueT267_recapture",
         "array_job_id": args.array_job_id,
         "velocity_seed": args.seed,
-        "window_type": "fully_unrestrained_NPT_100ps",
+        "window_type": args.window_type,
         "technical_status": "PASS" if numerical_pass else "FAIL",
         "scientific_status": scientific_status,
         "nac": series,
@@ -117,7 +120,7 @@ def main():
             "from the equilibrated free window"
         ),
     }
-    (root / "unrestrained_pilot_audit.json").write_text(
+    (root / args.output_name).write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n"
     )
     print(json.dumps(result, sort_keys=True))
