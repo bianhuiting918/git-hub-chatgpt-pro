@@ -77,7 +77,7 @@ fi
 
 set +e
 "$PY" "$FLOW/scripts/audit_true_thr267_recapture_pilot.py" \
-  --candidate "$candidate" --stage-dir recapture_response5 --stem response5 --min-response 0.20 --reference-gro "$TASK/candidates/$candidate/recapture_response3/response3.gro" >"$work/audit.stdout" 2>"$work/audit.stderr"
+  --candidate "$candidate" --stage-dir recapture_response5 --stem response5 --min-response 0.20 --reference-gro "$TASK/candidates/$candidate/recapture_response4/response4.gro" >"$work/audit.stdout" 2>"$work/audit.stderr"
 audit_rc=$?
 set -e
 audit_status="$("$PY" -c "import json;print(json.load(open('$work/pilot_audit.json'))['status'])" 2>/dev/null || echo MISSING_AUDIT)"
