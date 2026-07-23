@@ -21,6 +21,7 @@ class MdpContractTests(unittest.TestCase):
     def test_stage_schedule_and_restraint_contract(self):
         expected = {
             "em.mdp": ("steep", 50000, "POSRES_L2_1000"),
+            "em_cg.mdp": ("cg", 50000, "POSRES_L2_1000"),
             "nvt50.mdp": ("md", 50000, "POSRES_L2_1000"),
             "nvt150.mdp": ("md", 50000, "POSRES_L2_500"),
             "nvt300.mdp": ("md", 100000, "POSRES_L2_100"),
