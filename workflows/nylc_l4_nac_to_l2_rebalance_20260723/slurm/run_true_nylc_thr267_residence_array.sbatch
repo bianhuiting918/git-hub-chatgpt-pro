@@ -4,6 +4,7 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -c 4
+#SBATCH --gres=dcu:1
 #SBATCH --mem-per-cpu=2000M
 #SBATCH -t 02:00:00
 #SBATCH --array=0-1
