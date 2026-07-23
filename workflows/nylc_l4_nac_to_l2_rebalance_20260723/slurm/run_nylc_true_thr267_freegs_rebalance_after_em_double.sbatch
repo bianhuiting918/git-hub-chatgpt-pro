@@ -20,6 +20,7 @@ root="$TASK/candidates/$candidate"
 build="$root/build"
 em="$root/runs/em_cg_flexible_double_retry3"
 em_pass="$root/runs/em_cg_flexible_double_retry3/PASS.json"
+em_gro="$root/runs/em_cg_flexible_double_retry3/run.gro"
 runs="$root/runs/rebalance_after_em_double"
 job="${SLURM_JOB_ID:?}"
 mkdir -p "$runs" "$TASK/logs"
@@ -100,11 +101,11 @@ assert data["status"]=="PASS_TECHNICAL_EM"
 assert data["source_slurm_job_id"]=="61708647"
 assert data["fmax_kj_mol_nm"] <= data["threshold_kj_mol_nm"]
 PY
-test -s "$em/run.gro"
+test -s "$em_gro"
 record rebalance_after_em_double START "parent_em=61708647;em_status=PASS_TECHNICAL_EM"
 
 current=nvt50
-run_stage nvt50 "$em/run.gro" "" yes
+run_stage nvt50 "$em_gro" "" yes
 current=nvt150
 run_stage nvt150 "$runs/nvt50/run.gro" "$runs/nvt50/run.cpt" yes
 current=nvt300
