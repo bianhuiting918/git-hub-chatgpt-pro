@@ -1,0 +1,17 @@
+define                   = -DPOSRES_L2_1000
+integrator               = steep
+emtol                    = 500.0
+emstep                   = 0.0005
+nsteps                   = 50000
+cutoff-scheme            = Verlet
+nstlist                  = 20
+rlist                    = 1.0
+coulombtype              = PME
+rcoulomb                 = 1.0
+vdwtype                  = Cut-off
+rvdw                     = 1.0
+DispCorr                 = EnerPres
+pbc                      = xyz
+constraints              = none
+nstenergy                = 100
+nstlog                   = 100
