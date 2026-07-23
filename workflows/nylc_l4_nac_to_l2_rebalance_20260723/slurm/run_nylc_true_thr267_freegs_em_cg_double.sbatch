@@ -10,7 +10,7 @@
 #SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdfgs_%j.out
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdfgs_%j.err
 
-set -euo pipefail
+set -eo pipefail\nset -x
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
 PY=/work/home/acshdt1dks/anaconda3/bin/python3.9
@@ -18,7 +18,7 @@ GMX=/work/home/acshdt1dks/opt/gmx-cp2k/gromacs-2023.1-cp2k-2024.1/bin/gmx_mpi_d
 candidate=nylc_C18_trueT267_freeGS
 root="$TASK/candidates/$candidate"
 build="$root/build"
-out="$root/runs/em_cg_flexible_double_retry1"
+out="$root/runs/em_cg_flexible_double_retry2"
 start="$build/rebuilt.gro"
 job="${SLURM_JOB_ID:?}"
 mkdir -p "$out"
