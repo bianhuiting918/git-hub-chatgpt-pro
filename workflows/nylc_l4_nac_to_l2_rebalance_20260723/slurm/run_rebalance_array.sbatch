@@ -5,7 +5,7 @@
 #SBATCH -n 1
 #SBATCH -c 8
 #SBATCH --gres=dcu:1
-#SBATCH --mem=28G
+#SBATCH --mem-per-cpu=3500M
 #SBATCH -t 24:00:00
 #SBATCH --array=0-4%5
 #SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/rebalance_%A_%a.out
