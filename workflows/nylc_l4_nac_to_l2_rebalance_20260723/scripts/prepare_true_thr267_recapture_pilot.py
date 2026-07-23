@@ -29,6 +29,12 @@ CANDIDATES = {
         "carbonyl_group": "L4_C23", "oxygen_group": "L4_O_C23", "seed": 231267,
     },
 }
+PROTOCOLS = {
+    "pilot1": {"dir": "recapture_pilot", "stem": "pilot", "nsteps": 50000,
+               "rate": -0.004, "distance_k": 100, "angle_k": 20},
+    "response2": {"dir": "recapture_response2", "stem": "response2", "nsteps": 50000,
+                  "rate": -0.002, "distance_k": 500, "angle_k": 50},
+}
 
 
 def sha256(path):
@@ -77,12 +83,13 @@ def read_gro_identities(path):
     return atoms
 
 
-def make_mdp(branch, seed):
+def make_mdp(branch, seed, protocol="pilot1"):
+    p = PROTOCOLS[protocol]
     carbon = f"L4_C{branch[1:]}"
     oxygen = f"L4_O_C{branch[1:]}"
     return f"""integrator               = md
 dt                       = 0.002
-nsteps                   = 50000
+nsteps                   = {p["nsteps"]}
 continuation             = no
 constraints              = h-bonds
 constraint-algorithm     = lincs
@@ -123,8 +130,8 @@ pull-coord1-groups       = 1 2
 pull-coord1-dim          = Y Y Y
 pull-coord1-start        = yes
 pull-coord1-init         = 0
-pull-coord1-rate         = -0.004000
-pull-coord1-k            = 100
+pull-coord1-rate         = {p["rate"]:.6f}
+pull-coord1-k            = {p["distance_k"]}
 
 pull-coord2-type         = umbrella
 pull-coord2-geometry     = angle
@@ -132,7 +139,7 @@ pull-coord2-groups       = 2 1 2 3
 pull-coord2-start        = no
 pull-coord2-init         = 105.000000
 pull-coord2-rate         = 0
-pull-coord2-k            = 20
+pull-coord2-k            = {p["angle_k"]}
 
 pull-nstxout             = 500
 pull-nstfout             = 500
@@ -155,8 +162,10 @@ def append_history(candidate, state, detail):
         handle.write(json.dumps(record, sort_keys=True) + "\n")
 
 
-def prepare_one(name):
+def prepare_one(name, protocol="pilot1"):
     cfg = CANDIDATES[name]
+    p = PROTOCOLS[protocol]
+    seed = cfg["seed"] + (1 if protocol == "response2" else 0)
     candidate_root = TASK_ROOT / "candidates" / name
     source_gro = candidate_root / "source.gro"
     source_manifest = candidate_root / "source_manifest.json"
@@ -169,11 +178,12 @@ def prepare_one(name):
     source_branch = SOURCE_ROOT / cfg["branch"]
     original_index = source_branch / "cycle.ndx"
     topology = source_branch / "topol.top"
-    work = candidate_root / "recapture_pilot"
+    work = candidate_root / p["dir"]
+    stem = p["stem"]
     work.mkdir(parents=True, exist_ok=True)
     outputs = [
-        work / "corrected_true_thr267.ndx", work / "pilot.mdp",
-        work / "pilot.tpr", work / "pilot.processed.mdp",
+        work / "corrected_true_thr267.ndx", work / f"{stem}.mdp",
+        work / f"{stem}.tpr", work / f"{stem}.processed.mdp",
         work / "grompp.stdout", work / "grompp.stderr",
         work / "preflight.json",
     ]
@@ -199,16 +209,16 @@ def prepare_one(name):
     if parse_index_group(corrected_text, "Thr_OG1") != [TRUE_THR267_OG1]:
         raise RuntimeError("corrected Thr_OG1 group failed")
     (work / "corrected_true_thr267.ndx").write_text(corrected_text, encoding="utf-8")
-    (work / "pilot.mdp").write_text(
-        make_mdp(cfg["branch"], cfg["seed"]), encoding="utf-8"
+    (work / f"{stem}.mdp").write_text(
+        make_mdp(cfg["branch"], seed, protocol=protocol), encoding="utf-8"
     )
 
     command = [
-        str(GMX), "grompp", "-f", str(work / "pilot.mdp"),
+        str(GMX), "grompp", "-f", str(work / f"{stem}.mdp"),
         "-c", str(source_gro), "-p", str(topology),
         "-n", str(work / "corrected_true_thr267.ndx"),
-        "-o", str(work / "pilot.tpr"),
-        "-po", str(work / "pilot.processed.mdp"), "-maxwarn", "0",
+        "-o", str(work / f"{stem}.tpr"),
+        "-po", str(work / f"{stem}.processed.mdp"), "-maxwarn", "0",
     ]
     completed = subprocess.run(
         command, cwd=source_branch, capture_output=True, text=True,
@@ -232,12 +242,13 @@ def prepare_one(name):
         "thr267_excluded_from_gate": True,
         "protocol": {
             "duration_ps": 100.0,
-            "distance_reference_rate_nm_per_ps": -0.004,
-            "distance_k_kj_mol_nm2": 100,
+            "protocol": protocol,
+            "distance_reference_rate_nm_per_ps": p["rate"],
+            "distance_k_kj_mol_nm2": p["distance_k"],
             "angle_reference_deg": 105.0,
-            "angle_k_kj_mol_rad2": 20,
+            "angle_k_kj_mol_rad2": p["angle_k"],
             "gate_restraint": False,
-            "fresh_velocity_seed": cfg["seed"],
+            "fresh_velocity_seed": seed,
         },
         "scientific_gate": "NOT_EVALUATED_APPROACH_PILOT_NOT_AN_UNRESTRAINED_NAC",
     }
@@ -254,6 +265,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate", choices=sorted(CANDIDATES))
     parser.add_argument("--all", action="store_true")
+    parser.add_argument("--protocol", choices=sorted(PROTOCOLS), default="pilot1")
     args = parser.parse_args()
     if args.all == bool(args.candidate):
         parser.error("choose exactly one of --all or --candidate")
@@ -261,7 +273,7 @@ def main():
     failures = []
     for name in names:
         try:
-            print(json.dumps(prepare_one(name), sort_keys=True))
+            print(json.dumps(prepare_one(name, protocol=args.protocol), sort_keys=True))
         except Exception as exc:
             append_history(name, "FAIL", str(exc))
             print(f"{name}: {exc}", file=sys.stderr)
