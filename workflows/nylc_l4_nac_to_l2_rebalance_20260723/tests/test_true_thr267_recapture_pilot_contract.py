@@ -8,6 +8,7 @@ SBATCH = FLOW / "slurm" / "run_true_thr267_recapture_pilot_array.sbatch"
 AUDIT = FLOW / "scripts" / "audit_true_thr267_recapture_pilot.py"
 SBATCH2 = FLOW / "slurm" / "run_true_thr267_recapture_response2_array.sbatch"
 SBATCH3 = FLOW / "slurm" / "run_true_thr267_recapture_response3_array.sbatch"
+SBATCH4 = FLOW / "slurm" / "run_true_thr267_recapture_response4_array.sbatch"
 
 
 def load_prep():
@@ -100,3 +101,23 @@ def test_response3_slurm_uses_005_response_gate():
     assert '-deffnm "$work/response3"' in text
     assert "--min-response 0.05" in text
     assert "audit_true_thr267_recapture_pilot.py" in text
+
+
+def test_response4_continues_from_response3_checkpoint():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181270, protocol="response4")
+    assert "nsteps                   = 50000" in mdp
+    assert "continuation             = yes" in mdp
+    assert "gen-vel                  = no" in mdp
+    assert "gen-seed" not in mdp
+    assert "pull-coord1-rate         = -0.004000" in mdp
+    assert "pull-coord1-k            = 2000" in mdp
+
+
+def test_response4_slurm_audits_against_response3_start():
+    text = SBATCH4.read_text(encoding="utf-8")
+    assert "recapture_response4" in text
+    assert '-deffnm "$work/response4"' in text
+    assert "--reference-gro" in text
+    assert "recapture_response3/response3.gro" in text
+    assert "--min-response 0.15" in text
