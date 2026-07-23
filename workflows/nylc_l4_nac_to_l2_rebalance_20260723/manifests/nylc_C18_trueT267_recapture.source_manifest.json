@@ -1,0 +1,57 @@
+{
+  "candidate": "nylc_C18_trueT267_recapture",
+  "gate_definition": {
+    "residues": [
+      261,
+      262,
+      263,
+      264,
+      265,
+      266
+    ],
+    "thr267_excluded": true
+  },
+  "geometry": {
+    "joint_nac": false,
+    "nac_angle_range_deg": [
+      95.0,
+      115.0
+    ],
+    "nac_distance_cutoff_nm": 0.35,
+    "true_thr267_attack_angle_deg": 108.009,
+    "true_thr267_og1_to_carbonyl_c_nm": 1.450519
+  },
+  "identity": {
+    "reaction_carbonyl_c_global_index": 10297,
+    "reaction_carbonyl_o_global_index": 10298,
+    "superseded_wrong_atom": {
+      "atom_name": "OG1",
+      "global_index": 8896,
+      "residue_name": "THR",
+      "residue_number": 262,
+      "status": "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY"
+    },
+    "true_catalytic_atom": {
+      "atom_name": "OG1",
+      "global_index": 8961,
+      "residue_name": "THR",
+      "residue_number": 267
+    }
+  },
+  "output": {
+    "gro": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_recapture/source.gro",
+    "sha256": "a89168effcc963f7e7058463cd71618006ec935799286d830690af6ed1fb44cf"
+  },
+  "schema_version": 1,
+  "scientific_gate": "NOT_EVALUATED_RECAPTURE_AND_RELEASE_REQUIRED",
+  "source": {
+    "branch": "C18",
+    "cumulative_time_ps": 11956.0,
+    "local_time_ps": 16.0,
+    "segment": "segment_000122_FREE_MONITOR",
+    "selection_basis": "closest fully unrestrained true-Thr267 frame; angle compatible",
+    "tpr": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C18/segments/segment_000122_FREE_MONITOR/run.tpr",
+    "xtc": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C18/segments/segment_000122_FREE_MONITOR/run.xtc"
+  },
+  "status": "VERIFIED_TRUE_THR267_RECAPTURE_START_NOT_NAC"
+}
