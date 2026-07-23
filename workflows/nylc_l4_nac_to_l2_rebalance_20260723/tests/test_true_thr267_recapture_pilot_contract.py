@@ -7,6 +7,7 @@ PREP = FLOW / "scripts" / "prepare_true_thr267_recapture_pilot.py"
 SBATCH = FLOW / "slurm" / "run_true_thr267_recapture_pilot_array.sbatch"
 AUDIT = FLOW / "scripts" / "audit_true_thr267_recapture_pilot.py"
 SBATCH2 = FLOW / "slurm" / "run_true_thr267_recapture_response2_array.sbatch"
+SBATCH3 = FLOW / "slurm" / "run_true_thr267_recapture_response3_array.sbatch"
 
 
 def load_prep():
@@ -82,3 +83,20 @@ def test_response2_slurm_uses_separate_outputs_and_preflight():
     assert '-deffnm "$work/response2"' in text
     assert "audit_true_thr267_recapture_pilot.py" in text
     assert "audit_true_thr267_recapture_response2.py" not in text
+
+
+def test_response3_is_short_high_stiffness_probe():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181269, protocol="response3")
+    assert "nsteps                   = 12500" in mdp
+    assert "pull-coord1-rate         = -0.004000" in mdp
+    assert "pull-coord1-k            = 2000" in mdp
+    assert "pull-coord2-k            = 100" in mdp
+
+
+def test_response3_slurm_uses_005_response_gate():
+    text = SBATCH3.read_text(encoding="utf-8")
+    assert "recapture_response3" in text
+    assert '-deffnm "$work/response3"' in text
+    assert "--min-response 0.05" in text
+    assert "audit_true_thr267_recapture_pilot.py" in text
