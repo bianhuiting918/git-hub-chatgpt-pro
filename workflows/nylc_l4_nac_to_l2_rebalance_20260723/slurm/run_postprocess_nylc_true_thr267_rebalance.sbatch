@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J nylc_t267_post
-#SBATCH -p xahdnormal
+#SBATCH -p xahcnormal
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -c 8
