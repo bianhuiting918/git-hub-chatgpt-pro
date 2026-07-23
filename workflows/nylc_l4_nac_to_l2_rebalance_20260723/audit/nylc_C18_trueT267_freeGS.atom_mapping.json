@@ -1,0 +1,1105 @@
+{
+  "target_to_source": [
+    {
+      "l2_atom_id": 1,
+      "l2_atom_name": "N1",
+      "element": "N",
+      "source_atom_id": 40,
+      "source_atom_name": "N5",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 2,
+      "l2_atom_name": "C1",
+      "element": "C",
+      "source_atom_id": 39,
+      "source_atom_name": "C29",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 3,
+      "l2_atom_name": "C2",
+      "element": "C",
+      "source_atom_id": 38,
+      "source_atom_name": "C28",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 4,
+      "l2_atom_name": "C3",
+      "element": "C",
+      "source_atom_id": 37,
+      "source_atom_name": "C27",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 5,
+      "l2_atom_name": "C4",
+      "element": "C",
+      "source_atom_id": 36,
+      "source_atom_name": "C26",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 6,
+      "l2_atom_name": "C5",
+      "element": "C",
+      "source_atom_id": 35,
+      "source_atom_name": "C25",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 7,
+      "l2_atom_name": "C6",
+      "element": "C",
+      "source_atom_id": 34,
+      "source_atom_name": "C24",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 8,
+      "l2_atom_name": "N2",
+      "element": "N",
+      "source_atom_id": 33,
+      "source_atom_name": "N4",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 9,
+      "l2_atom_name": "C7",
+      "element": "C",
+      "source_atom_id": 31,
+      "source_atom_name": "C23",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 10,
+      "l2_atom_name": "O1",
+      "element": "O",
+      "source_atom_id": 32,
+      "source_atom_name": "O3",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 11,
+      "l2_atom_name": "C8",
+      "element": "C",
+      "source_atom_id": 30,
+      "source_atom_name": "C22",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 12,
+      "l2_atom_name": "C9",
+      "element": "C",
+      "source_atom_id": 29,
+      "source_atom_name": "C21",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 13,
+      "l2_atom_name": "C10",
+      "element": "C",
+      "source_atom_id": 28,
+      "source_atom_name": "C20",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 14,
+      "l2_atom_name": "C11",
+      "element": "C",
+      "source_atom_id": 27,
+      "source_atom_name": "C19",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 15,
+      "l2_atom_name": "C12",
+      "element": "C",
+      "source_atom_id": 25,
+      "source_atom_name": "C18",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 16,
+      "l2_atom_name": "O2",
+      "element": "O",
+      "source_atom_id": 26,
+      "source_atom_name": "O2",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 17,
+      "l2_atom_name": "N3",
+      "element": "N",
+      "source_atom_id": 24,
+      "source_atom_name": "N3",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 18,
+      "l2_atom_name": "C13",
+      "element": "C",
+      "source_atom_id": 23,
+      "source_atom_name": "C17",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 19,
+      "l2_atom_name": "C14",
+      "element": "C",
+      "source_atom_id": 22,
+      "source_atom_name": "C16",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 20,
+      "l2_atom_name": "C15",
+      "element": "C",
+      "source_atom_id": 21,
+      "source_atom_name": "C15",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 21,
+      "l2_atom_name": "C16",
+      "element": "C",
+      "source_atom_id": 20,
+      "source_atom_name": "C14",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 22,
+      "l2_atom_name": "C17",
+      "element": "C",
+      "source_atom_id": 19,
+      "source_atom_name": "C13",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 23,
+      "l2_atom_name": "C18",
+      "element": "C",
+      "source_atom_id": 18,
+      "source_atom_name": "C12",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 24,
+      "l2_atom_name": "N4",
+      "element": "N",
+      "source_atom_id": 17,
+      "source_atom_name": "N2",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 25,
+      "l2_atom_name": "C19",
+      "element": "C",
+      "source_atom_id": 15,
+      "source_atom_name": "C11",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 26,
+      "l2_atom_name": "O3",
+      "element": "O",
+      "source_atom_id": 16,
+      "source_atom_name": "O1",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 27,
+      "l2_atom_name": "C20",
+      "element": "C",
+      "source_atom_id": 14,
+      "source_atom_name": "C10",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 28,
+      "l2_atom_name": "C21",
+      "element": "C",
+      "source_atom_id": 13,
+      "source_atom_name": "C9",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 29,
+      "l2_atom_name": "C22",
+      "element": "C",
+      "source_atom_id": 12,
+      "source_atom_name": "C8",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 30,
+      "l2_atom_name": "C23",
+      "element": "C",
+      "source_atom_id": 11,
+      "source_atom_name": "C7",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 31,
+      "l2_atom_name": "C24",
+      "element": "C",
+      "source_atom_id": 9,
+      "source_atom_name": "C6",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 32,
+      "l2_atom_name": "O4",
+      "element": "O",
+      "source_atom_id": 10,
+      "source_atom_name": "O",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 33,
+      "l2_atom_name": "O5",
+      "element": "O",
+      "source_atom_id": null,
+      "source_atom_name": null,
+      "coordinate_origin": "rebuilt_endpoint"
+    },
+    {
+      "l2_atom_id": 34,
+      "l2_atom_name": "H1",
+      "element": "H",
+      "source_atom_id": null,
+      "source_atom_name": null,
+      "coordinate_origin": "rebuilt_endpoint"
+    },
+    {
+      "l2_atom_id": 35,
+      "l2_atom_name": "H2",
+      "element": "H",
+      "source_atom_id": null,
+      "source_atom_name": null,
+      "coordinate_origin": "rebuilt_endpoint"
+    },
+    {
+      "l2_atom_id": 36,
+      "l2_atom_name": "H3",
+      "element": "H",
+      "source_atom_id": null,
+      "source_atom_name": null,
+      "coordinate_origin": "rebuilt_endpoint"
+    },
+    {
+      "l2_atom_id": 37,
+      "l2_atom_name": "H4",
+      "element": "H",
+      "source_atom_id": 124,
+      "source_atom_name": "H57",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 38,
+      "l2_atom_name": "H5",
+      "element": "H",
+      "source_atom_id": 125,
+      "source_atom_name": "H58",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 39,
+      "l2_atom_name": "H6",
+      "element": "H",
+      "source_atom_id": 122,
+      "source_atom_name": "H55",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 40,
+      "l2_atom_name": "H7",
+      "element": "H",
+      "source_atom_id": 123,
+      "source_atom_name": "H56",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 41,
+      "l2_atom_name": "H8",
+      "element": "H",
+      "source_atom_id": 120,
+      "source_atom_name": "H53",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 42,
+      "l2_atom_name": "H9",
+      "element": "H",
+      "source_atom_id": 121,
+      "source_atom_name": "H54",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 43,
+      "l2_atom_name": "H10",
+      "element": "H",
+      "source_atom_id": 118,
+      "source_atom_name": "H51",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 44,
+      "l2_atom_name": "H11",
+      "element": "H",
+      "source_atom_id": 119,
+      "source_atom_name": "H52",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 45,
+      "l2_atom_name": "H12",
+      "element": "H",
+      "source_atom_id": 116,
+      "source_atom_name": "H49",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 46,
+      "l2_atom_name": "H13",
+      "element": "H",
+      "source_atom_id": 117,
+      "source_atom_name": "H50",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 47,
+      "l2_atom_name": "H14",
+      "element": "H",
+      "source_atom_id": 114,
+      "source_atom_name": "H47",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 48,
+      "l2_atom_name": "H15",
+      "element": "H",
+      "source_atom_id": 115,
+      "source_atom_name": "H48",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 49,
+      "l2_atom_name": "H16",
+      "element": "H",
+      "source_atom_id": 113,
+      "source_atom_name": "H46",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 50,
+      "l2_atom_name": "H17",
+      "element": "H",
+      "source_atom_id": 111,
+      "source_atom_name": "H44",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 51,
+      "l2_atom_name": "H18",
+      "element": "H",
+      "source_atom_id": 112,
+      "source_atom_name": "H45",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 52,
+      "l2_atom_name": "H19",
+      "element": "H",
+      "source_atom_id": 109,
+      "source_atom_name": "H42",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 53,
+      "l2_atom_name": "H20",
+      "element": "H",
+      "source_atom_id": 110,
+      "source_atom_name": "H43",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 54,
+      "l2_atom_name": "H21",
+      "element": "H",
+      "source_atom_id": 107,
+      "source_atom_name": "H40",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 55,
+      "l2_atom_name": "H22",
+      "element": "H",
+      "source_atom_id": 108,
+      "source_atom_name": "H41",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 56,
+      "l2_atom_name": "H23",
+      "element": "H",
+      "source_atom_id": 105,
+      "source_atom_name": "H38",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 57,
+      "l2_atom_name": "H24",
+      "element": "H",
+      "source_atom_id": 106,
+      "source_atom_name": "H39",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 58,
+      "l2_atom_name": "H25",
+      "element": "H",
+      "source_atom_id": 104,
+      "source_atom_name": "H37",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 59,
+      "l2_atom_name": "H26",
+      "element": "H",
+      "source_atom_id": 102,
+      "source_atom_name": "H35",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 60,
+      "l2_atom_name": "H27",
+      "element": "H",
+      "source_atom_id": 103,
+      "source_atom_name": "H36",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 61,
+      "l2_atom_name": "H28",
+      "element": "H",
+      "source_atom_id": 100,
+      "source_atom_name": "H33",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 62,
+      "l2_atom_name": "H29",
+      "element": "H",
+      "source_atom_id": 101,
+      "source_atom_name": "H34",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 63,
+      "l2_atom_name": "H30",
+      "element": "H",
+      "source_atom_id": 98,
+      "source_atom_name": "H31",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 64,
+      "l2_atom_name": "H31",
+      "element": "H",
+      "source_atom_id": 99,
+      "source_atom_name": "H32",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 65,
+      "l2_atom_name": "H32",
+      "element": "H",
+      "source_atom_id": 96,
+      "source_atom_name": "H29",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 66,
+      "l2_atom_name": "H33",
+      "element": "H",
+      "source_atom_id": 97,
+      "source_atom_name": "H30",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 67,
+      "l2_atom_name": "H34",
+      "element": "H",
+      "source_atom_id": 94,
+      "source_atom_name": "H27",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 68,
+      "l2_atom_name": "H35",
+      "element": "H",
+      "source_atom_id": 95,
+      "source_atom_name": "H28",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 69,
+      "l2_atom_name": "H36",
+      "element": "H",
+      "source_atom_id": 92,
+      "source_atom_name": "H25",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 70,
+      "l2_atom_name": "H37",
+      "element": "H",
+      "source_atom_id": 93,
+      "source_atom_name": "H26",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 71,
+      "l2_atom_name": "H38",
+      "element": "H",
+      "source_atom_id": 91,
+      "source_atom_name": "H24",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 72,
+      "l2_atom_name": "H39",
+      "element": "H",
+      "source_atom_id": 89,
+      "source_atom_name": "H22",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 73,
+      "l2_atom_name": "H40",
+      "element": "H",
+      "source_atom_id": 90,
+      "source_atom_name": "H23",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 74,
+      "l2_atom_name": "H41",
+      "element": "H",
+      "source_atom_id": 87,
+      "source_atom_name": "H20",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 75,
+      "l2_atom_name": "H42",
+      "element": "H",
+      "source_atom_id": 88,
+      "source_atom_name": "H21",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 76,
+      "l2_atom_name": "H43",
+      "element": "H",
+      "source_atom_id": 85,
+      "source_atom_name": "H18",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 77,
+      "l2_atom_name": "H44",
+      "element": "H",
+      "source_atom_id": 86,
+      "source_atom_name": "H19",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 78,
+      "l2_atom_name": "H45",
+      "element": "H",
+      "source_atom_id": 83,
+      "source_atom_name": "H16",
+      "coordinate_origin": "source_exact"
+    },
+    {
+      "l2_atom_id": 79,
+      "l2_atom_name": "H46",
+      "element": "H",
+      "source_atom_id": 84,
+      "source_atom_name": "H17",
+      "coordinate_origin": "source_exact"
+    }
+  ],
+  "source_to_l2": [
+    {
+      "source_atom_id": 9,
+      "source_atom_name": "C6",
+      "l2_atom_id": 31,
+      "l2_atom_name": "C24"
+    },
+    {
+      "source_atom_id": 10,
+      "source_atom_name": "O",
+      "l2_atom_id": 32,
+      "l2_atom_name": "O4"
+    },
+    {
+      "source_atom_id": 11,
+      "source_atom_name": "C7",
+      "l2_atom_id": 30,
+      "l2_atom_name": "C23"
+    },
+    {
+      "source_atom_id": 12,
+      "source_atom_name": "C8",
+      "l2_atom_id": 29,
+      "l2_atom_name": "C22"
+    },
+    {
+      "source_atom_id": 13,
+      "source_atom_name": "C9",
+      "l2_atom_id": 28,
+      "l2_atom_name": "C21"
+    },
+    {
+      "source_atom_id": 14,
+      "source_atom_name": "C10",
+      "l2_atom_id": 27,
+      "l2_atom_name": "C20"
+    },
+    {
+      "source_atom_id": 15,
+      "source_atom_name": "C11",
+      "l2_atom_id": 25,
+      "l2_atom_name": "C19"
+    },
+    {
+      "source_atom_id": 16,
+      "source_atom_name": "O1",
+      "l2_atom_id": 26,
+      "l2_atom_name": "O3"
+    },
+    {
+      "source_atom_id": 17,
+      "source_atom_name": "N2",
+      "l2_atom_id": 24,
+      "l2_atom_name": "N4"
+    },
+    {
+      "source_atom_id": 18,
+      "source_atom_name": "C12",
+      "l2_atom_id": 23,
+      "l2_atom_name": "C18"
+    },
+    {
+      "source_atom_id": 19,
+      "source_atom_name": "C13",
+      "l2_atom_id": 22,
+      "l2_atom_name": "C17"
+    },
+    {
+      "source_atom_id": 20,
+      "source_atom_name": "C14",
+      "l2_atom_id": 21,
+      "l2_atom_name": "C16"
+    },
+    {
+      "source_atom_id": 21,
+      "source_atom_name": "C15",
+      "l2_atom_id": 20,
+      "l2_atom_name": "C15"
+    },
+    {
+      "source_atom_id": 22,
+      "source_atom_name": "C16",
+      "l2_atom_id": 19,
+      "l2_atom_name": "C14"
+    },
+    {
+      "source_atom_id": 23,
+      "source_atom_name": "C17",
+      "l2_atom_id": 18,
+      "l2_atom_name": "C13"
+    },
+    {
+      "source_atom_id": 24,
+      "source_atom_name": "N3",
+      "l2_atom_id": 17,
+      "l2_atom_name": "N3"
+    },
+    {
+      "source_atom_id": 25,
+      "source_atom_name": "C18",
+      "l2_atom_id": 15,
+      "l2_atom_name": "C12"
+    },
+    {
+      "source_atom_id": 26,
+      "source_atom_name": "O2",
+      "l2_atom_id": 16,
+      "l2_atom_name": "O2"
+    },
+    {
+      "source_atom_id": 27,
+      "source_atom_name": "C19",
+      "l2_atom_id": 14,
+      "l2_atom_name": "C11"
+    },
+    {
+      "source_atom_id": 28,
+      "source_atom_name": "C20",
+      "l2_atom_id": 13,
+      "l2_atom_name": "C10"
+    },
+    {
+      "source_atom_id": 29,
+      "source_atom_name": "C21",
+      "l2_atom_id": 12,
+      "l2_atom_name": "C9"
+    },
+    {
+      "source_atom_id": 30,
+      "source_atom_name": "C22",
+      "l2_atom_id": 11,
+      "l2_atom_name": "C8"
+    },
+    {
+      "source_atom_id": 31,
+      "source_atom_name": "C23",
+      "l2_atom_id": 9,
+      "l2_atom_name": "C7"
+    },
+    {
+      "source_atom_id": 32,
+      "source_atom_name": "O3",
+      "l2_atom_id": 10,
+      "l2_atom_name": "O1"
+    },
+    {
+      "source_atom_id": 33,
+      "source_atom_name": "N4",
+      "l2_atom_id": 8,
+      "l2_atom_name": "N2"
+    },
+    {
+      "source_atom_id": 34,
+      "source_atom_name": "C24",
+      "l2_atom_id": 7,
+      "l2_atom_name": "C6"
+    },
+    {
+      "source_atom_id": 35,
+      "source_atom_name": "C25",
+      "l2_atom_id": 6,
+      "l2_atom_name": "C5"
+    },
+    {
+      "source_atom_id": 36,
+      "source_atom_name": "C26",
+      "l2_atom_id": 5,
+      "l2_atom_name": "C4"
+    },
+    {
+      "source_atom_id": 37,
+      "source_atom_name": "C27",
+      "l2_atom_id": 4,
+      "l2_atom_name": "C3"
+    },
+    {
+      "source_atom_id": 38,
+      "source_atom_name": "C28",
+      "l2_atom_id": 3,
+      "l2_atom_name": "C2"
+    },
+    {
+      "source_atom_id": 39,
+      "source_atom_name": "C29",
+      "l2_atom_id": 2,
+      "l2_atom_name": "C1"
+    },
+    {
+      "source_atom_id": 40,
+      "source_atom_name": "N5",
+      "l2_atom_id": 1,
+      "l2_atom_name": "N1"
+    },
+    {
+      "source_atom_id": 83,
+      "source_atom_name": "H16",
+      "l2_atom_id": 78,
+      "l2_atom_name": "H45"
+    },
+    {
+      "source_atom_id": 84,
+      "source_atom_name": "H17",
+      "l2_atom_id": 79,
+      "l2_atom_name": "H46"
+    },
+    {
+      "source_atom_id": 85,
+      "source_atom_name": "H18",
+      "l2_atom_id": 76,
+      "l2_atom_name": "H43"
+    },
+    {
+      "source_atom_id": 86,
+      "source_atom_name": "H19",
+      "l2_atom_id": 77,
+      "l2_atom_name": "H44"
+    },
+    {
+      "source_atom_id": 87,
+      "source_atom_name": "H20",
+      "l2_atom_id": 74,
+      "l2_atom_name": "H41"
+    },
+    {
+      "source_atom_id": 88,
+      "source_atom_name": "H21",
+      "l2_atom_id": 75,
+      "l2_atom_name": "H42"
+    },
+    {
+      "source_atom_id": 89,
+      "source_atom_name": "H22",
+      "l2_atom_id": 72,
+      "l2_atom_name": "H39"
+    },
+    {
+      "source_atom_id": 90,
+      "source_atom_name": "H23",
+      "l2_atom_id": 73,
+      "l2_atom_name": "H40"
+    },
+    {
+      "source_atom_id": 91,
+      "source_atom_name": "H24",
+      "l2_atom_id": 71,
+      "l2_atom_name": "H38"
+    },
+    {
+      "source_atom_id": 92,
+      "source_atom_name": "H25",
+      "l2_atom_id": 69,
+      "l2_atom_name": "H36"
+    },
+    {
+      "source_atom_id": 93,
+      "source_atom_name": "H26",
+      "l2_atom_id": 70,
+      "l2_atom_name": "H37"
+    },
+    {
+      "source_atom_id": 94,
+      "source_atom_name": "H27",
+      "l2_atom_id": 67,
+      "l2_atom_name": "H34"
+    },
+    {
+      "source_atom_id": 95,
+      "source_atom_name": "H28",
+      "l2_atom_id": 68,
+      "l2_atom_name": "H35"
+    },
+    {
+      "source_atom_id": 96,
+      "source_atom_name": "H29",
+      "l2_atom_id": 65,
+      "l2_atom_name": "H32"
+    },
+    {
+      "source_atom_id": 97,
+      "source_atom_name": "H30",
+      "l2_atom_id": 66,
+      "l2_atom_name": "H33"
+    },
+    {
+      "source_atom_id": 98,
+      "source_atom_name": "H31",
+      "l2_atom_id": 63,
+      "l2_atom_name": "H30"
+    },
+    {
+      "source_atom_id": 99,
+      "source_atom_name": "H32",
+      "l2_atom_id": 64,
+      "l2_atom_name": "H31"
+    },
+    {
+      "source_atom_id": 100,
+      "source_atom_name": "H33",
+      "l2_atom_id": 61,
+      "l2_atom_name": "H28"
+    },
+    {
+      "source_atom_id": 101,
+      "source_atom_name": "H34",
+      "l2_atom_id": 62,
+      "l2_atom_name": "H29"
+    },
+    {
+      "source_atom_id": 102,
+      "source_atom_name": "H35",
+      "l2_atom_id": 59,
+      "l2_atom_name": "H26"
+    },
+    {
+      "source_atom_id": 103,
+      "source_atom_name": "H36",
+      "l2_atom_id": 60,
+      "l2_atom_name": "H27"
+    },
+    {
+      "source_atom_id": 104,
+      "source_atom_name": "H37",
+      "l2_atom_id": 58,
+      "l2_atom_name": "H25"
+    },
+    {
+      "source_atom_id": 105,
+      "source_atom_name": "H38",
+      "l2_atom_id": 56,
+      "l2_atom_name": "H23"
+    },
+    {
+      "source_atom_id": 106,
+      "source_atom_name": "H39",
+      "l2_atom_id": 57,
+      "l2_atom_name": "H24"
+    },
+    {
+      "source_atom_id": 107,
+      "source_atom_name": "H40",
+      "l2_atom_id": 54,
+      "l2_atom_name": "H21"
+    },
+    {
+      "source_atom_id": 108,
+      "source_atom_name": "H41",
+      "l2_atom_id": 55,
+      "l2_atom_name": "H22"
+    },
+    {
+      "source_atom_id": 109,
+      "source_atom_name": "H42",
+      "l2_atom_id": 52,
+      "l2_atom_name": "H19"
+    },
+    {
+      "source_atom_id": 110,
+      "source_atom_name": "H43",
+      "l2_atom_id": 53,
+      "l2_atom_name": "H20"
+    },
+    {
+      "source_atom_id": 111,
+      "source_atom_name": "H44",
+      "l2_atom_id": 50,
+      "l2_atom_name": "H17"
+    },
+    {
+      "source_atom_id": 112,
+      "source_atom_name": "H45",
+      "l2_atom_id": 51,
+      "l2_atom_name": "H18"
+    },
+    {
+      "source_atom_id": 113,
+      "source_atom_name": "H46",
+      "l2_atom_id": 49,
+      "l2_atom_name": "H16"
+    },
+    {
+      "source_atom_id": 114,
+      "source_atom_name": "H47",
+      "l2_atom_id": 47,
+      "l2_atom_name": "H14"
+    },
+    {
+      "source_atom_id": 115,
+      "source_atom_name": "H48",
+      "l2_atom_id": 48,
+      "l2_atom_name": "H15"
+    },
+    {
+      "source_atom_id": 116,
+      "source_atom_name": "H49",
+      "l2_atom_id": 45,
+      "l2_atom_name": "H12"
+    },
+    {
+      "source_atom_id": 117,
+      "source_atom_name": "H50",
+      "l2_atom_id": 46,
+      "l2_atom_name": "H13"
+    },
+    {
+      "source_atom_id": 118,
+      "source_atom_name": "H51",
+      "l2_atom_id": 43,
+      "l2_atom_name": "H10"
+    },
+    {
+      "source_atom_id": 119,
+      "source_atom_name": "H52",
+      "l2_atom_id": 44,
+      "l2_atom_name": "H11"
+    },
+    {
+      "source_atom_id": 120,
+      "source_atom_name": "H53",
+      "l2_atom_id": 41,
+      "l2_atom_name": "H8"
+    },
+    {
+      "source_atom_id": 121,
+      "source_atom_name": "H54",
+      "l2_atom_id": 42,
+      "l2_atom_name": "H9"
+    },
+    {
+      "source_atom_id": 122,
+      "source_atom_name": "H55",
+      "l2_atom_id": 39,
+      "l2_atom_name": "H6"
+    },
+    {
+      "source_atom_id": 123,
+      "source_atom_name": "H56",
+      "l2_atom_id": 40,
+      "l2_atom_name": "H7"
+    },
+    {
+      "source_atom_id": 124,
+      "source_atom_name": "H57",
+      "l2_atom_id": 37,
+      "l2_atom_name": "H4"
+    },
+    {
+      "source_atom_id": 125,
+      "source_atom_name": "H58",
+      "l2_atom_id": 38,
+      "l2_atom_name": "H5"
+    }
+  ],
+  "cut_edges": [
+    {
+      "l2_endpoint": 1,
+      "source_endpoint": 40,
+      "removed_source_neighbor": 41
+    },
+    {
+      "l2_endpoint": 31,
+      "source_endpoint": 9,
+      "removed_source_neighbor": 8
+    }
+  ],
+  "target_reactive_triplet": {
+    "carbonyl_c": 15,
+    "carbonyl_o": 16,
+    "amide_n": 17
+  }
+}
