@@ -13,6 +13,7 @@ SBATCH5 = FLOW / "slurm" / "run_true_thr267_recapture_response5_c18.sbatch"
 SBATCH6 = FLOW / "slurm" / "run_true_thr267_recapture_response6_c18.sbatch"
 SBATCH7 = FLOW / "slurm" / "run_true_thr267_recapture_response7_c18.sbatch"
 SBATCH8 = FLOW / "slurm" / "run_true_thr267_recapture_response8_c18.sbatch"
+SBATCH9 = FLOW / "slurm" / "run_true_thr267_recapture_response9_c18.sbatch"
 
 
 def load_audit():
@@ -212,3 +213,21 @@ def test_response8_slurm_uses_response7_reference():
     assert '-deffnm "$work/response8"' in text
     assert "recapture_response7/response7.gro" in text
     assert "--min-response 0.05" in text
+
+
+def test_response9_targets_final_040_nm_gate():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181275, protocol="response9")
+    assert "pull-coord1-rate         = -0.002000" in mdp
+    assert m.PROTOCOLS["response9"]["parent_stem"] == "response8"
+    text = SBATCH9.read_text(encoding="utf-8")
+    assert '-deffnm "$work/response9"' in text
+    assert "recapture_response8/response8.gro" in text
+    assert "--min-response 0.03" in text
+    assert "--max-end-distance 0.40" in text
+
+
+def test_audit_supports_maximum_end_distance_gate():
+    text = AUDIT.read_text(encoding="utf-8")
+    assert "--max-end-distance" in text
+    assert "maximum_allowed_end_distance_nm" in text
