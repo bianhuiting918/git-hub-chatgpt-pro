@@ -1,0 +1,21 @@
+{
+  "candidate_id": "nylc_C18_trueT267_recapture",
+  "next_gate": "fully_unrestrained multi-seed NPT pilot; this restrained selection alone cannot establish GS stability",
+  "schema_version": 1,
+  "scientific_status": "NOT_A_SCIENTIFIC_GS_RESTRAINED_SOURCE",
+  "selected_angle_deg": 100.87,
+  "selected_distance_nm": 0.336447,
+  "selected_gro": "selected_lowest_potential_nac.gro",
+  "selected_gro_sha256": "d0f157575193c4662f5463c14f5d9075e817c18142aa74f0f7456b8bc732b4f7",
+  "selected_potential_energy_kj_mol": -1825802.875,
+  "selected_time_ps": 67.0,
+  "selection_rule": "minimum instantaneous potential energy among frames satisfying true Thr267 NAC distance <= 0.35 nm and angle 95-115 deg",
+  "source_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_recapture/recapture_release2",
+  "source_window": "restrained_release2",
+  "trajectory_nac": {
+    "frame_count": 101,
+    "longest_continuous_nac_ps": 4.0,
+    "nac_frame_count": 39,
+    "occupancy": 0.38613861386138615
+  }
+}
