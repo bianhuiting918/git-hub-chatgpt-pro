@@ -125,7 +125,7 @@
     },
     "scientific_status": "INVALID_WRONG_NUCLEOPHILE_IDENTITY"
   },
-  "scientific_gate": "No L2 GS or QM/MM promotion until corrected atom-identity-checked Thr267 residence audit finds a true fully unrestrained NAC.",
+  "scientific_gate": "Existing NylC L4 branches have zero authentic Thr267 NAC. A corrected restrained L4 recapture followed by fully unrestrained release must yield a true stable NAC before L2 truncation or QM/MM.",
   "free_1ns_extension": {
     "slurm_job_id": "61688773",
     "terminal_status": "CANCELLED_SUPERSEDED",
@@ -179,7 +179,54 @@
     "first_attempt_job_id": "61690618",
     "first_attempt_status": "TECHNICAL_FAIL_SHARED_GMX_ANGDIST_OUTPUT",
     "retry_job_id": "61691264",
-    "retry_status": "RUNNING",
-    "scientific_status": "NOT_EVALUATED_PENDING_CORRECTED_FULL_TRAJECTORY_AUDIT"
+    "retry_status": "COMPLETED",
+    "results": {
+      "C18": {
+        "all_frames": 16271,
+        "fully_unrestrained_frames": 1811,
+        "true_nac_frames": 0,
+        "true_nac_occupancy": 0,
+        "closest_angle_compatible": {
+          "segment": "segment_000122",
+          "cumulative_time_ps": 11956,
+          "true_distance_nm": 1.451,
+          "true_angle_deg": 108.009
+        }
+      },
+      "C23": {
+        "all_frames": 16221,
+        "fully_unrestrained_frames": 5021,
+        "true_nac_frames": 0,
+        "true_nac_occupancy": 0,
+        "closest_angle_compatible": {
+          "segment": "segment_000320",
+          "cumulative_time_ps": 31838,
+          "true_distance_nm": 1.31,
+          "true_angle_deg": 97.289
+        }
+      }
+    },
+    "scientific_status": "FAIL_NO_TRUE_THR267_NAC_IN_EXISTING_NYLC_C18_OR_C23_BRANCH"
+  },
+  "corrected_l4_recapture": {
+    "source_status": "VERIFIED_TRUE_THR267_RECAPTURE_START_NOT_NAC",
+    "source_sha256": {
+      "C18": "a89168effcc963f7e7058463cd71618006ec935799286d830690af6ed1fb44cf",
+      "C23": "612543a7d66b9e2683ff5b1208102d329ad739bc2805ae7054897ac16c015a8d"
+    },
+    "grompp_status": {
+      "C18": "PASS_GROMPP_TRUE_THR267",
+      "C23": "PASS_GROMPP_TRUE_THR267",
+      "maxwarn": 0
+    },
+    "first_submission": {
+      "job_id": "61695008",
+      "status": "TECHNICAL_FAIL_LITERAL_ESCAPED_ARRAY_VARIABLES_NO_MD"
+    },
+    "retry_submission": {
+      "job_id": "61695303",
+      "status": "RUNNING"
+    },
+    "scientific_gate": "NOT_EVALUATED_RESTRAINED_APPROACH_PILOT; require released L4 true NAC before L2 truncation"
   }
 }
