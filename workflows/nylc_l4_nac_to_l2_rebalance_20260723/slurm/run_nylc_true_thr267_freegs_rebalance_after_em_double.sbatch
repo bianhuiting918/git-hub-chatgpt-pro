@@ -34,7 +34,7 @@ record() {
   stamp="$(date -Is)"
   (
     flock -x 9
-    printf '%s\\t%s\\t%s\\tcandidate=%s;job=%s;%s\\n' "$stamp" "$event" "$state" "$candidate" "$job" "$detail" >&9
+    printf '%s\t%s\t%s\tcandidate=%s;job=%s;%s\n' "$stamp" "$event" "$state" "$candidate" "$job" "$detail" >&9
   ) 9>>"$TASK/run_history.tsv"
   (
     flock -x 8
@@ -51,13 +51,13 @@ scan_log() {
 import json,re,sys
 text=open(sys.argv[1],errors="replace").read()
 out={
- "fatal":len(re.findall(r"(?i)fatal(?:\\s+error)?",text)),
- "lincs_warning":len(re.findall(r"(?i)lincs\\s+warning",text)),
- "settle_problem":len(re.findall(r"(?i)(?:cannot\\s+be\\s+settled|settle[^\\n]*(?:warning|error|failed))",text)),
- "nan":len(re.findall(r"(?i)\\bnan\\b",text)),
+ "fatal":len(re.findall(r"(?i)fatal(?:\s+error)?",text)),
+ "lincs_warning":len(re.findall(r"(?i)lincs\s+warning",text)),
+ "settle_problem":len(re.findall(r"(?i)(?:cannot\s+be\s+settled|settle[^\n]*(?:warning|error|failed))",text)),
+ "nan":len(re.findall(r"(?i)\bnan\b",text)),
  "finished_mdrun":bool(re.search(r"Finished mdrun",text)),
 }
-open(sys.argv[2],"w").write(json.dumps(out,indent=2,sort_keys=True)+"\\n")
+open(sys.argv[2],"w").write(json.dumps(out,indent=2,sort_keys=True)+"\n")
 raise SystemExit(0 if out["finished_mdrun"] and not any(out[k] for k in ("fatal","lincs_warning","settle_problem","nan")) else 1)
 PY
 }
@@ -86,7 +86,7 @@ open(path,"w").write(json.dumps({
  "restrained":restrained=="yes",
  "parent_em_job_id":"61708647",
  "scientific_nac_evidence":stage=="npt300free" and restrained=="no",
-},indent=2,sort_keys=True)+"\\n")
+},indent=2,sort_keys=True)+"\n")
 PY
   record "$name" PASS_TECHNICAL "restrained=$restrained;parent_em=61708647"
 }
@@ -120,10 +120,10 @@ run_stage npt300free "$runs/npt300rel/run.gro" "$runs/npt300rel/run.cpt" no
 current=scientific_audit
 free="$runs/npt300free"
 "$GMX" distance -f "$free/run.xtc" -s "$free/run.tpr" -select 'atomnr 8961 plus atomnr 10287' -oall "$free/nac_distance.xvg" >"$free/nac_distance.stdout" 2>"$free/nac_distance.stderr"
-printf '[ nac_angle ]\\n8961 10287 10288\\n' >"$free/nac_angle.ndx"
-printf '0\\n' | "$GMX" angle -f "$free/run.xtc" -n "$free/nac_angle.ndx" -ov "$free/nac_angle.xvg" -type angle >"$free/nac_angle.stdout" 2>"$free/nac_angle.stderr"
-printf 'Potential\\n0\\n' | "$GMX" energy -f "$free/run.edr" -o "$free/potential_energy.xvg" >"$free/potential.stdout" 2>"$free/potential.stderr"
-printf 'Temperature\\nPressure\\nVolume\\n0\\n' | "$GMX" energy -f "$free/run.edr" -o "$free/thermo.xvg" >"$free/thermo.stdout" 2>"$free/thermo.stderr"
+printf '[ nac_angle ]\n8961 10287 10288\n' >"$free/nac_angle.ndx"
+printf '0\n' | "$GMX" angle -f "$free/run.xtc" -n "$free/nac_angle.ndx" -ov "$free/nac_angle.xvg" -type angle >"$free/nac_angle.stdout" 2>"$free/nac_angle.stderr"
+printf 'Potential\n0\n' | "$GMX" energy -f "$free/run.edr" -o "$free/potential_energy.xvg" >"$free/potential.stdout" 2>"$free/potential.stderr"
+printf 'Temperature\nPressure\nVolume\n0\n' | "$GMX" energy -f "$free/run.edr" -o "$free/thermo.xvg" >"$free/thermo.stdout" 2>"$free/thermo.stderr"
 "$GMX" distance -f "$free/run.xtc" -s "$free/run.tpr" -n "$build/source_cycle.ndx" -select 'com of group "Core" plus com of group "Gate"' -oxyz "$free/gate_core_vector.xvg" >"$free/gate.stdout" 2>"$free/gate.stderr"
 "$PY" "$FLOW/scripts/analyze_nac_series.py" --distance-xvg "$free/nac_distance.xvg" --angle-xvg "$free/nac_angle.xvg" --potential-xvg "$free/potential_energy.xvg" --distance-max-nm 0.35 --angle-min-deg 95 --angle-max-deg 115 --output "$free/nac_energy_series.json"
 "$PY" "$FLOW/scripts/audit_nylc_true_thr267_l2_free.py" --run-root "$free" --job-id "$job" >"$free/audit.stdout" 2>"$free/audit.stderr"
