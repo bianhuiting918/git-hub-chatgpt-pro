@@ -18,10 +18,10 @@ FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
 PY=/work/home/acshdt1dks/anaconda3/bin/python3.9
 GMX=/public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi
 candidates=(nylc_C18_trueT267_recapture nylc_C23_trueT267_recapture)
-candidate="\${candidates[\${SLURM_ARRAY_TASK_ID:?}]}"
+candidate="${candidates[${SLURM_ARRAY_TASK_ID:?}]}"
 work="$TASK/candidates/$candidate/recapture_pilot"
-job="\${SLURM_ARRAY_JOB_ID:?}"
-task="\${SLURM_ARRAY_TASK_ID:?}"
+job="${SLURM_ARRAY_JOB_ID:?}"
+task="${SLURM_ARRAY_TASK_ID:?}"
 mkdir -p "$TASK/logs"
 source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
 export GMX_MAXBACKUP=-1
@@ -68,7 +68,7 @@ record START "preflight=PASS_GROMPP_TRUE_THR267;restrained=yes;duration_ps=100"
 set +e
 mpirun -np 1 "$GMX" mdrun \
   -s "$work/pilot.tpr" -deffnm "$work/pilot" \
-  -ntomp "\${SLURM_CPUS_PER_TASK:-8}" -nb gpu -pme gpu -bonded gpu -pin on \
+  -ntomp "${SLURM_CPUS_PER_TASK:-8}" -nb gpu -pme gpu -bonded gpu -pin on \
   >"$work/mdrun.stdout" 2>"$work/mdrun.stderr"
 rc=$?
 set -e
