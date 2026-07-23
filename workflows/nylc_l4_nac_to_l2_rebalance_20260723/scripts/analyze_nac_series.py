@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit a paired GROMACS distance/angle series for strict NAC residence."""
+"""Audit paired GROMACS distance/angle series for strict NAC residence."""
 
 from __future__ import annotations
 
@@ -28,21 +28,36 @@ def read_xvg(path: Path):
     return rows
 
 
-def audit_series(distance_rows, angle_rows, distance_max, angle_min, angle_max):
+def audit_series(
+    distance_rows,
+    angle_rows,
+    distance_max,
+    angle_min,
+    angle_max,
+    potential_rows=None,
+):
     if len(distance_rows) != len(angle_rows):
         raise ValueError("time series do not align: different frame counts")
+    if potential_rows is not None and len(distance_rows) != len(potential_rows):
+        raise ValueError("time series do not align: different frame counts")
     rows = []
-    for (distance_time, distance), (angle_time, angle) in zip(distance_rows, angle_rows):
+    for index, ((distance_time, distance), (angle_time, angle)) in enumerate(
+        zip(distance_rows, angle_rows)
+    ):
         if abs(distance_time - angle_time) > 1e-6:
             raise ValueError("time series do not align: frame times differ")
-        rows.append(
-            {
-                "time_ps": distance_time,
-                "distance_nm": distance,
-                "angle_deg": angle,
-                "nac": distance <= distance_max and angle_min <= angle <= angle_max,
-            }
-        )
+        row = {
+            "time_ps": distance_time,
+            "distance_nm": distance,
+            "angle_deg": angle,
+            "nac": distance <= distance_max and angle_min <= angle <= angle_max,
+        }
+        if potential_rows is not None:
+            potential_time, potential = potential_rows[index]
+            if abs(distance_time - potential_time) > 1e-6:
+                raise ValueError("time series do not align: frame times differ")
+            row["potential_energy_kj_mol"] = potential
+        rows.append(row)
 
     runs = []
     start = None
@@ -77,6 +92,16 @@ def audit_series(distance_rows, angle_rows, distance_max, angle_min, angle_max):
         )
 
     nac_rows = [row for row in rows if row["nac"]]
+    lowest_potential = None
+    if potential_rows is not None and nac_rows:
+        selected = min(nac_rows, key=lambda row: row["potential_energy_kj_mol"])
+        lowest_potential = {
+            "time_ps": selected["time_ps"],
+            "potential_energy_kj_mol": selected["potential_energy_kj_mol"],
+            "distance_nm": selected["distance_nm"],
+            "angle_deg": selected["angle_deg"],
+        }
+
     return {
         "schema_version": 1,
         "frame_count": len(rows),
@@ -88,6 +113,7 @@ def audit_series(distance_rows, angle_rows, distance_max, angle_min, angle_max):
             "angle_max_deg": angle_max,
         },
         "longest_continuous_nac": longest,
+        "lowest_potential_nac_frame": lowest_potential,
         "nac_run_count": len(runs),
         "time_start_ps": rows[0]["time_ps"],
         "time_end_ps": rows[-1]["time_ps"],
@@ -98,6 +124,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--distance-xvg", type=Path, required=True)
     parser.add_argument("--angle-xvg", type=Path, required=True)
+    parser.add_argument("--potential-xvg", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--distance-max-nm", type=float, default=0.35)
     parser.add_argument("--angle-min-deg", type=float, default=95.0)
@@ -110,6 +137,7 @@ def main():
             args.distance_max_nm,
             args.angle_min_deg,
             args.angle_max_deg,
+            read_xvg(args.potential_xvg) if args.potential_xvg else None,
         )
     except ValueError as error:
         print(str(error), file=sys.stderr)
