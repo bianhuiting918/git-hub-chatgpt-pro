@@ -9,6 +9,7 @@ terminal carboxylate oxygen.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from pathlib import Path
 from typing import Dict, Iterable, List, Set, Tuple
 
@@ -28,6 +29,7 @@ class Topology:
     molecule_type: str
     atoms: Dict[int, Atom]
     neighbors: Dict[int, Set[int]]
+    bond_lengths: Dict[frozenset, float]
 
 
 @dataclass(frozen=True)
@@ -61,7 +63,7 @@ def parse_itp(path: Path) -> Topology:
     section = ""
     molecule_type = ""
     atoms: Dict[int, Atom] = {}
-    bonds: List[Tuple[int, int]] = []
+    bonds: List[Tuple[int, int, float]] = []
     for raw in path.read_text(encoding="utf-8").splitlines():
         body = raw.split(";", 1)[0].strip()
         if not body:
@@ -91,16 +93,14 @@ def parse_itp(path: Path) -> Topology:
         elif section == "bonds":
             if len(fields) < 2:
                 raise ValueError(f"Malformed bonds row in {path}: {raw}")
-            bonds.append((int(fields[0]), int(fields[1])))
+            if len(fields) < 4:\n                raise ValueError(f"Bond lacks equilibrium length in {path}: {raw}")\n            bonds.append((int(fields[0]), int(fields[1]), float(fields[3])))
     if not molecule_type or not atoms or not bonds:
         raise ValueError(f"Incomplete ITP topology: {path}")
     neighbors = {atom_id: set() for atom_id in atoms}
-    for left, right in bonds:
-        if left not in atoms or right not in atoms:
+    bond_lengths: Dict[frozenset, float] = {}\n    for left, right, length in bonds:\n        if left not in atoms or right not in atoms:
             raise ValueError(f"Bond references missing atom: {left}-{right}")
         neighbors[left].add(right)
-        neighbors[right].add(left)
-    return Topology(molecule_type=molecule_type, atoms=atoms, neighbors=neighbors)
+        neighbors[right].add(left)\n        bond_lengths[frozenset((left, right))] = length\n    return Topology(\n        molecule_type=molecule_type, atoms=atoms, neighbors=neighbors,\n        bond_lengths=bond_lengths,\n    )
 
 
 def validate_reactive_triplet(
@@ -284,3 +284,148 @@ def discover_heavy_mapping(
         cut_edges=cuts,
         target_reactive_triplet=target_triplet,
     )
+
+
+
+Vector = Tuple[float, float, float]
+
+
+def _vadd(left: Vector, right: Vector) -> Vector:
+    return tuple(a + b for a, b in zip(left, right))  # type: ignore[return-value]
+
+
+def _vsub(left: Vector, right: Vector) -> Vector:
+    return tuple(a - b for a, b in zip(left, right))  # type: ignore[return-value]
+
+
+def _vscale(vector: Vector, factor: float) -> Vector:
+    return tuple(value * factor for value in vector)  # type: ignore[return-value]
+
+
+def _dot(left: Vector, right: Vector) -> float:
+    return sum(a * b for a, b in zip(left, right))
+
+
+def _cross(left: Vector, right: Vector) -> Vector:
+    return (
+        left[1] * right[2] - left[2] * right[1],
+        left[2] * right[0] - left[0] * right[2],
+        left[0] * right[1] - left[1] * right[0],
+    )
+
+
+def _norm(vector: Vector) -> float:
+    return math.sqrt(_dot(vector, vector))
+
+
+def _unit(vector: Vector) -> Vector:
+    length = _norm(vector)
+    if length < 1e-10:
+        raise ValueError("Cannot normalize a zero-length vector")
+    return _vscale(vector, 1.0 / length)
+
+
+def build_atom_mapping(
+    source: Topology, target: Topology, heavy_mapping: MappingResult
+) -> Dict[int, int | None]:
+    """Map equivalent atoms by bonded parent; reserve rebuilt endpoint atoms."""
+    mapping: Dict[int, int | None] = dict(heavy_mapping.target_to_source)
+    mapping[33] = None
+    for target_parent, source_parent in sorted(heavy_mapping.target_to_source.items()):
+        target_hydrogens = sorted(
+            neighbor
+            for neighbor in target.neighbors[target_parent]
+            if target.atoms[neighbor].element == "H"
+        )
+        if not target_hydrogens:
+            continue
+        if target_parent == 1:
+            for target_h in target_hydrogens:
+                mapping[target_h] = None
+            continue
+        source_hydrogens = sorted(
+            neighbor
+            for neighbor in source.neighbors[source_parent]
+            if source.atoms[neighbor].element == "H"
+        )
+        if len(target_hydrogens) != len(source_hydrogens):
+            raise ValueError(
+                f"Hydrogen-count mismatch for target parent {target_parent} "
+                f"and source parent {source_parent}: "
+                f"{len(target_hydrogens)} != {len(source_hydrogens)}"
+            )
+        for target_h, source_h in zip(target_hydrogens, source_hydrogens):
+            mapping[target_h] = source_h
+    if set(mapping) != set(target.atoms):
+        missing = sorted(set(target.atoms) - set(mapping))
+        raise ValueError(f"Incomplete atom mapping; missing targets {missing}")
+    mapped_sources = [source_id for source_id in mapping.values() if source_id is not None]
+    if len(mapped_sources) != len(set(mapped_sources)):
+        raise ValueError("Source atom is reused in atom mapping")
+    return dict(sorted(mapping.items()))
+
+
+def build_l2_coordinates(
+    source: Topology,
+    target: Topology,
+    heavy_mapping: MappingResult,
+    source_coordinates: Dict[int, Vector],
+) -> Tuple[Dict[int, Vector], Dict[int, int | None]]:
+    mapping = build_atom_mapping(source, target, heavy_mapping)
+    coordinates: Dict[int, Vector] = {
+        target_id: source_coordinates[source_id]
+        for target_id, source_id in mapping.items()
+        if source_id is not None
+    }
+
+    cuts = {cut.target_endpoint: cut for cut in heavy_mapping.cut_edges}
+    if set(cuts) != {1, 31}:
+        raise ValueError("Expected one source cut at each L2 endpoint")
+
+    # Generate terminal O5 along the source C--removed-amide-N direction.
+    carboxyl_c = coordinates[31]
+    removed_n = source_coordinates[cuts[31].removed_source_neighbor]
+    c_o_length = target.bond_lengths[frozenset((31, 33))]
+    coordinates[33] = _vadd(
+        carboxyl_c, _vscale(_unit(_vsub(removed_n, carboxyl_c)), c_o_length)
+    )
+
+    # Rebuild three ammonium hydrogens as an ideal tetrahedron about retained N--C.
+    terminal_n = coordinates[1]
+    retained_c = coordinates[2]
+    axis = _unit(_vsub(retained_c, terminal_n))
+    source_n = heavy_mapping.target_to_source[1]
+    source_hydrogens = sorted(
+        neighbor
+        for neighbor in source.neighbors[source_n]
+        if source.atoms[neighbor].element == "H"
+    )
+    if source_hydrogens:
+        reference = _vsub(source_coordinates[source_hydrogens[0]], terminal_n)
+    else:
+        reference = _vsub(
+            source_coordinates[cuts[1].removed_source_neighbor], terminal_n
+        )
+    projected = _vsub(reference, _vscale(axis, _dot(reference, axis)))
+    if _norm(projected) < 1e-8:
+        fallback = (1.0, 0.0, 0.0) if abs(axis[0]) < 0.8 else (0.0, 1.0, 0.0)
+        projected = _cross(axis, fallback)
+    basis_u = _unit(projected)
+    basis_v = _unit(_cross(axis, basis_u))
+    cosine = -1.0 / 3.0
+    sine = math.sqrt(8.0 / 9.0)
+    for index, target_h in enumerate((34, 35, 36)):
+        phi = index * 2.0 * math.pi / 3.0
+        radial = _vadd(
+            _vscale(basis_u, math.cos(phi)),
+            _vscale(basis_v, math.sin(phi)),
+        )
+        direction = _vadd(_vscale(axis, cosine), _vscale(radial, sine))
+        n_h_length = target.bond_lengths[frozenset((1, target_h))]
+        coordinates[target_h] = _vadd(
+            terminal_n, _vscale(_unit(direction), n_h_length)
+        )
+    if set(coordinates) != set(target.atoms):
+        missing = sorted(set(target.atoms) - set(coordinates))
+        raise ValueError(f"Incomplete target coordinates; missing {missing}")
+    return dict(sorted(coordinates.items())), mapping
