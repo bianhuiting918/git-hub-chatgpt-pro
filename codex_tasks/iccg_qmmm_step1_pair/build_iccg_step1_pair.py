@@ -386,6 +386,41 @@ def transfer_state(iccg_atoms: Sequence[Atom], reference_atoms: Sequence[Atom], 
     return protein_atoms(iccg_atoms) + moved_lig
 
 
+def translate_ligand_in_pair(pair_atoms: Sequence[Atom], vector: Sequence[float]) -> list[Atom]:
+    return [atom.with_xyz(tuple(atom.xyz[i] + vector[i] for i in range(3))) if atom.resname in LIGAND_NAMES else atom for atom in pair_atoms]
+
+
+def relief_candidates() -> list[tuple[float, float, float]]:
+    candidates = [(0.0, 0.0, 0.0), (-0.299578, -0.007654, -0.351502)]
+    vals = [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+    for x in vals:
+        for y in vals:
+            for z in vals:
+                if math.sqrt(x*x + y*y + z*z) <= 0.5000001:
+                    candidates.append((x, y, z))
+    seen = set(); unique = []
+    for c in candidates:
+        key = tuple(round(v, 6) for v in c)
+        if key not in seen:
+            seen.add(key); unique.append(c)
+    return unique
+
+
+def common_translation_relief(lg1_pair: Sequence[Atom], lg2_pair: Sequence[Atom]) -> dict[str, object]:
+    from audit_iccg_step1_pair import geometry_gate
+    best = None
+    for vec in relief_candidates():
+        shifted1 = translate_ligand_in_pair(lg1_pair, vec)
+        shifted2 = translate_ligand_in_pair(lg2_pair, vec)
+        g1 = geometry_gate(shifted1); g2 = geometry_gate(shifted2)
+        objective = max(float(g1["max_vdw_overlap_A"]), float(g2["max_vdw_overlap_A"]))
+        norm = math.sqrt(sum(v*v for v in vec))
+        record = {"vector_A": list(vec), "norm_A": norm, "objective_max_overlap_A": objective, "LG1": g1, "LG2": g2}
+        if best is None or (objective, norm, vec) < (best["objective_max_overlap_A"], best["norm_A"], tuple(best["vector_A"])):
+            best = record
+    assert best is not None
+    return best
+
 def protein_coordinate_signature(atoms: Sequence[Atom]) -> list[tuple[str,int,str,tuple[float,float,float]]]:
     return [(a.resname, a.resid, a.name, tuple(round(c, 6) for c in a.xyz)) for a in protein_atoms(atoms)]
 
@@ -416,12 +451,21 @@ def build_stage_a(iccg_path: Path, lg1_path: Path, lg2_path: Path, out: Path) ->
         gates.append(gate("lg1_lg2_atom_name_order", False, str(exc), lg1_atom_names=lg1_a["atom_names"], lg2_atom_names=lg2_a["atom_names"]))
     lg1_pair = transfer_state(iccg, lg1_ref, "LG1")
     lg2_pair = transfer_state(iccg, lg2_ref, "LG2")
+    pre_geometry = {"LG1": geometry_gate(lg1_pair), "LG2": geometry_gate(lg2_pair)}
+    relief = {"enabled": False, "reason": "INITIAL_GEOMETRY_PASS", "vector_A": [0.0, 0.0, 0.0], "norm_A": 0.0, "pre": pre_geometry}
+    if not (pre_geometry["LG1"].get("pass") and pre_geometry["LG2"].get("pass")):
+        best = common_translation_relief(lg1_pair, lg2_pair)
+        relief = {"enabled": True, "reason": "INITIAL_GEOMETRY_FAILED_MINIMAX_COMMON_TRANSLATION", "vector_A": best["vector_A"], "norm_A": best["norm_A"], "pre": pre_geometry, "post": {"LG1": best["LG1"], "LG2": best["LG2"]}, "objective_max_overlap_A": best["objective_max_overlap_A"]}
+        lg1_pair = translate_ligand_in_pair(lg1_pair, best["vector_A"])
+        lg2_pair = translate_ligand_in_pair(lg2_pair, best["vector_A"])
+    post_geometry = {"LG1": geometry_gate(lg1_pair), "LG2": geometry_gate(lg2_pair)}
+    relief.setdefault("post", post_geometry)
     write_pdb(out / "generated_LG1_pair.pdb", lg1_pair)
     write_pdb(out / "generated_LG2_pair.pdb", lg2_pair)
     protein_same = protein_coordinate_signature(lg1_pair) == protein_coordinate_signature(lg2_pair)
     gates.append(gate("paired_protein_coordinates_identical", protein_same))
     for state, atoms in (("LG1", lg1_pair), ("LG2", lg2_pair)):
-        gg = geometry_gate(atoms)
+        gg = post_geometry[state]
         gates.append({"name": f"{state}_protein_ligand_geometry", **gg})
         rc = rc_audit(atoms)
         gates.append({"name": f"{state}_step1_literature_rc", **rc})
@@ -437,6 +481,7 @@ def build_stage_a(iccg_path: Path, lg1_path: Path, lg2_path: Path, out: Path) ->
         "method": {"qm_charge": -1, "multiplicity": 1, "radii": "mbondi3", "igb": 8, "qmgb": 2, "gbsa": 1, "saltcon": 0.10, "qm_theory": "DFTB3/3OB-3-1"},
         "mapping": paper_to_iccg_mapping(),
         "outputs": {"LG1_pair_pdb": str(out / "generated_LG1_pair.pdb"), "LG2_pair_pdb": str(out / "generated_LG2_pair.pdb")},
+        "relief": relief,
         "gates": gates,
     }
     (out / "preflight_report.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")

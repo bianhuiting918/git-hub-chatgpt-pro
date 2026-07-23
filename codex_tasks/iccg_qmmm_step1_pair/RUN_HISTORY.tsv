@@ -11,3 +11,4 @@
 2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_1	Stage-A ignores deferred RC/HG, preserves ligand internal distances, and records topology-not-built separately.
 2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	can_submit requires named Stage-A structural gates and ignores separate topology-not-built marker.
 2026-07-23T00:00:00Z	CORRECTION	RUN_HISTORY.tsv	exit_0	Line 11 label should be REGRESSION, not GREEN; retained append-only and superseded by line 12.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Full-scan worst pair and deterministic common-translation relief covered.

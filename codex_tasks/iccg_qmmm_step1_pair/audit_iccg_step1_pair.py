@@ -18,19 +18,16 @@ def topology_pairing_pass(state1_order: Sequence[str], state2_order: Sequence[st
     return list(state1_order) == list(state2_order) and len(state1_order) > 0
 
 def geometry_gate(atoms: Sequence[Atom], bonds: set[tuple[int, int]] | None = None, link_pairs: set[tuple[int, int]] | None = None) -> dict[str, object]:
-    """Audit only protein-ligand nonbonded heavy-atom pairs.
-
-    Protein-protein and ligand-ligand contacts are not the hard gate requested
-    here; true topology bonds and declared link-boundary pairs are excluded.
-    """
+    """Audit all protein-ligand nonbonded heavy-atom pairs before PASS/FAIL."""
     bonds = {_pair(*p) for p in (bonds or set())}
     link_pairs = {_pair(*p) for p in (link_pairs or set())}
     proteins = [a for a in protein_atoms(atoms) if a.element.upper() != "H"]
     ligands = [a for a in ligand_atoms(atoms) if a.element.upper() != "H"]
     if not proteins or not ligands:
         return {"pass": False, "reason": "NOT_SUBMITTED_MISSING_PROTEIN_OR_LIGAND"}
-    max_overlap = 0.0
+    max_overlap = -float("inf")
     min_nonbonded = float("inf")
+    worst: dict[str, object] | None = None
     for a in proteins:
         if any(not math.isfinite(c) for c in a.xyz):
             return {"pass": False, "reason": "NOT_SUBMITTED_NAN_INF"}
@@ -40,35 +37,23 @@ def geometry_gate(atoms: Sequence[Atom], bonds: set[tuple[int, int]] | None = No
             if _pair(a.index, b.index) in bonds or _pair(a.index, b.index) in link_pairs:
                 continue
             d = _dist(a, b)
-            min_nonbonded = min(min_nonbonded, d)
             overlap = VDW.get(a.element.upper(), 1.7) + VDW.get(b.element.upper(), 1.7) - d
-            max_overlap = max(max_overlap, overlap)
-            if d < 1.20 or overlap > 0.80:
-                return {"pass": False, "reason": "FAIL_GEOMETRY_CLASH_NOT_LABEL", "min_nonbonded_A": d, "max_vdw_overlap_A": overlap, "pair": [a.index, b.index], "worst_pair": {"protein_atom": a.name, "protein_residue": a.resid, "ligand_atom": b.name, "ligand_resname": b.resname}}
-    return {"pass": True, "reason": "PASS", "min_nonbonded_A": min_nonbonded, "max_vdw_overlap_A": max_overlap}
+            if d < min_nonbonded:
+                min_nonbonded = d
+            if overlap > max_overlap:
+                max_overlap = overlap
+                worst = {"protein_atom": a.name, "protein_residue": a.resid, "protein_element": a.element, "ligand_atom": b.name, "ligand_resname": b.resname, "ligand_element": b.element, "distance_A": d, "overlap_A": overlap, "atom_indices": [a.index, b.index]}
+    passed = min_nonbonded >= 1.20 and max_overlap <= 0.80
+    return {"pass": passed, "reason": "PASS" if passed else "FAIL_GEOMETRY_CLASH_NOT_LABEL", "min_nonbonded_A": min_nonbonded, "max_vdw_overlap_A": max_overlap, "worst_pair": worst}
 
 def can_submit(preflight_report: Path) -> bool:
-    """Return Stage-A structural readiness, not topology/submission readiness.
-
-    Stage-A requires structure completeness, ligand pairing, protein-coordinate
-    invariance, Ile243 mapping, and both state geometry gates. RC audits may be
-    deferred until protonation; missing topology is handled separately by deploy.
-    """
+    """Return Stage-A structural readiness, not topology/submission readiness."""
     report = json.loads(preflight_report.read_text())
     gates = report.get("gates")
     if not isinstance(gates, list) or not gates:
         return False
     by_name = {g.get("name"): g for g in gates if isinstance(g, dict)}
-    required = {
-        "active_iccg_258_ser165_og",
-        "lg1_54_32_two_rings",
-        "lg2_54_32_two_rings",
-        "lg1_lg2_atom_name_order",
-        "paired_protein_coordinates_identical",
-        "LG1_protein_ligand_geometry",
-        "LG2_protein_ligand_geometry",
-        "ile243_structural_mapping",
-    }
+    required = {"active_iccg_258_ser165_og", "lg1_54_32_two_rings", "lg2_54_32_two_rings", "lg1_lg2_atom_name_order", "paired_protein_coordinates_identical", "LG1_protein_ligand_geometry", "LG2_protein_ligand_geometry", "ile243_structural_mapping"}
     return all(by_name.get(name, {}).get("pass") is True for name in required)
 
 def main(argv=None) -> int:

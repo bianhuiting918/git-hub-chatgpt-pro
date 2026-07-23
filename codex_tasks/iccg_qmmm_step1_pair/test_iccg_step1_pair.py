@@ -124,6 +124,33 @@ class PairGateTests(unittest.TestCase):
         self.assertEqual(gate["reason"], "FAIL_GEOMETRY_CLASH_NOT_LABEL")
         self.assertGreater(gate["max_vdw_overlap_A"], 0.80)
 
+    def test_geometry_gate_scans_all_pairs_and_reports_true_worst_pair(self):
+        atoms = [
+            build.Atom(1, "ALA", 1, "CB", (0.0, 0.0, 0.0), "C", "ATOM"),
+            build.Atom(2, "TYR", 95, "CB", (10.0, 0.0, 0.0), "C", "ATOM"),
+            build.Atom(3, "LG2", 900, "O14", (2.50, 0.0, 0.0), "O", "HETATM"),
+            build.Atom(4, "LG2", 900, "C30", (11.0, 0.0, 0.0), "C", "HETATM"),
+        ]
+        gate = audit.geometry_gate(atoms)
+        self.assertFalse(gate["pass"])
+        self.assertEqual(gate["worst_pair"]["protein_residue"], 95)
+        self.assertEqual(gate["worst_pair"]["ligand_atom"], "C30")
+        self.assertGreater(gate["max_vdw_overlap_A"], 2.0)
+
+    def test_common_translation_relief_uses_one_vector_and_preserves_internal_distances(self):
+        protein = [build.Atom(1, "ALA", 1, "CB", (0.0, 0.0, 0.0), "C", "ATOM")]
+        lig1 = [build.Atom(2, "LG1", 900, "C1", (2.35, 0.0, 0.0), "C", "HETATM"), build.Atom(3, "LG1", 900, "C2", (3.85, 0.0, 0.0), "C", "HETATM")]
+        lig2 = [build.Atom(4, "LG2", 900, "C1", (2.35, 0.0, 0.0), "C", "HETATM"), build.Atom(5, "LG2", 900, "C2", (3.85, 0.0, 0.0), "C", "HETATM")]
+        best = build.common_translation_relief(protein + lig1, protein + lig2)
+        self.assertLessEqual(best["norm_A"], 0.5000001)
+        self.assertTrue(best["LG1"]["pass"])
+        self.assertTrue(best["LG2"]["pass"])
+        shifted = build.translate_ligand_in_pair(protein + lig1, best["vector_A"])
+        before = ((lig1[0].xyz[0]-lig1[1].xyz[0])**2 + (lig1[0].xyz[1]-lig1[1].xyz[1])**2 + (lig1[0].xyz[2]-lig1[1].xyz[2])**2) ** 0.5
+        after_lig = build.ligand_atoms(shifted)
+        after = ((after_lig[0].xyz[0]-after_lig[1].xyz[0])**2 + (after_lig[0].xyz[1]-after_lig[1].xyz[1])**2 + (after_lig[0].xyz[2]-after_lig[1].xyz[2])**2) ** 0.5
+        self.assertAlmostEqual(before, after, places=6)
+
     def test_rigid_transfer_preserves_literature_ligand_internal_distances(self):
         iccg = build.parse_pdb_atoms(ICCG_HEAVY)
         ref = build.parse_pdb_atoms(LG1_REF)
