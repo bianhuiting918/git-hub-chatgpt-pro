@@ -438,3 +438,156 @@ def build_l2_coordinates(
         missing = sorted(set(target.atoms) - set(coordinates))
         raise ValueError(f"Incomplete target coordinates; missing {missing}")
     return dict(sorted(coordinates.items())), mapping
+
+
+
+@dataclass(frozen=True)
+class GroAtom:
+    resid: int
+    resname: str
+    atom_name: str
+    atom_number: int
+    coordinate: Vector
+
+
+@dataclass
+class GroSystem:
+    title: str
+    atoms: List[GroAtom]
+    box: Tuple[float, ...]
+
+
+def parse_gro(path: Path) -> GroSystem:
+    with path.open(encoding="utf-8") as handle:
+        title = handle.readline().rstrip("\n")
+        count_line = handle.readline()
+        if not count_line:
+            raise ValueError(f"Missing GRO atom count: {path}")
+        atom_count = int(count_line.strip())
+        atoms: List[GroAtom] = []
+        for _ in range(atom_count):
+            line = handle.readline().rstrip("\n")
+            if len(line) < 44:
+                raise ValueError(f"Short GRO atom line in {path}: {line!r}")
+            atoms.append(
+                GroAtom(
+                    resid=int(line[0:5]),
+                    resname=line[5:10].strip(),
+                    atom_name=line[10:15].strip(),
+                    atom_number=int(line[15:20]),
+                    coordinate=(
+                        float(line[20:28]),
+                        float(line[28:36]),
+                        float(line[36:44]),
+                    ),
+                )
+            )
+        box_line = handle.readline()
+        if not box_line:
+            raise ValueError(f"Missing GRO box: {path}")
+        box = tuple(float(value) for value in box_line.split())
+    if len(atoms) != atom_count:
+        raise ValueError(f"GRO count mismatch in {path}")
+    return GroSystem(title=title, atoms=atoms, box=box)
+
+
+def write_gro(system: GroSystem, path: Path) -> None:
+    lines = [system.title, str(len(system.atoms))]
+    for global_index, atom in enumerate(system.atoms, 1):
+        lines.append(
+            f"{atom.resid % 100000:5d}{atom.resname:>5.5s}"
+            f"{atom.atom_name:>5.5s}{global_index % 100000:5d}"
+            f"{atom.coordinate[0]:8.3f}{atom.coordinate[1]:8.3f}"
+            f"{atom.coordinate[2]:8.3f}"
+        )
+    lines.append(" ".join(f"{value:.5f}" for value in system.box))
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def extract_ligand_coordinates(
+    system: GroSystem, first_global_atom: int, atom_count: int
+) -> Dict[int, Vector]:
+    start = first_global_atom - 1
+    stop = start + atom_count
+    if start < 0 or stop > len(system.atoms):
+        raise ValueError("Ligand atom block falls outside GRO system")
+    return {
+        local_id: system.atoms[start + local_id - 1].coordinate
+        for local_id in range(1, atom_count + 1)
+    }
+
+
+def replace_ligand(
+    system: GroSystem,
+    first_global_atom: int,
+    source_atom_count: int,
+    target_topology: Topology,
+    target_coordinates: Dict[int, Vector],
+) -> GroSystem:
+    if set(target_coordinates) != set(target_topology.atoms):
+        raise ValueError("Target coordinate IDs do not match target topology")
+    start = first_global_atom - 1
+    stop = start + source_atom_count
+    if start < 0 or stop > len(system.atoms):
+        raise ValueError("Source ligand block falls outside GRO system")
+    source_block = system.atoms[start:stop]
+    if len(source_block) != source_atom_count:
+        raise ValueError("Source ligand block count mismatch")
+    ligand_resid = source_block[0].resid
+    target_block = [
+        GroAtom(
+            resid=ligand_resid,
+            resname="L2",
+            atom_name=target_topology.atoms[target_id].atom_name,
+            atom_number=0,
+            coordinate=target_coordinates[target_id],
+        )
+        for target_id in sorted(target_topology.atoms)
+    ]
+    combined = list(system.atoms[:start]) + target_block + list(system.atoms[stop:])
+    renumbered = [
+        GroAtom(
+            resid=atom.resid,
+            resname=atom.resname,
+            atom_name=atom.atom_name,
+            atom_number=index % 100000,
+            coordinate=atom.coordinate,
+        )
+        for index, atom in enumerate(combined, 1)
+    ]
+    return GroSystem(
+        title=f"{system.title} | one L4 replaced by audited PA66_L2",
+        atoms=renumbered,
+        box=system.box,
+    )
+
+
+def _minimum_image_delta(delta: float, length: float) -> float:
+    if length <= 0:
+        raise ValueError("Invalid non-positive box length")
+    return delta - round(delta / length) * length
+
+
+def minimum_ligand_environment_distance(
+    system: GroSystem, first_global_atom: int, ligand_atom_count: int
+) -> float:
+    if len(system.box) != 3:
+        raise ValueError("Minimum-distance audit currently requires an orthorhombic box")
+    start = first_global_atom - 1
+    stop = start + ligand_atom_count
+    ligand = system.atoms[start:stop]
+    environment = system.atoms[:start] + system.atoms[stop:]
+    minimum_squared = math.inf
+    for ligand_atom in ligand:
+        lx, ly, lz = ligand_atom.coordinate
+        for environment_atom in environment:
+            ex, ey, ez = environment_atom.coordinate
+            dx = _minimum_image_delta(lx - ex, system.box[0])
+            dy = _minimum_image_delta(ly - ey, system.box[1])
+            dz = _minimum_image_delta(lz - ez, system.box[2])
+            squared = dx * dx + dy * dy + dz * dz
+            if squared < minimum_squared:
+                minimum_squared = squared
+    if not math.isfinite(minimum_squared):
+        raise ValueError("No ligand-environment pairs found")
+    return math.sqrt(minimum_squared)
