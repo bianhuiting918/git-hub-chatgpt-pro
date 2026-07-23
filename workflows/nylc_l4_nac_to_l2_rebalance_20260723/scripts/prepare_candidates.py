@@ -295,6 +295,9 @@ def _mapping_payload(
 def prepare_one(
     candidate: Dict[str, Any], task_root: Path, l2_itp_path: Path
 ) -> Dict[str, Any]:
+    status = candidate.get("status", "ACTIVE")
+    if status != "ACTIVE":
+        raise ValueError(f"Refusing superseded candidate {candidate['id']}: {status}")
     candidate_root = task_root / "candidates" / candidate["id"]
     build_dir = candidate_root / "build"
     audit_dir = candidate_root / "audit"
@@ -498,6 +501,15 @@ def prepare_all(
 
     rows = []
     for candidate in selected:
+        status = candidate.get("status", "ACTIVE")
+        if status != "ACTIVE":
+            rows.append({
+                "candidate_id": candidate["id"],
+                "state": "NOT_EVALUATED_SUPERSEDED",
+                "reason": status,
+                "audit": "",
+            })
+            continue
         try:
             audit = prepare_one(candidate, task_root, l2_itp_path)
             rows.append(
