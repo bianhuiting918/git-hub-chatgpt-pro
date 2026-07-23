@@ -10,7 +10,8 @@
 #SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdouble_%j.out
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdouble_%j.err
 
-set -eo pipefail\nset -x
+set -eo pipefail
+set -x
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
 PY=/work/home/acshdt1dks/anaconda3/bin/python3.9
@@ -22,7 +23,9 @@ out="$root/runs/em_cg_flexible_double_retry3"
 start="$build/rebuilt.gro"
 job="${SLURM_JOB_ID:?}"
 mkdir -p "$out"
-set +u\nsource /work/home/acshdt1dks/opt/gmx-cp2k/env.sh\nset -u
+set +u
+source /work/home/acshdt1dks/opt/gmx-cp2k/env.sh
+set -u
 export GMX_MAXBACKUP=-1
 for f in run.tpr run.gro PASS.json FAIL.json; do test ! -e "$out/$f"; done
 
