@@ -269,3 +269,51 @@ only from frames satisfying the corrected true-Thr267 NAC definition.  If no
 NAC recurs, retain a scientific FAIL/NOT_EVALUATED reason and do not relabel the
 restrained frame as GS.
 
+
+
+### Rare free NAC L4-to-L2 build and post-EM continuation
+
+The selected L4 source is the fully unrestrained seed-26703 frame at 8 ps
+(job 61705307): Thr267 OG1--carbonyl C 0.328757 nm, attack angle 114.257
+degrees.  It is an authentic rare free NAC candidate but is explicitly
+`NOT_ENSEMBLE_STABLE`; the subsequent 1 ns L4 continuation (job 61705692)
+had zero NAC frames.  This source is therefore a working GS hypothesis, not a
+claim of a dominant equilibrium basin.
+
+Job 61707444 built the audited PA66-L2 system with exact reactive C/O/N
+coordinate preservation, 133589 total atoms, net charge zero, two endpoint cut
+edges and `grompp -maxwarn 0` PASS.  The reactive global atoms are Thr267
+OG1 8961, L2 carbonyl C 10287 and O 10288.  The gate remains residues 261-266,
+excluding Thr267.
+
+Rigid-water steepest descent job 61707615 produced a water-pair collapse and
+is rejected.  Single-precision flexible-water CG job 61708159 stopped at
+machine precision with Fmax 5844.9 and did not pass the EM gate.  Double-
+precision flexible-water CG job 61708647 physically converged in 153 steps to
+Fmax 419.978 kJ mol-1 nm-1 and potential energy -2307725.863 kJ mol-1 with no
+FATAL, NaN, LINCS or SETTLE event.  Its Slurm state was FAILED only because the
+postprocessing Python dictionary contained literal newline escapes.  The
+immutable run was independently salvaged by:
+
+```bash
+python scripts/audit_em_double_result.py \
+  --run-root "$TASK_ROOT/candidates/nylc_C18_trueT267_freeGS/runs/em_cg_flexible_double_retry3" \
+  --job-id 61708647
+```
+
+The resulting `PASS.json` is `PASS_TECHNICAL_EM`; it is not scientific NAC
+evidence.  A standard GROMACS 2022.1 NVT50 preflight from that exact GRO passed
+`grompp -maxwarn 0` with TPR SHA256
+`4d49d3519939823a15ee3602e1ae311979a661a9326ba0d4092564f6a179f204`.
+
+Continuation job 61708900 was submitted with:
+
+```bash
+sbatch slurm/run_nylc_true_thr267_freegs_rebalance_after_em_double.sbatch
+```
+
+It starts from the immutable double-precision EM GRO and does not rerun EM.
+The stages are restrained NVT 50/150/300 K, restrained NPT, weak-restraint NPT,
+then at least 1 ns fully unrestrained NPT.  Only the final unrestrained audit
+can decide whether the L2 candidate remains eligible for Step1 DFTB3/3OB-3-1
+QM/MM preflight.
