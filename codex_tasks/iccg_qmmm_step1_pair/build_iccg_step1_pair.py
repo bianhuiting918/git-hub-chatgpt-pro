@@ -29,6 +29,9 @@ DFTB_SLKO_PATH = "/work/home/acshdt1dks/petase_qmmm_pilot8_20260721/third_party/
 LITERATURE_LIGAND_RESNAME = "UNK"
 LITERATURE_LIGAND_RESID = 265
 LITERATURE_LIGAND_NET_CHARGE = 0
+QMCHARGE = -1
+EXPECTED_SYSTEM_CHARGE = 6.0
+SYSTEM_CHARGE_TOLERANCE = 1e-4
 LITERATURE_LIGAND_ORDER = ["C1","O2","C3","O4","C5","O6","C7","O8","C9","O10","C11","O12","C13","O14","C15","O16","C17","O18","C19","O20","C21","C22","C23","C24","C25","C26","C27","C28","C29","C30","C31","C32","H33","H34","H35","H36","H37","H38","H39","H40","H41","H42","H43","H44","H45","H46","H47","H48","H49","H50","H51","H52","H53","H54"]
 QM_BACKBONE_EXCLUDED = {"N","H","H1","H2","H3","CA","HA","C","O","OXT"}
 
@@ -590,7 +593,7 @@ def sander_input_text(state: str, qmmask: str) -> str:
   ifqnt=1,
  /
  &qmmm
-  qmmask='{qmmask}', qmcharge=-1, spin=1, qm_theory='DFTB3',
+  qmmask='{qmmask}', qmcharge={QMCHARGE}, spin=1, qm_theory='DFTB3',
   qmgb=2, qmcut=999, dftb_maxiter=200, scfconv=1d-8, printcharges=1, verbosity=5,
   dftb_3ob=1, dftb_slko_path='{DFTB_SLKO_PATH}',
  /
@@ -672,12 +675,15 @@ import json, math, os, sys
 sys.path.insert(0, __PARMED_EGG__)
 import parmed
 from parmed.amber import ChamberParm
-from parmed.tools.changeradii import changeRadii
+from parmed.tools.actions import changeRadii
 LITERATURE_PRMTOP = __LITERATURE_PRMTOP__
 LITERATURE_INPCRD = __LITERATURE_INPCRD__
 LIGAND_ORDER = __LIGAND_ORDER__
 QM_BACKBONE_EXCLUDED = set(__EXCLUDED__)
 EXPECTED_DISULFIDES = [(238, 283), (275, 292)]
+QMCHARGE = -1
+EXPECTED_SYSTEM_CHARGE = 6.0
+SYSTEM_CHARGE_TOLERANCE = 1e-4
 
 
 def finite_xyz(xyz):
@@ -752,7 +758,7 @@ for res in ligand.residues:
 ligand.box = None
 combined = protein.copy(parmed.Structure) + ligand
 top = ChamberParm.from_structure(combined)
-changeRadii(top, 'mbondi3')
+changeRadii(top,'mbondi3').execute()
 original_resids = []
 for rec, name, resname, resid, xyz in load_pair_pdb('stage_b_protein_only.pdb'):
     if resid not in original_resids:
@@ -795,6 +801,7 @@ his242_hid = his242.name == 'HID' and any(a.name == 'HD1' for a in his242.atoms)
 ser165_hg = any(a.name == 'HG' for a in res_by_orig[165].atoms)
 mbondi3 = all(abs(float(getattr(a, 'solvent_radius', 0.0))) > 0.0 for a in top.atoms)
 coords_finite = finite_xyz([atom_xyz(a) for a in lg1_top.atoms]) and finite_xyz([atom_xyz(a) for a in lg2_top.atoms])
+system_charge = sum(a.charge for a in top.atoms)
 checks = [
     ('residue_count_259', len(top.residues) == 259),
     ('protein_residue_count_258', len(original_resids) == 258),
@@ -816,7 +823,8 @@ checks = [
     ('finite_coordinates', coords_finite),
     ('mbondi3', mbondi3),
     ('qm_atom_count_100', len(iqmatoms) == 100),
-    ('qmcharge_minus_one', True),
+    ('qmcharge_minus_one', QMCHARGE == -1),
+    ('system_charge_plus_six', abs(system_charge - EXPECTED_SYSTEM_CHARGE) < 1e-4),
 ]
 gates = [{'name': name, 'pass': bool(ok), 'reason': 'PASS' if ok else 'NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED'} for name, ok in checks]
 status = 'PASS' if all(g['pass'] for g in gates) else 'NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED'
@@ -830,7 +838,7 @@ json.dump({
     'ligand_atoms': 54,
     'qm_atom_count': len(iqmatoms),
     'iqmatoms': iqmatoms,
-    'qmcharge': -1,
+    'qmcharge': QMCHARGE,
     'multiplicity': 1,
     'mbondi3': mbondi3,
     'ligand_order': LIGAND_ORDER,
@@ -840,7 +848,7 @@ json.dump({
     'protein_coordinate_max_delta_A': protein_coordinate_max_delta_A,
     'LG1_ligand_generated_pair_max_delta_A': LG1_ligand_generated_pair_max_delta_A,
     'LG2_ligand_generated_pair_max_delta_A': LG2_ligand_generated_pair_max_delta_A,
-    'system_charge': sum(a.charge for a in top.atoms),
+    'system_charge': system_charge,
     'rc_audit_only': True,
 }, open('stage_b_parmed_manifest.json','w'), indent=2, sort_keys=True)
 """

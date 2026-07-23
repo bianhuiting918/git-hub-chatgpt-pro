@@ -503,6 +503,49 @@ QMMM SCC-DFTB: SCC-DFTB for step 1 converged in 2 cycles.
             report = build.build_stage_b(root, runner=fake_runner, **deps)
             self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED")
 
+
+    def test_parmed_script_uses_parmed_actions_change_radii_execute(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            deps = {"parmed_egg": out / "ParmEd.egg", "literature_prmtop": out / "vmd-md-b.prmtop", "literature_inpcrd": out / "vmd-md-b.inpcrd"}
+            for path in deps.values(): path.write_text("fixture")
+            script = build._write_parmed_stage_b_script(out, deps).read_text()
+            self.assertIn("from parmed.tools.actions import changeRadii", script)
+            self.assertIn("changeRadii(top,'mbondi3').execute()", script)
+            self.assertNotIn("from parmed.tools.changeradii import changeRadii", script)
+
+    def test_stage_b_qmcharge_and_system_charge_are_dynamic_manifest_gates(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            deps = {"parmed_egg": out / "ParmEd.egg", "literature_prmtop": out / "vmd-md-b.prmtop", "literature_inpcrd": out / "vmd-md-b.inpcrd"}
+            for path in deps.values(): path.write_text("fixture")
+            script = build._write_parmed_stage_b_script(out, deps).read_text()
+            self.assertIn("QMCHARGE = -1", script)
+            self.assertIn("EXPECTED_SYSTEM_CHARGE = 6.0", script)
+            self.assertIn("abs(system_charge - EXPECTED_SYSTEM_CHARGE) < 1e-4", script)
+            self.assertIn("('qmcharge_minus_one', QMCHARGE == -1)", script)
+            self.assertNotIn("('qmcharge_minus_one', True)", script)
+
+    def test_stage_b_rejects_manifest_with_bad_qmcharge_or_system_charge(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            deps = {}
+            for key, name in {"ambertools_prefix":"ambertools", "parmed_egg":"ParmEd.egg", "literature_prmtop":"vmd-md-b.prmtop", "literature_inpcrd":"vmd-md-b.inpcrd", "dftb_slko_path":"3ob-3-1"}.items():
+                path = root / name
+                if key.endswith("path") or key == "ambertools_prefix": path.mkdir()
+                else: path.write_text("fixture")
+                deps[key] = path
+            (deps["ambertools_prefix"] / "bin").mkdir(); (deps["ambertools_prefix"] / "bin" / "tleap").write_text("tleap")
+            def fake_runner(cmd, cwd):
+                if "tleap" in " ".join(map(str, cmd)):
+                    (cwd / "protein.prmtop").write_text("protein"); (cwd / "protein.rst7").write_text("coords")
+                if "parmed_stage_b" in " ".join(map(str, cmd)):
+                    for name in ["pair.prmtop","LG1.inpcrd","LG2.inpcrd"]: (cwd / name).write_text(name)
+                    (cwd / "stage_b_parmed_manifest.json").write_text(json.dumps({"status":"PASS", "iqmatoms":[1,2,3], "qmcharge":0, "system_charge":5.5, "gates":[{"name":"qmcharge_minus_one", "pass":False}, {"name":"system_charge_plus_six", "pass":False}], "qm_atom_count":100}))
+                return build.CommandResult(0, "ok", "")
+            report = build.build_stage_b(root, runner=fake_runner, **deps)
+            self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED")
+
     def test_sbatch_uses_single_rank_for_fixed_geometry_single_point(self):
         text = Path("run_iccg_step1_pair.sbatch").read_text()
         self.assertIn("#SBATCH --ntasks=1", text)
