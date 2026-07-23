@@ -12,7 +12,7 @@
       "SETTLE": 0,
       "NaN": 0
     },
-    "scientific_status": "RESTRAINED_DIAGNOSTIC_ONLY"
+    "scientific_status": "INVALID_WRONG_NUCLEOPHILE_IDENTITY"
   },
   "candidates": [
     {
@@ -40,7 +40,8 @@
         "angle_deg": 110.327,
         "potential_energy_kj_mol": -2257448.25,
         "gro_sha256": "c67cbb1d275863606be62628df6829e8ef15fbad39f3b5a51188c311f95ce235"
-      }
+      },
+      "scientific_evidence_status": "INVALID_WRONG_NUCLEOPHILE_IDENTITY"
     },
     {
       "id": "nylc_c23_29684ps",
@@ -55,7 +56,8 @@
         "nac_occupancy": 0,
         "longest_continuous_nac_ps": 0
       },
-      "disposition": "RETAIN_AUDIT_DO_NOT_EXTEND_CURRENT_ROUTE"
+      "disposition": "RETAIN_AUDIT_DO_NOT_EXTEND_CURRENT_ROUTE",
+      "scientific_evidence_status": "INVALID_WRONG_NUCLEOPHILE_IDENTITY"
     }
   ],
   "continuation_job": {
@@ -121,18 +123,63 @@
         }
       }
     },
-    "scientific_status": "NOT_EVALUATED_LOW_OCCUPANCY_PENDING_1NS_EXTENSION"
+    "scientific_status": "INVALID_WRONG_NUCLEOPHILE_IDENTITY"
   },
-  "scientific_gate": "No final PASS until complete >=1 ns fully unrestrained NPT NAC, thermodynamic and numerical audit",
+  "scientific_gate": "No L2 GS or QM/MM promotion until corrected atom-identity-checked Thr267 residence audit finds a true fully unrestrained NAC.",
   "free_1ns_extension": {
     "slurm_job_id": "61688773",
-    "status": "RUNNING",
-    "requested_unrestrained_ps": 1000,
-    "parent_job_id": "61687591",
-    "input_gro_sha256": "bab252dff6f2ce377e023c2cf1d2441da32fb0f2e6795622b782109cc0e26305",
-    "input_cpt_sha256": "0faa7e20ea5a4f571801c5bb4790777009556f18525df2cfdebf808f37363f57",
-    "strict_grompp_preflight": "PASS_MAXWARN_0",
-    "preflight_tpr_sha256": "80cf8448b53cca6a7e09481205660ef6b9639a1f150fa72d4ec6fdbf6bd6ab8d",
-    "scientific_status": "NOT_EVALUATED_PENDING_TRAJECTORY_AUDIT"
+    "terminal_status": "CANCELLED_SUPERSEDED",
+    "elapsed": "00:09:53",
+    "reason": "atom 8896 is Thr262 OG1, not catalytic Thr267 OG1",
+    "scientific_status": "INVALID_WRONG_NUCLEOPHILE_IDENTITY"
+  },
+  "status": "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY",
+  "identity_correction": {
+    "discovered_at": "2026-07-24 Asia/Shanghai",
+    "wrong_atom": {
+      "global_atom_id": 8896,
+      "residue_number": 262,
+      "residue_name": "THR",
+      "atom_name": "OG1",
+      "role": "gate residue Thr262; not catalytic"
+    },
+    "true_target_site_atom": {
+      "global_atom_id": 8961,
+      "residue_number": 267,
+      "residue_name": "THR",
+      "atom_name": "OG1",
+      "role": "catalytic Thr267 in the gate-associated chain"
+    },
+    "other_thr267_copy": {
+      "global_atom_id": 3825,
+      "residue_number": 267,
+      "residue_name": "THR",
+      "atom_name": "OG1"
+    },
+    "representative_spotchecks": {
+      "C18": {
+        "source_time_ps": 11854,
+        "true_thr267_distance_nm": 1.661,
+        "true_thr267_angle_deg": 124.548
+      },
+      "C23": {
+        "source_time_ps": 29684,
+        "true_thr267_distance_nm": 1.426,
+        "true_thr267_angle_deg": 103.363
+      }
+    },
+    "consequence": "All prior pilot, continuation and free-window NAC occupancies in this audit used atom 8896 and are invalid as catalytic NAC evidence."
+  },
+  "corrected_true_thr267_residence": {
+    "true_thr267_og1_global_atom_id": 8961,
+    "branches": [
+      "C18",
+      "C23"
+    ],
+    "first_attempt_job_id": "61690618",
+    "first_attempt_status": "TECHNICAL_FAIL_SHARED_GMX_ANGDIST_OUTPUT",
+    "retry_job_id": "61691264",
+    "retry_status": "RUNNING",
+    "scientific_status": "NOT_EVALUATED_PENDING_CORRECTED_FULL_TRAJECTORY_AUDIT"
   }
 }
