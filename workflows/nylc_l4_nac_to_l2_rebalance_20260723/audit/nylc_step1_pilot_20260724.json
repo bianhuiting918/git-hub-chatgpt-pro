@@ -225,8 +225,49 @@
     },
     "retry_submission": {
       "job_id": "61695303",
-      "status": "RUNNING"
+      "terminal_status": "FAILED_GATE_EXIT_2",
+      "mdrun_status": "COMPLETED_NUMERICALLY_STABLE",
+      "results": {
+        "C18": {
+          "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+          "start_distance_nm": 1.450519,
+          "end_distance_nm": 1.593972,
+          "end_angle_deg": 91.569,
+          "numerical_events": {
+            "FATAL": 0,
+            "LINCS": 0,
+            "SETTLE": 0,
+            "NaN": 0
+          }
+        },
+        "C23": {
+          "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+          "start_distance_nm": 1.309946,
+          "end_distance_nm": 1.419934,
+          "end_angle_deg": 89.179,
+          "numerical_events": {
+            "FATAL": 0,
+            "LINCS": 0,
+            "SETTLE": 0,
+            "NaN": 0
+          }
+        }
+      },
+      "scientific_status": "NOT_EVALUATED_RESTRAINED_AND_NO_APPROACH_RESPONSE"
     },
-    "scientific_gate": "NOT_EVALUATED_RESTRAINED_APPROACH_PILOT; require released L4 true NAC before L2 truncation"
+    "scientific_gate": "NOT_EVALUATED_RESTRAINED_APPROACH_PILOT; require released L4 true NAC before L2 truncation",
+    "response2": {
+      "job_id": "61695989",
+      "status": "RUNNING",
+      "protocol": {
+        "source": "original verified frames",
+        "duration_ps": 100,
+        "distance_reference_change_nm": -0.2,
+        "distance_k_kj_mol_nm2": 500,
+        "angle_k": 50,
+        "gate_restrained": false
+      },
+      "scientific_gate": "NOT_EVALUATED_RESTRAINED_RESPONSE_PROBE"
+    }
   }
 }
