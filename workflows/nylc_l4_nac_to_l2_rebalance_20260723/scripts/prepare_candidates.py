@@ -472,7 +472,12 @@ def prepare_one(
     return audit
 
 
-def prepare_all(manifest_path: Path, task_root: Path) -> Dict[str, Any]:
+def prepare_all(
+    manifest_path: Path,
+    task_root: Path,
+    candidate_ids: Iterable[str] | None = None,
+    summary_name: str = "prepare_summary.tsv",
+) -> Dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("formal_candidate_count") != 5 or len(manifest.get("candidates", [])) != 5:
         raise ValueError("Formal candidate universe must contain exactly five candidates")
@@ -481,8 +486,18 @@ def prepare_all(manifest_path: Path, task_root: Path) -> Dict[str, Any]:
     if sha256(l2_itp_path) != l2["sha256"]:
         raise ValueError("Audited L2 ITP SHA256 mismatch")
 
+    requested = set(candidate_ids or [])
+    known = {candidate["id"] for candidate in manifest["candidates"]}
+    unknown = requested - known
+    if unknown:
+        raise ValueError(f"Unknown candidate IDs: {sorted(unknown)}")
+    selected = [
+        candidate for candidate in manifest["candidates"]
+        if not requested or candidate["id"] in requested
+    ]
+
     rows = []
-    for candidate in manifest["candidates"]:
+    for candidate in selected:
         try:
             audit = prepare_one(candidate, task_root, l2_itp_path)
             rows.append(
@@ -515,7 +530,9 @@ def prepare_all(manifest_path: Path, task_root: Path) -> Dict[str, Any]:
                 }
             )
 
-    summary_path = task_root / "audit" / "prepare_summary.tsv"
+    if Path(summary_name).name != summary_name:
+        raise ValueError("summary_name must be a plain filename")
+    summary_path = task_root / "audit" / summary_name
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     lines = ["candidate_id\tstate\treason\taudit"]
     lines.extend(
@@ -528,6 +545,7 @@ def prepare_all(manifest_path: Path, task_root: Path) -> Dict[str, Any]:
     summary_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return {
         "formal_candidate_count": 5,
+        "selected_candidate_count": len(selected),
         "build_pass_count": sum(row["state"] == "BUILD_PASS" for row in rows),
         "rows": rows,
         "summary": str(summary_path),
@@ -538,8 +556,18 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--task-root", type=Path, required=True)
+    parser.add_argument("--candidate-id", action="append", default=[])
+    parser.add_argument("--summary-name", default="prepare_summary.tsv")
     args = parser.parse_args()
-    print(json.dumps(prepare_all(args.manifest, args.task_root), indent=2))
+    print(json.dumps(
+        prepare_all(
+            args.manifest,
+            args.task_root,
+            candidate_ids=args.candidate_id,
+            summary_name=args.summary_name,
+        ),
+        indent=2,
+    ))
 
 
 if __name__ == "__main__":
