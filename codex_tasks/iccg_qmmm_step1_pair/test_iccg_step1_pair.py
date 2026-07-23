@@ -151,6 +151,17 @@ class PairGateTests(unittest.TestCase):
         after = ((after_lig[0].xyz[0]-after_lig[1].xyz[0])**2 + (after_lig[0].xyz[1]-after_lig[1].xyz[1])**2 + (after_lig[0].xyz[2]-after_lig[1].xyz[2])**2) ** 0.5
         self.assertAlmostEqual(before, after, places=6)
 
+    def test_common_translation_relief_prefers_minimum_pass_norm_over_lower_overlap(self):
+        protein = [build.Atom(1, "ALA", 1, "CB", (0.0, 0.0, 0.0), "C", "ATOM")]
+        lig1 = [build.Atom(2, "LG1", 900, "C1", (-2.361, 0.0, 0.0), "C", "HETATM")]
+        lig2 = [build.Atom(3, "LG2", 900, "C1", (-2.361, 0.0, 0.0), "C", "HETATM")]
+        best = build.common_translation_relief(protein + lig1, protein + lig2)
+        self.assertEqual(best["search_scope"], "6A_pocket_then_full_validation")
+        self.assertEqual([round(v, 6) for v in best["vector_A"]], [-0.24, 0.0, 0.0])
+        self.assertAlmostEqual(best["norm_A"], 0.24, places=6)
+        self.assertTrue(best["full_validation"]["both_pass"])
+        self.assertLessEqual(best["objective_max_overlap_A"], 0.80)
+
     def test_rigid_transfer_preserves_literature_ligand_internal_distances(self):
         iccg = build.parse_pdb_atoms(ICCG_HEAVY)
         ref = build.parse_pdb_atoms(LG1_REF)

@@ -391,7 +391,7 @@ def translate_ligand_in_pair(pair_atoms: Sequence[Atom], vector: Sequence[float]
 
 
 def relief_candidates() -> list[tuple[float, float, float]]:
-    candidates = [(0.0, 0.0, 0.0), (-0.299578, -0.007654, -0.351502)]
+    candidates = [(0.0, 0.0, 0.0), (-0.240000, 0.0, 0.0), (-0.299578, -0.007654, -0.351502)]
     vals = [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
     for x in vals:
         for y in vals:
@@ -406,19 +406,43 @@ def relief_candidates() -> list[tuple[float, float, float]]:
     return unique
 
 
+def pocket_search_pair(pair_atoms: Sequence[Atom], cutoff_A: float = 6.0) -> list[Atom]:
+    lig_heavy = [a for a in ligand_atoms(pair_atoms) if a.element.upper() != "H"]
+    pocket = []
+    for atom in protein_atoms(pair_atoms):
+        if atom.element.upper() == "H":
+            continue
+        if any(math.dist(atom.xyz, lig.xyz) <= cutoff_A for lig in lig_heavy):
+            pocket.append(atom)
+    return pocket + list(ligand_atoms(pair_atoms))
+
+
 def common_translation_relief(lg1_pair: Sequence[Atom], lg2_pair: Sequence[Atom]) -> dict[str, object]:
     from audit_iccg_step1_pair import geometry_gate
+    lg1_scope = pocket_search_pair(lg1_pair, 6.0)
+    lg2_scope = pocket_search_pair(lg2_pair, 6.0)
     best = None
+    best_key = None
     for vec in relief_candidates():
-        shifted1 = translate_ligand_in_pair(lg1_pair, vec)
-        shifted2 = translate_ligand_in_pair(lg2_pair, vec)
+        shifted1 = translate_ligand_in_pair(lg1_scope, vec)
+        shifted2 = translate_ligand_in_pair(lg2_scope, vec)
         g1 = geometry_gate(shifted1); g2 = geometry_gate(shifted2)
         objective = max(float(g1["max_vdw_overlap_A"]), float(g2["max_vdw_overlap_A"]))
         norm = math.sqrt(sum(v*v for v in vec))
-        record = {"vector_A": list(vec), "norm_A": norm, "objective_max_overlap_A": objective, "LG1": g1, "LG2": g2}
-        if best is None or (objective, norm, vec) < (best["objective_max_overlap_A"], best["norm_A"], tuple(best["vector_A"])):
-            best = record
+        both_pass = g1.get("pass") is True and g2.get("pass") is True
+        # Prefer any two-state PASS, then the smallest displacement norm, then
+        # smaller max overlap. If no candidate passes, keep the least-bad clash.
+        key = (0, round(norm, 9), round(objective, 9), vec) if both_pass else (1, round(objective, 9), round(norm, 9), vec)
+        record = {"search_scope": "6A_pocket_then_full_validation", "vector_A": list(vec), "norm_A": norm, "objective_max_overlap_A": objective, "LG1": g1, "LG2": g2, "search_both_pass": both_pass}
+        if best is None or key < best_key:
+            best = record; best_key = key
     assert best is not None
+    full1 = geometry_gate(translate_ligand_in_pair(lg1_pair, best["vector_A"]))
+    full2 = geometry_gate(translate_ligand_in_pair(lg2_pair, best["vector_A"]))
+    best["full_validation"] = {"LG1": full1, "LG2": full2, "both_pass": full1.get("pass") is True and full2.get("pass") is True}
+    best["LG1"] = full1
+    best["LG2"] = full2
+    best["objective_max_overlap_A"] = max(float(full1["max_vdw_overlap_A"]), float(full2["max_vdw_overlap_A"]))
     return best
 
 def protein_coordinate_signature(atoms: Sequence[Atom]) -> list[tuple[str,int,str,tuple[float,float,float]]]:
@@ -455,7 +479,7 @@ def build_stage_a(iccg_path: Path, lg1_path: Path, lg2_path: Path, out: Path) ->
     relief = {"enabled": False, "reason": "INITIAL_GEOMETRY_PASS", "vector_A": [0.0, 0.0, 0.0], "norm_A": 0.0, "pre": pre_geometry}
     if not (pre_geometry["LG1"].get("pass") and pre_geometry["LG2"].get("pass")):
         best = common_translation_relief(lg1_pair, lg2_pair)
-        relief = {"enabled": True, "reason": "INITIAL_GEOMETRY_FAILED_MINIMAX_COMMON_TRANSLATION", "vector_A": best["vector_A"], "norm_A": best["norm_A"], "pre": pre_geometry, "post": {"LG1": best["LG1"], "LG2": best["LG2"]}, "objective_max_overlap_A": best["objective_max_overlap_A"]}
+        relief = {"enabled": True, "reason": "INITIAL_GEOMETRY_FAILED_MINIMAX_COMMON_TRANSLATION", "search_scope": best["search_scope"], "vector_A": best["vector_A"], "norm_A": best["norm_A"], "pre": pre_geometry, "post": {"LG1": best["LG1"], "LG2": best["LG2"]}, "objective_max_overlap_A": best["objective_max_overlap_A"], "full_validation": best["full_validation"]}
         lg1_pair = translate_ligand_in_pair(lg1_pair, best["vector_A"])
         lg2_pair = translate_ligand_in_pair(lg2_pair, best["vector_A"])
     post_geometry = {"LG1": geometry_gate(lg1_pair), "LG2": geometry_gate(lg2_pair)}
