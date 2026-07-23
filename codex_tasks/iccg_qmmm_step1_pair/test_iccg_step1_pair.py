@@ -265,8 +265,8 @@ class StageBTests(unittest.TestCase):
             report = build.build_stage_b(out, runner=fake_runner, **deps)
             self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_NOT_BUILT")
             self.assertFalse(report["gates"][-1]["pass"])
-            text = build.sander_input_text("LG1", "@1,2,3")
-            for needle in ["imin=1", "maxcyc=0", "igb=8", "ifqnt=1", "qmgb=2", "dftb_maxiter=200", "scfconv=1d-8", build.DFTB_SLKO_PATH]:
+            text = build.sander_input_text("LG1", [1,2,3])
+            for needle in ["imin=1", "maxcyc=0", "igb=8", "ifqnt=1", "qmgb=2", "dftb_maxiter=200", "scfconv=1.0d-8", build.DFTB_SLKO_PATH]:
                 self.assertIn(needle, text)
 
     def test_stage_b_invokes_tleap_and_parmed_runner_to_build_outputs(self):
@@ -405,6 +405,23 @@ QMMM SCC-DFTB: SCC-DFTB for step 1 converged in 2 cycles.
                 self.assertIn(needle, text)
             self.assertNotIn("Production intent", text)
 
+
+    def test_sander_input_uses_amber18_iqmatoms_not_qmmask_or_dftb_3ob(self):
+        text = build.sander_input_text("LG1", [1870, 1871, 3902])
+        self.assertIn("iqmatoms=1870,1871,3902", text)
+        self.assertIn("qmcharge=-1", text)
+        self.assertIn("qm_theory='DFTB3'", text)
+        self.assertIn("qmcut=999.0", text)
+        self.assertIn("qmgb=2", text)
+        self.assertIn("dftb_slko_path='" + build.DFTB_SLKO_PATH.rstrip("/") + "/'", text)
+        self.assertIn("dftb_maxiter=200", text)
+        self.assertIn("scfconv=1.0d-8", text)
+        self.assertIn("printcharges=1", text)
+        self.assertIn("verbosity=5", text)
+        self.assertNotIn("qmmask", text)
+        self.assertNotIn("dftb_3ob", text)
+        self.assertNotIn("spin=", text)
+
     def test_stage_b_requires_auditable_manifest_and_writes_real_qm_mask(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -427,7 +444,8 @@ QMMM SCC-DFTB: SCC-DFTB for step 1 converged in 2 cycles.
             report = build.build_stage_b(root, runner=fake_runner, **deps)
             self.assertEqual(report["status"], "PASS")
             self.assertNotIn("STAGE_B_QM_MASK_PLACEHOLDER", (root / "LG1.in").read_text())
-            self.assertIn("qmmask='@1,2,3'", (root / "LG1.in").read_text())
+            self.assertNotIn("qmmask", (root / "LG1.in").read_text())
+            self.assertIn("iqmatoms=1,2,3", (root / "LG1.in").read_text())
             self.assertEqual(report["topology_manifest"]["qm_atom_count"], 100)
             # Now prove touch-only outputs without manifest do not pass.
             root2 = root / "no_manifest"; root2.mkdir()

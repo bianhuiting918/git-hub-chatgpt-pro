@@ -586,16 +586,20 @@ def audit_no_ser_ligand_bond(atoms: Sequence[Atom], bonds: Sequence[tuple[int, i
     return {"name": "no_ser_ligand_bond", "pass": not bad, "reason": "PASS" if not bad else "NOT_SUBMITTED_SER_LIGAND_BOND_PRESENT", "bad_bonds": bad}
 
 
-def sander_input_text(state: str, qmmask: str) -> str:
+def sander_input_text(state: str, iqmatoms: Sequence[int]) -> str:
+    atoms = [int(i) for i in iqmatoms]
+    iqmatoms_text = ",".join(str(i) for i in atoms)
+    slko_path = DFTB_SLKO_PATH.rstrip("/") + "/"
     return f"""ICCG Step1 {state} DFTB3/GBN2 single point
  &cntrl
   imin=1, maxcyc=0, ntb=0, igb=8, gbsa=1, saltcon=0.10, cut=999,
   ifqnt=1,
  /
  &qmmm
-  qmmask='{qmmask}', qmcharge={QMCHARGE}, spin=1, qm_theory='DFTB3',
-  qmgb=2, qmcut=999, dftb_maxiter=200, scfconv=1d-8, printcharges=1, verbosity=5,
-  dftb_3ob=1, dftb_slko_path='{DFTB_SLKO_PATH}',
+  iqmatoms={iqmatoms_text},
+  qmcharge={QMCHARGE}, qm_theory='DFTB3',
+  qmgb=2, qmcut=999.0, dftb_maxiter=200, scfconv=1.0d-8, printcharges=1, verbosity=5,
+  dftb_slko_path='{slko_path}',
  /
 """
 
@@ -881,7 +885,7 @@ def build_stage_b(out: Path, runner=default_runner, ambertools_prefix=None, parm
     deps = _dependency_paths(ambertools_prefix, parmed_egg, literature_prmtop, literature_inpcrd, dftb_slko_path)
     missing_deps = [name for name, path in deps.items() if not path.exists()]
     for state in ("LG1", "LG2"):
-        (out / f"{state}.in").write_text(sander_input_text(state, "@STAGE_B_QM_MASK_PLACEHOLDER"))
+        (out / f"{state}.in").write_text(sander_input_text(state, []))
     if missing_deps:
         return _write_stage_b_report(out, "NOT_SUBMITTED_DEPENDENCY_MISSING", [{"name": "stage_b_dependencies", "pass": False, "reason": "NOT_SUBMITTED_DEPENDENCY_MISSING", "missing": missing_deps}], deps)
     protein_only = out / "stage_b_protein_only.pdb"
@@ -902,9 +906,9 @@ def build_stage_b(out: Path, runner=default_runner, ambertools_prefix=None, parm
     if not manifest_path.exists():
         return _write_stage_b_report(out, "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED", [{"name": "stage_b_parmed_manifest", "pass": False, "reason": "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED"}], deps)
     manifest = json.loads(manifest_path.read_text())
-    qmmask = "@" + ",".join(str(i) for i in manifest.get("iqmatoms", []))
+    iqmatoms = [int(i) for i in manifest.get("iqmatoms", [])]
     for state in ("LG1", "LG2"):
-        (out / f"{state}.in").write_text(sander_input_text(state, qmmask))
+        (out / f"{state}.in").write_text(sander_input_text(state, iqmatoms))
     missing = [str(path) for path in stage_b_required_outputs(out) if not path.exists()]
     manifest_gates = manifest.get("gates")
     gates_ok = isinstance(manifest_gates, list) and bool(manifest_gates) and all(g.get("pass") is True for g in manifest_gates)
