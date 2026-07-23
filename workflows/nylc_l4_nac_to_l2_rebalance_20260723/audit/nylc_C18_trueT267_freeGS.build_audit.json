@@ -1,0 +1,140 @@
+{
+  "atom_count_expected": 133589,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "checks": {
+    "l2_atom_count_79": true,
+    "l2_charge_neutral": true,
+    "l2_heavy_atom_count_33": true,
+    "minimum_ligand_environment_distance_gt_0p05_nm": true,
+    "reaction_angle_matches_selected_frame": true,
+    "reaction_distance_matches_selected_frame": true,
+    "reaction_geometry_finite": true,
+    "reactive_coordinates_preserved_to_gro_precision": true,
+    "system_charge_change_neutralized": true,
+    "two_cut_edges": true,
+    "whole_system_atom_count": true
+  },
+  "ion_neutralization": {
+    "ligand_charge_change_e": -1.0000000000000024,
+    "net_charge_change_relative_to_source": -2.4424906541753444e-15,
+    "removed_ion": {
+      "atom_name": "CL",
+      "coordinate_nm": [
+        1.343,
+        10.619,
+        6.733
+      ],
+      "global_atom_before_removal": 133578,
+      "minimum_distance_to_solute_nm": 4.173770716079168,
+      "resname": "CL",
+      "topology_count_after": 124,
+      "topology_count_before": 125
+    }
+  },
+  "mapping_file": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/audit/atom_mapping.json",
+  "max_reactive_coordinate_delta_nm": 0.0,
+  "minimum_ligand_environment_distance_nm": 0.16053660018824417,
+  "reaction_geometry": {
+    "angle_thr_og1_carbonyl_c_carbonyl_o_deg": 114.25708144699598,
+    "distance_thr_og1_to_carbonyl_c_nm": 0.32875674898015433
+  },
+  "reaction_geometry_delta": {
+    "angle_abs_error_deg": 8.144699597778526e-05,
+    "distance_abs_error_nm": 2.5101984568731694e-07
+  },
+  "reactive_coordinate_preservation": {
+    "amide_n": {
+      "l2_local_atom": 17,
+      "max_abs_delta_nm": 0.0,
+      "rebuilt_coordinate_nm": [
+        7.533,
+        6.386,
+        7.103
+      ],
+      "source_coordinate_nm": [
+        7.533,
+        6.386,
+        7.103
+      ],
+      "source_local_atom": 24
+    },
+    "carbonyl_c": {
+      "l2_local_atom": 15,
+      "max_abs_delta_nm": 0.0,
+      "rebuilt_coordinate_nm": [
+        7.543,
+        6.293,
+        7.004
+      ],
+      "source_coordinate_nm": [
+        7.543,
+        6.293,
+        7.004
+      ],
+      "source_local_atom": 25
+    },
+    "carbonyl_o": {
+      "l2_local_atom": 16,
+      "max_abs_delta_nm": 0.0,
+      "rebuilt_coordinate_nm": [
+        7.643,
+        6.297,
+        6.931
+      ],
+      "source_coordinate_nm": [
+        7.643,
+        6.297,
+        6.931
+      ],
+      "source_local_atom": 26
+    }
+  },
+  "reactive_global_atoms": {
+    "amide_n": 10289,
+    "carbonyl_c": 10287,
+    "carbonyl_o": 10288,
+    "thr_og1": 8961
+  },
+  "schema_version": 1,
+  "source": {
+    "atom_count": 133671,
+    "gro": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/inputs/nylc_C18_trueT267_freeGS/source.gro",
+    "gro_sha256": "0f0c4932e591084feba457819daf1c0bf5cd6ec249778f0673005917b82c4c22",
+    "itp": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C18/l4_nfree_GMX.itp",
+    "itp_sha256": "947daa922143b7678cad7f7d4a7214bd5b8759f8f975219650e30e80e2a0f08f",
+    "molecule_atom_count": 160,
+    "molecule_charge_e": 1.0000000000000033,
+    "topology": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C18/topol.top",
+    "topology_sha256": "b89d7bf87886245aa0962795f77aa6a80716847f1b07abfe0fca21386cfbf75c"
+  },
+  "source_reported_geometry": {
+    "angle_deg": 114.257,
+    "distance_nm": 0.328757
+  },
+  "source_selection_manifest": {
+    "one_ns_followup": {
+      "frame_count": 501,
+      "job_id": 61705692,
+      "nac_frame_count": 0,
+      "occupancy": 0.0,
+      "scientific_status": "FAIL_UNRESTRAINED_PILOT_NO_NAC"
+    },
+    "path": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/source_manifest.json",
+    "scientific_caveat": "NOT_ENSEMBLE_STABLE",
+    "sha256": "796aac87045fc1924d5fe27c4bb6c3914f406b99a95d6aac1723883354cfb153",
+    "status": "VERIFIED_RARE_UNRESTRAINED_NAC_GS_CANDIDATE"
+  },
+  "state": "BUILD_PASS",
+  "target": {
+    "atom_count": 133589,
+    "charge_e": 7.91033905045424e-16,
+    "gro": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/build/rebuilt.gro",
+    "gro_sha256": "f022d247397222bd691c0a6542b93eaf99911400ba7c7cdaec8f9a95c3b0b72d",
+    "itp": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/build/PA66_L2_GMX.itp",
+    "itp_sha256": "b0e753c60fd4b71c282d21cc6106a15e73d91d12a20d80e92dd01516162eb301",
+    "molecule_atom_count": 79,
+    "molecule_type": "PA66_L2",
+    "topology": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/build/topol.top",
+    "topology_sha256": "af98733e218a8f83d0a5c46120d9d230a16c222f76d230654d44b542288cc205"
+  }
+}
