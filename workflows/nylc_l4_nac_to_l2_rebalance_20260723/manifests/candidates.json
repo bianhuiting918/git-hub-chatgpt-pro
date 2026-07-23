@@ -46,7 +46,13 @@
       "gate_index_group": "Gate",
       "thr_index_group": "Thr_OG1",
       "gate_definition": "NylC residues 261-266; Thr267 excluded",
-      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)"
+      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)",
+      "status": "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY",
+      "identity_correction": {
+        "wrong_thr262_og1": 8896,
+        "true_thr267_og1": 8961,
+        "reason": "global atom 8896 parses as residue 262 THR OG1; catalytic residue 267 THR OG1 is atom 8961 in the targeted chain"
+      }
     },
     {
       "id": "nylc_c23_29684ps",
@@ -84,7 +90,13 @@
       "gate_index_group": "Gate",
       "thr_index_group": "Thr_OG1",
       "gate_definition": "NylC residues 261-266; Thr267 excluded",
-      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)"
+      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)",
+      "status": "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY",
+      "identity_correction": {
+        "wrong_thr262_og1": 8896,
+        "true_thr267_og1": 8961,
+        "reason": "global atom 8896 parses as residue 262 THR OG1; catalytic residue 267 THR OG1 is atom 8961 in the targeted chain"
+      }
     },
     {
       "id": "nyl50_c18_70792ps",
