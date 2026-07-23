@@ -75,6 +75,7 @@ def main():
     parser.add_argument("--stage-dir", default="recapture_pilot")
     parser.add_argument("--stem", default="pilot")
     parser.add_argument("--min-response", type=float, default=0.15)
+    parser.add_argument("--max-end-distance", type=float)
     parser.add_argument("--reference-gro")
     args = parser.parse_args()
     root = TASK_ROOT / "candidates" / args.candidate
@@ -108,6 +109,7 @@ def main():
         and end_distance >= 0.30
         and 75.0 <= end_angle <= 135.0
         and contact["distance_nm"] >= 0.10
+        and (args.max_end_distance is None or end_distance <= args.max_end_distance)
     )
     if not numerical_pass:
         status = "FAIL_NUMERICAL"
@@ -122,6 +124,7 @@ def main():
         "scientific_gate": "NOT_EVALUATED_RESTRAINED_PILOT_CANNOT_ESTABLISH_NAC",
         "finished_mdrun": finished,
         "minimum_required_response_nm": args.min_response,
+        "maximum_allowed_end_distance_nm": args.max_end_distance,
         "reference_gro": args.reference_gro,
         "numerical_issue_counts": counts,
         "minimum_ligand_protein_contact": contact,
