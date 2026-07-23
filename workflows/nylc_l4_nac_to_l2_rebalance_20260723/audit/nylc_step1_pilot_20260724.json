@@ -60,15 +60,79 @@
   ],
   "continuation_job": {
     "slurm_job_id": "61687591",
-    "initial_status": "RUNNING",
-    "stages": [
-      "nvt100_nac",
-      "nvt150_nac",
-      "nvt300_nac_release",
-      "npt300_nac_free_pilot"
-    ],
-    "final_pilot_unrestrained_ps": 100,
-    "required_final_unrestrained_ps": 1000
+    "terminal_status": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:12:10",
+    "numerical_events": {
+      "FATAL": 0,
+      "LINCS": 0,
+      "SETTLE": 0,
+      "NaN": 0
+    },
+    "stages": {
+      "nvt100_nac": {
+        "duration_ps": 20,
+        "nac_occupancy": 0.3532338308,
+        "longest_continuous_nac_ps": 0.4
+      },
+      "nvt150_nac": {
+        "duration_ps": 20,
+        "nac_occupancy": 0.2139303483,
+        "longest_continuous_nac_ps": 0.4
+      },
+      "nvt300_nac_release": {
+        "duration_ps": 50,
+        "nac_occupancy": 0.0578842315,
+        "longest_continuous_nac_ps": 0.1
+      },
+      "npt300_nac_free_pilot": {
+        "duration_ps": 100,
+        "unrestrained": true,
+        "frame_count": 501,
+        "nac_frame_count": 1,
+        "nac_occupancy": 0.001996007984031936,
+        "longest_continuous_nac_ps": 0,
+        "nac_frame": {
+          "time_ps": 3.6,
+          "distance_nm": 0.348,
+          "angle_deg": 97.426,
+          "potential_energy_kj_mol": -1832281.375,
+          "gate_opening_nm": 2.6314742208479927,
+          "gro_sha256": "f539fbedd402d8c8656b4f6576bff4aed46bff270c706d57f6944439c9c09dd3"
+        },
+        "gate_opening_nm": {
+          "mean": 2.5758282184426347,
+          "min": 2.484681714586398,
+          "max": 2.6595306881850482
+        },
+        "thermo": {
+          "temperature_K": {
+            "mean": 300.01,
+            "rmsd": 0.933
+          },
+          "pressure_bar": {
+            "mean": 4.197,
+            "rmsd": 83.98
+          },
+          "volume_nm3": {
+            "mean": 1340.4,
+            "rmsd": 3.523
+          }
+        }
+      }
+    },
+    "scientific_status": "NOT_EVALUATED_LOW_OCCUPANCY_PENDING_1NS_EXTENSION"
   },
-  "scientific_gate": "No final PASS until complete >=1 ns fully unrestrained NPT NAC, thermodynamic and numerical audit"
+  "scientific_gate": "No final PASS until complete >=1 ns fully unrestrained NPT NAC, thermodynamic and numerical audit",
+  "free_1ns_extension": {
+    "slurm_job_id": "61688773",
+    "status": "RUNNING",
+    "requested_unrestrained_ps": 1000,
+    "parent_job_id": "61687591",
+    "input_gro_sha256": "bab252dff6f2ce377e023c2cf1d2441da32fb0f2e6795622b782109cc0e26305",
+    "input_cpt_sha256": "0faa7e20ea5a4f571801c5bb4790777009556f18525df2cfdebf808f37363f57",
+    "strict_grompp_preflight": "PASS_MAXWARN_0",
+    "preflight_tpr_sha256": "80cf8448b53cca6a7e09481205660ef6b9639a1f150fa72d4ec6fdbf6bd6ab8d",
+    "scientific_status": "NOT_EVALUATED_PENDING_TRAJECTORY_AUDIT"
+  }
 }
