@@ -34,6 +34,41 @@ def geometry(path, cfg):
     return geom.norm(c_to_thr), geom.angle_deg(c_to_thr, c_to_o)
 
 
+def minimum_ligand_protein_distance(atoms, box):
+    ligand = [i for i, atom in atoms.items() if atom["resname"] == "UNL"]
+    if not ligand:
+        raise ValueError("no UNL ligand atoms in GRO")
+    first_ligand = min(ligand)
+    protein = [i for i in atoms if i < first_ligand]
+    if not protein:
+        raise ValueError("no protein atoms before UNL ligand")
+    best = None
+    for ligand_index in ligand:
+        ligand_atom = atoms[ligand_index]
+        for protein_index in protein:
+            protein_atom = atoms[protein_index]
+            vector = geom.minimum_image(
+                geom.subtract(ligand_atom["xyz_nm"], protein_atom["xyz_nm"]), box
+            )
+            distance = geom.norm(vector)
+            if best is None or distance < best[0]:
+                best = (distance, protein_index, ligand_index)
+    distance, protein_index, ligand_index = best
+    return {
+        "distance_nm": round(distance, 6),
+        "protein_global_index": protein_index,
+        "protein_identity": {
+            key: atoms[protein_index][key]
+            for key in ("resid", "resname", "atomname")
+        },
+        "ligand_global_index": ligand_index,
+        "ligand_identity": {
+            key: atoms[ligand_index][key]
+            for key in ("resid", "resname", "atomname")
+        },
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate", choices=sorted(geom.CANDIDATES), required=True)
@@ -51,7 +86,10 @@ def main():
     else:
         start_distance = source_manifest["geometry"]["true_thr267_og1_to_carbonyl_c_nm"]
         start_angle = source_manifest["geometry"]["true_thr267_attack_angle_deg"]
-    end_distance, end_angle = geometry(work / f"{args.stem}.gro", cfg)
+    end_gro = work / f"{args.stem}.gro"
+    end_distance, end_angle = geometry(end_gro, cfg)
+    end_atoms, end_box, _ = geom.read_gro(end_gro)
+    contact = minimum_ligand_protein_distance(end_atoms, end_box)
     log_text = (work / f"{args.stem}.log").read_text(errors="replace")
     counts = {
         "fatal": len(re.findall(r"(?i)fatal(?:\s+error)?", log_text)),
@@ -69,6 +107,7 @@ def main():
         response >= args.min_response
         and end_distance >= 0.30
         and 75.0 <= end_angle <= 135.0
+        and contact["distance_nm"] >= 0.10
     )
     if not numerical_pass:
         status = "FAIL_NUMERICAL"
@@ -85,6 +124,8 @@ def main():
         "minimum_required_response_nm": args.min_response,
         "reference_gro": args.reference_gro,
         "numerical_issue_counts": counts,
+        "minimum_ligand_protein_contact": contact,
+        "severe_contact_threshold_nm": 0.10,
         "geometry": {
             "start_distance_nm": start_distance,
             "end_distance_nm": round(end_distance, 6),
