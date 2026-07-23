@@ -4,7 +4,7 @@
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -c 1
-#SBATCH --mem=8G
+#SBATCH --mem=3G
 #SBATCH -t 01:00:00
 #SBATCH -o prepare_candidates_%j.out
 #SBATCH -e prepare_candidates_%j.err
