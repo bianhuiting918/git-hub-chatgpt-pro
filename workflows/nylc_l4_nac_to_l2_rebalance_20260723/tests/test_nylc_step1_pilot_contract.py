@@ -14,7 +14,7 @@ def test_nylc_pilot_is_limited_to_two_corrected_candidates():
     assert "nylc_c23_29684ps" in text
     assert "nyl50" not in text.lower()
     assert "nyl12" not in text.lower()
-    assert "superseded" not in text.lower()
+    assert "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY" in text
 
 
 def test_contact_relaxation_does_not_require_em_convergence():
