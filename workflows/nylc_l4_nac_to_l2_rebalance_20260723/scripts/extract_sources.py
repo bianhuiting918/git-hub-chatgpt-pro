@@ -70,8 +70,20 @@ def resolve_candidate(candidate: Dict[str, Any]) -> Dict[str, Any]:
         or selected_row["gate_restrained"] != 0
     ):
         raise ValueError(f"Selected frame is not an unrestrained NAC: {candidate['id']}")
-    first_time = min(row["simulation_time_ps"] for row in segment_rows)
-    local_time = selected_row["simulation_time_ps"] - first_time
+    geometry_times = sorted({row["simulation_time_ps"] for row in segment_rows})
+    positive_steps = [
+        right - left
+        for left, right in zip(geometry_times, geometry_times[1:])
+        if right > left
+    ]
+    if not positive_steps:
+        raise ValueError(f"Cannot derive geometry sample interval for {candidate['id']}")
+    sample_interval = min(positive_steps)
+    if any(abs(step - sample_interval) > 1e-6 for step in positive_steps):
+        raise ValueError(f"Nonuniform geometry sampling for {candidate['id']}")
+    first_time = geometry_times[0]
+    segment_start_time = first_time - sample_interval
+    local_time = selected_row["simulation_time_ps"] - segment_start_time
     if abs(local_time - candidate["local_xtc_time_ps"]) > 1e-6:
         raise ValueError(
             f"Local time mismatch for {candidate['id']}: {local_time} vs "
@@ -86,7 +98,9 @@ def resolve_candidate(candidate: Dict[str, Any]) -> Dict[str, Any]:
         "source_topology": str(branch / "topol.top"),
         "source_index": str(branch / "cycle.ndx"),
         "selected_row": selected_row,
-        "segment_first_time_ps": first_time,
+        "segment_first_geometry_time_ps": first_time,
+        "geometry_sample_interval_ps": sample_interval,
+        "segment_start_time_ps": segment_start_time,
         "derived_local_xtc_time_ps": local_time,
     }
     missing = [
@@ -114,7 +128,9 @@ def gro_atom_count(path: Path) -> int:
         return int(handle.readline().strip())
 
 
-def extract_all(manifest_path: Path, task_root: Path, gmx: str) -> Dict[str, Any]:
+def extract_all(
+    manifest_path: Path, task_root: Path, gmx: str, force: bool = False
+) -> Dict[str, Any]:
     manifest = load_manifest(manifest_path)
     inputs_root = task_root / "inputs"
     inputs_root.mkdir(parents=True, exist_ok=True)
@@ -125,7 +141,8 @@ def extract_all(manifest_path: Path, task_root: Path, gmx: str) -> Dict[str, Any
         candidate_dir = inputs_root / candidate["id"]
         candidate_dir.mkdir(parents=True, exist_ok=True)
         output_gro = candidate_dir / "source.gro"
-        if not output_gro.exists():
+        if force or not output_gro.exists():
+            temporary_gro = output_gro.with_suffix(".gro.tmp")
             subprocess.run(
                 [
                     gmx,
@@ -137,12 +154,13 @@ def extract_all(manifest_path: Path, task_root: Path, gmx: str) -> Dict[str, Any
                     "-dump",
                     str(resolved["derived_local_xtc_time_ps"]),
                     "-o",
-                    str(output_gro),
+                    str(temporary_gro),
                 ],
                 input="0\n",
                 text=True,
                 check=True,
             )
+            temporary_gro.replace(output_gro)
         expected_atoms = gro_atom_count(Path(resolved["tpr"]).with_name("run.gro"))
         if gro_atom_count(output_gro) != expected_atoms:
             raise ValueError(f"Extracted GRO atom count mismatch for {candidate['id']}")
@@ -187,8 +205,9 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--task-root", type=Path, required=True)
     parser.add_argument("--gmx", required=True)
+    parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
-    result = extract_all(args.manifest, args.task_root, args.gmx)
+    result = extract_all(args.manifest, args.task_root, args.gmx, force=args.force)
     print(json.dumps({"candidate_count": len(result["candidates"])}, indent=2))
 
 
