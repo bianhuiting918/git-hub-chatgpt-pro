@@ -79,3 +79,6 @@ def test_response2_slurm_uses_separate_outputs_and_preflight():
     assert "nylc_C23_trueT267_recapture" in text
     assert "pilot.gro" not in text
     assert "response2.gro" in text
+    assert '-deffnm "$work/response2"' in text
+    assert "audit_true_thr267_recapture_pilot.py" in text
+    assert "audit_true_thr267_recapture_response2.py" not in text
