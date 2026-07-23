@@ -37,15 +37,17 @@ def geometry(path, cfg):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate", choices=sorted(geom.CANDIDATES), required=True)
+    parser.add_argument("--stage-dir", default="recapture_pilot")
+    parser.add_argument("--stem", default="pilot")
     args = parser.parse_args()
     root = TASK_ROOT / "candidates" / args.candidate
-    work = root / "recapture_pilot"
+    work = root / args.stage_dir
     source_manifest = json.loads((root / "source_manifest.json").read_text())
     cfg = geom.CANDIDATES[args.candidate]
     start_distance = source_manifest["geometry"]["true_thr267_og1_to_carbonyl_c_nm"]
     start_angle = source_manifest["geometry"]["true_thr267_attack_angle_deg"]
-    end_distance, end_angle = geometry(work / "pilot.gro", cfg)
-    log_text = (work / "pilot.log").read_text(errors="replace")
+    end_distance, end_angle = geometry(work / f"{args.stem}.gro", cfg)
+    log_text = (work / f"{args.stem}.log").read_text(errors="replace")
     counts = {
         "fatal": len(re.findall(r"(?i)fatal(?:\s+error)?", log_text)),
         "lincs_warning": len(re.findall(r"(?i)lincs\s+warning", log_text)),
@@ -87,7 +89,7 @@ def main():
             ),
         },
     }
-    (work / "pilot_audit.json").write_text(
+    (work / f"{args.stem}_audit.json").write_text(
         json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     print(json.dumps(result, sort_keys=True))
