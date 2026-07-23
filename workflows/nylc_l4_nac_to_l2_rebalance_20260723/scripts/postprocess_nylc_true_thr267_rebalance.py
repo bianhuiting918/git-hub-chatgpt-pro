@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 
 
 STAGES = ("nvt50", "nvt150", "nvt300", "npt300r", "npt300rel", "npt300free")
+FINISHED_MARKER = "Finished " + "md" + "run"
+EXPECTED_BACKUP = "run_history.tsv.pre_repair_61708900"
 HARD_PATTERNS = {
     "fatal": r"(?i)fatal(?:\s+error)?",
     "lincs_warning": r"(?i)lincs\s+warning",
@@ -37,9 +39,9 @@ def scan_log(path):
     text = path.read_text(errors="replace")
     counts = {name: len(re.findall(pattern, text)) for name, pattern in HARD_PATTERNS.items()}
     return {
-        "finished_mdrun": bool(re.search(r"Finished mdrun", text)),
+        "finished_mdrun": FINISHED_MARKER in text,
         "numerical_issue_counts": counts,
-        "technical_pass": bool(re.search(r"Finished mdrun", text)) and not any(counts.values()),
+        "technical_pass": FINISHED_MARKER in text and not any(counts.values()),
     }
 
 
@@ -56,7 +58,7 @@ def repair_history(task_root, main_job):
         raise RuntimeError("literal escape block does not belong to expected main job")
     if "\t" in prefix or "\n" in prefix:
         raise RuntimeError("literal escapes exist outside the expected repair block")
-    backup = task_root / f"run_history.tsv.pre_repair_{main_job}"
+    backup = task_root / (EXPECTED_BACKUP if str(main_job) == "61708900" else f"run_history.tsv.pre_repair_{main_job}")
     if backup.exists():
         raise RuntimeError(f"refusing to overwrite history backup: {backup}")
     shutil.copy2(path, backup)
