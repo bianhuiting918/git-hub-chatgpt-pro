@@ -16,7 +16,7 @@ def test_rebalance_requires_build_preflight_and_runs_stages_in_order():
 def test_final_window_is_one_ns_fully_unrestrained():
     text = SBATCH.read_text()
     assert 'run_stage npt300free' in text
-    assert 'restrained=no' in text
+    assert 'run_stage npt300free "$runs/npt300rel/run.gro" "$runs/npt300rel/run.cpt" no' in text
     assert "npt300free_true_thr267_l2.mdp" in text
     assert "scientific audit" in text.lower()
 
