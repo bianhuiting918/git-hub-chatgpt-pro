@@ -1,0 +1,88 @@
+{
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "gate_definition": "NylC residues 261-266; Thr267 excluded",
+  "geometry": {
+    "joint_nac": true,
+    "true_thr267_attack_angle_deg": 114.257,
+    "true_thr267_og1_to_carbonyl_c_nm": 0.328757
+  },
+  "minimum_ligand_protein_contact": {
+    "distance_nm": 0.168036,
+    "ligand_global_index": 10418,
+    "ligand_identity": {
+      "atomname": "H79",
+      "resid": 356,
+      "resname": "UNL"
+    },
+    "minimum_heavy_atom_contact": {
+      "distance_nm": 0.282351,
+      "ligand_global_index": 10304,
+      "ligand_identity": {
+        "atomname": "O3",
+        "resid": 356,
+        "resname": "UNL"
+      },
+      "protein_global_index": 6395,
+      "protein_identity": {
+        "atomname": "N",
+        "resid": 91,
+        "resname": "ALA"
+      }
+    },
+    "protein_global_index": 4776,
+    "protein_identity": {
+      "atomname": "HH11",
+      "resid": 330,
+      "resname": "ARG"
+    }
+  },
+  "next_gate": "L4-to-L2 graph truncation and topology/charge/valence/contact/grompp audit; later fully unrestrained L2 validation remains required",
+  "one_ns_followup": {
+    "frame_count": 501,
+    "job_id": 61705692,
+    "nac_frame_count": 0,
+    "occupancy": 0.0,
+    "scientific_status": "FAIL_UNRESTRAINED_PILOT_NO_NAC"
+  },
+  "pilot_nac": {
+    "frame_count": 101,
+    "gates": {
+      "angle_max_deg": 115.0,
+      "angle_min_deg": 95.0,
+      "distance_max_nm": 0.35
+    },
+    "longest_continuous_nac": {
+      "duration_ps": 1.0,
+      "end_ps": 8.0,
+      "frame_count": 2,
+      "mean_angle_deg": 109.6935,
+      "mean_distance_nm": 0.3235,
+      "start_ps": 7.0
+    },
+    "lowest_potential_nac_frame": {
+      "angle_deg": 114.257,
+      "distance_nm": 0.329,
+      "potential_energy_kj_mol": -1829950.75,
+      "time_ps": 8.0
+    },
+    "nac_frame_count": 6,
+    "nac_occupancy": 0.0594059405940594,
+    "nac_run_count": 4,
+    "schema_version": 1,
+    "time_end_ps": 100.0,
+    "time_start_ps": 0.0
+  },
+  "potential_energy_kj_mol": -1829950.75,
+  "schema_version": 1,
+  "scientific_caveat": "NOT_ENSEMBLE_STABLE",
+  "selection_rule": "lowest instantaneous potential energy among true-Thr267 NAC frames in the 100 ps fully unrestrained NPT seed 26703",
+  "source": {
+    "array_job_id": 61705307,
+    "gro": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/source.gro",
+    "gro_sha256": "0f0c4932e591084feba457819daf1c0bf5cd6ec249778f0673005917b82c4c22",
+    "time_ps": 8.0,
+    "velocity_seed": 26703,
+    "window_type": "fully_unrestrained_NPT_100ps"
+  },
+  "status": "VERIFIED_RARE_UNRESTRAINED_NAC_GS_CANDIDATE"
+}
