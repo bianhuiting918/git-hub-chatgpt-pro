@@ -31,3 +31,8 @@ def test_corrective_array_covers_only_nylc_c18_and_c23():
     assert "C23 10303 10304" in text
     assert "--workers 4" in text
     assert "SUPERSEDED_WRONG_NUCLEOPHILE" in text
+
+
+def test_corrective_array_meets_scnet_minimum_gres_policy():
+    text = _read("slurm/run_true_nylc_thr267_residence_array.sbatch")
+    assert "#SBATCH --gres=dcu:1" in text
