@@ -99,25 +99,37 @@ def _angle_degrees(left: Vector, right: Vector) -> float:
 
 
 def _reaction_geometry(
-    system: Any, carbonyl_global: int, amide_global: int, thr_global: int
+    system: Any, carbonyl_global: int, carbonyl_o_global: int, thr_global: int
 ) -> Dict[str, float]:
     carbon = system.atoms[carbonyl_global - 1].coordinate
-    amide = system.atoms[amide_global - 1].coordinate
+    carbonyl_o = system.atoms[carbonyl_o_global - 1].coordinate
     thr = system.atoms[thr_global - 1].coordinate
     carbon_to_thr = _minimum_image_vector(
         tuple(a - b for a, b in zip(thr, carbon)), system.box
     )
-    carbon_to_amide = _minimum_image_vector(
-        tuple(a - b for a, b in zip(amide, carbon)), system.box
+    carbon_to_oxygen = _minimum_image_vector(
+        tuple(a - b for a, b in zip(carbonyl_o, carbon)), system.box
     )
     return {
         "distance_thr_og1_to_carbonyl_c_nm": math.sqrt(
             sum(value * value for value in carbon_to_thr)
         ),
-        "angle_thr_og1_carbonyl_c_amide_n_deg": _angle_degrees(
-            carbon_to_thr, carbon_to_amide
+        "angle_thr_og1_carbonyl_c_carbonyl_o_deg": _angle_degrees(
+            carbon_to_thr, carbon_to_oxygen
         ),
     }
+
+
+def reaction_geometry_from_target_globals(
+    system: Any, target_globals: Dict[str, int]
+) -> Dict[str, float]:
+    """Use the validated pull-coordinate angle: Thr OG1--C versus C--O."""
+    return _reaction_geometry(
+        system,
+        target_globals["carbonyl_c"],
+        target_globals["carbonyl_o"],
+        target_globals["thr_og1"],
+    )
 
 
 def _copy_topology_inputs(candidate: Dict[str, Any], build_dir: Path) -> None:
@@ -268,12 +280,20 @@ def prepare_one(
     min_environment = minimum_ligand_environment_distance(
         rebuilt_roundtrip, first, len(target_topology.atoms)
     )
-    geometry = _reaction_geometry(
-        rebuilt_roundtrip,
-        target_globals["carbonyl_c"],
-        target_globals["amide_n"],
-        target_globals["thr_og1"],
+    geometry = reaction_geometry_from_target_globals(
+        rebuilt_roundtrip, target_globals
     )
+    source_geometry = candidate["source_geometry"]
+    geometry_delta = {
+        "distance_abs_error_nm": abs(
+            geometry["distance_thr_og1_to_carbonyl_c_nm"]
+            - source_geometry["distance_nm"]
+        ),
+        "angle_abs_error_deg": abs(
+            geometry["angle_thr_og1_carbonyl_c_carbonyl_o_deg"]
+            - source_geometry["angle_deg"]
+        ),
+    }
     checks = {
         "l2_atom_count_79": len(target_topology.atoms) == 79,
         "l2_heavy_atom_count_33": sum(
@@ -285,6 +305,12 @@ def prepare_one(
         "reactive_coordinates_preserved_to_gro_precision": max_delta <= 5e-4,
         "minimum_ligand_environment_distance_gt_0p05_nm": min_environment > 0.05,
         "reaction_geometry_finite": all(math.isfinite(value) for value in geometry.values()),
+        "reaction_distance_matches_selected_frame": (
+            geometry_delta["distance_abs_error_nm"] <= 0.0015
+        ),
+        "reaction_angle_matches_selected_frame": (
+            geometry_delta["angle_abs_error_deg"] <= 0.75
+        ),
     }
     audit = {
         "schema_version": 1,
@@ -317,7 +343,8 @@ def prepare_one(
         "reactive_coordinate_preservation": preservation,
         "max_reactive_coordinate_delta_nm": max_delta,
         "reaction_geometry": geometry,
-        "source_reported_geometry": candidate["source_geometry"],
+        "source_reported_geometry": source_geometry,
+        "reaction_geometry_delta": geometry_delta,
         "minimum_ligand_environment_distance_nm": min_environment,
         "mapping_file": str(mapping_path),
         "checks": checks,
