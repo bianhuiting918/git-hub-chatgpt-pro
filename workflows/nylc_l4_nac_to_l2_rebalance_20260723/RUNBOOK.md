@@ -317,3 +317,21 @@ The stages are restrained NVT 50/150/300 K, restrained NPT, weak-restraint NPT,
 then at least 1 ns fully unrestrained NPT.  Only the final unrestrained audit
 can decide whether the L2 candidate remains eligible for Step1 DFTB3/3OB-3-1
 QM/MM preflight.
+
+
+#### Independent postprocessing for job 61708900
+
+The first running copy of the continuation script wrote literal escape sequences
+to its per-stage JSON and TSV records.  This does not affect the GROMACS
+coordinates, checkpoints, energies or trajectories, but those particular
+stage JSON files are not trusted.  The branch copy has been corrected and
+contract-tested.
+
+A non-destructive dependent postprocessor is queued as job 61709209 with
+`afterany:61708900` on the CPU-only `xahcnormal` partition.  It never runs
+dynamics.  It independently scans every stage log, preserves a backup before
+repairing only the malformed TSV text block, and writes all scientific analysis
+into a new `postprocess_job_61709209` directory.  It uses true Thr267 atom
+8961, L2 reactive C/O atoms 10287/10288, and the 261-266 gate group excluding
+Thr267.  If the final 1 ns artifacts are incomplete or any stage has a numerical
+failure, its status remains `NOT_EVALUATED_INCOMPLETE_OR_NUMERICAL_FAIL`.
