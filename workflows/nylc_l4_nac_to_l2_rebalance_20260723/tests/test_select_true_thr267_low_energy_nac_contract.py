@@ -21,3 +21,9 @@ def test_selector_extracts_audited_frame_without_overwriting_parent():
     assert "selected_lowest_potential_nac.json" in text
     assert "NOT_A_SCIENTIFIC_GS_RESTRAINED_SOURCE" in text
     assert "release2.gro" not in text.split("trjconv", 1)[-1]
+
+
+def test_selector_matches_analyzer_output_schema():
+    text = SCRIPT.read_text()
+    assert 'series["nac_occupancy"]' in text
+    assert 'series["longest_continuous_nac"]["duration_ps"]' in text
