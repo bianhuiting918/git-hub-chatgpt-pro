@@ -20,7 +20,9 @@ def test_corrected_source_contract():
     assert m.CANDIDATES["nylc_C18_trueT267_recapture"]["local_time_ps"] == 16.0
     assert m.CANDIDATES["nylc_C23_trueT267_recapture"]["local_time_ps"] == 98.0
     assert m.CANDIDATES["nylc_C18_trueT267_recapture"]["carbonyl_c"] == 10297
+    assert m.CANDIDATES["nylc_C18_trueT267_recapture"]["carbonyl_c_atomname"] == "C18"
     assert m.CANDIDATES["nylc_C23_trueT267_recapture"]["carbonyl_c"] == 10303
+    assert m.CANDIDATES["nylc_C23_trueT267_recapture"]["carbonyl_c_atomname"] == "C23"
 
 
 def test_temporary_name_is_mandatory():
