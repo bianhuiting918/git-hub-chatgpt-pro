@@ -8,9 +8,9 @@ import re
 
 
 HARD_PATTERNS = {
-    "fatal": r"(?i)fatal(?:\\s+error)?",
-    "lincs_warning": r"(?i)lincs\\s+warning",
-    "settle_problem": r"(?i)(?:cannot\\s+be\\s+settled|settle[^\\n]*(?:warning|error|failed))",
+    "fatal": r"(?i)fatal(?:\s+error)?",
+    "lincs_warning": r"(?i)lincs\s+warning",
+    "settle_problem": r"(?i)(?:cannot\s+be\s+settled|settle[^\n]*(?:warning|error|failed))",
     "nan": r"(?i)(?:^|[^A-Za-z0-9_])nan(?:[^A-Za-z0-9_]|$)",
 }
 
@@ -52,16 +52,16 @@ def main():
 
     log = (root / "run.log").read_text(errors="replace")
     mdp = (root / "run.processed.mdp").read_text(errors="replace")
-    fmax = last_float(r"Maximum force\\s*=\\s*([+0-9.eE-]+)", log)
-    potential = last_float(r"Potential Energy\\s*=\\s*([+0-9.eE-]+)", log)
+    fmax = last_float(r"Maximum force\s*=\s*([+0-9.eE-]+)", log)
+    potential = last_float(r"Potential Energy\s*=\s*([+0-9.eE-]+)", log)
     issue_counts = {name: len(re.findall(pattern, log)) for name, pattern in HARD_PATTERNS.items()}
     checks = {
         "finished_mdrun": bool(re.search(r"Finished mdrun", log)),
         "cg_converged": bool(re.search(r"Polak-Ribiere Conjugate Gradients converged to Fmax < 500", log)),
         "fmax_within_threshold": fmax <= 500.0,
-        "double_precision": bool(re.search(r"Precision:\\s+double", log)),
-        "gromacs_2023_1": bool(re.search(r"GROMACS version:\\s+2023\\.1", log)),
-        "cg_integrator": bool(re.search(r"(?m)^integrator\\s*=\\s*cg\\s*$", mdp)),
+        "double_precision": bool(re.search(r"Precision:\s+double", log)),
+        "gromacs_2023_1": bool(re.search(r"GROMACS version:\s+2023\.1", log)),
+        "cg_integrator": bool(re.search(r"(?m)^integrator\s*=\s*cg\s*$", mdp)),
         "flexible_water": "-DFLEXIBLE" in mdp,
         "no_hard_numerical_issues": not any(issue_counts.values()),
         "atom_count_133589": gro_atom_count(root / "run.gro") == 133589,
