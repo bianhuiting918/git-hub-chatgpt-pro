@@ -43,6 +43,7 @@ def minimum_ligand_protein_distance(atoms, box):
     if not protein:
         raise ValueError("no protein atoms before UNL ligand")
     best = None
+    best_heavy = None
     for ligand_index in ligand:
         ligand_atom = atoms[ligand_index]
         for protein_index in protein:
@@ -53,7 +54,12 @@ def minimum_ligand_protein_distance(atoms, box):
             distance = geom.norm(vector)
             if best is None or distance < best[0]:
                 best = (distance, protein_index, ligand_index)
+            if (not ligand_atom["atomname"].startswith("H")
+                    and not protein_atom["atomname"].startswith("H")
+                    and (best_heavy is None or distance < best_heavy[0])):
+                best_heavy = (distance, protein_index, ligand_index)
     distance, protein_index, ligand_index = best
+    heavy_distance, heavy_protein_index, heavy_ligand_index = best_heavy
     return {
         "distance_nm": round(distance, 6),
         "protein_global_index": protein_index,
@@ -65,6 +71,19 @@ def minimum_ligand_protein_distance(atoms, box):
         "ligand_identity": {
             key: atoms[ligand_index][key]
             for key in ("resid", "resname", "atomname")
+        },
+        "minimum_heavy_atom_contact": {
+            "distance_nm": round(heavy_distance, 6),
+            "protein_global_index": heavy_protein_index,
+            "protein_identity": {
+                key: atoms[heavy_protein_index][key]
+                for key in ("resid", "resname", "atomname")
+            },
+            "ligand_global_index": heavy_ligand_index,
+            "ligand_identity": {
+                key: atoms[heavy_ligand_index][key]
+                for key in ("resid", "resname", "atomname")
+            },
         },
     }
 
@@ -91,6 +110,35 @@ def main():
     end_distance, end_angle = geometry(end_gro, cfg)
     end_atoms, end_box, _ = geom.read_gro(end_gro)
     contact = minimum_ligand_protein_distance(end_atoms, end_box)
+    pull_rows = []
+    pull_path = work / f"{args.stem}_pullx.xvg"
+    if pull_path.exists():
+        for line in pull_path.read_text(errors="replace").splitlines():
+            if line and line[0] not in "#@":
+                values = [float(value) for value in line.split()]
+                if len(values) >= 3:
+                    pull_rows.append(values[:3])
+    nac_flags = [row[1] <= 0.35 and 95.0 <= row[2] <= 115.0 for row in pull_rows]
+    longest_frames = 0
+    current_frames = 0
+    for passed in nac_flags:
+        current_frames = current_frames + 1 if passed else 0
+        longest_frames = max(longest_frames, current_frames)
+    sampling_ps = (
+        pull_rows[1][0] - pull_rows[0][0] if len(pull_rows) > 1 else None
+    )
+    trajectory_nac = {
+        "frame_count": len(pull_rows),
+        "nac_frame_count": sum(nac_flags),
+        "occupancy": sum(nac_flags) / len(pull_rows) if pull_rows else None,
+        "sampling_ps": sampling_ps,
+        "longest_continuous_nac_frames": longest_frames,
+        "longest_continuous_nac_ps": (
+            max(0, longest_frames - 1) * sampling_ps
+            if sampling_ps is not None else None
+        ),
+        "minimum_distance_nm": min((row[1] for row in pull_rows), default=None),
+    }
     log_text = (work / f"{args.stem}.log").read_text(errors="replace")
     counts = {
         "fatal": len(re.findall(r"(?i)fatal(?:\s+error)?", log_text)),
@@ -109,6 +157,7 @@ def main():
         and end_distance >= 0.30
         and 75.0 <= end_angle <= 135.0
         and contact["distance_nm"] >= 0.10
+        and contact["minimum_heavy_atom_contact"]["distance_nm"] >= 0.18
         and (args.max_end_distance is None or end_distance <= args.max_end_distance)
     )
     if not numerical_pass:
@@ -128,7 +177,9 @@ def main():
         "reference_gro": args.reference_gro,
         "numerical_issue_counts": counts,
         "minimum_ligand_protein_contact": contact,
+        "trajectory_nac": trajectory_nac,
         "severe_contact_threshold_nm": 0.10,
+        "severe_heavy_atom_contact_threshold_nm": 0.18,
         "geometry": {
             "start_distance_nm": start_distance,
             "end_distance_nm": round(end_distance, 6),
