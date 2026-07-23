@@ -562,17 +562,66 @@ def replace_ligand(
     )
 
 
-def _minimum_image_delta(delta: float, length: float) -> float:
-    if length <= 0:
-        raise ValueError("Invalid non-positive box length")
-    return delta - round(delta / length) * length
+def _box_matrix(box: Tuple[float, ...]) -> Tuple[Vector, Vector, Vector]:
+    if len(box) == 3:
+        return (
+            (box[0], 0.0, 0.0),
+            (0.0, box[1], 0.0),
+            (0.0, 0.0, box[2]),
+        )
+    if len(box) == 9:
+        # GRO order: v1x v2y v3z v1y v1z v2x v2z v3x v3y.
+        return (
+            (box[0], box[5], box[7]),
+            (box[3], box[1], box[8]),
+            (box[4], box[6], box[2]),
+        )
+    raise ValueError(f"Unsupported GRO box with {len(box)} values")
+
+
+def _inverse3(matrix: Tuple[Vector, Vector, Vector]) -> Tuple[Vector, Vector, Vector]:
+    a, b, c = matrix
+    determinant = (
+        a[0] * (b[1] * c[2] - b[2] * c[1])
+        - a[1] * (b[0] * c[2] - b[2] * c[0])
+        + a[2] * (b[0] * c[1] - b[1] * c[0])
+    )
+    if abs(determinant) < 1e-12:
+        raise ValueError("Singular GRO box matrix")
+    inverse_det = 1.0 / determinant
+    return (
+        (
+            (b[1] * c[2] - b[2] * c[1]) * inverse_det,
+            (a[2] * c[1] - a[1] * c[2]) * inverse_det,
+            (a[1] * b[2] - a[2] * b[1]) * inverse_det,
+        ),
+        (
+            (b[2] * c[0] - b[0] * c[2]) * inverse_det,
+            (a[0] * c[2] - a[2] * c[0]) * inverse_det,
+            (a[2] * b[0] - a[0] * b[2]) * inverse_det,
+        ),
+        (
+            (b[0] * c[1] - b[1] * c[0]) * inverse_det,
+            (a[1] * c[0] - a[0] * c[1]) * inverse_det,
+            (a[0] * b[1] - a[1] * b[0]) * inverse_det,
+        ),
+    )
+
+
+def _matvec(matrix: Tuple[Vector, Vector, Vector], vector: Vector) -> Vector:
+    return tuple(_dot(row, vector) for row in matrix)  # type: ignore[return-value]
+
+
+def _minimum_image_vector(delta: Vector, box: Tuple[float, ...]) -> Vector:
+    matrix = _box_matrix(box)
+    fractional = _matvec(_inverse3(matrix), delta)
+    wrapped = tuple(value - round(value) for value in fractional)
+    return _matvec(matrix, wrapped)  # type: ignore[arg-type]
 
 
 def minimum_ligand_environment_distance(
     system: GroSystem, first_global_atom: int, ligand_atom_count: int
 ) -> float:
-    if len(system.box) != 3:
-        raise ValueError("Minimum-distance audit currently requires an orthorhombic box")
     start = first_global_atom - 1
     stop = start + ligand_atom_count
     ligand = system.atoms[start:stop]
@@ -582,9 +631,9 @@ def minimum_ligand_environment_distance(
         lx, ly, lz = ligand_atom.coordinate
         for environment_atom in environment:
             ex, ey, ez = environment_atom.coordinate
-            dx = _minimum_image_delta(lx - ex, system.box[0])
-            dy = _minimum_image_delta(ly - ey, system.box[1])
-            dz = _minimum_image_delta(lz - ez, system.box[2])
+            dx, dy, dz = _minimum_image_vector(
+                (lx - ex, ly - ey, lz - ez), system.box
+            )
             squared = dx * dx + dy * dy + dz * dz
             if squared < minimum_squared:
                 minimum_squared = squared
