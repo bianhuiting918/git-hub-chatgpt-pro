@@ -10,7 +10,7 @@ import math
 import re
 import shutil
 from pathlib import Path
-from typing import Any, Dict, Iterable, Tuple
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 from build_l4_to_l2 import (
     _box_matrix,
@@ -475,7 +475,7 @@ def prepare_one(
 def prepare_all(
     manifest_path: Path,
     task_root: Path,
-    candidate_ids: Iterable[str] | None = None,
+    candidate_ids: Optional[Iterable[str]] = None,
     summary_name: str = "prepare_summary.tsv",
 ) -> Dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
