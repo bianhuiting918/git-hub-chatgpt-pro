@@ -372,9 +372,34 @@
     },
     "response7": {
       "job_id": "61699852",
+      "terminal_status": "COMPLETED",
+      "candidate": "C18",
+      "result": {
+        "status": "PASS_TECHNICAL_BOUNDED_APPROACH",
+        "start_distance_nm": 0.721183,
+        "end_distance_nm": 0.496337,
+        "distance_response_nm": 0.224846,
+        "end_angle_deg": 103.473,
+        "minimum_ligand_protein_contact_nm": 0.200883,
+        "numerical_events": {
+          "FATAL": 0,
+          "LINCS": 0,
+          "SETTLE": 0,
+          "NaN": 0
+        }
+      },
+      "scientific_gate": "NOT_EVALUATED_RESTRAINED"
+    },
+    "response8": {
+      "job_id": "61700389",
       "candidate": "C18",
       "status": "RUNNING",
-      "parent_job": "61699443",
+      "protocol": {
+        "duration_ps": 100,
+        "distance_rate_nm_per_ps": -0.0015,
+        "distance_k": 2000,
+        "angle_k": 500
+      },
       "scientific_gate": "NOT_EVALUATED_RESTRAINED"
     }
   }
