@@ -17,6 +17,7 @@ SBATCH9 = FLOW / "slurm" / "run_true_thr267_recapture_response9_c18.sbatch"
 SBATCH10 = FLOW / "slurm" / "run_true_thr267_recapture_response10_c18.sbatch"
 SBATCH11 = FLOW / "slurm" / "run_true_thr267_recapture_response11_c18.sbatch"
 RELEASE1 = FLOW / "slurm" / "run_true_thr267_recapture_release1_c18.sbatch"
+RELEASE2 = FLOW / "slurm" / "run_true_thr267_recapture_release2_c18.sbatch"
 
 
 def load_audit():
@@ -282,3 +283,14 @@ def test_release1_reduces_restraint_strength():
     text = RELEASE1.read_text(encoding="utf-8")
     assert '-deffnm "$work/release1"' in text
     assert "recapture_response11/response11.gro" in text
+
+
+def test_release2_reduces_restraints_again():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181279, protocol="release2")
+    assert "pull-coord1-k            = 1000" in mdp
+    assert "pull-coord2-k            = 100" in mdp
+    assert m.PROTOCOLS["release2"]["parent_stem"] == "release1"
+    text = RELEASE2.read_text(encoding="utf-8")
+    assert '-deffnm "$work/release2"' in text
+    assert "recapture_release1/release1.gro" in text
