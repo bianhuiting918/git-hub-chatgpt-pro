@@ -5,6 +5,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 FLOW = HERE.parent
 PREP = FLOW / "scripts" / "prepare_true_thr267_recapture_pilot.py"
 SBATCH = FLOW / "slurm" / "run_true_thr267_recapture_pilot_array.sbatch"
+AUDIT = FLOW / "scripts" / "audit_true_thr267_recapture_pilot.py"
 
 
 def load_prep():
@@ -50,3 +51,10 @@ def test_slurm_requires_preflight_and_true_thr267_contract():
     assert "8896" not in text
     assert r"\\${" not in text
     assert 'candidate="${candidates[${SLURM_ARRAY_TASK_ID:?}]}\"' in text
+
+
+def test_audit_distinguishes_numerical_failure_from_response_failure():
+    text = AUDIT.read_text(encoding="utf-8")
+    assert "FAIL_NUMERICAL" in text
+    assert "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE" in text
+    assert "PASS_TECHNICAL_BOUNDED_APPROACH" in text
