@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "timestamp_timezone": "2026-07-24 Asia/Shanghai",
+  "scope": "NylC step1 GS selection",
+  "source_frame_policy": "corrected +2 ps representatives extracted from original XTC; no superseded inputs",
+  "pilot_job": {
+    "slurm_array_job_id": "61686301",
+    "technical_status": "COMPLETED_STAGES_EXITED_ON_FINAL_FRAME_GATE",
+    "numerical_events": {
+      "FATAL": 0,
+      "LINCS": 0,
+      "SETTLE": 0,
+      "NaN": 0
+    },
+    "scientific_status": "RESTRAINED_DIAGNOSTIC_ONLY"
+  },
+  "candidates": [
+    {
+      "id": "nylc_c18_11854ps",
+      "source_gro_sha256": "1a91bd3283c4ddf59a42adc35544a5dc0ba1bfb7afb5f1842287c9d89dd21c97",
+      "nvt10": {
+        "duration_ps": 2,
+        "nac_occupancy": 0.5024875621890548,
+        "longest_continuous_nac_ps": 0.39
+      },
+      "nvt50": {
+        "duration_ps": 10,
+        "nac_occupancy": 0.34328358208955223,
+        "longest_continuous_nac_ps": 0.45
+      },
+      "disposition": "SELECT_FOR_STAGED_RELEASE",
+      "selected_frame": {
+        "source_stage": "nvt50_nac",
+        "time_ps": 9.55,
+        "selection_window_ps": [
+          5,
+          10
+        ],
+        "distance_nm": 0.337,
+        "angle_deg": 110.327,
+        "potential_energy_kj_mol": -2257448.25,
+        "gro_sha256": "c67cbb1d275863606be62628df6829e8ef15fbad39f3b5a51188c311f95ce235"
+      }
+    },
+    {
+      "id": "nylc_c23_29684ps",
+      "source_gro_sha256": "2f1a5007b6fc41580c88007c43471d1c5c58d335c284f0d6fbbf47b92702d4dd",
+      "nvt10": {
+        "duration_ps": 2,
+        "nac_occupancy": 0.04477611940298507,
+        "longest_continuous_nac_ps": 0.08
+      },
+      "nvt50": {
+        "duration_ps": 10,
+        "nac_occupancy": 0,
+        "longest_continuous_nac_ps": 0
+      },
+      "disposition": "RETAIN_AUDIT_DO_NOT_EXTEND_CURRENT_ROUTE"
+    }
+  ],
+  "continuation_job": {
+    "slurm_job_id": "61687591",
+    "initial_status": "RUNNING",
+    "stages": [
+      "nvt100_nac",
+      "nvt150_nac",
+      "nvt300_nac_release",
+      "npt300_nac_free_pilot"
+    ],
+    "final_pilot_unrestrained_ps": 100,
+    "required_final_unrestrained_ps": 1000
+  },
+  "scientific_gate": "No final PASS until complete >=1 ns fully unrestrained NPT NAC, thermodynamic and numerical audit"
+}
