@@ -1,0 +1,65 @@
+{
+  "candidate": "nylc_C18_trueT267_recapture",
+  "finished_mdrun": true,
+  "geometry": {
+    "distance_response_nm": 0.024848,
+    "end_angle_deg": 102.919,
+    "end_distance_nm": 0.344402,
+    "end_joint_nac": true,
+    "start_angle_deg": 105.94171678843863,
+    "start_distance_nm": 0.36925059241658614
+  },
+  "maximum_allowed_end_distance_nm": 0.45,
+  "minimum_ligand_protein_contact": {
+    "distance_nm": 0.179229,
+    "ligand_global_index": 10288,
+    "ligand_identity": {
+      "atomname": "O1",
+      "resid": 356,
+      "resname": "UNL"
+    },
+    "minimum_heavy_atom_contact": {
+      "distance_nm": 0.274259,
+      "ligand_global_index": 10288,
+      "ligand_identity": {
+        "atomname": "O1",
+        "resid": 356,
+        "resname": "UNL"
+      },
+      "protein_global_index": 9531,
+      "protein_identity": {
+        "atomname": "OG1",
+        "resid": 303,
+        "resname": "THR"
+      }
+    },
+    "protein_global_index": 9532,
+    "protein_identity": {
+      "atomname": "HG1",
+      "resid": 303,
+      "resname": "THR"
+    }
+  },
+  "minimum_required_response_nm": 0.0,
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "nan": 0,
+    "settle_problem": 0
+  },
+  "reference_gro": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_recapture/recapture_response11/response11.gro",
+  "schema_version": 1,
+  "scientific_gate": "NOT_EVALUATED_RESTRAINED_PILOT_CANNOT_ESTABLISH_NAC",
+  "severe_contact_threshold_nm": 0.1,
+  "severe_heavy_atom_contact_threshold_nm": 0.18,
+  "status": "PASS_TECHNICAL_BOUNDED_APPROACH",
+  "trajectory_nac": {
+    "frame_count": 101,
+    "longest_continuous_nac_frames": 5,
+    "longest_continuous_nac_ps": 4.0,
+    "minimum_distance_nm": 0.31616,
+    "nac_frame_count": 35,
+    "occupancy": 0.3465346534653465,
+    "sampling_ps": 1.0
+  }
+}
