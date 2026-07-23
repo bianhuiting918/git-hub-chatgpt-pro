@@ -337,16 +337,25 @@
     },
     "response5": {
       "job_id": "61698865",
+      "terminal_status": "FAILED_GATE_EXIT_2",
+      "mdrun_status": "COMPLETED_NUMERICALLY_STABLE",
+      "candidate": "C18",
+      "result": {
+        "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+        "start_distance_nm": 1.134993,
+        "end_distance_nm": 0.938775,
+        "distance_response_nm": 0.196218,
+        "start_angle_deg": 116.438,
+        "end_angle_deg": 108.187
+      },
+      "interpretation": "missed arbitrary 0.20 response gate by 0.003782 nm; positive stable response supports continuation"
+    },
+    "response6": {
+      "job_id": "61699443",
       "candidate": "C18",
       "status": "RUNNING",
-      "parent_job": "61698403_0",
-      "protocol": {
-        "duration_ps": 100,
-        "distance_k": 2000,
-        "distance_rate_nm_per_ps": -0.004,
-        "angle_k": 500,
-        "gate_restrained": false
-      }
+      "parent_job": "61698865",
+      "scientific_gate": "NOT_EVALUATED_RESTRAINED"
     }
   }
 }
