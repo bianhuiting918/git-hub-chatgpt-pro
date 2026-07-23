@@ -58,6 +58,10 @@ PROTOCOLS = {
                    "rate": 0.0, "distance_k": 5000, "angle_k": 500,
                    "target_distance": 0.35,
                    "parent_dir": "recapture_response9", "parent_stem": "response9"},
+    "response11": {"dir": "recapture_response11", "stem": "response11", "nsteps": 50000,
+                   "rate": 0.0, "distance_k": 7500, "angle_k": 500,
+                   "target_distance": 0.35,
+                   "parent_dir": "recapture_response10", "parent_stem": "response10"},
 }
 
 
@@ -195,7 +199,7 @@ def append_history(candidate, state, detail):
 def prepare_one(name, protocol="pilot1"):
     cfg = CANDIDATES[name]
     p = PROTOCOLS[protocol]
-    seed = cfg["seed"] + {"pilot1": 0, "response2": 1, "response3": 2, "response4": 3, "response5": 4, "response6": 5, "response7": 6, "response8": 7, "response9": 8, "response10": 9}[protocol]
+    seed = cfg["seed"] + {"pilot1": 0, "response2": 1, "response3": 2, "response4": 3, "response5": 4, "response6": 5, "response7": 6, "response8": 7, "response9": 8, "response10": 9, "response11": 10}[protocol]
     candidate_root = TASK_ROOT / "candidates" / name
     source_gro = candidate_root / "source.gro"
     source_manifest = candidate_root / "source_manifest.json"
