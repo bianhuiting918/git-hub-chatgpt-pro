@@ -11,6 +11,8 @@
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/nylc_c18_step1_%j.err
 
 set -euo pipefail
+echo "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY: atom 8896 is Thr262 OG1, not catalytic Thr267 OG1" >&2
+exit 42
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK_ROOT/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
 PYTHON=/work/home/acshdt1dks/anaconda3/bin/python3.9
