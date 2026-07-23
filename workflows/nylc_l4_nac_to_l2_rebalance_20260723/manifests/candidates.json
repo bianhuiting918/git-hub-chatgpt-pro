@@ -17,19 +17,36 @@
       "segment_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C18/segments/segment_000121_FREE_MONITOR",
       "branch_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C18",
       "segment": "segment_000121",
-      "cumulative_time_ps": 11854.0,
-      "local_xtc_time_ps": 12.0,
-      "strict_nac_interval_ps": [11852.0, 11854.0],
+      "cumulative_time_ps": 11854,
+      "local_xtc_time_ps": 14,
+      "strict_nac_interval_ps": [
+        11852,
+        11854
+      ],
       "source_itp": "l4_nfree_GMX.itp",
       "source_molecule_type": "l4_nfree",
       "source_atom_count": 160,
       "ligand_first_global_atom": 10273,
-      "reactive_local_atoms": {"carbonyl_c": 25, "carbonyl_o": 26, "amide_n": 24},
-      "reactive_global_atoms": {"carbonyl_c": 10297, "carbonyl_o": 10298, "amide_n": 10296, "thr_og1": 8896},
-      "source_geometry": {"gate_nm": 2.733330, "distance_nm": 0.321930, "angle_deg": 106.626},
+      "reactive_local_atoms": {
+        "carbonyl_c": 25,
+        "carbonyl_o": 26,
+        "amide_n": 24
+      },
+      "reactive_global_atoms": {
+        "carbonyl_c": 10297,
+        "carbonyl_o": 10298,
+        "amide_n": 10296,
+        "thr_og1": 8896
+      },
+      "source_geometry": {
+        "gate_nm": 2.73333,
+        "distance_nm": 0.32193,
+        "angle_deg": 106.626
+      },
       "gate_index_group": "Gate",
       "thr_index_group": "Thr_OG1",
-      "gate_definition": "NylC residues 261-266; Thr267 excluded"
+      "gate_definition": "NylC residues 261-266; Thr267 excluded",
+      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)"
     },
     {
       "id": "nylc_c23_29684ps",
@@ -38,19 +55,36 @@
       "segment_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C23/segments/segment_000299_FREE_MONITOR",
       "branch_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nylc_gyaq/C23",
       "segment": "segment_000299",
-      "cumulative_time_ps": 29684.0,
-      "local_xtc_time_ps": 42.0,
-      "strict_nac_interval_ps": [29682.0, 29694.0],
+      "cumulative_time_ps": 29684,
+      "local_xtc_time_ps": 44,
+      "strict_nac_interval_ps": [
+        29682,
+        29694
+      ],
       "source_itp": "l4_nfree_GMX.itp",
       "source_molecule_type": "l4_nfree",
       "source_atom_count": 160,
       "ligand_first_global_atom": 10273,
-      "reactive_local_atoms": {"carbonyl_c": 31, "carbonyl_o": 32, "amide_n": 33},
-      "reactive_global_atoms": {"carbonyl_c": 10303, "carbonyl_o": 10304, "amide_n": 10305, "thr_og1": 8896},
-      "source_geometry": {"gate_nm": 3.543080, "distance_nm": 0.309471, "angle_deg": 104.076},
+      "reactive_local_atoms": {
+        "carbonyl_c": 31,
+        "carbonyl_o": 32,
+        "amide_n": 33
+      },
+      "reactive_global_atoms": {
+        "carbonyl_c": 10303,
+        "carbonyl_o": 10304,
+        "amide_n": 10305,
+        "thr_og1": 8896
+      },
+      "source_geometry": {
+        "gate_nm": 3.54308,
+        "distance_nm": 0.309471,
+        "angle_deg": 104.076
+      },
       "gate_index_group": "Gate",
       "thr_index_group": "Thr_OG1",
-      "gate_definition": "NylC residues 261-266; Thr267 excluded"
+      "gate_definition": "NylC residues 261-266; Thr267 excluded",
+      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)"
     },
     {
       "id": "nyl50_c18_70792ps",
@@ -59,19 +93,36 @@
       "segment_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nyl50/C18/segments/segment_000710_FREE_MONITOR",
       "branch_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/cyclic_gate_nac_20260719/branches/nyl50/C18",
       "segment": "segment_000710",
-      "cumulative_time_ps": 70792.0,
-      "local_xtc_time_ps": 50.0,
-      "strict_nac_interval_ps": [70786.0, 70798.0],
+      "cumulative_time_ps": 70792,
+      "local_xtc_time_ps": 52,
+      "strict_nac_interval_ps": [
+        70786,
+        70798
+      ],
       "source_itp": "l4_nfree_GMX.itp",
       "source_molecule_type": "l4_nfree",
       "source_atom_count": 160,
       "ligand_first_global_atom": 8817,
-      "reactive_local_atoms": {"carbonyl_c": 25, "carbonyl_o": 26, "amide_n": 24},
-      "reactive_global_atoms": {"carbonyl_c": 8841, "carbonyl_o": 8842, "amide_n": 8840, "thr_og1": 7684},
-      "source_geometry": {"gate_nm": 0.585460, "distance_nm": 0.332772, "angle_deg": 109.349},
+      "reactive_local_atoms": {
+        "carbonyl_c": 25,
+        "carbonyl_o": 26,
+        "amide_n": 24
+      },
+      "reactive_global_atoms": {
+        "carbonyl_c": 8841,
+        "carbonyl_o": 8842,
+        "amide_n": 8840,
+        "thr_og1": 7684
+      },
+      "source_geometry": {
+        "gate_nm": 0.58546,
+        "distance_nm": 0.332772,
+        "angle_deg": 109.349
+      },
       "gate_index_group": "Gate",
       "thr_index_group": "Thr_OG1",
-      "gate_definition": "reuse validated Nyl50 cycle.ndx group; do not apply NylC residue numbers"
+      "gate_definition": "reuse validated Nyl50 cycle.ndx group; do not apply NylC residue numbers",
+      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)"
     },
     {
       "id": "nyl12_j1_37848ps",
@@ -80,19 +131,36 @@
       "segment_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/nyl12_ad_l4_j123_20260720/branches/Nyl12/J1/segments/segment_000380_FREE_MONITOR",
       "branch_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/nyl12_ad_l4_j123_20260720/branches/Nyl12/J1",
       "segment": "segment_000380",
-      "cumulative_time_ps": 37848.0,
-      "local_xtc_time_ps": 26.0,
-      "strict_nac_interval_ps": [37846.0, 37856.0],
+      "cumulative_time_ps": 37848,
+      "local_xtc_time_ps": 28,
+      "strict_nac_interval_ps": [
+        37846,
+        37856
+      ],
       "source_itp": "pa66_l4_GMX.itp",
       "source_molecule_type": "pa66_l4",
       "source_atom_count": 164,
       "ligand_first_global_atom": 9741,
-      "reactive_local_atoms": {"carbonyl_c": 18, "carbonyl_o": 19, "amide_n": 20},
-      "reactive_global_atoms": {"carbonyl_c": 9758, "carbonyl_o": 9759, "amide_n": 9760, "thr_og1": 3386},
-      "source_geometry": {"gate_nm": 1.227638, "distance_nm": 0.310658, "angle_deg": 104.975},
+      "reactive_local_atoms": {
+        "carbonyl_c": 18,
+        "carbonyl_o": 19,
+        "amide_n": 20
+      },
+      "reactive_global_atoms": {
+        "carbonyl_c": 9758,
+        "carbonyl_o": 9759,
+        "amide_n": 9760,
+        "thr_og1": 3386
+      },
+      "source_geometry": {
+        "gate_nm": 1.227638,
+        "distance_nm": 0.310658,
+        "angle_deg": 104.975
+      },
       "gate_index_group": "Gate",
       "thr_index_group": "ThrOG1",
-      "gate_definition": "reuse validated Nyl12 cycle.ndx group; J1 mapping is local atoms 18/19/20"
+      "gate_definition": "reuse validated Nyl12 cycle.ndx group; J1 mapping is local atoms 18/19/20",
+      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)"
     },
     {
       "id": "nyl12_j2_87418ps",
@@ -101,19 +169,36 @@
       "segment_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/nyl12_ad_l4_j123_20260720/branches/Nyl12/J2/segments/segment_000875_FREE_MONITOR",
       "branch_dir": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/apo_gate_l4_three_carbonyl_20260715/nyl12_ad_l4_j123_20260720/branches/Nyl12/J2",
       "segment": "segment_000875",
-      "cumulative_time_ps": 87418.0,
-      "local_xtc_time_ps": 96.0,
-      "strict_nac_interval_ps": [87408.0, 87420.0],
+      "cumulative_time_ps": 87418,
+      "local_xtc_time_ps": 98,
+      "strict_nac_interval_ps": [
+        87408,
+        87420
+      ],
       "source_itp": "pa66_l4_GMX.itp",
       "source_molecule_type": "pa66_l4",
       "source_atom_count": 164,
       "ligand_first_global_atom": 9741,
-      "reactive_local_atoms": {"carbonyl_c": 34, "carbonyl_o": 35, "amide_n": 36},
-      "reactive_global_atoms": {"carbonyl_c": 9774, "carbonyl_o": 9775, "amide_n": 9776, "thr_og1": 3386},
-      "source_geometry": {"gate_nm": 1.233828, "distance_nm": 0.318620, "angle_deg": 106.089},
+      "reactive_local_atoms": {
+        "carbonyl_c": 34,
+        "carbonyl_o": 35,
+        "amide_n": 36
+      },
+      "reactive_global_atoms": {
+        "carbonyl_c": 9774,
+        "carbonyl_o": 9775,
+        "amide_n": 9776,
+        "thr_og1": 3386
+      },
+      "source_geometry": {
+        "gate_nm": 1.233828,
+        "distance_nm": 0.31862,
+        "angle_deg": 106.089
+      },
       "gate_index_group": "Gate",
       "thr_index_group": "ThrOG1",
-      "gate_definition": "reuse validated Nyl12 cycle.ndx group; J2 mapping is local atoms 34/35/36"
+      "gate_definition": "reuse validated Nyl12 cycle.ndx group; J2 mapping is local atoms 34/35/36",
+      "xtc_alignment": "geometry.tsv first sample is XTC 2 ps; local time = cumulative time - (first geometry time - 2 ps)"
     }
   ]
 }
