@@ -11,6 +11,8 @@
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgffgs_%j.err
 
 set -euo pipefail
+echo "SUPERSEDED_SINGLE_PRECISION_MACHINE_PRECISION: use double-precision flexible CG" >&2
+exit 42
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
 PY=/work/home/acshdt1dks/anaconda3/bin/python3.9
