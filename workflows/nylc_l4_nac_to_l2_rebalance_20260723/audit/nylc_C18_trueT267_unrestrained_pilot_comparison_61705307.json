@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_recapture",
+  "source_restrained_selection": {
+    "job_id": 61705002,
+    "time_ps": 67,
+    "distance_nm": 0.336447,
+    "angle_deg": 100.87,
+    "potential_energy_kj_mol": -1825802.875,
+    "scientific_status": "NOT_A_SCIENTIFIC_GS_RESTRAINED_SOURCE"
+  },
+  "unrestrained_pilot_array_job_id": 61705307,
+  "seeds": [
+    {
+      "seed": 26701,
+      "technical_status": "PASS",
+      "scientific_status": "FAIL_UNRESTRAINED_PILOT_NO_NAC",
+      "nac_frames": 0,
+      "frame_count": 101,
+      "occupancy": 0,
+      "end_distance_nm": 0.467994,
+      "end_angle_deg": 4.836
+    },
+    {
+      "seed": 26702,
+      "technical_status": "PASS",
+      "scientific_status": "FAIL_UNRESTRAINED_PILOT_NO_NAC",
+      "nac_frames": 0,
+      "frame_count": 101,
+      "occupancy": 0,
+      "end_distance_nm": 0.506901,
+      "end_angle_deg": 52.39
+    },
+    {
+      "seed": 26703,
+      "technical_status": "PASS",
+      "scientific_status": "PASS_UNRESTRAINED_PILOT_NAC_PRESENT",
+      "nac_frames": 6,
+      "frame_count": 101,
+      "occupancy": 0.0594059405940594,
+      "longest_continuous_nac_ps": 1,
+      "end_distance_nm": 0.454517,
+      "end_angle_deg": 118.512,
+      "lowest_potential_nac_frame": {
+        "time_ps": 8,
+        "distance_nm": 0.329,
+        "angle_deg": 114.257,
+        "potential_energy_kj_mol": -1829950.75
+      }
+    }
+  ],
+  "numerical_events": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "settle_problem": 0,
+    "nan": 0
+  },
+  "interpretation": "True Thr267 NAC is rare rather than a high-occupancy basin in the 100 ps pilots. Seed 26703 supplies an authentic fully unrestrained low-potential NAC frame, but the pilot alone is insufficient to establish a stable GS ensemble.",
+  "decision": {
+    "status": "EXTEND_ONLY_NAC_POSITIVE_SEED",
+    "seed": 26703,
+    "job_id": 61705692,
+    "window": "fully_unrestrained_NPT_1ns",
+    "selection_after_extension": "lowest potential energy among true NAC frames in the full free window"
+  }
+}
