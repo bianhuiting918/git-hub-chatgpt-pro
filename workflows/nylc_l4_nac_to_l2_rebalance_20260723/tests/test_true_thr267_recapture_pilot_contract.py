@@ -16,6 +16,7 @@ SBATCH8 = FLOW / "slurm" / "run_true_thr267_recapture_response8_c18.sbatch"
 SBATCH9 = FLOW / "slurm" / "run_true_thr267_recapture_response9_c18.sbatch"
 SBATCH10 = FLOW / "slurm" / "run_true_thr267_recapture_response10_c18.sbatch"
 SBATCH11 = FLOW / "slurm" / "run_true_thr267_recapture_response11_c18.sbatch"
+RELEASE1 = FLOW / "slurm" / "run_true_thr267_recapture_release1_c18.sbatch"
 
 
 def load_audit():
@@ -184,6 +185,7 @@ def test_contact_audit_reports_ligand_protein_minimum():
     assert result["distance_nm"] == 0.2
     assert result["protein_global_index"] == 1
     assert result["ligand_global_index"] == 2
+    assert result["minimum_heavy_atom_contact"]["distance_nm"] == 0.2
 
 
 def test_response7_continues_c18_from_response6():
@@ -260,3 +262,23 @@ def test_response11_tightens_fixed_target_hold():
     assert '-deffnm "$work/response11"' in text
     assert "recapture_response10/response10.gro" in text
     assert "--max-end-distance 0.36" in text
+
+
+def test_audit_reports_full_trajectory_nac_statistics():
+    text = AUDIT.read_text(encoding="utf-8")
+    assert "trajectory_nac" in text
+    assert "longest_continuous_nac_ps" in text
+    assert "minimum_heavy_atom_contact" in text
+
+
+def test_release1_reduces_restraint_strength():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181278, protocol="release1")
+    assert "continuation             = yes" in mdp
+    assert "pull-coord1-init         = 0.350000" in mdp
+    assert "pull-coord1-k            = 3000" in mdp
+    assert "pull-coord2-k            = 300" in mdp
+    assert m.PROTOCOLS["release1"]["parent_stem"] == "response11"
+    text = RELEASE1.read_text(encoding="utf-8")
+    assert '-deffnm "$work/release1"' in text
+    assert "recapture_response11/response11.gro" in text
