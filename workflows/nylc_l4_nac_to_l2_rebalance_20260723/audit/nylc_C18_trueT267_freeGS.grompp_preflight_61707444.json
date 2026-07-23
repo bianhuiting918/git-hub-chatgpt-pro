@@ -1,0 +1,11 @@
+{
+  "build_state": "BUILD_PASS",
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "grompp_returncode": 0,
+  "maxwarn": 0,
+  "schema_version": 1,
+  "scientific_status": "NOT_EVALUATED_L2_EM_AND_UNRESTRAINED_REBALANCE_REQUIRED",
+  "slurm_job_id": "61707444",
+  "status": "PASS_BUILD_AND_GROMPP",
+  "tpr_sha256": "d05e98be3fc7403268b12c083a9f7f5ae55d873edfc0e49676038536ea4284e4"
+}
