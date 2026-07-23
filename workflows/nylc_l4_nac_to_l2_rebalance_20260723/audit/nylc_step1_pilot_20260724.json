@@ -258,16 +258,48 @@
     "scientific_gate": "NOT_EVALUATED_RESTRAINED_APPROACH_PILOT; require released L4 true NAC before L2 truncation",
     "response2": {
       "job_id": "61695989",
-      "status": "RUNNING",
+      "terminal_status": "FAILED_POSTPROCESS_EXIT_2",
+      "mdrun_status": "COMPLETED_NUMERICALLY_STABLE",
+      "results": {
+        "C18": {
+          "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+          "end_distance_nm": 1.482534,
+          "end_angle_deg": 89.306
+        },
+        "C23": {
+          "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+          "end_distance_nm": 1.368859,
+          "end_angle_deg": 95.06
+        }
+      },
+      "note": "automatic audit path was wrong; identical audit was run manually on retained outputs"
+    },
+    "response3": {
+      "job_id": "61697621",
+      "terminal_status": "FAILED_GATE_EXIT_2",
+      "mdrun_status": "COMPLETED_NUMERICALLY_STABLE",
       "protocol": {
-        "source": "original verified frames",
-        "duration_ps": 100,
-        "distance_reference_change_nm": -0.2,
-        "distance_k_kj_mol_nm2": 500,
-        "angle_k": 50,
+        "duration_ps": 25,
+        "distance_reference_change_nm": -0.1,
+        "distance_k_kj_mol_nm2": 2000,
+        "angle_k": 100,
         "gate_restrained": false
       },
-      "scientific_gate": "NOT_EVALUATED_RESTRAINED_RESPONSE_PROBE"
+      "results": {
+        "C18": {
+          "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+          "distance_response_nm": 0.019334,
+          "end_distance_nm": 1.431185,
+          "end_angle_deg": 106.993
+        },
+        "C23": {
+          "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+          "distance_response_nm": 0.014828,
+          "end_distance_nm": 1.295118,
+          "end_angle_deg": 88.984
+        }
+      },
+      "next_gate": "checkpoint continuation; C18 preferred geometry, C23 retained"
     }
   }
 }
