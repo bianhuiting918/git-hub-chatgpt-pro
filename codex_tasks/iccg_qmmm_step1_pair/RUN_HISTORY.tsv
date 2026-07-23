@@ -1,0 +1,13 @@
+2026-07-23T00:00:00Z	RED	python test_iccg_step1_pair.py	exit_1	Expected missing implementation before code.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Implemented local hard-gate unit coverage; remote science not run.
+2026-07-23T00:00:00Z	REGRESSION	python test_iccg_step1_pair.py	exit_1	Reviewer-requested fail-closed and fixture integration coverage.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_1	Reviewer-requested corrections pass locally; remote Amber dependencies not run.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Reviewer-requested corrections pass locally; remote Amber dependencies not run.
+2026-07-23T00:00:00Z	CORRECTION	RUN_HISTORY.tsv	exit_0	Line 4 label should be REGRESSION, not GREEN; retained append-only and superseded by line 5.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Exact Step1 RC atoms C30/O14/O16 plus Ser165 HG required; LG2 overlap blocker covered.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-A main writes pair PDBs and non-empty fail-closed preflight gates; LG1 transfer geometry PASS.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-A status preserves exact NOT_SUBMITTED/FAIL reason without double prefix.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Geometry gate reports worst protein-ligand pair details.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_1	Stage-A ignores deferred RC/HG, preserves ligand internal distances, and records topology-not-built separately.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	can_submit requires named Stage-A structural gates and ignores separate topology-not-built marker.
+2026-07-23T00:00:00Z	CORRECTION	RUN_HISTORY.tsv	exit_0	Line 11 label should be REGRESSION, not GREEN; retained append-only and superseded by line 12.
