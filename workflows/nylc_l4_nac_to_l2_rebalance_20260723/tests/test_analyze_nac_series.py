@@ -47,6 +47,41 @@ def test_reports_occupancy_and_longest_continuous_residence(tmp_path):
     assert audit["longest_continuous_nac"]["frame_count"] == 2
 
 
+def test_reports_lowest_potential_nac_frame_when_energy_is_supplied(tmp_path):
+    distance = tmp_path / "distance.xvg"
+    angle = tmp_path / "angle.xvg"
+    energy = tmp_path / "potential.xvg"
+    output = tmp_path / "audit.json"
+    times = [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0]
+    _write_xvg(distance, list(zip(times, [0.34, 0.33, 0.36, 0.32, 0.31, 0.34, 0.37])))
+    _write_xvg(angle, list(zip(times, [100, 110, 105, 94, 100, 115, 108])))
+    _write_xvg(energy, list(zip(times, [-10, -12, -30, -40, -50, -20, -60])))
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--distance-xvg",
+            str(distance),
+            "--angle-xvg",
+            str(angle),
+            "--potential-xvg",
+            str(energy),
+            "--output",
+            str(output),
+        ],
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    selected = json.loads(output.read_text())["lowest_potential_nac_frame"]
+    assert selected["time_ps"] == 8.0
+    assert selected["potential_energy_kj_mol"] == -50.0
+    assert selected["distance_nm"] == 0.31
+    assert selected["angle_deg"] == 100.0
+
+
 def test_rejects_misaligned_time_series(tmp_path):
     distance = tmp_path / "distance.xvg"
     angle = tmp_path / "angle.xvg"
