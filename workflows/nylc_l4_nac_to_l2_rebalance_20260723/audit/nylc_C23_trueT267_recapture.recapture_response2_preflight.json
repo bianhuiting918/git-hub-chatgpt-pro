@@ -1,0 +1,32 @@
+{
+  "candidate": "nylc_C23_trueT267_recapture",
+  "corrected_index_sha256": "84a8c3350d307b212982868e7060f62b1da9e544205cfc74af66428cef6c9da0",
+  "gate_residues": [
+    261,
+    262,
+    263,
+    264,
+    265,
+    266
+  ],
+  "grompp_returncode": 0,
+  "maxwarn": 0,
+  "protocol": {
+    "angle_k_kj_mol_rad2": 50,
+    "angle_reference_deg": 105.0,
+    "distance_k_kj_mol_nm2": 500,
+    "distance_reference_rate_nm_per_ps": -0.002,
+    "duration_ps": 100.0,
+    "fresh_velocity_seed": 231268,
+    "gate_restraint": false,
+    "protocol": "response2"
+  },
+  "schema_version": 1,
+  "scientific_gate": "NOT_EVALUATED_APPROACH_PILOT_NOT_AN_UNRESTRAINED_NAC",
+  "source_gro_sha256": "612543a7d66b9e2683ff5b1208102d329ad739bc2805ae7054897ac16c015a8d",
+  "status": "PASS_GROMPP_TRUE_THR267",
+  "superseded_thr262_og1_global_index": 8896,
+  "thr267_excluded_from_gate": true,
+  "topology_sha256": "b89d7bf87886245aa0962795f77aa6a80716847f1b07abfe0fca21386cfbf75c",
+  "true_thr267_og1_global_index": 8961
+}
