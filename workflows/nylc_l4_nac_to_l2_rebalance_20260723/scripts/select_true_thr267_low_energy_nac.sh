@@ -75,8 +75,8 @@ out={
     "trajectory_nac":{
         "frame_count":series["frame_count"],
         "nac_frame_count":series["nac_frame_count"],
-        "occupancy":series["occupancy"],
-        "longest_continuous_nac_ps":series["longest_continuous_nac_ps"],
+        "occupancy":series["nac_occupancy"],
+        "longest_continuous_nac_ps":series["longest_continuous_nac"]["duration_ps"],
     },
     "next_gate":"fully_unrestrained multi-seed NPT pilot; this restrained selection alone cannot establish GS stability",
 }
