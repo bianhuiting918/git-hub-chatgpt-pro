@@ -106,7 +106,8 @@ run_stage nvt150_nac "$run_root/nvt100_nac/run.gro" "$run_root/nvt100_nac/run.cp
 stage=nvt300_nac_release
 run_stage nvt300_nac_release "$run_root/nvt150_nac/run.gro" "$run_root/nvt150_nac/run.cpt"
 stage=npt300_nac_free_pilot
-run_stage npt300_nac_free_pilot "$run_root/nvt300_nac_release/run.gro" "$run_root/nvt300_nac_release/run.cpt" yes
+unrestrained=yes
+run_stage npt300_nac_free_pilot "$run_root/nvt300_nac_release/run.gro" "$run_root/nvt300_nac_release/run.cpt" "$unrestrained"
 
 "$PYTHON" - "$run_root/UNRESTRAINED_100PS_PILOT_COMPLETE.json" "$candidate" "$job_id" <<'PY'
 import json,sys
