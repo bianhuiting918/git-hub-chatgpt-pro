@@ -15,3 +15,16 @@
 2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_1	Relief search uses 6A pocket prefilter, full validation, and minimum-PASS-norm priority.
 2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Minimum-PASS-norm relief test adjusted away from exact floating threshold.
 2026-07-23T00:00:00Z	CORRECTION	RUN_HISTORY.tsv	exit_0	Line 15 label should be REGRESSION, not GREEN; retained append-only and superseded by line 16.
+2026-07-23T00:00:00Z	RED	python test_iccg_step1_pair.py	exit_0	Stage-B tests written before implementation.
+2026-07-23T00:00:00Z	RED	python test_iccg_step1_pair.py	exit_1	Stage-B tests now execute and fail before implementation.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-B minimal topology/QM/smoke contracts implemented fail-closed.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-B deploy path added before final verification.
+2026-07-23T00:00:00Z	RED	python test_iccg_step1_pair.py	exit_1	Stage-B runner tests fail against placeholder topology builder.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_1	Stage-B invokes fake tleap/ParmEd runner and fails closed on missing dependencies.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_1	Stage-B runner implementation repaired and tested.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-B topology-not-built path uses existing fake dependencies and missing pair outputs.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-B CLI/deploy dependency path arguments verified by regression run.
+2026-07-23T00:00:00Z	CORRECTION	RUN_HISTORY.tsv	exit_0	Lines 23-24 labels should be REGRESSION, not GREEN; retained append-only and superseded by lines 25-26.
+2026-07-23T00:00:00Z	RED	python test_iccg_step1_pair.py	exit_1	CYX disulfide, Amber18 verbose collector, and postrun geometry CLI tests added before implementation.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	CYX disulfides, Amber18 collector regex, and postrun geometry CLI implemented.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Final CYX/collector/postrun geometry regression run.

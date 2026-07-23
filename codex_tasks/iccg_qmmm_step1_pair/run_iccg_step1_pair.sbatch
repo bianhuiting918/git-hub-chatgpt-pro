@@ -14,6 +14,6 @@ cd "$PROJECT"
 python audit_iccg_step1_pair.py preflight_report.json --submit-check
 for state in LG1 LG2; do
   sander.MPI -O -i "${state}.in" -o "${state}.out" -p pair.prmtop -c "${state}.inpcrd" -r "${state}.rst" -inf "${state}.mdinfo"
-  python audit_iccg_step1_pair.py "${state}_postrun_geometry.json"
+  python audit_iccg_step1_pair.py "generated_${state}_pair.pdb" --geometry-json "${state}_postrun_geometry.json"
   python collect_iccg_step1_pair.py --log "${state}.out" --out "${state}.PASS.json" --process-exit 0 --geometry-report "${state}_postrun_geometry.json"
 done

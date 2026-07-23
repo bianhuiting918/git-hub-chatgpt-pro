@@ -203,5 +203,169 @@ class PairGateTests(unittest.TestCase):
                 collect.write_pass_json(log, out, process_exit=0, geometry_pass=True)
             self.assertFalse(out.exists())
 
+class StageBTests(unittest.TestCase):
+    def test_stage_b_literature_ligand_copy_contract(self):
+        self.assertEqual(build.LITERATURE_LIGAND_RESNAME, "UNK")
+        self.assertEqual(build.LITERATURE_LIGAND_RESID, 265)
+        self.assertEqual(build.LITERATURE_LIGAND_NET_CHARGE, 0)
+        self.assertEqual(build.LITERATURE_LIGAND_ORDER[:4], ["C1", "O2", "C3", "O4"])
+        self.assertEqual(build.LITERATURE_LIGAND_ORDER[-1], "H54")
+        self.assertEqual(len(build.LITERATURE_LIGAND_ORDER), 54)
+
+    def test_stage_b_his242_hid_and_ser165_hg_required(self):
+        atoms = [
+            build.Atom(1, "SER", 165, "OG", (0,0,0), "O", "ATOM"),
+            build.Atom(2, "HID", 242, "HD1", (0,0,0), "H", "ATOM"),
+            build.Atom(3, "HID", 242, "NE2", (0,0,0), "N", "ATOM"),
+        ]
+        audit_b = build.audit_stage_b_protonation(atoms)
+        self.assertFalse(audit_b["pass"])
+        self.assertEqual(audit_b["reason"], "NOT_SUBMITTED_PROTONATION_INCOMPLETE")
+        atoms.append(build.Atom(4, "SER", 165, "HG", (0,0,0), "H", "ATOM"))
+        self.assertTrue(build.audit_stage_b_protonation(atoms)["pass"])
+
+    def test_stage_b_qm_sidechains_exclude_backbone_and_include_ligand54(self):
+        atoms = []
+        idx = 1
+        for resid, resname in [(164,"TRP"),(165,"SER"),(210,"ASP"),(242,"HID"),(243,"ILE")]:
+            for name in ["N","H","CA","HA","C","O","CB","SC"]:
+                atoms.append(build.Atom(idx, resname, resid, name, (0,0,0), "C", "ATOM")); idx += 1
+        for name in build.LITERATURE_LIGAND_ORDER:
+            atoms.append(build.Atom(idx, "LG1", 900, name, (0,0,0), "C" if not name.startswith("H") else "H", "HETATM")); idx += 1
+        qm = build.select_stage_b_qm_atoms(atoms)
+        self.assertEqual(sum(1 for a in qm if a.resname == "LG1"), 54)
+        self.assertFalse(any(a.name in build.QM_BACKBONE_EXCLUDED for a in qm if a.resname != "LG1"))
+        self.assertEqual({a.resid for a in qm if a.resname != "LG1"}, {164,165,210,242,243})
+
+    def test_stage_b_no_ser_ligand_covalent_bond_gate(self):
+        bonds = [(1, 2), (10, 11)]
+        atoms = [build.Atom(1, "SER", 165, "OG", (0,0,0), "O", "ATOM"), build.Atom(2, "LG1", 900, "C30", (0,0,0), "C", "HETATM")]
+        gate = build.audit_no_ser_ligand_bond(atoms, bonds)
+        self.assertFalse(gate["pass"])
+        self.assertEqual(gate["reason"], "NOT_SUBMITTED_SER_LIGAND_BOND_PRESENT")
+        self.assertTrue(build.audit_no_ser_ligand_bond(atoms, [(10, 11)])["pass"])
+
+    def test_stage_b_sander_inputs_and_missing_topology_fail_closed(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            deps = {}
+            for key, name in {"ambertools_prefix":"ambertools", "parmed_egg":"ParmEd.egg", "literature_prmtop":"vmd-md-b.prmtop", "literature_inpcrd":"vmd-md-b.inpcrd", "dftb_slko_path":"3ob-3-1"}.items():
+                path = out / name
+                if key.endswith("path") or key == "ambertools_prefix": path.mkdir()
+                else: path.write_text("fixture")
+                deps[key] = path
+            (deps["ambertools_prefix"] / "bin").mkdir(); (deps["ambertools_prefix"] / "bin" / "tleap").write_text("tleap")
+            def fake_runner(cmd, cwd):
+                if "tleap" in " ".join(str(x) for x in cmd):
+                    (cwd / "protein.prmtop").write_text("protein topology"); (cwd / "protein.rst7").write_text("protein coords")
+                return build.CommandResult(0, "ok", "")
+            report = build.build_stage_b(out, runner=fake_runner, **deps)
+            self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_NOT_BUILT")
+            self.assertFalse(report["gates"][-1]["pass"])
+            text = build.sander_input_text("LG1", "@1,2,3")
+            for needle in ["imin=1", "maxcyc=0", "igb=8", "ifqnt=1", "qmgb=2", "dftb_maxiter=200", "scfconv=1d-8", build.DFTB_SLKO_PATH]:
+                self.assertIn(needle, text)
+
+    def test_stage_b_invokes_tleap_and_parmed_runner_to_build_outputs(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            deps = {}
+            for key, name in {"ambertools_prefix":"ambertools", "parmed_egg":"ParmEd.egg", "literature_prmtop":"vmd-md-b.prmtop", "literature_inpcrd":"vmd-md-b.inpcrd", "dftb_slko_path":"3ob-3-1"}.items():
+                path = root / name
+                if key.endswith("path") or key == "ambertools_prefix":
+                    path.mkdir()
+                else:
+                    path.write_text("fixture")
+                deps[key] = path
+            (deps["ambertools_prefix"] / "bin").mkdir()
+            (deps["ambertools_prefix"] / "bin" / "tleap").write_text("#!/bin/sh\n")
+            for state in ("LG1", "LG2"):
+                (root / f"generated_{state}_pair.pdb").write_text("END\n")
+            calls = []
+            def fake_runner(cmd, cwd):
+                calls.append(cmd)
+                joined = " ".join(str(x) for x in cmd)
+                if "tleap" in joined:
+                    (cwd / "protein.prmtop").write_text("protein topology")
+                    (cwd / "protein.rst7").write_text("protein coords")
+                if "parmed_stage_b" in joined:
+                    (cwd / "pair.prmtop").write_text("pair topology")
+                    (cwd / "LG1.inpcrd").write_text("lg1 coords")
+                    (cwd / "LG2.inpcrd").write_text("lg2 coords")
+                return build.CommandResult(0, "ok", "")
+            report = build.build_stage_b(root, runner=fake_runner, **deps)
+            self.assertEqual(report["status"], "PASS")
+            self.assertTrue(any("tleap" in " ".join(map(str, c)) for c in calls))
+            self.assertTrue(any("parmed_stage_b" in " ".join(map(str, c)) for c in calls))
+            self.assertTrue((root / "topology_audit.json").exists())
+            self.assertTrue((root / "LG1.in").exists())
+            self.assertTrue((root / "LG2.in").exists())
+            self.assertTrue(report["gates"][0]["pass"])
+
+    def test_stage_b_missing_dependency_fails_before_runner(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            calls = []
+            report = build.build_stage_b(root, runner=lambda cmd, cwd: calls.append(cmd), ambertools_prefix=root / "missing")
+            self.assertEqual(report["status"], "NOT_SUBMITTED_DEPENDENCY_MISSING")
+            self.assertEqual(calls, [])
+
+    def test_stage_b_tleap_marks_cyx_and_explicit_disulfide_bonds(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            tleap = build._write_tleap_input(out)
+            text = tleap.read_text()
+            for resid in (238, 283, 275, 292):
+                self.assertIn(f"p.{resid}.name", text)
+                self.assertIn("CYX", text)
+            self.assertIn("bond p.238.SG p.283.SG", text)
+            self.assertIn("bond p.275.SG p.292.SG", text)
+
+    def test_stage_b_disulfide_audit_requires_cyx_no_hg_and_two_ss_bonds(self):
+        atoms = [
+            build.Atom(238, "CYX", 238, "SG", (0,0,0), "S", "ATOM"),
+            build.Atom(283, "CYX", 283, "SG", (2.07,0,0), "S", "ATOM"),
+            build.Atom(275, "CYX", 275, "SG", (0,4,0), "S", "ATOM"),
+            build.Atom(292, "CYX", 292, "SG", (2.11,4,0), "S", "ATOM"),
+        ]
+        ok = build.audit_disulfides(atoms, [(238, 283), (275, 292)])
+        self.assertTrue(ok["pass"])
+        bad = atoms + [build.Atom(999, "CYX", 238, "HG", (0,0,1), "H", "ATOM")]
+        self.assertFalse(build.audit_disulfides(bad, [(238, 283), (275, 292)])["pass"])
+
+    def test_collector_parses_amber18_verbose_scc_and_final_results_energy(self):
+        amber = """Header
+QMMM SCC-DFTB: SCC-DFTB for step 1 converged in 2 cycles.
+ DFTBESCF = -11256.4565 EGB = -2188.3072
+ FINAL RESULTS
+ NSTEP       ENERGY          RMS            GMAX
+     1  -1.8090E+04   0.0E+00       4.3766E+02
+ Maximum number of minimization cycles reached
+"""
+        with tempfile.TemporaryDirectory() as td:
+            log = Path(td) / "lg2.out"
+            log.write_text(amber)
+            parsed = collect.parse_sander_output(log)
+            self.assertTrue(parsed["scc_converged"])
+            self.assertTrue(parsed["normal_termination"])
+            self.assertAlmostEqual(parsed["TOTAL_ENERGY"], -1.8090e4)
+            self.assertAlmostEqual(parsed["DFTBESCF"], -11256.4565)
+            self.assertAlmostEqual(parsed["EGB"], -2188.3072)
+
+    def test_postrun_geometry_cli_writes_json_before_collector_reads_it(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            pdb = root / "state.pdb"
+            pdb.write_text("".join([
+                "ATOM      1  CB  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\n",
+                "HETATM    2  C1  LG1 A 900       3.000   0.000   0.000  1.00  0.00           C\n",
+                "END\n",
+            ]))
+            geom = root / "postrun_geometry.json"
+            rc = audit.main([str(pdb), "--geometry-json", str(geom)])
+            self.assertEqual(rc, 0)
+            self.assertTrue(json.loads(geom.read_text())["pass"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

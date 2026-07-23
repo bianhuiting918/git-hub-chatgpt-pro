@@ -7,17 +7,34 @@ from pathlib import Path
 def parse_sander_output(path: Path) -> dict[str, object]:
     text = path.read_text(errors="replace")
     def finite_field(name: str) -> float | None:
-        m = re.search(rf"{name}\s*=\s*([-+0-9.Ee]+)", text)
-        if not m:
+        matches = re.findall(rf"{name}\s*=\s*([-+0-9.Ee]+)", text)
+        if not matches:
             return None
-        value = float(m.group(1))
+        value = float(matches[-1])
         return value if math.isfinite(value) else None
+    def final_results_energy() -> float | None:
+        idx = text.rfind("FINAL RESULTS")
+        if idx < 0:
+            return None
+        block = text[idx:].splitlines()
+        for i, line in enumerate(block):
+            if "NSTEP" in line and "ENERGY" in line:
+                for data in block[i+1:]:
+                    nums = re.findall(r"[-+]?\d+(?:\.\d*)?(?:[Ee][-+]?\d+)?", data)
+                    if len(nums) >= 2:
+                        value = float(nums[1])
+                        return value if math.isfinite(value) else None
+        return None
+    scc = bool(re.search(r"SCC-DFTB for step\s+\d+\s+converged in\s+\d+\s+cycles", text)) or "SCC CONVERGED" in text or "DFTB SCC converged" in text
+    total = finite_field("TOTAL_ENERGY")
+    if total is None:
+        total = final_results_energy()
     return {
         "normal_termination": "FINAL RESULTS" in text or "Normal termination" in text,
-        "scc_converged": "SCC CONVERGED" in text or "DFTB SCC converged" in text,
+        "scc_converged": scc,
         "DFTBESCF": finite_field("DFTBESCF"),
         "EGB": finite_field("EGB"),
-        "TOTAL_ENERGY": finite_field("TOTAL_ENERGY"),
+        "TOTAL_ENERGY": total,
     }
 
 def geometry_report_pass(path: Path) -> bool:

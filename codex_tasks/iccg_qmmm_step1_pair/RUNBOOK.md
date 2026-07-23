@@ -38,3 +38,13 @@ Each state requires normal Amber termination, converged DFTB SCC, finite
 `DFTBESCF`, finite `EGB`, finite total energy, and a passing post-run geometry
 audit before a state `PASS.json` can be written. The pair summary is permitted
 only after both state PASS files exist.
+
+## Remote CYX Stage-B notes
+
+The validated remote CYX topology has two disulfides (Cys238-Cys283 and
+Cys275-Cys292), 258 protein residues plus one ligand residue, 3848 protein
+atoms, 3902 total atoms, ligand54, QM atom count 100, system charge about +6,
+qmcharge -1, His242 as HID with HD1/no HE2, and Ser165 HG present. Reported
+GMAX values are diagnostics only, not low-gradient hard gates. The hard geometry
+gate remains protein-ligand heavy-atom max vdW overlap <= 0.80 A, with verbose
+SCC convergence and finite DFTBESCF/EGB/ENERGY required for PASS.json.

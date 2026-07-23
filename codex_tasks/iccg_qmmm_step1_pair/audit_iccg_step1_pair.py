@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse, json, math
 from pathlib import Path
 from typing import Sequence
-from build_iccg_step1_pair import Atom, ligand_atoms, protein_atoms
+from build_iccg_step1_pair import Atom, ligand_atoms, protein_atoms, parse_pdb_atoms
 
 VDW = {"H": 1.20, "C": 1.70, "N": 1.55, "O": 1.52, "S": 1.80}
 
@@ -60,7 +60,13 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("preflight_report", type=Path)
     p.add_argument("--submit-check", action="store_true")
+    p.add_argument("--geometry-json", type=Path)
     args = p.parse_args(argv)
+    if args.geometry_json:
+        report = geometry_gate(parse_pdb_atoms(args.preflight_report))
+        args.geometry_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return 0 if report.get("pass") is True else 2
     if args.submit_check:
         ok = can_submit(args.preflight_report)
         print("PASS" if ok else "NOT_SUBMITTED_HARD_GATE")

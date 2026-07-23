@@ -20,6 +20,18 @@ LIGAND_ATOM_COUNT = 54
 LIGAND_HEAVY_COUNT = 32
 REMOTE_PROJECT = Path("/work/home/acshdt1dks/iccg_qmmm_step1_pair_20260723")
 
+AMBERTOOLS_DATA = "/work/home/acshdt1dks/petase_qmmm_pilot8_20260721/software/ambertools20_data_f0ab9845_lf"
+AMBER_MODULE = "amber/2018-hpcx-gcc-7.3.1"
+PARMED_EGG = "/public/software/apps/amber/2018/hpcx-2.4.1-gcc-7.3.1/lib/python2.7/site-packages/ParmEd-3.0.0_57.g74a84d30-py2.7-linux-x86_64.egg"
+LITERATURE_PRMTOP = "/work/home/acshdt1dks/petase_orbmol_lg1_lg4_active_20260719/inputs/literature_rc_sources/acylation/vmd-md-b.prmtop"
+LITERATURE_INPCRD = "/work/home/acshdt1dks/petase_orbmol_lg1_lg4_active_20260719/inputs/literature_rc_sources/acylation/vmd-md-b.inpcrd"
+DFTB_SLKO_PATH = "/work/home/acshdt1dks/petase_qmmm_pilot8_20260721/third_party/3ob-3-1"
+LITERATURE_LIGAND_RESNAME = "UNK"
+LITERATURE_LIGAND_RESID = 265
+LITERATURE_LIGAND_NET_CHARGE = 0
+LITERATURE_LIGAND_ORDER = ["C1","O2","C3","O4","C5","O6","C7","O8","C9","O10","C11","O12","C13","O14","C15","O16","C17","O18","C19","O20","C21","C22","C23","C24","C25","C26","C27","C28","C29","C30","C31","C32","H33","H34","H35","H36","H37","H38","H39","H40","H41","H42","H43","H44","H45","H46","H47","H48","H49","H50","H51","H52","H53","H54"]
+QM_BACKBONE_EXCLUDED = {"N","H","H1","H2","H3","CA","HA","C","O","OXT"}
+
 @dataclasses.dataclass(frozen=True)
 class Atom:
     index: int
@@ -32,6 +44,18 @@ class Atom:
 
     def with_xyz(self, xyz: Sequence[float]) -> "Atom":
         return dataclasses.replace(self, xyz=(float(xyz[0]), float(xyz[1]), float(xyz[2])))
+
+
+@dataclasses.dataclass(frozen=True)
+class CommandResult:
+    returncode: int
+    stdout: str = ""
+    stderr: str = ""
+
+def default_runner(cmd: Sequence[str], cwd: Path) -> CommandResult:
+    import subprocess
+    proc = subprocess.run([str(x) for x in cmd], cwd=str(cwd), text=True, capture_output=True)
+    return CommandResult(proc.returncode, proc.stdout, proc.stderr)
 
 
 def sha256_file(path: Path) -> str:
@@ -512,6 +536,186 @@ def build_stage_a(iccg_path: Path, lg1_path: Path, lg2_path: Path, out: Path) ->
     return report
 
 
+
+def audit_stage_b_protonation(atoms: Sequence[Atom]) -> dict[str, object]:
+    names = {(a.resname, a.resid, a.name) for a in atoms}
+    ser_hg = ("SER", 165, "HG") in names
+    his_hid = any(a.resname == "HID" and a.resid == 242 for a in atoms)
+    his_hd1 = ("HID", 242, "HD1") in names
+    his_ne2 = ("HID", 242, "NE2") in names
+    passed = ser_hg and his_hid and his_hd1 and his_ne2
+    missing = []
+    if not ser_hg: missing.append("SER165_HG")
+    if not his_hid: missing.append("HIS242_HID")
+    if not his_hd1: missing.append("HID242_HD1")
+    if not his_ne2: missing.append("HID242_NE2")
+    return {"name": "stage_b_protonation", "pass": passed, "reason": "PASS" if passed else "NOT_SUBMITTED_PROTONATION_INCOMPLETE", "missing": missing}
+
+
+def _stage_b_qm_residue_key(atom: Atom) -> tuple[str, int]:
+    return ("HIS", atom.resid) if atom.resname == "HID" else (atom.resname, atom.resid)
+
+
+def select_stage_b_qm_atoms(atoms: Sequence[Atom]) -> list[Atom]:
+    sidechains = {(res, resid) for res, resid in QM_SIDECHAINS}
+    selected = []
+    for atom in atoms:
+        if atom.resname in LIGAND_NAMES:
+            selected.append(atom)
+        elif _stage_b_qm_residue_key(atom) in sidechains and atom.name not in QM_BACKBONE_EXCLUDED:
+            selected.append(atom)
+    ligand_count = sum(1 for atom in selected if atom.resname in LIGAND_NAMES)
+    present = {atom.resid for atom in selected if atom.resname not in LIGAND_NAMES}
+    if ligand_count != 54 or present != {164, 165, 210, 242, 243}:
+        raise ValueError("Stage-B QM region must contain ligand54 plus five complete sidechains")
+    return selected
+
+
+def audit_no_ser_ligand_bond(atoms: Sequence[Atom], bonds: Sequence[tuple[int, int]]) -> dict[str, object]:
+    by_index = {atom.index: atom for atom in atoms}
+    bad = []
+    for i, j in bonds:
+        a = by_index.get(i); b = by_index.get(j)
+        if not a or not b:
+            continue
+        if ((a.resname == "SER" and a.resid == 165 and b.resname in LIGAND_NAMES) or (b.resname == "SER" and b.resid == 165 and a.resname in LIGAND_NAMES)):
+            bad.append([i, j])
+    return {"name": "no_ser_ligand_bond", "pass": not bad, "reason": "PASS" if not bad else "NOT_SUBMITTED_SER_LIGAND_BOND_PRESENT", "bad_bonds": bad}
+
+
+def sander_input_text(state: str, qmmask: str) -> str:
+    return f"""ICCG Step1 {state} DFTB3/GBN2 single point
+ &cntrl
+  imin=1, maxcyc=0, ntb=0, igb=8, gbsa=1, saltcon=0.10, cut=999,
+  ifqnt=1,
+ /
+ &qmmm
+  qmmask='{qmmask}', qmcharge=-1, spin=1, qm_theory='DFTB3',
+  qmgb=2, qmcut=999, dftb_maxiter=200, scfconv=1d-8, printcharges=1, verbosity=5,
+  dftb_3ob=1, dftb_slko_path='{DFTB_SLKO_PATH}',
+ /
+"""
+
+
+def stage_b_required_outputs(out: Path) -> list[Path]:
+    return [out / name for name in ["pair.prmtop", "LG1.inpcrd", "LG2.inpcrd", "LG1.in", "LG2.in"]]
+
+
+def _dependency_paths(ambertools_prefix, parmed_egg, literature_prmtop, literature_inpcrd, dftb_slko_path) -> dict[str, Path]:
+    return {
+        "ambertools_prefix": Path(ambertools_prefix or AMBERTOOLS_DATA),
+        "tleap": Path(ambertools_prefix or AMBERTOOLS_DATA) / "bin" / "tleap",
+        "parmed_egg": Path(parmed_egg or PARMED_EGG),
+        "literature_prmtop": Path(literature_prmtop or LITERATURE_PRMTOP),
+        "literature_inpcrd": Path(literature_inpcrd or LITERATURE_INPCRD),
+        "dftb_slko_path": Path(dftb_slko_path or DFTB_SLKO_PATH),
+    }
+
+
+DISULFIDE_PAIRS = ((238, 283), (275, 292))
+
+def audit_disulfides(atoms: Sequence[Atom], bonds: Sequence[tuple[int, int]]) -> dict[str, object]:
+    by_res_atom = {(a.resid, a.name): a for a in atoms}
+    bondset = {tuple(sorted(pair)) for pair in bonds}
+    missing = []
+    for a, b in DISULFIDE_PAIRS:
+        if (a, "SG") not in by_res_atom or (b, "SG") not in by_res_atom:
+            missing.append(f"{a}-{b}:SG")
+    cyx = [a for a in atoms if a.resid in {238, 283, 275, 292}]
+    wrong_resname = sorted({a.resid for a in cyx if a.resname != "CYX"})
+    cyx_hg = sorted({a.resid for a in cyx if a.name == "HG"})
+    missing_bonds = [[a, b] for a, b in DISULFIDE_PAIRS if tuple(sorted((a, b))) not in bondset]
+    passed = not missing and not wrong_resname and not cyx_hg and not missing_bonds
+    return {"name": "stage_b_disulfides", "pass": passed, "reason": "PASS" if passed else "NOT_SUBMITTED_DISULFIDE_INCOMPLETE", "pairs": [list(p) for p in DISULFIDE_PAIRS], "missing_atoms": missing, "wrong_resname": wrong_resname, "cyx_hg_present": cyx_hg, "missing_bonds": missing_bonds}
+
+def _write_tleap_input(out: Path) -> Path:
+    text = """source leaprc.protein.ff14SB
+set default PBRadii mbondi3
+p = loadpdb stage_b_protein_only.pdb
+set p.238.name CYX
+set p.283.name CYX
+set p.275.name CYX
+set p.292.name CYX
+bond p.238.SG p.283.SG
+bond p.275.SG p.292.SG
+saveamberparm p protein.prmtop protein.rst7
+quit
+"""
+    path = out / "stage_b_tleap.in"
+    path.write_text(text)
+    return path
+
+
+def _write_parmed_stage_b_script(out: Path, deps: dict[str, Path]) -> Path:
+    script = """#!/usr/bin/env python2
+# Remote-generated Stage-B ParmEd script. Production intent:
+# - load protein.prmtop/protein.rst7 from tleap ff14SB mbondi3 protein
+# - find unique literature residue named UNK with exactly 54 atoms in vmd-md-b
+# - copy ligand atom names/types/charges/internal bonds without reparameterizing
+# - rename the copied ligand LG1 and combine with protein into pair.prmtop
+# - write LG1.inpcrd/LG2.inpcrd by explicit PDB-resid/atom-name coordinate maps
+# - ensure no Ser165-ligand cross bond is present
+import sys
+sys.path.insert(0, {parmed_egg!r})
+LITERATURE_PRMTOP = {literature_prmtop!r}
+LITERATURE_INPCRD = {literature_inpcrd!r}
+LIGAND_ORDER = {ligand_order!r}
+""".format(
+        parmed_egg=str(deps["parmed_egg"]),
+        literature_prmtop=str(deps["literature_prmtop"]),
+        literature_inpcrd=str(deps["literature_inpcrd"]),
+        ligand_order=LITERATURE_LIGAND_ORDER,
+    )
+    path = out / "parmed_stage_b.py"
+    path.write_text(script)
+    return path
+
+
+def _write_stage_b_report(out: Path, status: str, gates: list[dict[str, object]], deps: dict[str, Path]) -> dict[str, object]:
+    report = {
+        "status": status,
+        "stage": "Stage-B-topology",
+        "remote_resources": {"AmberTools": str(deps["ambertools_prefix"]), "Amber module": AMBER_MODULE, "ParmEd egg": str(deps["parmed_egg"]), "literature_prmtop": str(deps["literature_prmtop"]), "literature_inpcrd": str(deps["literature_inpcrd"]), "DFTB": str(deps["dftb_slko_path"])},
+        "ligand_copy_contract": {"source_resname": LITERATURE_LIGAND_RESNAME, "source_resid": LITERATURE_LIGAND_RESID, "atom_order": LITERATURE_LIGAND_ORDER, "net_charge": LITERATURE_LIGAND_NET_CHARGE, "copy_types_charges_bonds": True, "reparameterize": False},
+        "qm_contract": {"ligand_atoms": 54, "sidechains": [f"{res}{rid}" for res, rid in QM_SIDECHAINS], "qmcharge": -1, "multiplicity": 1, "excluded_backbone_atoms": sorted(QM_BACKBONE_EXCLUDED)},
+        "gates": gates,
+    }
+    (out / "topology_audit.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    return report
+
+
+def build_stage_b(out: Path, runner=default_runner, ambertools_prefix=None, parmed_egg=None, literature_prmtop=None, literature_inpcrd=None, dftb_slko_path=None) -> dict[str, object]:
+    out.mkdir(parents=True, exist_ok=True)
+    deps = _dependency_paths(ambertools_prefix, parmed_egg, literature_prmtop, literature_inpcrd, dftb_slko_path)
+    missing_deps = [name for name, path in deps.items() if not path.exists()]
+    for state in ("LG1", "LG2"):
+        (out / f"{state}.in").write_text(sander_input_text(state, "@STAGE_B_QM_MASK_PLACEHOLDER"))
+    if missing_deps:
+        return _write_stage_b_report(out, "NOT_SUBMITTED_DEPENDENCY_MISSING", [{"name": "stage_b_dependencies", "pass": False, "reason": "NOT_SUBMITTED_DEPENDENCY_MISSING", "missing": missing_deps}], deps)
+    protein_only = out / "stage_b_protein_only.pdb"
+    source_pair = out / "generated_LG1_pair.pdb"
+    if source_pair.exists():
+        protein_only.write_text("".join(line for line in source_pair.read_text().splitlines(True) if line.startswith("ATOM")) + "END\n")
+    else:
+        protein_only.write_text("END\n")
+    tleap_input = _write_tleap_input(out)
+    tleap = runner([str(deps["tleap"]), "-f", str(tleap_input)], out)
+    if tleap.returncode != 0:
+        return _write_stage_b_report(out, "NOT_SUBMITTED_TLEAP_FAILED", [{"name": "tleap_ff14sb_mbondi3", "pass": False, "reason": "NOT_SUBMITTED_TLEAP_FAILED", "stdout": tleap.stdout, "stderr": tleap.stderr}], deps)
+    parmed_script = _write_parmed_stage_b_script(out, deps)
+    parmed = runner(["python2", str(parmed_script), "parmed_stage_b"], out)
+    if parmed.returncode != 0:
+        return _write_stage_b_report(out, "NOT_SUBMITTED_PARMED_FAILED", [{"name": "parmed_ligand_copy", "pass": False, "reason": "NOT_SUBMITTED_PARMED_FAILED", "stdout": parmed.stdout, "stderr": parmed.stderr}], deps)
+    missing = [str(path) for path in stage_b_required_outputs(out) if not path.exists()]
+    gates = [
+        {"name": "stage_b_dependencies", "pass": True, "reason": "PASS"},
+        {"name": "tleap_ff14sb_mbondi3", "pass": True, "reason": "PASS"},
+        {"name": "parmed_ligand_copy", "pass": True, "reason": "PASS", "temporary_script": str(parmed_script)},
+        {"name": "stage_b_required_topology_and_inputs", "pass": not missing, "reason": "PASS" if not missing else "NOT_SUBMITTED_TOPOLOGY_NOT_BUILT", "missing": missing},
+    ]
+    return _write_stage_b_report(out, "PASS" if not missing else "NOT_SUBMITTED_TOPOLOGY_NOT_BUILT", gates, deps)
+
+
 def write_preflight_report(output: Path, inputs: Iterable[Path]) -> None:
     paths = list(inputs)
     if len(paths) >= 3:
@@ -528,9 +732,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--lg1", required=True, type=Path)
     parser.add_argument("--lg2", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--stage-b", action="store_true")
+    parser.add_argument("--ambertools-prefix", type=Path, default=Path(AMBERTOOLS_DATA))
+    parser.add_argument("--parmed-egg", type=Path, default=Path(PARMED_EGG))
+    parser.add_argument("--literature-prmtop", type=Path, default=Path(LITERATURE_PRMTOP))
+    parser.add_argument("--literature-inpcrd", type=Path, default=Path(LITERATURE_INPCRD))
+    parser.add_argument("--dftb-slko-path", type=Path, default=Path(DFTB_SLKO_PATH))
     args = parser.parse_args(argv)
     args.out.mkdir(parents=True, exist_ok=True)
-    build_stage_a(args.iccg, args.lg1, args.lg2, args.out)
+    if args.stage_b:
+        build_stage_b(args.out, ambertools_prefix=args.ambertools_prefix, parmed_egg=args.parmed_egg, literature_prmtop=args.literature_prmtop, literature_inpcrd=args.literature_inpcrd, dftb_slko_path=args.dftb_slko_path)
+    else:
+        build_stage_a(args.iccg, args.lg1, args.lg2, args.out)
     return 0
 
 if __name__ == "__main__":
