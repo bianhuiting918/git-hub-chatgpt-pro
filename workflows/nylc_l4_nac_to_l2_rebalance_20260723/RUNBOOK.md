@@ -68,36 +68,58 @@ A build is not eligible for EM until its audit confirms:
 - finite reactive geometry and minimum nonbonded distance;
 - successful grompp topology preprocessing.
 
-## EM and staged equilibration
+## NylC step1 GS selection and staged release
 
-The common schedule is:
+The original `Fmax <= 500` rule is not a scientific gate. Authentic finite-temperature source frames can have larger instantaneous forces, and over-minimization can move a selected NAC out of its geometric basin. Contact relaxation is acceptable when it finishes, produces coordinates and has no FATAL, NaN, LINCS or SETTLE event; always record, but do not threshold, its maximum force.
 
-| Stage | Ensemble | Temperature | L2-heavy restraint | Duration |
-| --- | --- | ---: | ---: | ---: |
-| EM | steep | n/a | 1000 | convergence or 50,000 steps |
-| nvt50 | NVT | 50 K | 1000 | 100 ps |
-| nvt150 | NVT | 150 K | 500 | 100 ps |
-| nvt300 | NVT | 300 K | 100 | 200 ps |
-| npt300r | NPT | 300 K | 100 | 200 ps |
-| npt300rel | NPT | 300 K | 10 | 200 ps |
-| npt300free | NPT | 300 K | none | 1000 ps minimum |
+Run the NylC-only diagnostic pilot with:
 
-Each candidate uses an independent SCNet job and output directory. Query `squeue` and `sinfo` before submission. Use one DCU task and modest CPU/memory per candidate unless a current cluster probe justifies a different request.
+```bash
+sbatch workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_step1_pilot_array.sbatch
+```
 
-Every stage scans the log for FATAL, NaN, LINCS and SETTLE. A failure records its exact stage and leaves remaining candidate jobs independent.
+Job `61686301` used the corrected C18 and C23 inputs. Both completed restrained contact relaxation, 2 ps at 10 K and 10 ps at 50 K without numerical warnings. Full-trajectory strict NAC statistics were:
+
+| candidate | 10 K occupancy | 50 K occupancy | 50 K longest residence |
+| --- | ---: | ---: | ---: |
+| NylC-C18 | 0.5025 | 0.3433 | 0.45 ps |
+| NylC-C23 | 0.0448 | 0.0000 | 0 ps |
+
+These are restrained diagnostics, not scientific PASS. C23 is retained with its failure evidence but is not extended in the current NylC-first route.
+
+For C18, select only from frames satisfying distance <= 0.35 nm and angle 95-115 degrees. Exclude the initial heating transient when ranking by potential energy. The selected late-window frame is:
+
+```text
+50 K trajectory time: 9.55 ps
+distance: 0.337 nm
+angle: 110.327 degrees
+SHA256: c67cbb1d275863606be62628df6829e8ef15fbad39f3b5a51188c311f95ce235
+remote file: candidates/nylc_c18_11854ps/selected_step1_gs/c18_50k_late_lowest_potential_nac_9p55ps.gro
+```
+
+Run the staged continuation with:
+
+```bash
+sbatch workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_c18_step1_continuation.sbatch
+```
+
+Job `61687591` performs 100 K with weak protein/L2 restraints, 150 K with weaker L2 restraints, 300 K with only 10 kJ mol-1 nm-2 L2 restraints, then a 100 ps fully unrestrained NPT pilot. The 100 ps pilot is not the required final 1 ns window. Audit its complete trajectory before extension.
 
 ## Unconstrained scientific audit
 
-Only `npt300free` counts. Use PBC-aware analysis at a common sampling interval to report:
+Only fully unrestrained NPT counts as scientific NAC evidence. Use `scripts/analyze_nac_series.py` with PBC-aware GROMACS distance/angle series at a common sampling interval and report:
 
 - distance <= 0.35 nm;
 - angle 95-115 degrees;
-- joint NAC occupancy;
-- branch-specific validated gate opening;
+- joint NAC occupancy and longest continuous residence;
+- a representative lower-potential NAC frame selected only after thermal equilibration;
+- branch-specific gate opening using residues 261-266, excluding Thr267;
 - temperature and pressure statistics;
-- numerical-warning scan.
+- FATAL, NaN, LINCS and SETTLE counts.
 
-Restrained results are diagnostic only. A candidate with no complete free window is NOT_EVALUATED, not inactive. DFTB3/3OB-3-1 preflight eligibility requires the unconstrained audit.
+The 100 ps free pilot determines whether to extend C18 to the required >=1 ns free window. Restrained results cannot approve QM/MM. A candidate without a complete free-window audit is `NOT_EVALUATED`.
+
+Step1 DFTB3/3OB-3-1 preparation begins only after a stable C18 reactant/NAC ensemble is identified. Step1 TS, committor and PMF inputs are added incrementally after the reactant basin is validated. Step2 is not started before a defensible step1 acyl-enzyme/product basin exists.
 
 ## Recovery
 
