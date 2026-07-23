@@ -2,12 +2,17 @@
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HERE / "scripts"))
 
-from prepare_candidates import make_posre, rewrite_topology  # noqa: E402
+from prepare_candidates import (  # noqa: E402
+    make_posre,
+    reaction_geometry_from_target_globals,
+    rewrite_topology,
+)
 
 
 class PrepareCandidateTests(unittest.TestCase):
@@ -58,6 +63,28 @@ pa66_l4 1
             self.assertEqual(len(rows), 33)
             self.assertEqual([int(row.split()[0]) for row in rows], list(range(1, 34)))
             self.assertTrue(all(row.split()[2:] == ["500", "500", "500"] for row in rows))
+
+    def test_nac_angle_uses_carbonyl_oxygen_not_amide_nitrogen(self):
+        atoms = [
+            SimpleNamespace(coordinate=(0.0, 0.0, 0.0)),
+            SimpleNamespace(coordinate=(1.0, 0.0, 0.0)),
+            SimpleNamespace(coordinate=(-1.0, 0.0, 0.0)),
+            SimpleNamespace(coordinate=(0.0, 1.0, 0.0)),
+        ]
+        system = SimpleNamespace(atoms=atoms, box=(5.0, 5.0, 5.0))
+        geometry = reaction_geometry_from_target_globals(
+            system,
+            {
+                "carbonyl_c": 1,
+                "carbonyl_o": 2,
+                "amide_n": 3,
+                "thr_og1": 4,
+            },
+        )
+        self.assertAlmostEqual(geometry["distance_thr_og1_to_carbonyl_c_nm"], 1.0)
+        self.assertAlmostEqual(
+            geometry["angle_thr_og1_carbonyl_c_carbonyl_o_deg"], 90.0
+        )
 
 
 if __name__ == "__main__":
