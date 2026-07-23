@@ -1,0 +1,107 @@
+{
+  "array_job_id": "61705307",
+  "candidate_id": "nylc_C18_trueT267_recapture",
+  "end_geometry": {
+    "angle_deg": 118.512,
+    "distance_nm": 0.454517,
+    "joint_nac": false
+  },
+  "gate_definition": "NylC residues 261-266; Thr267 excluded",
+  "gate_opening_nm": {
+    "frame_count": 101,
+    "max": 2.691522272985096,
+    "mean": 2.6173357913073914,
+    "min": 2.5492339401649295,
+    "stdev": 0.033518340628725246
+  },
+  "minimum_ligand_protein_contact": {
+    "distance_nm": 0.197127,
+    "ligand_global_index": 10330,
+    "ligand_identity": {
+      "atomname": "O6",
+      "resid": 356,
+      "resname": "UNL"
+    },
+    "minimum_heavy_atom_contact": {
+      "distance_nm": 0.291914,
+      "ligand_global_index": 10330,
+      "ligand_identity": {
+        "atomname": "O6",
+        "resid": 356,
+        "resname": "UNL"
+      },
+      "protein_global_index": 4772,
+      "protein_identity": {
+        "atomname": "NE",
+        "resid": 330,
+        "resname": "ARG"
+      }
+    },
+    "protein_global_index": 4773,
+    "protein_identity": {
+      "atomname": "HE",
+      "resid": 330,
+      "resname": "ARG"
+    }
+  },
+  "nac": {
+    "frame_count": 101,
+    "gates": {
+      "angle_max_deg": 115.0,
+      "angle_min_deg": 95.0,
+      "distance_max_nm": 0.35
+    },
+    "longest_continuous_nac": {
+      "duration_ps": 1.0,
+      "end_ps": 8.0,
+      "frame_count": 2,
+      "mean_angle_deg": 109.6935,
+      "mean_distance_nm": 0.3235,
+      "start_ps": 7.0
+    },
+    "lowest_potential_nac_frame": {
+      "angle_deg": 114.257,
+      "distance_nm": 0.329,
+      "potential_energy_kj_mol": -1829950.75,
+      "time_ps": 8.0
+    },
+    "nac_frame_count": 6,
+    "nac_occupancy": 0.0594059405940594,
+    "nac_run_count": 4,
+    "schema_version": 1,
+    "time_end_ps": 100.0,
+    "time_start_ps": 0.0
+  },
+  "next_gate": "compare all three seeds; extend at least 1 ns only from a fully unrestrained NAC-positive seed and choose the lower-potential NAC from the equilibrated free window",
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "nan": 0,
+    "settle_problem": 0
+  },
+  "schema_version": 1,
+  "scientific_status": "PASS_UNRESTRAINED_PILOT_NAC_PRESENT",
+  "technical_status": "PASS",
+  "thermodynamics": {
+    "pressure_bar": {
+      "max": 194.706223,
+      "mean": 5.668769851485148,
+      "min": -296.790894,
+      "stdev": 88.77289786184512
+    },
+    "temperature_K": {
+      "max": 302.333771,
+      "mean": 300.0401825841584,
+      "min": 298.434448,
+      "stdev": 0.8096782746504276
+    },
+    "volume_nm3": {
+      "max": 1367.963745,
+      "mean": 1340.8805524455447,
+      "min": 1329.133545,
+      "stdev": 3.8439070026535505
+    }
+  },
+  "velocity_seed": 26703,
+  "window_type": "fully_unrestrained_NPT_100ps"
+}
