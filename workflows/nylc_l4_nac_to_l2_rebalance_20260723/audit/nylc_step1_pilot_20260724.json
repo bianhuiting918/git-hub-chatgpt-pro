@@ -412,14 +412,33 @@
     },
     "response9": {
       "job_id": "61700808",
+      "terminal_status": "FAILED_GATE_EXIT_2",
+      "candidate": "C18",
+      "result": {
+        "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+        "start_distance_nm": 0.44864,
+        "end_distance_nm": 0.433241,
+        "distance_response_nm": 0.015399,
+        "end_angle_deg": 105.893,
+        "minimum_ligand_protein_contact_nm": 0.203258,
+        "numerical_events": {
+          "FATAL": 0,
+          "LINCS": 0,
+          "SETTLE": 0,
+          "NaN": 0
+        }
+      },
+      "interpretation": "mobile target lagged; replace by fixed 0.35 nm hold"
+    },
+    "response10": {
+      "job_id": "61701100",
       "candidate": "C18",
       "status": "RUNNING",
       "protocol": {
         "duration_ps": 100,
-        "distance_rate_nm_per_ps": -0.002,
-        "distance_k": 2000,
-        "angle_k": 500,
-        "max_end_distance_nm": 0.4
+        "target_distance_nm": 0.35,
+        "distance_k": 5000,
+        "angle_k": 500
       },
       "scientific_gate": "NOT_EVALUATED_RESTRAINED"
     }
