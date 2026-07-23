@@ -9,7 +9,7 @@ def test_double_recovery_uses_validated_double_binary_and_env():
     assert "source /work/home/acshdt1dks/opt/gmx-cp2k/env.sh" in text
     assert "gmx_mpi_d" in text
     assert "2023.1" in text
-    assert "em_cg_flexible.mdp" in text
+    assert "em_cg_flexible.mdp" in text\n    assert "set +u" in text\n    assert "em_cg_flexible_double_retry1" in text
     assert 'start="$build/rebuilt.gro"' in text
 
 
