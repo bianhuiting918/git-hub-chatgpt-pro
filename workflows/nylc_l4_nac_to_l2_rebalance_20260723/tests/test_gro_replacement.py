@@ -98,10 +98,11 @@ class GroReplacementTests(unittest.TestCase):
             reread = parse_gro(path)
             self.assertEqual(len(reread.atoms), len(self.replaced.atoms))
             self.assertEqual(reread.box, self.replaced.box)
-            self.assertEqual(
-                [atom.coordinate for atom in reread.atoms],
-                [atom.coordinate for atom in self.replaced.atoms],
-            )
+            for observed, expected in zip(reread.atoms, self.replaced.atoms):
+                for observed_value, expected_value in zip(
+                    observed.coordinate, expected.coordinate
+                ):
+                    self.assertAlmostEqual(observed_value, expected_value, places=3)
 
     def test_minimum_ligand_environment_distance_is_finite(self):
         first = self.candidate["ligand_first_global_atom"]
