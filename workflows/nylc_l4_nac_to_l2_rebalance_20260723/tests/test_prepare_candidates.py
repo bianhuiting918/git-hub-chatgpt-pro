@@ -8,8 +8,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HERE / "scripts"))
 
+from build_l4_to_l2 import GroAtom, GroSystem  # noqa: E402
 from prepare_candidates import (  # noqa: E402
     make_posre,
+    neutralize_ligand_charge_change,
     reaction_geometry_from_target_globals,
     rewrite_topology,
 )
@@ -63,6 +65,26 @@ pa66_l4 1
             self.assertEqual(len(rows), 33)
             self.assertEqual([int(row.split()[0]) for row in rows], list(range(1, 34)))
             self.assertTrue(all(row.split()[2:] == ["500", "500", "500"] for row in rows))
+
+    def test_charge_change_removes_one_farthest_chloride_and_updates_topology(self):
+        atoms = [
+            GroAtom(1, "ALA", "CA", 1, (0.0, 0.0, 0.0)),
+            GroAtom(2, "L2", "C1", 2, (0.1, 0.0, 0.0)),
+            GroAtom(3, "CL", "CL", 3, (0.2, 0.0, 0.0)),
+            GroAtom(4, "CL", "CL", 4, (4.0, 4.0, 4.0)),
+            GroAtom(5, "NA", "NA", 5, (2.0, 2.0, 2.0)),
+        ]
+        system = GroSystem("synthetic", atoms, (10.0, 10.0, 10.0))
+        topology = "[ molecules ]\nProtein 1\nPA66_L2 1\nNA 1\nCL 2\n"
+        corrected, corrected_topology, audit = neutralize_ligand_charge_change(
+            system, topology, source_charge=1.0, target_charge=0.0
+        )
+        self.assertEqual(len(corrected.atoms), 4)
+        self.assertEqual(sum(atom.resname == "CL" for atom in corrected.atoms), 1)
+        self.assertEqual(corrected.atoms[2].coordinate, (0.2, 0.0, 0.0))
+        self.assertIn("\nCL 1\n", corrected_topology)
+        self.assertEqual(audit["removed_ion"]["resname"], "CL")
+        self.assertEqual(audit["net_charge_change_relative_to_source"], 0.0)
 
     def test_nac_angle_uses_carbonyl_oxygen_not_amide_nitrogen(self):
         atoms = [
