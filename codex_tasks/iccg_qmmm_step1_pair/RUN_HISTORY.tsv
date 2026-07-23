@@ -38,3 +38,5 @@
 2026-07-23T18:01:43Z	GREEN	python test_iccg_step1_pair.py	exit_0	Full regression after deploy UTC run-history timestamp fix.
 2026-07-23T18:12:53Z	RED	python test_iccg_step1_pair.py	exit_1	ParmEd actions changeRadii and dynamic qmcharge/system-charge gate tests fail before compatibility fix.
 2026-07-23T18:13:15Z	GREEN	python test_iccg_step1_pair.py	exit_0	ParmEd actions changeRadii execute path and dynamic qmcharge/system-charge gates implemented.
+2026-07-23T18:21:43Z	RED	python test_iccg_step1_pair.py	exit_1	Python2.7 finite_xyz regression test fails while generated script still uses math.isfinite.
+2026-07-23T18:21:50Z	GREEN	python test_iccg_step1_pair.py	exit_0	Python2.7 finite_xyz now rejects NaN/Inf without math.isfinite.

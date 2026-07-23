@@ -687,7 +687,7 @@ SYSTEM_CHARGE_TOLERANCE = 1e-4
 
 
 def finite_xyz(xyz):
-    return all(math.isfinite(float(v)) for row in xyz for v in row)
+    return all(not (math.isnan(float(v)) or math.isinf(float(v))) for row in xyz for v in row)
 
 
 def load_pair_pdb(path):

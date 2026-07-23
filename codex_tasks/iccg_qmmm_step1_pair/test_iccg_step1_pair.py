@@ -504,6 +504,17 @@ QMMM SCC-DFTB: SCC-DFTB for step 1 converged in 2 cycles.
             self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED")
 
 
+
+    def test_parmed_script_finite_xyz_is_python27_compatible(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            deps = {"parmed_egg": out / "ParmEd.egg", "literature_prmtop": out / "vmd-md-b.prmtop", "literature_inpcrd": out / "vmd-md-b.inpcrd"}
+            for path in deps.values(): path.write_text("fixture")
+            script = build._write_parmed_stage_b_script(out, deps).read_text()
+            self.assertNotIn("math.isfinite", script)
+            self.assertIn("math.isnan(float(v))", script)
+            self.assertIn("math.isinf(float(v))", script)
+
     def test_parmed_script_uses_parmed_actions_change_radii_execute(self):
         with tempfile.TemporaryDirectory() as td:
             out = Path(td)
