@@ -25,7 +25,7 @@ class ItpGraphTests(unittest.TestCase):
         self.assertEqual(len(self.l2.atoms), 79)
         heavy = [a for a in self.l2.atoms.values() if a.element != "H"]
         self.assertEqual(len(heavy), 33)
-        self.assertAlmostEqual(sum(a.charge for a in self.l2.atoms.values()), 0.003001, places=6)
+        self.assertAlmostEqual(sum(a.charge for a in self.l2.atoms.values()), 0.0, places=6)
 
     def test_reactive_triplets_are_bonded_graph_facts(self):
         for topology, triplet in [
