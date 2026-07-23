@@ -19,6 +19,7 @@ candidate=nylc_C18_trueT267_freeGS
 root="$TASK/candidates/$candidate"
 build="$root/build"
 em="$root/runs/em_cg_flexible_double_retry3"
+em_pass="$root/runs/em_cg_flexible_double_retry3/PASS.json"
 runs="$root/runs/rebalance_after_em_double"
 job="${SLURM_JOB_ID:?}"
 mkdir -p "$runs" "$TASK/logs"
@@ -92,7 +93,7 @@ PY
 failure=1
 current=initialization
 trap 'rc=$?; if [[ $failure -ne 0 ]]; then record rebalance_after_em_double FAIL_STAGE "stage=$current;rc=$rc"; fi; exit $rc' EXIT
-"$PY" - "$em/PASS.json" <<'PY'
+"$PY" - "$em_pass" <<'PY'
 import json,sys
 data=json.load(open(sys.argv[1]))
 assert data["status"]=="PASS_TECHNICAL_EM"
