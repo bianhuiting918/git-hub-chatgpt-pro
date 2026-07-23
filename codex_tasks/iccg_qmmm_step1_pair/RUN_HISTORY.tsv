@@ -40,3 +40,6 @@
 2026-07-23T18:13:15Z	GREEN	python test_iccg_step1_pair.py	exit_0	ParmEd actions changeRadii execute path and dynamic qmcharge/system-charge gates implemented.
 2026-07-23T18:21:43Z	RED	python test_iccg_step1_pair.py	exit_1	Python2.7 finite_xyz regression test fails while generated script still uses math.isfinite.
 2026-07-23T18:21:50Z	GREEN	python test_iccg_step1_pair.py	exit_0	Python2.7 finite_xyz now rejects NaN/Inf without math.isfinite.
+2026-07-23T18:29:46Z	RED	python test_iccg_step1_pair.py	exit_1	sbatch still hard-requires AMBERHOME instead of probing sander.MPI path.
+2026-07-23T18:30:20Z	GREEN	python test_iccg_step1_pair.py	exit_0	sbatch now probes sander.MPI without AMBERHOME and records state runtime boundaries.
+2026-07-23T18:30:35Z	GREEN	python test_iccg_step1_pair.py	exit_0	Full regression after preserving sander.MPI nonzero exit code capture.

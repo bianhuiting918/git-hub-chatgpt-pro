@@ -557,6 +557,17 @@ QMMM SCC-DFTB: SCC-DFTB for step 1 converged in 2 cycles.
             report = build.build_stage_b(root, runner=fake_runner, **deps)
             self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED")
 
+
+    def test_sbatch_uses_sander_mpi_path_probe_not_amberhome(self):
+        text = Path("run_iccg_step1_pair.sbatch").read_text()
+        self.assertNotIn("AMBERHOME", text)
+        self.assertIn("command -v sander.MPI >/dev/null", text)
+        self.assertIn("NOT_SUBMITTED_RUNTIME_ENV_SANDER_MPI_MISSING", text)
+        self.assertIn("RUN_HISTORY.tsv", text)
+        self.assertIn("SLURM_JOB_ID", text)
+        self.assertIn("STATE_BEGIN", text)
+        self.assertIn("STATE_END", text)
+
     def test_sbatch_uses_single_rank_for_fixed_geometry_single_point(self):
         text = Path("run_iccg_step1_pair.sbatch").read_text()
         self.assertIn("#SBATCH --ntasks=1", text)
