@@ -1,0 +1,95 @@
+{
+  "array_job_id": "61705692",
+  "candidate_id": "nylc_C18_trueT267_recapture",
+  "end_geometry": {
+    "angle_deg": 47.145,
+    "distance_nm": 1.349525,
+    "joint_nac": false
+  },
+  "gate_definition": "NylC residues 261-266; Thr267 excluded",
+  "gate_opening_nm": {
+    "frame_count": 501,
+    "max": 2.853488673260042,
+    "mean": 2.5898872897319083,
+    "min": 2.34033214175816,
+    "stdev": 0.09539802082522979
+  },
+  "minimum_ligand_protein_contact": {
+    "distance_nm": 0.175494,
+    "ligand_global_index": 10341,
+    "ligand_identity": {
+      "atomname": "H2",
+      "resid": 356,
+      "resname": "UNL"
+    },
+    "minimum_heavy_atom_contact": {
+      "distance_nm": 0.274674,
+      "ligand_global_index": 10273,
+      "ligand_identity": {
+        "atomname": "N",
+        "resid": 356,
+        "resname": "UNL"
+      },
+      "protein_global_index": 9520,
+      "protein_identity": {
+        "atomname": "O",
+        "resid": 302,
+        "resname": "HIS"
+      }
+    },
+    "protein_global_index": 9544,
+    "protein_identity": {
+      "atomname": "OD2",
+      "resid": 304,
+      "resname": "ASP"
+    }
+  },
+  "nac": {
+    "frame_count": 501,
+    "gates": {
+      "angle_max_deg": 115.0,
+      "angle_min_deg": 95.0,
+      "distance_max_nm": 0.35
+    },
+    "longest_continuous_nac": null,
+    "lowest_potential_nac_frame": null,
+    "nac_frame_count": 0,
+    "nac_occupancy": 0.0,
+    "nac_run_count": 0,
+    "schema_version": 1,
+    "time_end_ps": 1000.0,
+    "time_start_ps": 0.0
+  },
+  "next_gate": "compare all three seeds; extend at least 1 ns only from a fully unrestrained NAC-positive seed and choose the lower-potential NAC from the equilibrated free window",
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "nan": 0,
+    "settle_problem": 0
+  },
+  "schema_version": 1,
+  "scientific_status": "FAIL_UNRESTRAINED_PILOT_NO_NAC",
+  "technical_status": "PASS",
+  "thermodynamics": {
+    "pressure_bar": {
+      "max": 225.869736,
+      "mean": -0.855554630738523,
+      "min": -232.742676,
+      "stdev": 73.48469595706435
+    },
+    "temperature_K": {
+      "max": 301.80426,
+      "mean": 299.96118602195605,
+      "min": 297.694946,
+      "stdev": 0.7987126668799832
+    },
+    "volume_nm3": {
+      "max": 1346.443237,
+      "mean": 1340.5919888782435,
+      "min": 1333.630737,
+      "stdev": 1.9379912787692655
+    }
+  },
+  "velocity_seed": 26703,
+  "window_type": "fully_unrestrained_NPT_1ns"
+}
