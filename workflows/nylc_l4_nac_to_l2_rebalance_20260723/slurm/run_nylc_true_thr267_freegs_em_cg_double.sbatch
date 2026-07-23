@@ -18,11 +18,11 @@ GMX=/work/home/acshdt1dks/opt/gmx-cp2k/gromacs-2023.1-cp2k-2024.1/bin/gmx_mpi_d
 candidate=nylc_C18_trueT267_freeGS
 root="$TASK/candidates/$candidate"
 build="$root/build"
-out="$root/runs/em_cg_flexible_double"
+out="$root/runs/em_cg_flexible_double_retry1"
 start="$build/rebuilt.gro"
 job="${SLURM_JOB_ID:?}"
 mkdir -p "$out"
-source /work/home/acshdt1dks/opt/gmx-cp2k/env.sh
+set +u\nsource /work/home/acshdt1dks/opt/gmx-cp2k/env.sh\nset -u
 export GMX_MAXBACKUP=-1
 for f in run.tpr run.gro PASS.json FAIL.json; do test ! -e "$out/$f"; done
 
