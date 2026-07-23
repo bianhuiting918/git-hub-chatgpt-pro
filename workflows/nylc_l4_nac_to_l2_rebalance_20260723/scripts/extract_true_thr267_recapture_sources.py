@@ -40,7 +40,9 @@ CANDIDATES = {
         "local_time_ps": 16.0,
         "cumulative_time_ps": 11956.0,
         "carbonyl_c": 10297,
+        "carbonyl_c_atomname": "C18",
         "carbonyl_o": 10298,
+        "carbonyl_o_atomname": "O2",
         "expected_distance_nm": 1.451,
         "expected_angle_deg": 108.009,
         "selection_basis": "closest fully unrestrained true-Thr267 frame; angle compatible",
@@ -51,7 +53,9 @@ CANDIDATES = {
         "local_time_ps": 98.0,
         "cumulative_time_ps": 31838.0,
         "carbonyl_c": 10303,
+        "carbonyl_c_atomname": "C23",
         "carbonyl_o": 10304,
+        "carbonyl_o_atomname": "O3",
         "expected_distance_nm": 1.310,
         "expected_angle_deg": 97.289,
         "selection_basis": "closest angle-compatible fully unrestrained true-Thr267 frame",
@@ -189,9 +193,9 @@ def extract_one(name):
     )
     carbonyl_c = atoms[cfg["carbonyl_c"]]
     carbonyl_o = atoms[cfg["carbonyl_o"]]
-    if carbonyl_c["atomname"] != "C":
+    if (carbonyl_c["resname"], carbonyl_c["atomname"]) != ("UNL", cfg["carbonyl_c_atomname"]):
         raise RuntimeError(f"reaction carbonyl C identity mismatch: {carbonyl_c}")
-    if carbonyl_o["atomname"] != "O":
+    if (carbonyl_o["resname"], carbonyl_o["atomname"]) != ("UNL", cfg["carbonyl_o_atomname"]):
         raise RuntimeError(f"reaction carbonyl O identity mismatch: {carbonyl_o}")
 
     match = re.search(r"\bt=\s*([0-9.]+)", title)
