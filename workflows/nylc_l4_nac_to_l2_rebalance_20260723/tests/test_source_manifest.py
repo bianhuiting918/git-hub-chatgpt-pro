@@ -33,7 +33,15 @@ class SourceManifestTests(unittest.TestCase):
         )
 
     def test_each_candidate_resolves_to_unrestrained_selected_frame(self):
+        expected_local_times = {
+            "nylc_c18_11854ps": 14.0,
+            "nylc_c23_29684ps": 44.0,
+            "nyl50_c18_70792ps": 52.0,
+            "nyl12_j1_37848ps": 28.0,
+            "nyl12_j2_87418ps": 98.0,
+        }
         for candidate in self.manifest["candidates"]:
+            self.assertEqual(candidate["local_xtc_time_ps"], expected_local_times[candidate["id"]])
             resolved = resolve_candidate(candidate)
             self.assertEqual(resolved["selected_row"]["segment"], candidate["segment"])
             self.assertEqual(resolved["selected_row"]["action"], "FREE_MONITOR")
@@ -43,6 +51,15 @@ class SourceManifestTests(unittest.TestCase):
             self.assertAlmostEqual(
                 resolved["derived_local_xtc_time_ps"],
                 candidate["local_xtc_time_ps"],
+                places=6,
+            )
+            self.assertAlmostEqual(
+                resolved["geometry_sample_interval_ps"], 2.0, places=6
+            )
+            self.assertAlmostEqual(
+                resolved["segment_start_time_ps"],
+                resolved["selected_row"]["simulation_time_ps"]
+                - candidate["local_xtc_time_ps"],
                 places=6,
             )
             self.assertTrue(Path(resolved["xtc"]).is_file())
