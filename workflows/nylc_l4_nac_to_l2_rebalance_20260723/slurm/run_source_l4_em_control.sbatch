@@ -28,7 +28,7 @@ IFS=$'\t' read -r candidate branch <<< "${rows[${SLURM_ARRAY_TASK_ID}]}"
 out="$TASK_ROOT/candidates/$candidate/controls/source_l4_em"
 mkdir -p "$out"
 cd "$branch"
-"$GMX" grompp -f "$FLOW/mdp/em.mdp" \
+"$GMX" grompp -f "$FLOW/mdp/em_source_control.mdp" \
   -c "$TASK_ROOT/inputs/$candidate/source.gro" \
   -r "$TASK_ROOT/inputs/$candidate/source.gro" \
   -p "$branch/topol.top" -o "$out/run.tpr" -po "$out/run.processed.mdp" -maxwarn 0 \
