@@ -43,3 +43,8 @@ def test_wrapper_is_cpu_only_and_records_dependency_target():
     assert "--gres=dcu" not in text
     assert "61708900" in text
     assert "postprocess_nylc_true_thr267_rebalance.py" in text
+
+
+def test_wrapper_uses_cpu_partition_available_without_dcu_gres():
+    text = SBATCH.read_text()
+    assert "#SBATCH -p xahcnormal" in text
