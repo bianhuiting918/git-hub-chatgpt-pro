@@ -46,3 +46,29 @@ Maximum force     =  4.19978114876091e+02 on atom 3668
 """
     assert module.last_float(r"Maximum force\s*=\s*([+0-9.eE-]+)", sample) == 419.978114876091
     assert module.last_float(r"Potential Energy\s*=\s*([+0-9.eE-]+)", sample) == -2307725.86301368
+
+
+def test_em_audit_main_accepts_completed_double_cg_log(tmp_path, monkeypatch):
+    import importlib.util
+    import pytest
+    spec = importlib.util.spec_from_file_location("audit_em_double_result_main", AUDIT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    (tmp_path / "run.log").write_text(
+        "GROMACS version:    2023.1\n"
+        "Precision:          double\n"
+        "Polak-Ribiere Conjugate Gradients converged to Fmax < 500 in 153 steps\n"
+        "Potential Energy  = -2.30772586301368e+06\n"
+        "Maximum force     =  4.19978114876091e+02 on atom 3668\n"
+        "Finished mdrun on rank 0\n"
+    )
+    (tmp_path / "run.processed.mdp").write_text(
+        "define = -DPOSRES_L2_1000 -DFLEXIBLE\nintegrator = cg\n"
+    )
+    (tmp_path / "run.gro").write_text("test\n133589\n")
+    (tmp_path / "run.tpr").write_bytes(b"tpr")
+    monkeypatch.setattr("sys.argv", ["audit", "--run-root", str(tmp_path)])
+    with pytest.raises(SystemExit) as exc:
+        module.main()
+    assert exc.value.code == 0
+    assert (tmp_path / "PASS.json").is_file()
