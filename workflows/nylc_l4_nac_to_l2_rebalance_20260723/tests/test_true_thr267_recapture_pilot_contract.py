@@ -10,6 +10,7 @@ SBATCH2 = FLOW / "slurm" / "run_true_thr267_recapture_response2_array.sbatch"
 SBATCH3 = FLOW / "slurm" / "run_true_thr267_recapture_response3_array.sbatch"
 SBATCH4 = FLOW / "slurm" / "run_true_thr267_recapture_response4_array.sbatch"
 SBATCH5 = FLOW / "slurm" / "run_true_thr267_recapture_response5_c18.sbatch"
+SBATCH6 = FLOW / "slurm" / "run_true_thr267_recapture_response6_c18.sbatch"
 
 
 def load_prep():
@@ -142,3 +143,20 @@ def test_response5_slurm_is_c18_only_and_checkpointed():
     assert '-deffnm "$work/response5"' in text
     assert "recapture_response4/response4.gro" in text
     assert "--min-response 0.20" in text
+
+
+def test_response6_continues_c18_from_response5():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181272, protocol="response6")
+    assert "continuation             = yes" in mdp
+    assert "pull-coord1-k            = 2000" in mdp
+    assert "pull-coord2-k            = 500" in mdp
+    assert m.PROTOCOLS["response6"]["parent_stem"] == "response5"
+
+
+def test_response6_slurm_uses_response5_reference():
+    text = SBATCH6.read_text(encoding="utf-8")
+    assert "nylc_C18_trueT267_recapture" in text
+    assert '-deffnm "$work/response6"' in text
+    assert "recapture_response5/response5.gro" in text
+    assert "--min-response 0.15" in text
