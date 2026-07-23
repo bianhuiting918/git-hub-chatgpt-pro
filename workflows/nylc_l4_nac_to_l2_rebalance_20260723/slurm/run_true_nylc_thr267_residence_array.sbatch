@@ -19,6 +19,7 @@ PY=/work/home/acshdt1dks/anaconda3/bin/python3.9
 GMX=/public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi
 mkdir -p "$TASK/logs" "$TASK/audit/true_thr267_residence"
 source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
+export GMX_MAXBACKUP=-1
 
 specs=(
   "C18 10297 10298"
