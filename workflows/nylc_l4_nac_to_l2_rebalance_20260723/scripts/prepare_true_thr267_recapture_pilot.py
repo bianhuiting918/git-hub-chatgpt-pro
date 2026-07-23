@@ -243,7 +243,7 @@ def prepare_one(name, protocol="pilot1"):
         "gate_residues": gate_residues,
         "thr267_excluded_from_gate": True,
         "protocol": {
-            "duration_ps": 100.0,
+            "duration_ps": p["nsteps"] * 0.002,
             "protocol": protocol,
             "distance_reference_rate_nm_per_ps": p["rate"],
             "distance_k_kj_mol_nm2": p["distance_k"],
