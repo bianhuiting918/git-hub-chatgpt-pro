@@ -9,6 +9,7 @@ AUDIT = FLOW / "scripts" / "audit_true_thr267_recapture_pilot.py"
 SBATCH2 = FLOW / "slurm" / "run_true_thr267_recapture_response2_array.sbatch"
 SBATCH3 = FLOW / "slurm" / "run_true_thr267_recapture_response3_array.sbatch"
 SBATCH4 = FLOW / "slurm" / "run_true_thr267_recapture_response4_array.sbatch"
+SBATCH5 = FLOW / "slurm" / "run_true_thr267_recapture_response5_c18.sbatch"
 
 
 def load_prep():
@@ -121,3 +122,23 @@ def test_response4_slurm_audits_against_response3_start():
     assert "--reference-gro" in text
     assert "recapture_response3/response3.gro" in text
     assert "--min-response 0.15" in text
+
+
+def test_response5_continues_c18_and_strengthens_angle_only():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181271, protocol="response5")
+    assert "continuation             = yes" in mdp
+    assert "nsteps                   = 50000" in mdp
+    assert "pull-coord1-k            = 2000" in mdp
+    assert "pull-coord2-k            = 500" in mdp
+    assert m.PROTOCOLS["response5"]["parent_stem"] == "response4"
+
+
+def test_response5_slurm_is_c18_only_and_checkpointed():
+    text = SBATCH5.read_text(encoding="utf-8")
+    assert "#SBATCH --array" not in text
+    assert "nylc_C18_trueT267_recapture" in text
+    assert "nylc_C23_trueT267_recapture" not in text
+    assert '-deffnm "$work/response5"' in text
+    assert "recapture_response4/response4.gro" in text
+    assert "--min-response 0.20" in text
