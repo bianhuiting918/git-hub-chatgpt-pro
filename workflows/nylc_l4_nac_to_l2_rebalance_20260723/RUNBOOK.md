@@ -32,6 +32,8 @@ Resolve and hash every path in `manifests/candidates.json`. For each segment, ve
 - action is FREE_MONITOR;
 - source and gate restraint flags are zero at the selected cumulative time;
 - the selected local XTC time exists;
+- account for the segment boundary: the first geometry row is the 2 ps XTC sample, so segment start is `first_geometry_time - sample_interval`; never subtract the first geometry time directly;
+- recomputed Thr OG1--carbonyl C distance and the Thr OG1--C versus C--O angle agree with the selected `geometry.tsv` row within XTC precision;
 - source TPR, XTC, ITP, topology and index exist;
 - source reactive C/O/N is a bonded carbonyl-amide triplet.
 
@@ -52,7 +54,9 @@ The first run must fail because `build_l4_to_l2.py` does not exist. After implem
 
 ## Build and preprocessing
 
-Use `scripts/prepare_candidates.py` from the repository checkout. It extracts each frame into the task root, calls `build_l4_to_l2.py`, copies the required non-ligand topology includes, installs the audited L2 ITP and position-restraint includes, and writes one audit JSON per candidate.
+First run `scripts/extract_sources.py`; use `--force` only for an audited refresh of derived GRO files, never source trajectories. Then run `scripts/prepare_candidates.py`. The latter calls `build_l4_to_l2.py`, copies the required non-ligand topology includes, installs the audited L2 ITP and position-restraint includes, and writes one audit JSON per candidate.
+
+The 2026-07-23 offset audit established corrected XTC local times 14, 44, 52, 28 and 98 ps for NylC-C18, NylC-C23, Nyl50-C18, Nyl12-J1 and Nyl12-J2 respectively. The superseded minus-2-ps derived inputs/builds are preserved under `$TASK_ROOT/superseded/incorrect_minus2ps_20260723`.
 
 A build is not eligible for EM until its audit confirms:
 
