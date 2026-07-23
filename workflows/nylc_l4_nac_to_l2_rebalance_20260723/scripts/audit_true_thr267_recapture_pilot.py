@@ -57,20 +57,22 @@ def main():
     }
     finished = bool(re.search(r"Finished mdrun", log_text))
     response = start_distance - end_distance
-    pass_technical = (
-        finished
-        and not any(counts.values())
-        and response >= 0.15
+    numerical_pass = finished and not any(counts.values())
+    response_pass = (
+        response >= 0.15
         and end_distance >= 0.30
         and 75.0 <= end_angle <= 135.0
     )
+    if not numerical_pass:
+        status = "FAIL_NUMERICAL"
+    elif not response_pass:
+        status = "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE"
+    else:
+        status = "PASS_TECHNICAL_BOUNDED_APPROACH"
     result = {
         "schema_version": 1,
         "candidate": args.candidate,
-        "status": (
-            "PASS_TECHNICAL_BOUNDED_APPROACH"
-            if pass_technical else "FAIL_TECHNICAL_OR_APPROACH_RESPONSE"
-        ),
+        "status": status,
         "scientific_gate": "NOT_EVALUATED_RESTRAINED_PILOT_CANNOT_ESTABLISH_NAC",
         "finished_mdrun": finished,
         "numerical_issue_counts": counts,
@@ -89,7 +91,7 @@ def main():
         json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     print(json.dumps(result, sort_keys=True))
-    raise SystemExit(0 if pass_technical else 2)
+    raise SystemExit(0 if status == "PASS_TECHNICAL_BOUNDED_APPROACH" else 2)
 
 
 if __name__ == "__main__":
