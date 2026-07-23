@@ -128,6 +128,10 @@ def gro_atom_count(path: Path) -> int:
         return int(handle.readline().strip())
 
 
+def temporary_gro_path(output_gro: Path) -> Path:
+    return output_gro.with_name(output_gro.stem + ".tmp.gro")
+
+
 def extract_all(
     manifest_path: Path, task_root: Path, gmx: str, force: bool = False
 ) -> Dict[str, Any]:
@@ -142,7 +146,7 @@ def extract_all(
         candidate_dir.mkdir(parents=True, exist_ok=True)
         output_gro = candidate_dir / "source.gro"
         if force or not output_gro.exists():
-            temporary_gro = output_gro.with_suffix(".gro.tmp")
+            temporary_gro = temporary_gro_path(output_gro)
             subprocess.run(
                 [
                     gmx,
