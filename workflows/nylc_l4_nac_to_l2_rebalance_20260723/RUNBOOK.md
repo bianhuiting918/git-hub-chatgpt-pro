@@ -128,3 +128,18 @@ Step1 DFTB3/3OB-3-1 preparation begins only after a stable C18 reactant/NAC ense
 - Do not resubmit merely because SSH or scheduler display is transiently unavailable.
 - Re-run only the failed candidate and append a new history row.
 - Preserve every audit JSON and failure reason.
+
+### 100 ps free-pilot audit and 1 ns extension
+
+Job `61687591` completed with exit code `0:0` and no FATAL, NaN, LINCS or SETTLE event. The restrained 100 K, 150 K and 300 K release stages had NAC occupancies 0.3532, 0.2139 and 0.0579, respectively. These restrained values remain diagnostic only.
+
+The 100 ps fully unrestrained NPT pilot contained 1 NAC frame among 501 frames (occupancy 0.001996). It occurred at 3.6 ps with distance 0.348 nm, angle 97.426 degrees and gate opening 2.631 nm. Mean gate opening was 2.576 nm. Temperature averaged 300.01 K; no numerical instability was detected. This is evidence that the rebuilt L2 can transiently form NAC, but it is not evidence of a stable high-occupancy NAC basin.
+
+The required 1 ns continuation uses the exact 100 ps endpoint and checkpoint:
+
+```bash
+sbatch workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_c18_step1_free_1ns.sbatch
+```
+
+Job `61688773` passed an independent `grompp -maxwarn 0` preflight and is the fully unrestrained 1 ns extension. Its scheduler completion alone is not a scientific PASS; audit the complete trajectory for NAC occupancy/residence, energy-conditioned NAC representatives, gate opening, thermodynamics and numerical events.
+
