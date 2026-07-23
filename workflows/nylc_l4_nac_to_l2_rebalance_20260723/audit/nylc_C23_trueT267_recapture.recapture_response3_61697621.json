@@ -1,0 +1,22 @@
+{
+  "candidate": "nylc_C23_trueT267_recapture",
+  "finished_mdrun": true,
+  "geometry": {
+    "distance_response_nm": 0.014828,
+    "end_angle_deg": 88.984,
+    "end_distance_nm": 1.295118,
+    "end_joint_nac": false,
+    "start_angle_deg": 97.289,
+    "start_distance_nm": 1.309946
+  },
+  "minimum_required_response_nm": 0.05,
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "nan": 0,
+    "settle_problem": 0
+  },
+  "schema_version": 1,
+  "scientific_gate": "NOT_EVALUATED_RESTRAINED_PILOT_CANNOT_ESTABLISH_NAC",
+  "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE"
+}
