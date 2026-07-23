@@ -612,11 +612,19 @@ def _matvec(matrix: Tuple[Vector, Vector, Vector], vector: Vector) -> Vector:
     return tuple(_dot(row, vector) for row in matrix)  # type: ignore[return-value]
 
 
-def _minimum_image_vector(delta: Vector, box: Tuple[float, ...]) -> Vector:
-    matrix = _box_matrix(box)
-    fractional = _matvec(_inverse3(matrix), delta)
+def _minimum_image_vector_precomputed(
+    delta: Vector,
+    matrix: Tuple[Vector, Vector, Vector],
+    inverse: Tuple[Vector, Vector, Vector],
+) -> Vector:
+    fractional = _matvec(inverse, delta)
     wrapped = tuple(value - round(value) for value in fractional)
     return _matvec(matrix, wrapped)  # type: ignore[arg-type]
+
+
+def _minimum_image_vector(delta: Vector, box: Tuple[float, ...]) -> Vector:
+    matrix = _box_matrix(box)
+    return _minimum_image_vector_precomputed(delta, matrix, _inverse3(matrix))
 
 
 def minimum_ligand_environment_distance(
@@ -627,12 +635,14 @@ def minimum_ligand_environment_distance(
     ligand = system.atoms[start:stop]
     environment = system.atoms[:start] + system.atoms[stop:]
     minimum_squared = math.inf
+    matrix = _box_matrix(system.box)
+    inverse = _inverse3(matrix)
     for ligand_atom in ligand:
         lx, ly, lz = ligand_atom.coordinate
         for environment_atom in environment:
             ex, ey, ez = environment_atom.coordinate
-            dx, dy, dz = _minimum_image_vector(
-                (lx - ex, ly - ey, lz - ez), system.box
+            dx, dy, dz = _minimum_image_vector_precomputed(
+                (lx - ex, ly - ey, lz - ez), matrix, inverse
             )
             squared = dx * dx + dy * dy + dz * dz
             if squared < minimum_squared:
