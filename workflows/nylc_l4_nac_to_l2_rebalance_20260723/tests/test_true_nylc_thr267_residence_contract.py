@@ -36,3 +36,11 @@ def test_corrective_array_covers_only_nylc_c18_and_c23():
 def test_corrective_array_meets_scnet_minimum_gres_policy():
     text = _read("slurm/run_true_nylc_thr267_residence_array.sbatch")
     assert "#SBATCH --gres=dcu:1" in text
+
+
+def test_each_angle_task_uses_unique_distribution_output_and_no_backups():
+    py = _read("scripts/audit_true_nylc_thr267_residence.py")
+    sbatch = _read("slurm/run_true_nylc_thr267_residence_array.sbatch")
+    assert 'angle_distribution = work / f"{seg}.angdist.xvg"' in py
+    assert '"-od", str(angle_distribution)' in py
+    assert "export GMX_MAXBACKUP=-1" in sbatch
