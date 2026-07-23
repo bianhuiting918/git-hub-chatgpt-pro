@@ -143,3 +143,24 @@ sbatch workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_c18_step1_f
 
 Job `61688773` passed an independent `grompp -maxwarn 0` preflight and is the fully unrestrained 1 ns extension. Its scheduler completion alone is not a scientific PASS; audit the complete trajectory for NAC occupancy/residence, energy-conditioned NAC representatives, gate opening, thermodynamics and numerical events.
 
+## Critical atom-identity correction (2026-07-24)
+
+The historical NylC source manifest labeled global atom 8896 as catalytic Thr267 OG1. Direct GRO identity parsing proves that atom 8896 is Thr262 OG1, a gate residue. In the same gate-associated protein chain, catalytic Thr267 OG1 is atom 8961; the other protein copy has Thr267 OG1 at atom 3825.
+
+Therefore all NylC C18/C23 residence labels, restrained pilots, the 100 ps free pilot, and job 61688773 that used atom 8896 are `SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY`. They are not catalytic NAC evidence. Job 61688773 was cancelled after 9 min 53 s. The corresponding pilot, continuation, 1 ns and 1 ns-audit scripts are hard-blocked with exit code 42 to prevent accidental reuse.
+
+Direct corrected spot checks against atom 8961 gave:
+
+| source representative | true Thr267 distance | true Thr267 angle | result |
+| --- | ---: | ---: | --- |
+| C18, 11854 ps | 1.661 nm | 124.548 deg | not NAC |
+| C23, 29684 ps | 1.426 nm | 103.363 deg | not NAC |
+
+The full corrected C18/C23 residence audit is run by:
+
+```bash
+sbatch workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_true_nylc_thr267_residence_array.sbatch
+```
+
+The first array attempt, job 61690618, failed technically because concurrent `gmx angle` processes shared the default `angdist.xvg` output. The repaired version gives every segment a unique angle-distribution path and disables backups; job 61691264 is the retry. No earlier atom-8896 occupancy may be used to select a GS or approve QM/MM.
+
