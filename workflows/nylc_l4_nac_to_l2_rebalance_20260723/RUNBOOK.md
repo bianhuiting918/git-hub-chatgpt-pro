@@ -209,3 +209,47 @@ All values below use atom 8961 (Thr267 OG1). Restrained probes are steering diag
 The first two protocols must not be extended from their endpoints. Response3 established a small, positive, numerically stable response. C18 currently has the better attack angle; C23 remains retained independently.
 
 Job `61698403` continues both response3 checkpoints for 100 ps without regenerating velocities. It keeps k=2000 and rate=-0.004 nm/ps, leaves the 261-266 gate unrestrained, and audits each endpoint against its own response3 start. A scheduler exit code or restrained endpoint is not NAC/GS evidence. Only after a controlled approach followed by a fully unrestrained L4 release can a lower-potential stable true-Thr267 NAC be selected for L4-to-L2 truncation.
+
+## True-Thr267 NAC recapture and unbiased GS selection (2026-07-24)
+
+Historical C18/C23 NAC labels that used atom 8896 are superseded because atom
+8896 is Thr262 OG1.  The corrected catalytic atom is Thr267 OG1, global atom
+8961 for this NylC copy.  The historical fully unrestrained L4 branches contain
+no corrected true-Thr267 NAC frames.
+
+The bounded C18 recapture series produced authentic true-Thr267 NAC sampling
+without numerical instability.  Release1 (job 61701900; distance restraint
+3000 and angle restraint 300) sampled 35/101 NAC frames.  Release2 (job
+61702619; distance restraint 1000 and angle restraint 100) sampled 39/101 NAC
+frames, 38.61% occupancy and a 4 ps longest continuous run.  Release2 ended at
+0.392481 nm and therefore exited the endpoint gate, but had no
+LINCS/SETTLE/NaN/FATAL events and a 0.294284 nm minimum heavy-atom
+ligand-protein contact.  Both windows remain restrained and cannot establish a
+scientific GS.
+
+Run the auditable low-energy NAC selector only on the immutable release2
+trajectory:
+
+```bash
+sbatch slurm/run_select_true_thr267_low_energy_nac.sbatch
+```
+
+Job 61705002 selected the 67.0 ps frame: true-Thr267 distance 0.336447 nm,
+attack angle 100.87 degrees, potential energy -1825802.875 kJ/mol, GRO SHA256
+`d0f157575193c4662f5463c14f5d9075e817c18142aa74f0f7456b8bc732b4f7`.
+This record is a restrained-source starting point, not a scientific GS.
+
+The next gate is a three-seed fully unrestrained pilot:
+
+```bash
+sbatch slurm/run_true_thr267_unrestrained_pilot_array.sbatch
+```
+
+Array job 61705307 uses velocity seeds 26701-26703.  Each task performs 20 ps
+fully unrestrained NVT initialization followed by 100 ps fully unrestrained NPT.
+The NPT audit reports corrected NAC occupancy, longest residence, potential
+energy, gate opening using residues 261-266 only, thermodynamics, close
+contacts, and numerical events.  Compare all three seeds before extending any
+seed to at least 1 ns.  A restrained window never counts as the scientific
+pass.
+
