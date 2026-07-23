@@ -300,6 +300,53 @@
         }
       },
       "next_gate": "checkpoint continuation; C18 preferred geometry, C23 retained"
+    },
+    "response4": {
+      "job_id": "61698403",
+      "results": {
+        "C18": {
+          "terminal_status": "COMPLETED",
+          "status": "PASS_TECHNICAL_BOUNDED_APPROACH",
+          "start_distance_nm": 1.431185,
+          "end_distance_nm": 1.134993,
+          "distance_response_nm": 0.296192,
+          "end_angle_deg": 116.438,
+          "numerical_events": {
+            "FATAL": 0,
+            "LINCS": 0,
+            "SETTLE": 0,
+            "NaN": 0
+          }
+        },
+        "C23": {
+          "terminal_status": "FAILED_GATE_EXIT_2",
+          "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+          "start_distance_nm": 1.295118,
+          "end_distance_nm": 1.212373,
+          "distance_response_nm": 0.082744,
+          "end_angle_deg": 86.158,
+          "numerical_events": {
+            "FATAL": 0,
+            "LINCS": 0,
+            "SETTLE": 0,
+            "NaN": 0
+          }
+        }
+      },
+      "scientific_gate": "NOT_EVALUATED_RESTRAINED; continue C18 only"
+    },
+    "response5": {
+      "job_id": "61698865",
+      "candidate": "C18",
+      "status": "RUNNING",
+      "parent_job": "61698403_0",
+      "protocol": {
+        "duration_ps": 100,
+        "distance_k": 2000,
+        "distance_rate_nm_per_ps": -0.004,
+        "angle_k": 500,
+        "gate_restrained": false
+      }
     }
   }
 }
