@@ -72,3 +72,10 @@ def test_em_audit_main_accepts_completed_double_cg_log(tmp_path, monkeypatch):
         module.main()
     assert exc.value.code == 0
     assert (tmp_path / "PASS.json").is_file()
+
+
+def test_continuation_contains_no_double_escaped_record_or_audit_sequences():
+    text = CONT.read_text()
+    assert "\\\\t" not in text
+    assert r"\\s" not in text
+    assert r"\\n" not in text
