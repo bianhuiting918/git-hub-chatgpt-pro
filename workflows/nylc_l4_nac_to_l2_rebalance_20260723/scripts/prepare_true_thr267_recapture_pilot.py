@@ -54,6 +54,10 @@ PROTOCOLS = {
     "response9": {"dir": "recapture_response9", "stem": "response9", "nsteps": 50000,
                   "rate": -0.002, "distance_k": 2000, "angle_k": 500,
                   "parent_dir": "recapture_response8", "parent_stem": "response8"},
+    "response10": {"dir": "recapture_response10", "stem": "response10", "nsteps": 50000,
+                   "rate": 0.0, "distance_k": 5000, "angle_k": 500,
+                   "target_distance": 0.35,
+                   "parent_dir": "recapture_response9", "parent_stem": "response9"},
 }
 
 
@@ -112,6 +116,9 @@ def make_mdp(branch, seed, protocol="pilot1"):
     velocity_block = "gen-vel                  = no" if is_continuation else (
         f"gen-vel                  = yes\ngen-temp                 = 300\ngen-seed                 = {seed}"
     )
+    fixed_target = p.get("target_distance")
+    distance_start = "no" if fixed_target is not None else "yes"
+    distance_init = f"{fixed_target:.6f}" if fixed_target is not None else "0"
     return f"""integrator               = md
 dt                       = 0.002
 nsteps                   = {p["nsteps"]}
@@ -151,8 +158,8 @@ pull-coord1-type         = umbrella
 pull-coord1-geometry     = distance
 pull-coord1-groups       = 1 2
 pull-coord1-dim          = Y Y Y
-pull-coord1-start        = yes
-pull-coord1-init         = 0
+pull-coord1-start        = {distance_start}
+pull-coord1-init         = {distance_init}
 pull-coord1-rate         = {p["rate"]:.6f}
 pull-coord1-k            = {p["distance_k"]}
 
@@ -188,7 +195,7 @@ def append_history(candidate, state, detail):
 def prepare_one(name, protocol="pilot1"):
     cfg = CANDIDATES[name]
     p = PROTOCOLS[protocol]
-    seed = cfg["seed"] + {"pilot1": 0, "response2": 1, "response3": 2, "response4": 3, "response5": 4, "response6": 5, "response7": 6, "response8": 7, "response9": 8}[protocol]
+    seed = cfg["seed"] + {"pilot1": 0, "response2": 1, "response3": 2, "response4": 3, "response5": 4, "response6": 5, "response7": 6, "response8": 7, "response9": 8, "response10": 9}[protocol]
     candidate_root = TASK_ROOT / "candidates" / name
     source_gro = candidate_root / "source.gro"
     source_manifest = candidate_root / "source_manifest.json"
