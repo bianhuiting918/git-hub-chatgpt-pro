@@ -392,13 +392,34 @@
     },
     "response8": {
       "job_id": "61700389",
+      "terminal_status": "FAILED_GATE_EXIT_2",
+      "candidate": "C18",
+      "result": {
+        "status": "FAIL_APPROACH_RESPONSE_NUMERICALLY_STABLE",
+        "start_distance_nm": 0.496337,
+        "end_distance_nm": 0.44864,
+        "distance_response_nm": 0.047696,
+        "end_angle_deg": 106.64,
+        "minimum_ligand_protein_contact_nm": 0.203283,
+        "numerical_events": {
+          "FATAL": 0,
+          "LINCS": 0,
+          "SETTLE": 0,
+          "NaN": 0
+        }
+      },
+      "interpretation": "stable positive approach; missed 0.05 response threshold by 0.002304 nm"
+    },
+    "response9": {
+      "job_id": "61700808",
       "candidate": "C18",
       "status": "RUNNING",
       "protocol": {
         "duration_ps": 100,
-        "distance_rate_nm_per_ps": -0.0015,
+        "distance_rate_nm_per_ps": -0.002,
         "distance_k": 2000,
-        "angle_k": 500
+        "angle_k": 500,
+        "max_end_distance_nm": 0.4
       },
       "scientific_gate": "NOT_EVALUATED_RESTRAINED"
     }
