@@ -3,7 +3,7 @@
 #SBATCH --output=iccg_step1_pair.%j.out
 #SBATCH --error=iccg_step1_pair.%j.err
 #SBATCH --nodes=1
-#SBATCH --ntasks=16
+#SBATCH --ntasks=1
 #SBATCH --time=02:00:00
 #SBATCH --partition=xahcnormal
 set -euo pipefail

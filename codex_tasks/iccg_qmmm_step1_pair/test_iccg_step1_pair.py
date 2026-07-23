@@ -256,8 +256,11 @@ class StageBTests(unittest.TestCase):
                 deps[key] = path
             (deps["ambertools_prefix"] / "bin").mkdir(); (deps["ambertools_prefix"] / "bin" / "tleap").write_text("tleap")
             def fake_runner(cmd, cwd):
-                if "tleap" in " ".join(str(x) for x in cmd):
+                joined = " ".join(str(x) for x in cmd)
+                if "tleap" in joined:
                     (cwd / "protein.prmtop").write_text("protein topology"); (cwd / "protein.rst7").write_text("protein coords")
+                if "parmed_stage_b" in joined:
+                    (cwd / "stage_b_parmed_manifest.json").write_text(json.dumps({"status":"PASS", "iqmatoms":[1,2,3], "qm_atom_count":100, "residues":259, "atoms":3902, "mbondi3":True, "gates":[{"name":"dynamic","pass":True}]}))
                 return build.CommandResult(0, "ok", "")
             report = build.build_stage_b(out, runner=fake_runner, **deps)
             self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_NOT_BUILT")
@@ -292,6 +295,7 @@ class StageBTests(unittest.TestCase):
                     (cwd / "pair.prmtop").write_text("pair topology")
                     (cwd / "LG1.inpcrd").write_text("lg1 coords")
                     (cwd / "LG2.inpcrd").write_text("lg2 coords")
+                    (cwd / "stage_b_parmed_manifest.json").write_text(json.dumps({"status":"PASS", "iqmatoms":[1,2,3], "qm_atom_count":100, "residues":259, "atoms":3902, "mbondi3":True, "gates":[{"name":"dynamic","pass":True}]}))
                 return build.CommandResult(0, "ok", "")
             report = build.build_stage_b(root, runner=fake_runner, **deps)
             self.assertEqual(report["status"], "PASS")
@@ -315,9 +319,7 @@ class StageBTests(unittest.TestCase):
             out = Path(td)
             tleap = build._write_tleap_input(out)
             text = tleap.read_text()
-            for resid in (238, 283, 275, 292):
-                self.assertIn(f"p.{resid}.name", text)
-                self.assertIn("CYX", text)
+            self.assertNotIn("set p.238.name CYX", text)
             self.assertIn("bond p.238.SG p.283.SG", text)
             self.assertIn("bond p.275.SG p.292.SG", text)
 
@@ -365,6 +367,146 @@ QMMM SCC-DFTB: SCC-DFTB for step 1 converged in 2 cycles.
             rc = audit.main([str(pdb), "--geometry-json", str(geom)])
             self.assertEqual(rc, 0)
             self.assertTrue(json.loads(geom.read_text())["pass"])
+
+    def test_stage_b_protein_only_preprocesses_templates_before_tleap(self):
+        lines = [
+            "ATOM      1  SG  CYS A 238       0.000   0.000   0.000  1.00  0.00           S\n",
+            "ATOM      2  HG  CYS A 238       0.000   0.000   1.000  1.00  0.00           H\n",
+            "ATOM      3  ND1 HIS A 242       1.000   0.000   0.000  1.00  0.00           N\n",
+            "ATOM      4  HD1 HIS A 242       1.000   0.000   1.000  1.00  0.00           H\n",
+            "ATOM      5  NE2 HIS A 200       2.000   0.000   0.000  1.00  0.00           N\n",
+            "ATOM      6  CB  ALA A 100       3.000   0.000   0.000  1.00  0.00           C\n",
+            "HETATM    7  C1  LG1 A 900       4.000   0.000   0.000  1.00  0.00           C\n",
+            "END\n",
+        ]
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            src = out / "generated_LG1_pair.pdb"
+            src.write_text("".join(lines))
+            protein = build.write_stage_b_protein_only_pdb(src, out / "stage_b_protein_only.pdb")
+            text = protein.read_text()
+            self.assertIn("CYX A 238", text)
+            self.assertIn("HID A 242", text)
+            self.assertIn("HIE A 200", text)
+            self.assertNotIn(" HG ", text)
+            self.assertNotIn("HETATM", text)
+            tleap = build._write_tleap_input(out).read_text()
+            self.assertNotIn("set p.238.name CYX", tleap)
+            self.assertIn("bond p.238.SG p.283.SG", tleap)
+
+    def test_stage_b_parmed_script_contains_real_api_and_save_calls(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            deps = {"parmed_egg": out / "ParmEd.egg", "literature_prmtop": out / "vmd-md-b.prmtop", "literature_inpcrd": out / "vmd-md-b.inpcrd"}
+            for path in deps.values(): path.write_text("fixture")
+            script = build._write_parmed_stage_b_script(out, {"parmed_egg": deps["parmed_egg"], "literature_prmtop": deps["literature_prmtop"], "literature_inpcrd": deps["literature_inpcrd"]})
+            text = script.read_text()
+            for needle in ["import parmed", "load_file", "ChamberParm.from_structure", "changeRadii", "save('pair.prmtop'", "save('LG1.inpcrd'", "save('LG2.inpcrd'", "iqmatoms"]:
+                self.assertIn(needle, text)
+            self.assertNotIn("Production intent", text)
+
+    def test_stage_b_requires_auditable_manifest_and_writes_real_qm_mask(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            deps = {}
+            for key, name in {"ambertools_prefix":"ambertools", "parmed_egg":"ParmEd.egg", "literature_prmtop":"vmd-md-b.prmtop", "literature_inpcrd":"vmd-md-b.inpcrd", "dftb_slko_path":"3ob-3-1"}.items():
+                path = root / name
+                if key.endswith("path") or key == "ambertools_prefix": path.mkdir()
+                else: path.write_text("fixture")
+                deps[key] = path
+            (deps["ambertools_prefix"] / "bin").mkdir(); (deps["ambertools_prefix"] / "bin" / "tleap").write_text("tleap")
+            (root / "generated_LG1_pair.pdb").write_text("END\n"); (root / "generated_LG2_pair.pdb").write_text("END\n")
+            def fake_runner(cmd, cwd):
+                joined = " ".join(map(str, cmd))
+                if "tleap" in joined:
+                    (cwd / "protein.prmtop").write_text("protein"); (cwd / "protein.rst7").write_text("coords")
+                if "parmed_stage_b" in joined:
+                    for name in ["pair.prmtop","LG1.inpcrd","LG2.inpcrd"]: (cwd / name).write_text(name)
+                    (cwd / "stage_b_parmed_manifest.json").write_text(json.dumps({"status":"PASS", "iqmatoms":[1,2,3], "qm_atom_count":100, "residues":259, "atoms":3902, "mbondi3":True, "gates":[{"name":"dynamic","pass":True}]}))
+                return build.CommandResult(0, "ok", "")
+            report = build.build_stage_b(root, runner=fake_runner, **deps)
+            self.assertEqual(report["status"], "PASS")
+            self.assertNotIn("STAGE_B_QM_MASK_PLACEHOLDER", (root / "LG1.in").read_text())
+            self.assertIn("qmmask='@1,2,3'", (root / "LG1.in").read_text())
+            self.assertEqual(report["topology_manifest"]["qm_atom_count"], 100)
+            # Now prove touch-only outputs without manifest do not pass.
+            root2 = root / "no_manifest"; root2.mkdir()
+            for key, path in deps.items():
+                pass
+            (root2 / "generated_LG1_pair.pdb").write_text("END\n"); (root2 / "generated_LG2_pair.pdb").write_text("END\n")
+            def touch_only(cmd, cwd):
+                if "tleap" in " ".join(map(str, cmd)):
+                    (cwd / "protein.prmtop").write_text("protein"); (cwd / "protein.rst7").write_text("coords")
+                if "parmed_stage_b" in " ".join(map(str, cmd)):
+                    for name in ["pair.prmtop","LG1.inpcrd","LG2.inpcrd"]: (cwd / name).write_text(name)
+                return build.CommandResult(0, "ok", "")
+            report2 = build.build_stage_b(root2, runner=touch_only, **deps)
+            self.assertEqual(report2["status"], "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED")
+
+    def test_parmed_script_overrides_lg1_lg2_ligand_coordinates_separately(self):
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td)
+            deps = {"parmed_egg": out / "ParmEd.egg", "literature_prmtop": out / "vmd-md-b.prmtop", "literature_inpcrd": out / "vmd-md-b.inpcrd"}
+            for path in deps.values(): path.write_text("fixture")
+            script = build._write_parmed_stage_b_script(out, deps).read_text()
+            self.assertIn("generated_LG1_pair.pdb", script)
+            self.assertIn("generated_LG2_pair.pdb", script)
+            self.assertIn("apply_ligand_xyz", script)
+            self.assertIn("LG1_ligand_generated_pair_max_delta_A", script)
+            self.assertIn("LG2_ligand_generated_pair_max_delta_A", script)
+            self.assertIn("protein_coordinate_max_delta_A", script)
+            self.assertNotIn("Production coordinate override", script)
+
+    def test_stage_b_uses_usr_bin_python27_with_pythonpath_env(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            deps = {}
+            for key, name in {"ambertools_prefix":"ambertools", "parmed_egg":"ParmEd.egg", "literature_prmtop":"vmd-md-b.prmtop", "literature_inpcrd":"vmd-md-b.inpcrd", "dftb_slko_path":"3ob-3-1"}.items():
+                path = root / name
+                if key.endswith("path") or key == "ambertools_prefix": path.mkdir()
+                else: path.write_text("fixture")
+                deps[key] = path
+            (deps["ambertools_prefix"] / "bin").mkdir(); (deps["ambertools_prefix"] / "bin" / "tleap").write_text("tleap")
+            calls = []
+            def fake_runner(cmd, cwd):
+                calls.append(cmd)
+                joined = " ".join(map(str, cmd))
+                if "tleap" in joined:
+                    (cwd / "protein.prmtop").write_text("protein"); (cwd / "protein.rst7").write_text("coords")
+                if "parmed_stage_b" in joined:
+                    for name in ["pair.prmtop","LG1.inpcrd","LG2.inpcrd"]: (cwd / name).write_text(name)
+                    (cwd / "stage_b_parmed_manifest.json").write_text(json.dumps({"status":"PASS", "iqmatoms":[1,2,3], "gates":[{"name":"dynamic","pass":True}], "qm_atom_count":100}))
+                return build.CommandResult(0, "ok", "")
+            build.build_stage_b(root, runner=fake_runner, **deps)
+            parmed_cmd = next(c for c in calls if "parmed_stage_b" in " ".join(map(str, c)))
+            self.assertEqual(parmed_cmd[0], "/usr/bin/env")
+            self.assertIn(f"PYTHONPATH={deps['parmed_egg']}", parmed_cmd)
+            self.assertIn("/usr/bin/python2.7", parmed_cmd)
+
+    def test_stage_b_manifest_gates_must_all_pass_dynamically(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            deps = {}
+            for key, name in {"ambertools_prefix":"ambertools", "parmed_egg":"ParmEd.egg", "literature_prmtop":"vmd-md-b.prmtop", "literature_inpcrd":"vmd-md-b.inpcrd", "dftb_slko_path":"3ob-3-1"}.items():
+                path = root / name
+                if key.endswith("path") or key == "ambertools_prefix": path.mkdir()
+                else: path.write_text("fixture")
+                deps[key] = path
+            (deps["ambertools_prefix"] / "bin").mkdir(); (deps["ambertools_prefix"] / "bin" / "tleap").write_text("tleap")
+            def fake_runner(cmd, cwd):
+                if "tleap" in " ".join(map(str, cmd)):
+                    (cwd / "protein.prmtop").write_text("protein"); (cwd / "protein.rst7").write_text("coords")
+                if "parmed_stage_b" in " ".join(map(str, cmd)):
+                    for name in ["pair.prmtop","LG1.inpcrd","LG2.inpcrd"]: (cwd / name).write_text(name)
+                    (cwd / "stage_b_parmed_manifest.json").write_text(json.dumps({"status":"PASS", "iqmatoms":[1,2,3], "gates":[{"name":"ligand_charges", "pass":False}], "qm_atom_count":100}))
+                return build.CommandResult(0, "ok", "")
+            report = build.build_stage_b(root, runner=fake_runner, **deps)
+            self.assertEqual(report["status"], "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED")
+
+    def test_sbatch_uses_single_rank_for_fixed_geometry_single_point(self):
+        text = Path("run_iccg_step1_pair.sbatch").read_text()
+        self.assertIn("#SBATCH --ntasks=1", text)
+        self.assertNotIn("#SBATCH --ntasks=16", text)
 
 
 if __name__ == "__main__":

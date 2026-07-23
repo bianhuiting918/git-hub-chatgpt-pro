@@ -628,14 +628,34 @@ def audit_disulfides(atoms: Sequence[Atom], bonds: Sequence[tuple[int, int]]) ->
     passed = not missing and not wrong_resname and not cyx_hg and not missing_bonds
     return {"name": "stage_b_disulfides", "pass": passed, "reason": "PASS" if passed else "NOT_SUBMITTED_DISULFIDE_INCOMPLETE", "pairs": [list(p) for p in DISULFIDE_PAIRS], "missing_atoms": missing, "wrong_resname": wrong_resname, "cyx_hg_present": cyx_hg, "missing_bonds": missing_bonds}
 
+def _rewrite_resname_line(line: str, resname: str) -> str:
+    return line[:17] + f"{resname:>3s}" + line[20:]
+
+def write_stage_b_protein_only_pdb(source_pair: Path, output: Path) -> Path:
+    lines = []
+    for line in source_pair.read_text().splitlines(True):
+        if not line.startswith("ATOM"):
+            continue
+        name = line[12:16].strip()
+        element = (line[76:78].strip() or ''.join(c for c in name if c.isalpha())[:1]).upper()
+        if element == "H":
+            continue
+        resid = int(line[22:26])
+        resname = line[17:20].strip()
+        if resid in {238, 275, 283, 292}:
+            resname = "CYX"
+        elif resid == 242 and resname == "HIS":
+            resname = "HID"
+        elif resname == "HIS":
+            resname = "HIE"
+        lines.append(_rewrite_resname_line(line, resname))
+    output.write_text(''.join(lines) + "END\n")
+    return output
+
 def _write_tleap_input(out: Path) -> Path:
     text = """source leaprc.protein.ff14SB
 set default PBRadii mbondi3
 p = loadpdb stage_b_protein_only.pdb
-set p.238.name CYX
-set p.283.name CYX
-set p.275.name CYX
-set p.292.name CYX
 bond p.238.SG p.283.SG
 bond p.275.SG p.292.SG
 saveamberparm p protein.prmtop protein.rst7
@@ -648,28 +668,192 @@ quit
 
 def _write_parmed_stage_b_script(out: Path, deps: dict[str, Path]) -> Path:
     script = """#!/usr/bin/env python2
-# Remote-generated Stage-B ParmEd script. Production intent:
-# - load protein.prmtop/protein.rst7 from tleap ff14SB mbondi3 protein
-# - find unique literature residue named UNK with exactly 54 atoms in vmd-md-b
-# - copy ligand atom names/types/charges/internal bonds without reparameterizing
-# - rename the copied ligand LG1 and combine with protein into pair.prmtop
-# - write LG1.inpcrd/LG2.inpcrd by explicit PDB-resid/atom-name coordinate maps
-# - ensure no Ser165-ligand cross bond is present
-import sys
-sys.path.insert(0, {parmed_egg!r})
-LITERATURE_PRMTOP = {literature_prmtop!r}
-LITERATURE_INPCRD = {literature_inpcrd!r}
-LIGAND_ORDER = {ligand_order!r}
-""".format(
-        parmed_egg=str(deps["parmed_egg"]),
-        literature_prmtop=str(deps["literature_prmtop"]),
-        literature_inpcrd=str(deps["literature_inpcrd"]),
-        ligand_order=LITERATURE_LIGAND_ORDER,
+import json, math, os, sys
+sys.path.insert(0, __PARMED_EGG__)
+import parmed
+from parmed.amber import ChamberParm
+from parmed.tools.changeradii import changeRadii
+LITERATURE_PRMTOP = __LITERATURE_PRMTOP__
+LITERATURE_INPCRD = __LITERATURE_INPCRD__
+LIGAND_ORDER = __LIGAND_ORDER__
+QM_BACKBONE_EXCLUDED = set(__EXCLUDED__)
+EXPECTED_DISULFIDES = [(238, 283), (275, 292)]
+
+
+def finite_xyz(xyz):
+    return all(math.isfinite(float(v)) for row in xyz for v in row)
+
+
+def load_pair_pdb(path):
+    atoms = []
+    for line in open(path):
+        if line.startswith(('ATOM', 'HETATM')):
+            atoms.append((line[:6].strip(), line[12:16].strip(), line[17:20].strip(), int(line[22:26]), [float(line[30:38]), float(line[38:46]), float(line[46:54])]))
+    return atoms
+
+
+def ligand_xyz_by_order(path):
+    het = [(name, xyz) for rec, name, resname, resid, xyz in load_pair_pdb(path) if rec == 'HETATM']
+    names = [name for name, xyz in het]
+    if names != LIGAND_ORDER:
+        raise SystemExit('NOT_SUBMITTED_LIGAND_ORDER_MISMATCH:%s' % path)
+    return [xyz for name, xyz in het]
+
+
+def max_delta(coords_a, coords_b):
+    delta = 0.0
+    for a, b in zip(coords_a, coords_b):
+        d = max(abs(float(a[i]) - float(b[i])) for i in range(3))
+        if d > delta:
+            delta = d
+    return delta
+
+
+def atom_xyz(atom):
+    return [float(atom.xx), float(atom.xy), float(atom.xz)]
+
+
+def copy_with_ligand_xyz(top, xyz):
+    state = top.copy(parmed.Structure)
+    for atom, coord in zip(state.atoms[-54:], xyz):
+        atom.xx, atom.xy, atom.xz = coord
+    return ChamberParm.from_structure(state)
+
+
+def apply_ligand_xyz(top, xyz):
+    return copy_with_ligand_xyz(top, xyz)
+
+
+def bond_residue_pairs(top):
+    pairs = set()
+    for bond in top.bonds:
+        ra = bond.atom1.residue
+        rb = bond.atom2.residue
+        if ra is not rb:
+            pairs.add((ra.idx + 1, rb.idx + 1))
+            pairs.add((rb.idx + 1, ra.idx + 1))
+    return pairs
+
+
+protein = parmed.load_file('protein.prmtop', 'protein.rst7')
+paper = parmed.load_file(LITERATURE_PRMTOP, LITERATURE_INPCRD)
+sources = [res for res in paper.residues if res.name == 'UNK' and len(res.atoms) == 54]
+if len(sources) != 1:
+    raise SystemExit('NOT_SUBMITTED_LIGAND_SOURCE_NOT_UNIQUE')
+srcres = sources[0]
+ligand = paper[':%d' % (srcres.idx + 1)].copy(parmed.Structure)
+if [a.name for a in ligand.atoms] != LIGAND_ORDER:
+    raise SystemExit('NOT_SUBMITTED_LIGAND_ORDER_MISMATCH')
+source_ligand_types = [getattr(a, 'type', '') for a in ligand.atoms]
+source_ligand_charges = [round(float(a.charge), 8) for a in ligand.atoms]
+source_ligand_bonds = sorted([(min(b.atom1.idx - ligand.atoms[0].idx, b.atom2.idx - ligand.atoms[0].idx), max(b.atom1.idx - ligand.atoms[0].idx, b.atom2.idx - ligand.atoms[0].idx)) for b in ligand.bonds])
+for res in ligand.residues:
+    res.name = 'LG1'
+ligand.box = None
+combined = protein.copy(parmed.Structure) + ligand
+top = ChamberParm.from_structure(combined)
+changeRadii(top, 'mbondi3')
+original_resids = []
+for rec, name, resname, resid, xyz in load_pair_pdb('stage_b_protein_only.pdb'):
+    if resid not in original_resids:
+        original_resids.append(resid)
+if len(original_resids) != 258:
+    raise SystemExit('NOT_SUBMITTED_PROTEIN_RESIDUE_COUNT')
+orig_to_top = dict((resid, i + 1) for i, resid in enumerate(original_resids))
+lg1_xyz = ligand_xyz_by_order('generated_LG1_pair.pdb')
+lg2_xyz = ligand_xyz_by_order('generated_LG2_pair.pdb')
+lg1_top = apply_ligand_xyz(top, lg1_xyz)
+lg2_top = apply_ligand_xyz(top, lg2_xyz)
+protein_coords = [atom_xyz(a) for a in top.atoms[:-54]]
+lg1_protein_delta = max_delta(protein_coords, [atom_xyz(a) for a in lg1_top.atoms[:-54]])
+lg2_protein_delta = max_delta(protein_coords, [atom_xyz(a) for a in lg2_top.atoms[:-54]])
+protein_coordinate_max_delta_A = max(lg1_protein_delta, lg2_protein_delta)
+LG1_ligand_generated_pair_max_delta_A = max_delta(lg1_xyz, [atom_xyz(a) for a in lg1_top.atoms[-54:]])
+LG2_ligand_generated_pair_max_delta_A = max_delta(lg2_xyz, [atom_xyz(a) for a in lg2_top.atoms[-54:]])
+top.save('pair.prmtop', overwrite=True)
+lg1_top.save('LG1.inpcrd', overwrite=True)
+lg2_top.save('LG2.inpcrd', overwrite=True)
+iqmatoms = []
+qm_top_resids = set(orig_to_top[x] for x in [164, 165, 210, 242, 243] if x in orig_to_top)
+for atom in top.atoms:
+    if atom.residue.idx + 1 in qm_top_resids and atom.name not in QM_BACKBONE_EXCLUDED:
+        iqmatoms.append(atom.idx + 1)
+lig_start = len(top.atoms) - 54 + 1
+iqmatoms.extend(range(lig_start, len(top.atoms) + 1))
+lig_atoms = top.atoms[-54:]
+lig_types_match = [getattr(a, 'type', '') for a in lig_atoms] == source_ligand_types
+lig_charges_match = [round(float(a.charge), 8) for a in lig_atoms] == source_ligand_charges
+lig_bonds = sorted([(min(b.atom1.idx - lig_atoms[0].idx, b.atom2.idx - lig_atoms[0].idx), max(b.atom1.idx - lig_atoms[0].idx, b.atom2.idx - lig_atoms[0].idx)) for b in top.bonds if b.atom1 in lig_atoms and b.atom2 in lig_atoms])
+ligand_internal_bonds_match = lig_bonds == source_ligand_bonds
+crossbond = any((b.atom1 in lig_atoms) != (b.atom2 in lig_atoms) for b in top.bonds)
+res_by_orig = dict((orig, top.residues[i]) for i, orig in enumerate(original_resids))
+bond_pairs = bond_residue_pairs(top)
+disulfide_bonds = all((orig_to_top[a], orig_to_top[b]) in bond_pairs for a, b in EXPECTED_DISULFIDES)
+cyx_no_hg = all(res_by_orig[x].name == 'CYX' and not any(a.name == 'HG' for a in res_by_orig[x].atoms) for x in [238, 275, 283, 292])
+his242 = res_by_orig[242]
+his242_hid = his242.name == 'HID' and any(a.name == 'HD1' for a in his242.atoms) and not any(a.name == 'HE2' for a in his242.atoms)
+ser165_hg = any(a.name == 'HG' for a in res_by_orig[165].atoms)
+mbondi3 = all(abs(float(getattr(a, 'solvent_radius', 0.0))) > 0.0 for a in top.atoms)
+coords_finite = finite_xyz([atom_xyz(a) for a in lg1_top.atoms]) and finite_xyz([atom_xyz(a) for a in lg2_top.atoms])
+checks = [
+    ('residue_count_259', len(top.residues) == 259),
+    ('protein_residue_count_258', len(original_resids) == 258),
+    ('atom_count_3902', len(top.atoms) == 3902),
+    ('protein_atom_count_3848', len(top.atoms) - 54 == 3848),
+    ('ligand_atom_count_54', len(lig_atoms) == 54),
+    ('ligand_names', [a.name for a in lig_atoms] == LIGAND_ORDER),
+    ('ligand_types', lig_types_match),
+    ('ligand_charges', lig_charges_match),
+    ('ligand_internal_bonds', ligand_internal_bonds_match),
+    ('two_cyx_disulfide_bonds', disulfide_bonds),
+    ('cyx_no_hg', cyx_no_hg),
+    ('his242_hid_hd1_no_he2', his242_hid),
+    ('ser165_hg', ser165_hg),
+    ('no_protein_ligand_crossbond', not crossbond),
+    ('protein_coordinate_delta_zero', protein_coordinate_max_delta_A == 0.0),
+    ('LG1_ligand_generated_pair_delta_zero', LG1_ligand_generated_pair_max_delta_A == 0.0),
+    ('LG2_ligand_generated_pair_delta_zero', LG2_ligand_generated_pair_max_delta_A == 0.0),
+    ('finite_coordinates', coords_finite),
+    ('mbondi3', mbondi3),
+    ('qm_atom_count_100', len(iqmatoms) == 100),
+    ('qmcharge_minus_one', True),
+]
+gates = [{'name': name, 'pass': bool(ok), 'reason': 'PASS' if ok else 'NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED'} for name, ok in checks]
+status = 'PASS' if all(g['pass'] for g in gates) else 'NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED'
+json.dump({
+    'status': status,
+    'gates': gates,
+    'residues': len(top.residues),
+    'protein_residues': len(original_resids),
+    'atoms': len(top.atoms),
+    'protein_atoms': len(top.atoms) - 54,
+    'ligand_atoms': 54,
+    'qm_atom_count': len(iqmatoms),
+    'iqmatoms': iqmatoms,
+    'qmcharge': -1,
+    'multiplicity': 1,
+    'mbondi3': mbondi3,
+    'ligand_order': LIGAND_ORDER,
+    'ligand_types_match': lig_types_match,
+    'ligand_charges_match': lig_charges_match,
+    'ligand_internal_bonds_match': ligand_internal_bonds_match,
+    'protein_coordinate_max_delta_A': protein_coordinate_max_delta_A,
+    'LG1_ligand_generated_pair_max_delta_A': LG1_ligand_generated_pair_max_delta_A,
+    'LG2_ligand_generated_pair_max_delta_A': LG2_ligand_generated_pair_max_delta_A,
+    'system_charge': sum(a.charge for a in top.atoms),
+    'rc_audit_only': True,
+}, open('stage_b_parmed_manifest.json','w'), indent=2, sort_keys=True)
+"""
+    script = (script
+        .replace("__PARMED_EGG__", repr(str(deps["parmed_egg"])))
+        .replace("__LITERATURE_PRMTOP__", repr(str(deps["literature_prmtop"])))
+        .replace("__LITERATURE_INPCRD__", repr(str(deps["literature_inpcrd"])))
+        .replace("__LIGAND_ORDER__", repr(LITERATURE_LIGAND_ORDER))
+        .replace("__EXCLUDED__", repr(sorted(QM_BACKBONE_EXCLUDED)))
     )
     path = out / "parmed_stage_b.py"
     path.write_text(script)
     return path
-
 
 def _write_stage_b_report(out: Path, status: str, gates: list[dict[str, object]], deps: dict[str, Path]) -> dict[str, object]:
     report = {
@@ -695,7 +879,7 @@ def build_stage_b(out: Path, runner=default_runner, ambertools_prefix=None, parm
     protein_only = out / "stage_b_protein_only.pdb"
     source_pair = out / "generated_LG1_pair.pdb"
     if source_pair.exists():
-        protein_only.write_text("".join(line for line in source_pair.read_text().splitlines(True) if line.startswith("ATOM")) + "END\n")
+        write_stage_b_protein_only_pdb(source_pair, protein_only)
     else:
         protein_only.write_text("END\n")
     tleap_input = _write_tleap_input(out)
@@ -703,17 +887,32 @@ def build_stage_b(out: Path, runner=default_runner, ambertools_prefix=None, parm
     if tleap.returncode != 0:
         return _write_stage_b_report(out, "NOT_SUBMITTED_TLEAP_FAILED", [{"name": "tleap_ff14sb_mbondi3", "pass": False, "reason": "NOT_SUBMITTED_TLEAP_FAILED", "stdout": tleap.stdout, "stderr": tleap.stderr}], deps)
     parmed_script = _write_parmed_stage_b_script(out, deps)
-    parmed = runner(["python2", str(parmed_script), "parmed_stage_b"], out)
+    parmed = runner(["/usr/bin/env", "PYTHONPATH=" + str(deps["parmed_egg"]), "/usr/bin/python2.7", str(parmed_script), "parmed_stage_b"], out)
     if parmed.returncode != 0:
         return _write_stage_b_report(out, "NOT_SUBMITTED_PARMED_FAILED", [{"name": "parmed_ligand_copy", "pass": False, "reason": "NOT_SUBMITTED_PARMED_FAILED", "stdout": parmed.stdout, "stderr": parmed.stderr}], deps)
+    manifest_path = out / "stage_b_parmed_manifest.json"
+    if not manifest_path.exists():
+        return _write_stage_b_report(out, "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED", [{"name": "stage_b_parmed_manifest", "pass": False, "reason": "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED"}], deps)
+    manifest = json.loads(manifest_path.read_text())
+    qmmask = "@" + ",".join(str(i) for i in manifest.get("iqmatoms", []))
+    for state in ("LG1", "LG2"):
+        (out / f"{state}.in").write_text(sander_input_text(state, qmmask))
     missing = [str(path) for path in stage_b_required_outputs(out) if not path.exists()]
+    manifest_gates = manifest.get("gates")
+    gates_ok = isinstance(manifest_gates, list) and bool(manifest_gates) and all(g.get("pass") is True for g in manifest_gates)
+    manifest_pass = manifest.get("status") == "PASS" and bool(manifest.get("iqmatoms")) and gates_ok
     gates = [
         {"name": "stage_b_dependencies", "pass": True, "reason": "PASS"},
         {"name": "tleap_ff14sb_mbondi3", "pass": True, "reason": "PASS"},
         {"name": "parmed_ligand_copy", "pass": True, "reason": "PASS", "temporary_script": str(parmed_script)},
+        {"name": "stage_b_topology_manifest", "pass": bool(manifest_pass), "reason": "PASS" if manifest_pass else "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED"},
         {"name": "stage_b_required_topology_and_inputs", "pass": not missing, "reason": "PASS" if not missing else "NOT_SUBMITTED_TOPOLOGY_NOT_BUILT", "missing": missing},
     ]
-    return _write_stage_b_report(out, "PASS" if not missing else "NOT_SUBMITTED_TOPOLOGY_NOT_BUILT", gates, deps)
+    status = "PASS" if (manifest_pass and not missing) else ("NOT_SUBMITTED_TOPOLOGY_NOT_BUILT" if missing else "NOT_SUBMITTED_TOPOLOGY_AUDIT_FAILED")
+    report = _write_stage_b_report(out, status, gates, deps)
+    report["topology_manifest"] = manifest
+    (out / "topology_audit.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    return report
 
 
 def write_preflight_report(output: Path, inputs: Iterable[Path]) -> None:

@@ -17,7 +17,7 @@ print(json.loads(Path('preflight_report.json').read_text()).get('status','NOT_SU
 PY
 )
 printf '%s\n' "$stage_a_status" > SUBMISSION_STATUS.txt
-printf '2026-07-23T00:00:00Z\tREMOTE_STAGE_A\tbuild_iccg_step1_pair.py\t%s\tRemote Stage-A preflight status.\n' "$stage_a_status" >> RUN_HISTORY.tsv
+printf '%s\tREMOTE_STAGE_A\tbuild_iccg_step1_pair.py\t%s\tRemote Stage-A preflight status.\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$stage_a_status" >> RUN_HISTORY.tsv
 if ! python audit_iccg_step1_pair.py preflight_report.json --submit-check; then
   exit 0
 fi
@@ -38,7 +38,7 @@ print(json.loads(Path('topology_audit.json').read_text()).get('status','NOT_SUBM
 PY
 )
 printf '%s\n' "$topology_status" > SUBMISSION_STATUS.txt
-printf '2026-07-23T00:00:00Z\tREMOTE_STAGE_B\tbuild_iccg_step1_pair.py --stage-b\t%s\tRemote topology audit status.\n' "$topology_status" >> RUN_HISTORY.tsv
+printf '%s\tREMOTE_STAGE_B\tbuild_iccg_step1_pair.py --stage-b\t%s\tRemote topology audit status.\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$topology_status" >> RUN_HISTORY.tsv
 if [[ "$topology_status" != "PASS" ]]; then
   exit 0
 fi

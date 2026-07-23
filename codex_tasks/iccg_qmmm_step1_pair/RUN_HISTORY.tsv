@@ -28,3 +28,11 @@
 2026-07-23T00:00:00Z	RED	python test_iccg_step1_pair.py	exit_1	CYX disulfide, Amber18 verbose collector, and postrun geometry CLI tests added before implementation.
 2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	CYX disulfides, Amber18 collector regex, and postrun geometry CLI implemented.
 2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Final CYX/collector/postrun geometry regression run.
+2026-07-23T00:00:00Z	RED	python test_iccg_step1_pair.py	exit_1	Stage-B real script/preprocessed protein/manifest tests fail before implementation.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_1	Stage-B protein preprocessing, executable ParmEd API script, and manifest-gated QM masks implemented.
+2026-07-23T00:00:00Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-B legacy fake-runner tests updated to require auditable manifest.
+2026-07-23T00:00:00Z	CORRECTION	RUN_HISTORY.tsv	exit_0	Line 32 label should be REGRESSION, not GREEN; retained append-only and superseded by line 33.
+2026-07-23T17:57:12Z	RED	python test_iccg_step1_pair.py	exit_1	Stage-B coordinate override, dynamic manifest, python2.7 env, and ntasks tests fail before implementation.
+2026-07-23T18:00:01Z	GREEN	python test_iccg_step1_pair.py	exit_0	Stage-B coordinate override, dynamic manifest gating, python2.7 PYTHONPATH runner, and single-rank sbatch tests pass after implementation.
+2026-07-23T18:01:19Z	GREEN	python test_iccg_step1_pair.py	exit_0	Full regression after deploy UTC run-history timestamp fix.
+2026-07-23T18:01:43Z	GREEN	python test_iccg_step1_pair.py	exit_0	Full regression after deploy UTC run-history timestamp fix.
