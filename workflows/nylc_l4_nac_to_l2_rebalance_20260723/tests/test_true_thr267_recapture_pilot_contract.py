@@ -13,6 +13,13 @@ SBATCH5 = FLOW / "slurm" / "run_true_thr267_recapture_response5_c18.sbatch"
 SBATCH6 = FLOW / "slurm" / "run_true_thr267_recapture_response6_c18.sbatch"
 
 
+def load_audit():
+    spec = importlib.util.spec_from_file_location("audit_recapture", AUDIT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def load_prep():
     spec = importlib.util.spec_from_file_location("prepare_recapture", PREP)
     module = importlib.util.module_from_spec(spec)
@@ -160,3 +167,15 @@ def test_response6_slurm_uses_response5_reference():
     assert '-deffnm "$work/response6"' in text
     assert "recapture_response5/response5.gro" in text
     assert "--min-response 0.15" in text
+
+
+def test_contact_audit_reports_ligand_protein_minimum():
+    m = load_audit()
+    atoms = {
+        1: {"resid": 10, "resname": "ALA", "atomname": "CA", "xyz_nm": (0.0, 0.0, 0.0)},
+        2: {"resid": 356, "resname": "UNL", "atomname": "C18", "xyz_nm": (0.2, 0.0, 0.0)},
+    }
+    result = m.minimum_ligand_protein_distance(atoms, (1.0, 1.0, 1.0))
+    assert result["distance_nm"] == 0.2
+    assert result["protein_global_index"] == 1
+    assert result["ligand_global_index"] == 2
