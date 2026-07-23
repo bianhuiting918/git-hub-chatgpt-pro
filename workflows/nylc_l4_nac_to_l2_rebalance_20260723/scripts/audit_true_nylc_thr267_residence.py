@@ -54,6 +54,7 @@ def run_segment(task):
         raise FileNotFoundError(f"missing trajectory input for {seg}: {directory}")
     dist = work / f"{seg}.distance.xvg"
     angle = work / f"{seg}.angle.xvg"
+    angle_distribution = work / f"{seg}.angdist.xvg"
     ndx = work / f"{seg}.angle.ndx"
     ndx.write_text(f"[ true_thr267_angle ]\n{TRUE_THR267_OG1} {c_atom} {o_atom}\n")
     subprocess.run(
@@ -64,7 +65,7 @@ def run_segment(task):
     )
     subprocess.run(
         [gmx, "angle", "-f", str(xtc), "-n", str(ndx),
-         "-ov", str(angle), "-type", "angle"],
+         "-ov", str(angle), "-od", str(angle_distribution), "-type", "angle"],
         input="0\n", text=True, check=True,
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
     )
