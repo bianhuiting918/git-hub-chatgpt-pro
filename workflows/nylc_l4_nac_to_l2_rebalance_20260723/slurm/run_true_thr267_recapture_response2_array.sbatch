@@ -67,7 +67,7 @@ done
 record START "preflight=PASS_GROMPP_TRUE_THR267;restrained=yes;duration_ps=100;protocol=response2"
 set +e
 mpirun -np 1 "$GMX" mdrun \
-  -s "$work/response2.tpr" -deffnm "$work/pilot" \
+  -s "$work/response2.tpr" -deffnm "$work/response2" \
   -ntomp "${SLURM_CPUS_PER_TASK:-8}" -nb gpu -pme gpu -bonded gpu -pin on \
   >"$work/mdrun.stdout" 2>"$work/mdrun.stderr"
 rc=$?
@@ -78,7 +78,7 @@ if [[ $rc -ne 0 ]]; then
 fi
 
 set +e
-"$PY" "$FLOW/scripts/audit_true_thr267_recapture_response2.py" \
+"$PY" "$FLOW/scripts/audit_true_thr267_recapture_pilot.py" \
   --candidate "$candidate" --stage-dir recapture_response2 --stem response2 >"$work/audit.stdout" 2>"$work/audit.stderr"
 audit_rc=$?
 set -e
