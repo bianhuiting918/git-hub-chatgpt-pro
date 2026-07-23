@@ -33,3 +33,16 @@ def test_continuation_free_window_is_unrestrained_and_scientifically_audited():
     assert "atomnr 8961 plus atomnr 10287" in text
     assert "8961 10287 10288" in text
     assert "residues 261-266" in text
+
+
+def test_em_audit_parses_real_gromacs_force_and_energy_lines():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("audit_em_double_result", AUDIT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    sample = """
+Potential Energy  = -2.30772586301368e+06
+Maximum force     =  4.19978114876091e+02 on atom 3668
+"""
+    assert module.last_float(r"Maximum force\s*=\s*([+0-9.eE-]+)", sample) == 419.978114876091
+    assert module.last_float(r"Potential Energy\s*=\s*([+0-9.eE-]+)", sample) == -2307725.86301368
