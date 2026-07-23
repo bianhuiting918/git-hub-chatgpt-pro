@@ -352,9 +352,29 @@
     },
     "response6": {
       "job_id": "61699443",
+      "terminal_status": "COMPLETED",
+      "candidate": "C18",
+      "result": {
+        "status": "PASS_TECHNICAL_BOUNDED_APPROACH",
+        "start_distance_nm": 0.938775,
+        "end_distance_nm": 0.721183,
+        "distance_response_nm": 0.217592,
+        "end_angle_deg": 107.817,
+        "minimum_ligand_protein_contact_nm": 0.205964,
+        "numerical_events": {
+          "FATAL": 0,
+          "LINCS": 0,
+          "SETTLE": 0,
+          "NaN": 0
+        }
+      },
+      "scientific_gate": "NOT_EVALUATED_RESTRAINED"
+    },
+    "response7": {
+      "job_id": "61699852",
       "candidate": "C18",
       "status": "RUNNING",
-      "parent_job": "61698865",
+      "parent_job": "61699443",
       "scientific_gate": "NOT_EVALUATED_RESTRAINED"
     }
   }
