@@ -11,7 +11,7 @@ def test_double_recovery_uses_validated_double_binary_and_env():
     assert "2023.1" in text
     assert "em_cg_flexible.mdp" in text
     assert "set +u" in text
-    assert "em_cg_flexible_double_retry2" in text
+    assert "em_cg_flexible_double_retry3" in text
     assert 'start="$build/rebuilt.gro"' in text
 
 
