@@ -7,7 +7,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HERE / "scripts"))
 
-from extract_sources import load_manifest, resolve_candidate  # noqa: E402
+from extract_sources import load_manifest, resolve_candidate, temporary_gro_path  # noqa: E402
 
 
 class SourceManifestTests(unittest.TestCase):
@@ -67,6 +67,11 @@ class SourceManifestTests(unittest.TestCase):
             self.assertTrue(Path(resolved["source_itp"]).is_file())
             self.assertTrue(Path(resolved["source_topology"]).is_file())
             self.assertTrue(Path(resolved["source_index"]).is_file())
+
+    def test_temporary_extract_path_remains_a_gro_filename(self):
+        observed = temporary_gro_path(Path("/tmp/source.gro"))
+        self.assertEqual(observed.name, "source.tmp.gro")
+        self.assertEqual(observed.suffix, ".gro")
 
     def test_global_and_local_reactive_indices_share_one_ligand_offset(self):
         for candidate in self.manifest["candidates"]:
