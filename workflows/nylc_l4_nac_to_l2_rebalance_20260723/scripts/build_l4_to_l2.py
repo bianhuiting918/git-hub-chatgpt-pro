@@ -93,14 +93,23 @@ def parse_itp(path: Path) -> Topology:
         elif section == "bonds":
             if len(fields) < 2:
                 raise ValueError(f"Malformed bonds row in {path}: {raw}")
-            if len(fields) < 4:\n                raise ValueError(f"Bond lacks equilibrium length in {path}: {raw}")\n            bonds.append((int(fields[0]), int(fields[1]), float(fields[3])))
+            if len(fields) < 4:
+                raise ValueError(f"Bond lacks equilibrium length in {path}: {raw}")
+            bonds.append((int(fields[0]), int(fields[1]), float(fields[3])))
     if not molecule_type or not atoms or not bonds:
         raise ValueError(f"Incomplete ITP topology: {path}")
     neighbors = {atom_id: set() for atom_id in atoms}
-    bond_lengths: Dict[frozenset, float] = {}\n    for left, right, length in bonds:\n        if left not in atoms or right not in atoms:
+    bond_lengths: Dict[frozenset, float] = {}
+    for left, right, length in bonds:
+        if left not in atoms or right not in atoms:
             raise ValueError(f"Bond references missing atom: {left}-{right}")
         neighbors[left].add(right)
-        neighbors[right].add(left)\n        bond_lengths[frozenset((left, right))] = length\n    return Topology(\n        molecule_type=molecule_type, atoms=atoms, neighbors=neighbors,\n        bond_lengths=bond_lengths,\n    )
+        neighbors[right].add(left)
+        bond_lengths[frozenset((left, right))] = length
+    return Topology(
+        molecule_type=molecule_type, atoms=atoms, neighbors=neighbors,
+        bond_lengths=bond_lengths,
+    )
 
 
 def validate_reactive_triplet(
