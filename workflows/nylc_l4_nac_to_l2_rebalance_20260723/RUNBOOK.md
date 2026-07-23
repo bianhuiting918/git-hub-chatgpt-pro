@@ -253,3 +253,19 @@ contacts, and numerical events.  Compare all three seeds before extending any
 seed to at least 1 ns.  A restrained window never counts as the scientific
 pass.
 
+### Unrestrained pilot outcome and 1 ns continuation
+
+Array 61705307 completed all three tasks without LINCS/SETTLE/NaN/FATAL.
+Seeds 26701 and 26702 sampled no true NAC in 101 NPT frames.  Seed 26703
+sampled 6/101 true NAC frames (5.94% occupancy; 1 ps longest continuous run).
+Its lowest-potential free NAC was at 8 ps: distance 0.329 nm, angle 114.257
+degrees, potential energy -1829950.75 kJ/mol.  Therefore NAC is rare in this
+pilot and the 100 ps result is not by itself a stable GS ensemble.
+
+Job 61705692 continues seed 26703 for 1 ns fully unrestrained NPT from its
+checkpoint.  The continuation does not restart from the early NAC frame and
+does not add restraints.  After completion, select the lowest-potential frame
+only from frames satisfying the corrected true-Thr267 NAC definition.  If no
+NAC recurs, retain a scientific FAIL/NOT_EVALUATED reason and do not relabel the
+restrained frame as GS.
+
