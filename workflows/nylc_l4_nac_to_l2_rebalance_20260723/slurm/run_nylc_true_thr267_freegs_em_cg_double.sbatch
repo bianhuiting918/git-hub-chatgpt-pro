@@ -7,8 +7,8 @@
 #SBATCH --gres=dcu:1
 #SBATCH --mem-per-cpu=2500M
 #SBATCH -t 02:00:00
-#SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdfgs_%j.out
-#SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdfgs_%j.err
+#SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdouble_%j.out
+#SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_emcgdouble_%j.err
 
 set -eo pipefail\nset -x
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
@@ -18,7 +18,7 @@ GMX=/work/home/acshdt1dks/opt/gmx-cp2k/gromacs-2023.1-cp2k-2024.1/bin/gmx_mpi_d
 candidate=nylc_C18_trueT267_freeGS
 root="$TASK/candidates/$candidate"
 build="$root/build"
-out="$root/runs/em_cg_flexible_double_retry2"
+out="$root/runs/em_cg_flexible_double_retry3"
 start="$build/rebuilt.gro"
 job="${SLURM_JOB_ID:?}"
 mkdir -p "$out"
@@ -29,11 +29,11 @@ for f in run.tpr run.gro PASS.json FAIL.json; do test ! -e "$out/$f"; done
 record() {
   local state=$1 detail=$2 stamp
   stamp="$(date -Is)"
-  printf '%s\ttrue_thr267_l2_em_cg_double_double\t%s\tcandidate=%s;job=%s;%s\n' "$stamp" "$state" "$candidate" "$job" "$detail" >>"$TASK/run_history.tsv"
+  printf '%s\ttrue_thr267_l2_em_cg_double\t%s\tcandidate=%s;job=%s;%s\n' "$stamp" "$state" "$candidate" "$job" "$detail" >>"$TASK/run_history.tsv"
   "$PY" - "$stamp" "$state" "$detail" "$job" >>"$TASK/run_history.jsonl" <<'PY'
 import json,sys
 stamp,state,detail,job=sys.argv[1:]
-print(json.dumps({"timestamp":stamp,"event":"true_thr267_l2_em_cg_double_double","state":state,"detail":detail,"candidate_id":"nylc_C18_trueT267_freeGS","slurm_job_id":job},sort_keys=True))
+print(json.dumps({"timestamp":stamp,"event":"true_thr267_l2_em_cg_double","state":state,"detail":detail,"candidate_id":"nylc_C18_trueT267_freeGS","slurm_job_id":job},sort_keys=True))
 PY
 }
 record START "reason=steep_EM_61707615_water_pair_collapse;start=immutable_rebuilt.gro;flexible_water=yes"
