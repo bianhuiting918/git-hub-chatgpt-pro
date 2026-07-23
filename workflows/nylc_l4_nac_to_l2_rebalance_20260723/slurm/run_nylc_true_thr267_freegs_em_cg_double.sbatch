@@ -39,7 +39,7 @@ PY
 record START "reason=steep_EM_61707615_water_pair_collapse;start=immutable_rebuilt.gro;flexible_water=yes"
 (
   cd "$build"
-  "$GMX" grompp -f "$FLOW/mdp/em_cg_flexible_double.mdp" -c "$start" -r "$start" -p "$build/topol.top" \
+  "$GMX" grompp -f "$FLOW/mdp/em_cg_flexible.mdp" -c "$start" -r "$start" -p "$build/topol.top" \
     -o "$out/run.tpr" -po "$out/run.processed.mdp" -maxwarn 0 \
     >"$out/grompp.stdout" 2>"$out/grompp.stderr"
 )
