@@ -13,7 +13,12 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Tuple
 
 from build_l4_to_l2 import (
+    _box_matrix,
+    _inverse3,
     _minimum_image_vector,
+    _minimum_image_vector_precomputed,
+    GroAtom,
+    GroSystem,
     build_l2_coordinates,
     discover_heavy_mapping,
     extract_ligand_coordinates,
@@ -130,6 +135,106 @@ def reaction_geometry_from_target_globals(
         target_globals["carbonyl_o"],
         target_globals["thr_og1"],
     )
+
+
+
+def neutralize_ligand_charge_change(
+    system: GroSystem,
+    topology_text: str,
+    source_charge: float,
+    target_charge: float,
+) -> Tuple[GroSystem, str, Dict[str, Any]]:
+    charge_change = target_charge - source_charge
+    rounded_change = int(round(charge_change))
+    if abs(charge_change - rounded_change) > 1e-5:
+        raise ValueError(f"Nonintegral ligand charge change: {charge_change}")
+    if rounded_change == 0:
+        return system, topology_text, {
+            "ligand_charge_change_e": charge_change,
+            "removed_ion": None,
+            "net_charge_change_relative_to_source": charge_change,
+        }
+    if rounded_change not in {-1, 1}:
+        raise ValueError(f"Unsupported ligand charge change: {rounded_change}")
+
+    ion_resname = "CL" if rounded_change == -1 else "NA"
+    ion_charge = -1.0 if ion_resname == "CL" else 1.0
+    ion_indices = [
+        index for index, atom in enumerate(system.atoms)
+        if atom.resname.upper() == ion_resname
+    ]
+    if not ion_indices:
+        raise ValueError(f"No {ion_resname} ion is available for neutralization")
+    solute = [
+        atom for atom in system.atoms
+        if atom.resname.upper() not in {"SOL", "NA", "CL"}
+    ]
+    if not solute:
+        raise ValueError("No solute atoms found for ion-distance audit")
+    matrix = _box_matrix(system.box)
+    inverse = _inverse3(matrix)
+    scored = []
+    for index in ion_indices:
+        ion = system.atoms[index]
+        minimum_squared = math.inf
+        for solute_atom in solute:
+            delta = tuple(
+                a - b for a, b in zip(ion.coordinate, solute_atom.coordinate)
+            )
+            wrapped = _minimum_image_vector_precomputed(delta, matrix, inverse)
+            squared = sum(value * value for value in wrapped)
+            minimum_squared = min(minimum_squared, squared)
+        scored.append((math.sqrt(minimum_squared), index))
+    minimum_solute_distance, remove_index = max(scored)
+    removed = system.atoms[remove_index]
+
+    molecule_pattern = re.compile(
+        r"(?m)^(\s*" + re.escape(ion_resname) + r"\s+)(\d+)(\s*(?:;.*)?)$"
+    )
+    matches = list(molecule_pattern.finditer(topology_text))
+    if len(matches) != 1:
+        raise ValueError(
+            f"Expected one {ion_resname} molecule row, found {len(matches)}"
+        )
+    old_count = int(matches[0].group(2))
+    if old_count < 1:
+        raise ValueError(f"Cannot decrement {ion_resname} count {old_count}")
+    corrected_topology = molecule_pattern.sub(
+        lambda match: f"{match.group(1)}{old_count - 1}{match.group(3)}",
+        topology_text,
+        count=1,
+    )
+    kept = system.atoms[:remove_index] + system.atoms[remove_index + 1 :]
+    renumbered = [
+        GroAtom(
+            resid=atom.resid,
+            resname=atom.resname,
+            atom_name=atom.atom_name,
+            atom_number=index % 100000,
+            coordinate=atom.coordinate,
+        )
+        for index, atom in enumerate(kept, 1)
+    ]
+    corrected = GroSystem(
+        title=system.title + f" | removed distant {ion_resname} for neutrality",
+        atoms=renumbered,
+        box=system.box,
+    )
+    net_change = charge_change - ion_charge
+    audit = {
+        "ligand_charge_change_e": charge_change,
+        "removed_ion": {
+            "resname": removed.resname,
+            "atom_name": removed.atom_name,
+            "global_atom_before_removal": remove_index + 1,
+            "coordinate_nm": removed.coordinate,
+            "minimum_distance_to_solute_nm": minimum_solute_distance,
+            "topology_count_before": old_count,
+            "topology_count_after": old_count - 1,
+        },
+        "net_charge_change_relative_to_source": net_change,
+    }
+    return corrected, corrected_topology, audit
 
 
 def _copy_topology_inputs(candidate: Dict[str, Any], build_dir: Path) -> None:
