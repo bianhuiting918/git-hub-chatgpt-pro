@@ -194,3 +194,18 @@ python scripts/prepare_true_thr267_recapture_pilot.py --all
 Both candidates passed `grompp -maxwarn 0`. The pilot is 100 ps NVT at 300 K with freshly generated, recorded velocity seeds, a distance reference moving by -0.004 nm/ps with k=100 kJ mol-1 nm-2, a weak 105 degree angle restraint with k=20, and no gate restraint. Its sole purpose is to test a gentle true-Thr267 approach without severe numerical or steric failure; it cannot establish an unbiased NAC or GS.
 
 Array job `61695008` failed before MD because escaped Slurm variables were interpreted literally. The repaired script passed contract tests and bash syntax validation. Retry job `61695303` runs C18 and C23 independently. After it completes, require `pilot_audit.json` technical PASS before any further approach. A later fully released L4 trajectory must supply the actual NAC residence and lower-potential GS candidate; only then may L4-to-L2 truncation resume.
+
+
+### True-Thr267 staged response probes
+
+All values below use atom 8961 (Thr267 OG1). Restrained probes are steering diagnostics only.
+
+| job | protocol | C18 end / response / angle | C23 end / response / angle | disposition |
+| --- | --- | --- | --- | --- |
+| 61695303 | 100 ps, k=100, reference -0.4 nm | 1.5940 / -0.1435 nm / 91.57 deg | 1.4199 / -0.1100 nm / 89.18 deg | numerically stable; insufficient force |
+| 61695989 | 100 ps, k=500, reference -0.2 nm | 1.4825 / -0.0320 nm / 89.31 deg | 1.3689 / -0.0589 nm / 95.06 deg | numerically stable; insufficient force; auto-audit filename failed and was rerun manually |
+| 61697621 | 25 ps, k=2000, reference -0.1 nm | 1.4312 / +0.0193 nm / 106.99 deg | 1.2951 / +0.0148 nm / 88.98 deg | numerically stable; first correct-direction response, below 0.05 nm gate |
+
+The first two protocols must not be extended from their endpoints. Response3 established a small, positive, numerically stable response. C18 currently has the better attack angle; C23 remains retained independently.
+
+Job `61698403` continues both response3 checkpoints for 100 ps without regenerating velocities. It keeps k=2000 and rate=-0.004 nm/ps, leaves the 261-266 gate unrestrained, and audits each endpoint against its own response3 start. A scheduler exit code or restrained endpoint is not NAC/GS evidence. Only after a controlled approach followed by a fully unrestrained L4 release can a lower-potential stable true-Thr267 NAC be selected for L4-to-L2 truncation.
