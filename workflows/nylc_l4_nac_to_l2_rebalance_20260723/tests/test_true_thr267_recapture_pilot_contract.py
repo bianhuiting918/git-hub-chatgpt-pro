@@ -11,6 +11,7 @@ SBATCH3 = FLOW / "slurm" / "run_true_thr267_recapture_response3_array.sbatch"
 SBATCH4 = FLOW / "slurm" / "run_true_thr267_recapture_response4_array.sbatch"
 SBATCH5 = FLOW / "slurm" / "run_true_thr267_recapture_response5_c18.sbatch"
 SBATCH6 = FLOW / "slurm" / "run_true_thr267_recapture_response6_c18.sbatch"
+SBATCH7 = FLOW / "slurm" / "run_true_thr267_recapture_response7_c18.sbatch"
 
 
 def load_audit():
@@ -179,3 +180,18 @@ def test_contact_audit_reports_ligand_protein_minimum():
     assert result["distance_nm"] == 0.2
     assert result["protein_global_index"] == 1
     assert result["ligand_global_index"] == 2
+
+
+def test_response7_continues_c18_from_response6():
+    m = load_prep()
+    mdp = m.make_mdp("C18", seed=181273, protocol="response7")
+    assert "continuation             = yes" in mdp
+    assert "pull-coord1-rate         = -0.004000" in mdp
+    assert m.PROTOCOLS["response7"]["parent_stem"] == "response6"
+
+
+def test_response7_slurm_uses_response6_reference():
+    text = SBATCH7.read_text(encoding="utf-8")
+    assert '-deffnm "$work/response7"' in text
+    assert "recapture_response6/response6.gro" in text
+    assert "--min-response 0.15" in text
