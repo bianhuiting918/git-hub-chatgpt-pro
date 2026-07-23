@@ -1,0 +1,21 @@
+HELIX    1 AA1 ARG A   47  ALA A   52  5                                   6    
+HELIX    2 AA2 SER A   64  VAL A   68  5                                   5    
+HELIX    3 AA3 ASP A   98  SER A  101  5                                   4    
+HELIX    4 AA4 LEU A  102  HIS A  112  1                                  11    
+HELIX    5 AA5 GLY A  127  SER A  145  1                                  19    
+HELIX    6 AA6 PRO A  147  ALA A  152  1                                   6    
+HELIX    7 AA7 ALA A  165  ASN A  178  1                                  14    
+HELIX    8 AA8 HIS A  218  LEU A  226  1                                   9    
+HELIX    9 AA9 ILE A  243  SER A  247  5                                   5    
+HELIX   10 AB1 ASN A  249  ASP A  265  1                                  17    
+HELIX   11 AB2 ASP A  267  LEU A  274  5                                   8    
+HELIX   12 AB3 ASN A  289  GLN A  293  5                                   5    
+SHEET    1 AA1 6 SER A  57  VAL A  63  0                                        
+SHEET    2 AA1 6 GLY A  74  THR A  80 -1  O  TYR A  78   N  ALA A  59           
+SHEET    3 AA1 6 VAL A 115  ILE A 119 -1  O  VAL A 116   N  TYR A  77           
+SHEET    4 AA1 6 PHE A  86  SER A  92  1  N  MET A  91   O  LEU A 117           
+SHEET    5 AA1 6 LEU A 154  HIS A 164  1  O  ASP A 155   N  PHE A  86           
+SHEET    6 AA1 6 ALA A 184  LEU A 187  1  O  LEU A 187   N  GLY A 163           
+SHEET    1 AA2 3 VAL A 202  ALA A 207  0                                        
+SHEET    2 AA2 3 LYS A 232  LEU A 237  1  O  VAL A 235   N  GLY A 206           
+SHEET    3 AA2 3 LEU A 282  THR A 287 -1  O  CYS A 283   N  GLU A 236           
