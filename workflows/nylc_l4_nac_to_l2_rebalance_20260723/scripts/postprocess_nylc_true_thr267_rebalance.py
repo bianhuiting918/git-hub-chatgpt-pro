@@ -39,7 +39,7 @@ def scan_log(path):
     text = path.read_text(errors="replace")
     counts = {name: len(re.findall(pattern, text)) for name, pattern in HARD_PATTERNS.items()}
     return {
-        "finished_mdrun": FINISHED_MARKER in text,
+        "finished_dynamics": FINISHED_MARKER in text,
         "numerical_issue_counts": counts,
         "technical_pass": FINISHED_MARKER in text and not any(counts.values()),
     }
@@ -121,7 +121,7 @@ def main():
     for stage in STAGES:
         log = runs / stage / "run.log"
         stage_results[stage] = scan_log(log) if log.is_file() else {
-            "finished_mdrun": False,
+            "finished_dynamics": False,
             "numerical_issue_counts": {},
             "technical_pass": False,
             "missing_log": str(log),
