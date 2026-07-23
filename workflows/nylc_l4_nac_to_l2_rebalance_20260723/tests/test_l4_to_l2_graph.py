@@ -8,6 +8,8 @@ HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HERE / "scripts"))
 
 from build_l4_to_l2 import (  # noqa: E402
+    build_atom_mapping,
+    build_l2_coordinates,
     discover_heavy_mapping,
     parse_itp,
     validate_reactive_triplet,
@@ -90,6 +92,51 @@ class ItpGraphTests(unittest.TestCase):
             }
             if target_id not in {1, 31}:
                 self.assertEqual(extras, set())
+
+    def test_hydrogens_follow_bonded_parent_equivalence(self):
+        result = discover_heavy_mapping(self.nylc, self.l2, (31, 32, 33))
+        atom_mapping = build_atom_mapping(self.nylc, self.l2, result)
+        self.assertEqual(set(atom_mapping), set(self.l2.atoms))
+        rebuilt = {target for target, source in atom_mapping.items() if source is None}
+        self.assertEqual(rebuilt, {33, 34, 35, 36})
+        for target_id, source_id in atom_mapping.items():
+            if target_id in rebuilt:
+                continue
+            if self.l2.atoms[target_id].element == "H":
+                target_parent = next(iter(self.l2.neighbors[target_id]))
+                source_parent = next(iter(self.nylc.neighbors[source_id]))
+                self.assertEqual(atom_mapping[target_parent], source_parent)
+
+    def test_coordinate_builder_copies_inherited_atoms_and_rebuilds_endpoints(self):
+        result = discover_heavy_mapping(self.nylc, self.l2, (31, 32, 33))
+        source_xyz = {
+            atom_id: (0.01 * atom_id, 0.003 * atom_id, -0.002 * atom_id)
+            for atom_id in self.nylc.atoms
+        }
+        # Give endpoint neighborhoods non-collinear geometry.
+        source_xyz[56] = (0.0, 0.0, 0.0)
+        source_xyz[55] = (0.145, 0.0, 0.0)
+        source_xyz[57] = (-0.08, 0.10, 0.0)
+        source_xyz[148] = (-0.03, -0.02, 0.095)
+        source_xyz[25] = (1.0, 1.0, 1.0)
+        source_xyz[27] = (1.15, 1.0, 1.0)
+        source_xyz[24] = (0.94, 1.11, 1.0)
+        built, atom_mapping = build_l2_coordinates(
+            self.nylc, self.l2, result, source_xyz
+        )
+        for target_id, source_id in atom_mapping.items():
+            if source_id is not None:
+                self.assertEqual(built[target_id], source_xyz[source_id])
+        self.assertEqual(built[25], source_xyz[31])
+        self.assertEqual(built[26], source_xyz[32])
+        self.assertEqual(built[24], source_xyz[33])
+
+        def distance(a, b):
+            return sum((x - y) ** 2 for x, y in zip(a, b)) ** 0.5
+
+        self.assertAlmostEqual(distance(built[31], built[33]), 0.12190, places=5)
+        for hydrogen in (34, 35, 36):
+            self.assertAlmostEqual(distance(built[1], built[hydrogen]), 0.10271, places=5)
 
 
 if __name__ == "__main__":
