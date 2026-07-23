@@ -1,0 +1,143 @@
+{
+  "branches": {
+    "C18": {
+      "branch": "C18",
+      "closest_angle_compatible_unrestrained_frame": {
+        "action": "FREE_MONITOR",
+        "angle_deg": "106.853000",
+        "distance_nm": "0.344362",
+        "gate_opening_nm": "2.625590",
+        "gate_restrained": "0",
+        "joint_pass": "1",
+        "segment": "segment_000122",
+        "simulation_time_ps": "11956.000000",
+        "substrate_restrained": "0",
+        "true_joint_pass": 0,
+        "true_thr267_angle_deg": 108.009,
+        "true_thr267_distance_nm": 1.451
+      },
+      "closest_unrestrained_frame": {
+        "action": "FREE_MONITOR",
+        "angle_deg": "106.853000",
+        "distance_nm": "0.344362",
+        "gate_opening_nm": "2.625590",
+        "gate_restrained": "0",
+        "joint_pass": "1",
+        "segment": "segment_000122",
+        "simulation_time_ps": "11956.000000",
+        "substrate_restrained": "0",
+        "true_joint_pass": 0,
+        "true_thr267_angle_deg": 108.009,
+        "true_thr267_distance_nm": 1.451
+      },
+      "frame_counts": {
+        "all": 16271,
+        "fully_unrestrained": 1811,
+        "true_nac": 0
+      },
+      "geometry_tsv_sha256": "1304b80502cce63bb2d354c22f4046aa69315d0fffc523b0a1147fab0e2376c4",
+      "identity": {
+        "legacy_results_status": "SUPERSEDED_WRONG_NUCLEOPHILE",
+        "superseded_wrong_atom": {
+          "atom_name": "OG1",
+          "atom_number": 8896,
+          "residue_name": "THR",
+          "residue_number": 262
+        },
+        "true_catalytic_atom": {
+          "atom_name": "OG1",
+          "atom_number": 8961,
+          "residue_name": "THR",
+          "residue_number": 267
+        }
+      },
+      "longest_continuous_nac": null,
+      "reaction_atoms": {
+        "carbonyl_c": 10297,
+        "carbonyl_o": 10298,
+        "thr267_og1": 8961
+      },
+      "schema_version": 1,
+      "scientific_status": "FAIL_NO_TRUE_THR267_NAC_IN_EXISTING_BRANCH",
+      "status": "CORRECTED_TRUE_THR267_RESIDENCE_AUDIT",
+      "true_nac_occupancy_unrestrained": 0.0
+    },
+    "C23": {
+      "branch": "C23",
+      "closest_angle_compatible_unrestrained_frame": {
+        "action": "FREE_MONITOR",
+        "angle_deg": "100.807000",
+        "distance_nm": "0.357160",
+        "gate_opening_nm": "3.531350",
+        "gate_restrained": "0",
+        "joint_pass": "0",
+        "segment": "segment_000320",
+        "simulation_time_ps": "31838.000000",
+        "substrate_restrained": "0",
+        "true_joint_pass": 0,
+        "true_thr267_angle_deg": 97.289,
+        "true_thr267_distance_nm": 1.31
+      },
+      "closest_unrestrained_frame": {
+        "action": "FREE_MONITOR",
+        "angle_deg": "112.596000",
+        "distance_nm": "0.475192",
+        "gate_opening_nm": "2.821310",
+        "gate_restrained": "0",
+        "joint_pass": "0",
+        "segment": "segment_000223",
+        "simulation_time_ps": "22074.000000",
+        "substrate_restrained": "0",
+        "true_joint_pass": 0,
+        "true_thr267_angle_deg": 82.298,
+        "true_thr267_distance_nm": 1.252
+      },
+      "frame_counts": {
+        "all": 16221,
+        "fully_unrestrained": 5021,
+        "true_nac": 0
+      },
+      "geometry_tsv_sha256": "7811fee414a834f195d745e332ba77cf9d9b8983f7386bbc27339ff923b75997",
+      "identity": {
+        "legacy_results_status": "SUPERSEDED_WRONG_NUCLEOPHILE",
+        "superseded_wrong_atom": {
+          "atom_name": "OG1",
+          "atom_number": 8896,
+          "residue_name": "THR",
+          "residue_number": 262
+        },
+        "true_catalytic_atom": {
+          "atom_name": "OG1",
+          "atom_number": 8961,
+          "residue_name": "THR",
+          "residue_number": 267
+        }
+      },
+      "longest_continuous_nac": null,
+      "reaction_atoms": {
+        "carbonyl_c": 10303,
+        "carbonyl_o": 10304,
+        "thr267_og1": 8961
+      },
+      "schema_version": 1,
+      "scientific_status": "FAIL_NO_TRUE_THR267_NAC_IN_EXISTING_BRANCH",
+      "status": "CORRECTED_TRUE_THR267_RESIDENCE_AUDIT",
+      "true_nac_occupancy_unrestrained": 0.0
+    }
+  },
+  "conclusion": "NO_TRUE_THR267_NAC_IN_EXISTING_NYLC_C18_OR_C23_BRANCH",
+  "first_attempt": {
+    "job_id": "61690618",
+    "status": "TECHNICAL_FAIL_SHARED_GMX_ANGDIST_OUTPUT"
+  },
+  "next_scientific_gate": "corrected true-Thr267 L4 recapture followed by fully unrestrained release; no direct L2 truncation from legacy representatives",
+  "schema_version": 1,
+  "scope": "NylC corrected catalytic Thr267 residence in legacy L4 branches",
+  "successful_job": {
+    "C18_state": "COMPLETED",
+    "C23_state": "COMPLETED",
+    "job_id": "61691264"
+  },
+  "true_thr267_og1_global_atom_id": 8961,
+  "wrong_thr262_og1_global_atom_id": 8896
+}
