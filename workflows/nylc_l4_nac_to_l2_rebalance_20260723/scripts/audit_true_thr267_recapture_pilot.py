@@ -40,13 +40,17 @@ def main():
     parser.add_argument("--stage-dir", default="recapture_pilot")
     parser.add_argument("--stem", default="pilot")
     parser.add_argument("--min-response", type=float, default=0.15)
+    parser.add_argument("--reference-gro")
     args = parser.parse_args()
     root = TASK_ROOT / "candidates" / args.candidate
     work = root / args.stage_dir
     source_manifest = json.loads((root / "source_manifest.json").read_text())
     cfg = geom.CANDIDATES[args.candidate]
-    start_distance = source_manifest["geometry"]["true_thr267_og1_to_carbonyl_c_nm"]
-    start_angle = source_manifest["geometry"]["true_thr267_attack_angle_deg"]
+    if args.reference_gro:
+        start_distance, start_angle = geometry(pathlib.Path(args.reference_gro), cfg)
+    else:
+        start_distance = source_manifest["geometry"]["true_thr267_og1_to_carbonyl_c_nm"]
+        start_angle = source_manifest["geometry"]["true_thr267_attack_angle_deg"]
     end_distance, end_angle = geometry(work / f"{args.stem}.gro", cfg)
     log_text = (work / f"{args.stem}.log").read_text(errors="replace")
     counts = {
@@ -79,6 +83,7 @@ def main():
         "scientific_gate": "NOT_EVALUATED_RESTRAINED_PILOT_CANNOT_ESTABLISH_NAC",
         "finished_mdrun": finished,
         "minimum_required_response_nm": args.min_response,
+        "reference_gro": args.reference_gro,
         "numerical_issue_counts": counts,
         "geometry": {
             "start_distance_nm": start_distance,
