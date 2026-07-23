@@ -12,6 +12,8 @@
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/nylc_step1_pilot_%A_%a.err
 
 set -euo pipefail
+echo "SUPERSEDED_WRONG_NUCLEOPHILE_IDENTITY: atom 8896 is Thr262 OG1, not catalytic Thr267 OG1" >&2
+exit 42
 
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 REPO="$TASK_ROOT/repo"
