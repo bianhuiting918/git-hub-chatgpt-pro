@@ -1,0 +1,11 @@
+{
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "gromacs": "2022.1",
+  "input_run_gro_sha256": "e3714bd8a88792bfa164799d175ecfc55d156ff39194b1a3f8b014b3ec381679",
+  "parent_em_job_id": "61708647",
+  "schema_version": 1,
+  "stage": "nvt50_after_em_double_preflight",
+  "status": "PASS_GROMPP_MAXWARN0",
+  "tpr_sha256": "4d49d3519939823a15ee3602e1ae311979a661a9326ba0d4092564f6a179f204",
+  "warnings_allowed": 0
+}
