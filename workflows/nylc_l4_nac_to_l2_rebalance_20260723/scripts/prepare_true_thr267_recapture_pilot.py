@@ -36,6 +36,9 @@ PROTOCOLS = {
                   "rate": -0.002, "distance_k": 500, "angle_k": 50},
     "response3": {"dir": "recapture_response3", "stem": "response3", "nsteps": 12500,
                   "rate": -0.004, "distance_k": 2000, "angle_k": 100},
+    "response4": {"dir": "recapture_response4", "stem": "response4", "nsteps": 50000,
+                  "rate": -0.004, "distance_k": 2000, "angle_k": 100,
+                  "parent_dir": "recapture_response3", "parent_stem": "response3"},
 }
 
 
@@ -89,10 +92,15 @@ def make_mdp(branch, seed, protocol="pilot1"):
     p = PROTOCOLS[protocol]
     carbon = f"L4_C{branch[1:]}"
     oxygen = f"L4_O_C{branch[1:]}"
+    is_continuation = "parent_dir" in p
+    continuation = "yes" if is_continuation else "no"
+    velocity_block = "gen-vel                  = no" if is_continuation else (
+        f"gen-vel                  = yes\ngen-temp                 = 300\ngen-seed                 = {seed}"
+    )
     return f"""integrator               = md
 dt                       = 0.002
 nsteps                   = {p["nsteps"]}
-continuation             = no
+continuation             = {continuation}
 constraints              = h-bonds
 constraint-algorithm     = lincs
 lincs-iter               = 1
@@ -114,9 +122,7 @@ pbc                      = xyz
 nstxout-compressed       = 500
 nstenergy                = 500
 nstlog                   = 500
-gen-vel                  = yes
-gen-temp                 = 300
-gen-seed                 = {seed}
+{velocity_block}
 comm-mode                = Linear
 nstcomm                  = 100
 pull                     = yes
@@ -167,7 +173,7 @@ def append_history(candidate, state, detail):
 def prepare_one(name, protocol="pilot1"):
     cfg = CANDIDATES[name]
     p = PROTOCOLS[protocol]
-    seed = cfg["seed"] + {"pilot1": 0, "response2": 1, "response3": 2}[protocol]
+    seed = cfg["seed"] + {"pilot1": 0, "response2": 1, "response3": 2, "response4": 3}[protocol]
     candidate_root = TASK_ROOT / "candidates" / name
     source_gro = candidate_root / "source.gro"
     source_manifest = candidate_root / "source_manifest.json"
@@ -176,6 +182,24 @@ def prepare_one(name, protocol="pilot1"):
     manifest = json.loads(source_manifest.read_text(encoding="utf-8"))
     if manifest["status"] != "VERIFIED_TRUE_THR267_RECAPTURE_START_NOT_NAC":
         raise RuntimeError(f"source status is not verified for {name}")
+
+    checkpoint = None
+    input_coord = source_gro
+    if "parent_dir" in p:
+        parent = candidate_root / p["parent_dir"]
+        input_coord = parent / f"{p['parent_stem']}.gro"
+        checkpoint = parent / f"{p['parent_stem']}.cpt"
+        parent_audit = json.loads(
+            (parent / f"{p['parent_stem']}_audit.json").read_text()
+        )
+        if not parent_audit["finished_mdrun"] or any(
+            parent_audit["numerical_issue_counts"].values()
+        ):
+            raise RuntimeError(f"parent stage is not numerically valid for {name}")
+        if parent_audit["geometry"]["distance_response_nm"] <= 0:
+            raise RuntimeError(f"parent stage did not move toward Thr267 for {name}")
+        if not input_coord.exists() or not checkpoint.exists():
+            raise FileNotFoundError(f"parent coordinate/checkpoint missing for {name}")
 
     source_branch = SOURCE_ROOT / cfg["branch"]
     original_index = source_branch / "cycle.ndx"
@@ -217,11 +241,13 @@ def prepare_one(name, protocol="pilot1"):
 
     command = [
         str(GMX), "grompp", "-f", str(work / f"{stem}.mdp"),
-        "-c", str(source_gro), "-p", str(topology),
+        "-c", str(input_coord), "-p", str(topology),
         "-n", str(work / "corrected_true_thr267.ndx"),
         "-o", str(work / f"{stem}.tpr"),
         "-po", str(work / f"{stem}.processed.mdp"), "-maxwarn", "0",
     ]
+    if checkpoint is not None:
+        command.extend(["-t", str(checkpoint)])
     completed = subprocess.run(
         command, cwd=source_branch, capture_output=True, text=True,
         env={**os.environ, "GMX_MAXBACKUP": "-1"}, check=False,
@@ -236,6 +262,9 @@ def prepare_one(name, protocol="pilot1"):
         "grompp_returncode": completed.returncode,
         "maxwarn": 0,
         "source_gro_sha256": sha256(source_gro),
+        "input_coordinate": str(input_coord),
+        "input_coordinate_sha256": sha256(input_coord),
+        "parent_checkpoint": str(checkpoint) if checkpoint else None,
         "topology_sha256": sha256(topology),
         "corrected_index_sha256": sha256(work / "corrected_true_thr267.ndx"),
         "true_thr267_og1_global_index": TRUE_THR267_OG1,
@@ -250,7 +279,7 @@ def prepare_one(name, protocol="pilot1"):
             "angle_reference_deg": 105.0,
             "angle_k_kj_mol_rad2": p["angle_k"],
             "gate_restraint": False,
-            "fresh_velocity_seed": seed,
+            "fresh_velocity_seed": None if checkpoint else seed,
         },
         "scientific_gate": "NOT_EVALUATED_APPROACH_PILOT_NOT_AN_UNRESTRAINED_NAC",
     }
