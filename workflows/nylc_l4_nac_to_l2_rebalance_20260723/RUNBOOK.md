@@ -164,3 +164,33 @@ sbatch workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_true_nylc_thr267
 
 The first array attempt, job 61690618, failed technically because concurrent `gmx angle` processes shared the default `angdist.xvg` output. The repaired version gives every segment a unique angle-distribution path and disables backups; job 61691264 is the retry. No earlier atom-8896 occupancy may be used to select a GS or approve QM/MM.
 
+
+
+### Corrected true-Thr267 residence result and recapture pilot
+
+Corrected array job `61691264` completed both branches using catalytic Thr267 OG1 atom 8961:
+
+| branch | all frames | fully unrestrained frames | true NAC frames | closest angle-compatible free frame |
+| --- | ---: | ---: | ---: | --- |
+| C18 | 16,271 | 1,811 | 0 | segment_000122 at 11956 ps; 1.451 nm, 108.009 deg |
+| C23 | 16,221 | 5,021 | 0 | segment_000320 at 31838 ps; 1.310 nm, 97.289 deg |
+
+Thus the legacy L4 C18/C23 trajectories contain no authentic Thr267 NAC. Do not truncate their former representatives directly to L2.
+
+The corrected source extractor is:
+
+```bash
+python scripts/extract_true_thr267_recapture_sources.py --all
+```
+
+It extracts C18 local 16 ps and C23 local 98 ps from the original segment XTC files through the mandatory temporary name `source.tmp.gro`. It promotes a file to `source.gro` only after time, identity, geometry and SHA256 verification. These are explicitly `VERIFIED_TRUE_THR267_RECAPTURE_START_NOT_NAC`.
+
+Prepare the bounded L4 pilot with:
+
+```bash
+python scripts/prepare_true_thr267_recapture_pilot.py --all
+```
+
+Both candidates passed `grompp -maxwarn 0`. The pilot is 100 ps NVT at 300 K with freshly generated, recorded velocity seeds, a distance reference moving by -0.004 nm/ps with k=100 kJ mol-1 nm-2, a weak 105 degree angle restraint with k=20, and no gate restraint. Its sole purpose is to test a gentle true-Thr267 approach without severe numerical or steric failure; it cannot establish an unbiased NAC or GS.
+
+Array job `61695008` failed before MD because escaped Slurm variables were interpreted literally. The repaired script passed contract tests and bash syntax validation. Retry job `61695303` runs C18 and C23 independently. After it completes, require `pilot_audit.json` technical PASS before any further approach. A later fully released L4 trajectory must supply the actual NAC residence and lower-potential GS candidate; only then may L4-to-L2 truncation resume.
