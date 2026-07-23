@@ -39,6 +39,7 @@ def main():
     parser.add_argument("--candidate", choices=sorted(geom.CANDIDATES), required=True)
     parser.add_argument("--stage-dir", default="recapture_pilot")
     parser.add_argument("--stem", default="pilot")
+    parser.add_argument("--min-response", type=float, default=0.15)
     args = parser.parse_args()
     root = TASK_ROOT / "candidates" / args.candidate
     work = root / args.stage_dir
@@ -61,7 +62,7 @@ def main():
     response = start_distance - end_distance
     numerical_pass = finished and not any(counts.values())
     response_pass = (
-        response >= 0.15
+        response >= args.min_response
         and end_distance >= 0.30
         and 75.0 <= end_angle <= 135.0
     )
@@ -77,6 +78,7 @@ def main():
         "status": status,
         "scientific_gate": "NOT_EVALUATED_RESTRAINED_PILOT_CANNOT_ESTABLISH_NAC",
         "finished_mdrun": finished,
+        "minimum_required_response_nm": args.min_response,
         "numerical_issue_counts": counts,
         "geometry": {
             "start_distance_nm": start_distance,
