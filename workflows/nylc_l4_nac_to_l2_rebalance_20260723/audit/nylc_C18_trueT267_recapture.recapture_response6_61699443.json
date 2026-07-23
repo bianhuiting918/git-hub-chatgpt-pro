@@ -1,0 +1,39 @@
+{
+  "candidate": "nylc_C18_trueT267_recapture",
+  "finished_mdrun": true,
+  "geometry": {
+    "distance_response_nm": 0.217592,
+    "end_angle_deg": 107.817,
+    "end_distance_nm": 0.721183,
+    "end_joint_nac": false,
+    "start_angle_deg": 108.1867557608283,
+    "start_distance_nm": 0.9387747333625887
+  },
+  "minimum_ligand_protein_contact": {
+    "distance_nm": 0.205964,
+    "ligand_global_index": 10377,
+    "ligand_identity": {
+      "atomname": "H38",
+      "resid": 356,
+      "resname": "UNL"
+    },
+    "protein_global_index": 8268,
+    "protein_identity": {
+      "atomname": "HG13",
+      "resid": 221,
+      "resname": "VAL"
+    }
+  },
+  "minimum_required_response_nm": 0.15,
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "nan": 0,
+    "settle_problem": 0
+  },
+  "reference_gro": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_recapture/recapture_response5/response5.gro",
+  "schema_version": 1,
+  "scientific_gate": "NOT_EVALUATED_RESTRAINED_PILOT_CANNOT_ESTABLISH_NAC",
+  "severe_contact_threshold_nm": 0.1,
+  "status": "PASS_TECHNICAL_BOUNDED_APPROACH"
+}
