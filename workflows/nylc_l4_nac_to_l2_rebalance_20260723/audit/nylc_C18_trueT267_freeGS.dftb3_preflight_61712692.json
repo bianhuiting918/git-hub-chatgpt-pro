@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "job_id": "61712692",
+  "postprocess_job_id": "61710861",
+  "status": "PASS_DFTB3_PREFLIGHT",
+  "interpretation": "Numerical preflight only; not a TS search, reaction coordinate, PMF, barrier, or Step2 endpoint.",
+  "selected_free_nac": {
+    "time_ps": 434,
+    "distance_nm": 0.3394230398779673,
+    "angle_deg": 114.03689389132796,
+    "potential_energy_kj_mol": -1832730.5,
+    "gro_sha256": "182f68a41c72c490e0046323c9b8a0f8514ccf7af7dc4d578dcb87342c1c8e2d"
+  },
+  "qm_region": {
+    "scope": "minimal_numerical_smoke",
+    "thr267_og1_global": 8961,
+    "l2_global_range": [
+      10273,
+      10351
+    ],
+    "reactive_c_o_global": [
+      10287,
+      10288
+    ],
+    "qm_atom_count": 95,
+    "boundary_bonds": [
+      {
+        "qm_atom": 8963,
+        "mm_atom": 8965
+      }
+    ],
+    "qmcharge": 1,
+    "spin": 1,
+    "link_atom_count": 1,
+    "electron_count_including_link_h": 314,
+    "dftb_telec_K": 200,
+    "slater_koster_set": "3ob-3-1"
+  },
+  "stages": {
+    "one_step": {
+      "run_done": true,
+      "final_results": true,
+      "scc_warnings": 0,
+      "vlimit_warnings": 0,
+      "hard_error_hits": 0
+    },
+    "twenty_step": {
+      "run_done": true,
+      "final_results": true,
+      "scc_warnings": 0,
+      "vlimit_warnings": 0,
+      "hard_error_hits": 0
+    }
+  },
+  "pass_json_sha256": "74a598b392b17998359996d1dd8f6d4468086ac05854778b900a536714e407c9",
+  "production_gate": "Expand through Asp306/Asp308; test Tyr146/Lys189/Asn219 before Step1 TS/PMF."
+}
