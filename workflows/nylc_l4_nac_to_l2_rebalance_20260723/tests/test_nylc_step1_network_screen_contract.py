@@ -53,6 +53,8 @@ def test_wrapper_is_cpu_only_analysis_and_never_runs_md():
     assert "mdrun" not in text
     assert "npt300free/run.xtc" in text
     assert "npt300free/run.tpr" in text
+    assert "\\nFREE=" not in text
+    assert "\nFREE=" in text
     assert "postprocess_job_61710861" in text
     assert "analyze_nylc_step1_network_nac.py" in text
 
