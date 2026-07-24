@@ -60,7 +60,7 @@ export GROMACS_TOPDIR="$GMXDATA/top"
 export GMX_MAXBACKUP=-1
 (
   cd "$OUT/build"
-  "$GMX" grompp -f grompp_preflight.mdp -c system.gro -p topol.top \
+  "$GMX" grompp -f grompp_preflight.mdp -c system.gro -r system.gro -p topol.top \
     -o preflight.tpr -po preflight.processed.mdp -maxwarn 0 > "$OUT/grompp.log" 2>&1
 )
 "$PY" "$FLOW/scripts/audit_nylc_ash306_full_system_preflight.py" \
