@@ -39,8 +39,8 @@ def test_bracket_is_gradual_and_does_not_overdetermine_og_h_breaking():
     assert 'if window["proton_A"] is not None:' in text
     assert "ntr=1" in text and "restraint_wt=1.0" in text
     assert "ntmin=2" in text
-    assert \'"maxcyc": 300\' in text
-    assert \'amber_input(name, qmmask, window["maxcyc"])\' in text
+    assert '"maxcyc": 300' in text
+    assert 'amber_input(name, qmmask, window["maxcyc"])' in text
     assert "!@H=" in text
 
 
