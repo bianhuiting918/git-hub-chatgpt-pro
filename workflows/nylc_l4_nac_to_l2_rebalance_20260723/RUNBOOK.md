@@ -359,3 +359,14 @@ with independent aimless shooting/committor outcomes and endpoint separation,
 and require PMF window overlap, block stability, hard-error scans and MBAR
 sensitivity.  PETase atom numbers and fitted RC weights are not transferable to
 NylC.
+
+
+The minimal smoke QM region is deliberately not the production Step1 region.
+Negoro et al. (FEBS Journal 2023, DOI 10.1111/febs.16755) assign substrate
+hydrolysis to the Asp308-Asp306-Thr267 catalytic triad, with Tyr146 and Lys189
+as additional nylon-specific catalytic/substrate-binding residues and Asn219
+in the Thr267 hydrogen-bond network.  Therefore any Step1 TS/committor/PMF work
+must expand at least through Asp306/Asp308 and explicitly test the sensitivity
+to including Tyr146/Lys189/Asn219.  The minimal Thr267+L2 smoke result can only
+validate file conversion, DFTB3 parameter availability and short-run numerical
+entry.
