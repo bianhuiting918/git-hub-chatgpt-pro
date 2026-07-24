@@ -49,6 +49,7 @@ def test_runner_waits_for_postprocess_gate_and_uses_scnet_cpu_amber18():
     assert "--gres=dcu" not in text
     assert 'POSTJOB=${POSTJOB:?set POSTJOB to the successful postprocess job id}' in text
     assert "module load amber/2018" in text
+    assert "export GMXDATA=/public/software/apps/Gromacs-DCU2/2022.1/mpi/share/gromacs" in text
     assert "3ob-3-1/C-C.skf" in text
     assert "01_qmmm_one_step.in" in text
     assert "02_qmmm_20_step.in" in text
