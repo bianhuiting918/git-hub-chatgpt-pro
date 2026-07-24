@@ -21,9 +21,9 @@ def inspect(path):
     bad = {pattern: len(re.findall(re.escape(pattern), text, flags=re.IGNORECASE)) for pattern in BAD_PATTERNS}
     return {
         "final_results": "FINAL RESULTS" in text,
-        "run_done": bool(re.search(r"Run\\s+done", text)),
+        "run_done": bool(re.search(r"Run\s+done", text)),
         "bad_pattern_counts": bad,
-        "passed": "FINAL RESULTS" in text and bool(re.search(r"Run\\s+done", text)) and not any(bad.values()),
+        "passed": "FINAL RESULTS" in text and bool(re.search(r"Run\s+done", text)) and not any(bad.values()),
     }
 
 
