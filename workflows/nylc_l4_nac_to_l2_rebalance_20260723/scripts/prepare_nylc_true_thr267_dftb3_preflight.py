@@ -12,10 +12,10 @@ import parmed as pmd
 import extract_true_thr267_recapture_sources as geom
 
 
-PROTEIN_ATOMS = 10270
+PROTEIN_ATOMS = 10272
 THR267_OG1 = 8961
-L2_FIRST = 10271
-L2_LAST = 10349
+L2_FIRST = 10273
+L2_LAST = 10351
 L2_REACTIVE_C = 10287
 L2_REACTIVE_O = 10288
 QMCHARGE = 0
