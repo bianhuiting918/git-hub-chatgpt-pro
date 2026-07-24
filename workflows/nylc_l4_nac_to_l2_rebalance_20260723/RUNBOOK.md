@@ -499,3 +499,23 @@ any transition-path or umbrella workflow.
 
 Compact audit:
 `audit/nylc_C18_trueT267_freeGS.ash306_full_system_preflight.json`.
+
+
+## ASH306/Asp308- production-QM numerical smoke (2026-07-24)
+
+SCNet job 61719422 completed 0:0 and passed both one-step DFTB3/3ob-3-1
+numerical smokes at `dftb_telec=200 K`. The core region contains 111 explicit
+QM atoms, three link atoms, QM charge 0 and 388 electrons including links. The
+network sensitivity region contains 162 explicit QM atoms, seven link atoms,
+QM charge +1 and 570 electrons including links. Both regions have FINAL RESULTS
+and Run done, with zero SCC convergence, vlimit, SANDER BOMB, segmentation,
+forrtl, NaN and FATAL hits.
+
+This PASS establishes numerical feasibility only. Raw absolute energies must
+not be compared against the all-deprotonated Asp306-/Asp308- system because the
+proton and counterion compositions differ. The mechanistically ready Step1
+reactant microstate must be chosen using proton-acceptor geometry and subsequent
+reaction-path/committor evidence, not the one-step smoke energy.
+
+Compact audit:
+`audit/nylc_C18_trueT267_freeGS.step1_ash306_qm_smoke.json`.
