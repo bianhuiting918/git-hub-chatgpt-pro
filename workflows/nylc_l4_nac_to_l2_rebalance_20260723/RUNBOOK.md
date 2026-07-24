@@ -666,3 +666,19 @@ The first focus export lacked a cpptraj reference and was rejected. The
 corrected exporter sets r01 as the reference before evaluating `:L2<:8.0`.
 Only the corrected v2 PDBs were downloaded. They are visualization artifacts
 from an attack-only seed, not TS/PMF evidence.
+
+
+### Step1 attack prerequisite PASS
+
+Shared continuation job 61725801 completed 0:0 and passed in r02. The locked
+attack seed has SHA256
+`d5e607dd722be4fd6e5d33016afb4975d18b200a78d1fceedf5bfb9fed1b87bf`.
+Its geometry is OG1--C12 2.762500 A, OG1--HG1 0.986029 A, C12--O2
+1.264571 A and C12--N3 1.358855 A. All Amber completion and hard-error gates
+passed. HG1 is 3.080492 A from Asp306 OD1 and 4.905876 A from OD2.
+
+This PASS authorizes construction of independent, gently staged OD1 and OD2
+proton-approach brackets from the same immutable attack seed. It is not a
+proton-transfer path, TS, committor, PMF or barrier. Every proton stage must
+reject a detached proton and preserve carbonyl/amide chemistry before its
+restart can be propagated.
