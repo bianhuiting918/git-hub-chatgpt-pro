@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "status": "PASS_STEP1_RC_SEED_AUDIT",
+  "authoritative_job_id": 61719995,
+  "failed_predecessor": {
+    "job_id": 61719848,
+    "status": "FAIL_TECHNICAL_SCALAR_X_COORDINATE"
+  },
+  "all_deprotonated_reactant_candidate": {
+    "attack_og1_c12_A": 3.3942303987796594,
+    "thr_og1_hg1_A": 0.9618731725128857,
+    "thr_hg1_asp306_od1_A": 3.600236103368776,
+    "thr_hg1_asp306_od2_A": 5.20107681158431,
+    "thr_hg1_thr_n_A": 3.156754662624264,
+    "carbonyl_c12_o2_A": 1.2126829758844675,
+    "amide_c12_n3_A": 1.3789851340750523
+  },
+  "ash306_reference": {
+    "ash306_od2_hd2_A": 0.9988993943335882,
+    "ash306_hd2_bridge_water_ow_A": 2.3034539283432625
+  },
+  "primary_step1_acceptor_hypothesis": "Asp306_OD1",
+  "retained_control_hypothesis": "Asp306_OD2",
+  "interpretation": "Geometry and candidate basin thresholds only; not a validated RC, TS, committor, PMF, or barrier."
+}
