@@ -5,6 +5,8 @@ PREP = ROOT / "scripts" / "prepare_nylc_step1_proton_bracket.py"
 AUDIT = ROOT / "scripts" / "audit_nylc_step1_proton_stage.py"
 SBATCH = ROOT / "slurm" / "run_nylc_step1_proton_bracket.sbatch"
 RESUME = ROOT / "slurm" / "run_nylc_step1_proton_resume.sbatch"
+STRENGTH_PREP = ROOT / "scripts" / "prepare_nylc_step1_attack_strengthen.py"
+STRENGTH = ROOT / "slurm" / "run_nylc_step1_attack_strengthen.sbatch"
 
 
 def test_proton_bracket_locks_passed_attack_seed_and_two_acceptors():
@@ -31,6 +33,8 @@ def test_stage_audit_rejects_detached_proton_and_separates_endpoint():
     text = AUDIT.read_text()
     assert "DETACHED_MAX_A = 1.35" in text
     assert "min(ogh, hacc) <= DETACHED_MAX_A" in text
+    assert "attack_angle_O2_C12_OG1_deg" in text
+    assert "95.0 <= attack_angle <= 115.0" in text
     assert "PASS_PROTON_BRACKET_STAGE" in text
     assert "PASS_SCIENTIFIC_TETRAHEDRAL_SEED_REACHED" in text
     assert "FAIL_SCIENTIFIC_PROTON_BRACKET_STAGE" in text
@@ -64,4 +68,28 @@ def test_resume_wrapper_continues_only_a_valid_p00_scientific_failure():
     assert "for stage in p01 p02 p03" in text
     assert "sha256sum" in text
     assert "SCIENTIFIC_FAIL.json" in text
+    assert "run_history.tsv" in text and "run_history.jsonl" in text
+
+
+def test_strengthened_attack_is_single_variable_and_keeps_proton_unrestrained():
+    assert STRENGTH_PREP.exists(), "strengthened attack preparer is not implemented"
+    text = STRENGTH_PREP.read_text()
+    assert '"attack_A": 2.55' in text
+    assert '"force": 100.0' in text
+    assert '"maxcyc": 300' in text
+    assert "THR267_OG1" in text and "L2_C12" in text
+    assert "THR267_HG1" not in text
+    assert "FAIL_SCIENTIFIC_PROTON_BRACKET_STAGE" in text
+    assert "OG1-HG1 remains observed but is never restrained" in text
+
+
+def test_strengthened_attack_wrapper_preserves_source_and_scientific_gates():
+    assert STRENGTH.exists(), "strengthened attack Slurm wrapper is not implemented"
+    text = STRENGTH.read_text()
+    assert "SOURCE_JOB=\"${SOURCE_JOB:?set SOURCE_JOB=failed_resume_job_id}\"" in text
+    assert "prepare_nylc_step1_attack_strengthen.py" in text
+    assert "audit_nylc_step1_proton_stage.py" in text
+    assert "for stage in p01 p02 p03" in text
+    assert "SCIENTIFIC_FAIL.json" in text and "tetrahedral_seed.rst7" in text
+    assert "sha256sum" in text
     assert "run_history.tsv" in text and "run_history.jsonl" in text
