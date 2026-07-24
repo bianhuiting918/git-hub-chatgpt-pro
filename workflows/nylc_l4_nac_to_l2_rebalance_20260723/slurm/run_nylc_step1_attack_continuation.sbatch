@@ -60,6 +60,7 @@ passed=0
 last_gate=
 cd "$OUT/run"
 for round in r01 r02 r03; do
+  test -s "../input/w01.RST"
   sander -O -i "../input/w01.in" -o "${round}.out" -p "$BASE/system.prmtop" -c "$current" -ref "$current" -r "${round}.rst7" -inf "${round}.mdinfo"
   if ! grep -q "FINAL RESULTS" "${round}.out" || ! grep -q "5.  TIMINGS" "${round}.out"; then
     echo "Amber completion marker missing in $round" >&2
