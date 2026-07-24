@@ -69,7 +69,7 @@ pull-coord3-k            = 500
 
 pull-coord4-type         = umbrella
 pull-coord4-geometry     = angle
-pull-coord4-groups       = 4 5 5 3
+pull-coord4-groups       = 5 4 5 3
 pull-coord4-start        = no
 pull-coord4-init         = 160.000000
 pull-coord4-rate         = 0.000000
@@ -85,7 +85,7 @@ pull-coord5-k            = 500
 
 pull-coord6-type         = umbrella
 pull-coord6-geometry     = angle
-pull-coord6-groups       = 6 7 7 3
+pull-coord6-groups       = 7 6 7 3
 pull-coord6-start        = no
 pull-coord6-init         = 160.000000
 pull-coord6-rate         = 0.000000
