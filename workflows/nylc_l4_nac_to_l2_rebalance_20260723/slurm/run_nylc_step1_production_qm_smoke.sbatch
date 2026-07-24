@@ -12,6 +12,7 @@
 set -euo pipefail
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
+# Immutable topology: step1_dftb3_preflight_post61710861_job61712692/system.prmtop
 SRC="$TASK/candidates/nylc_C18_trueT267_freeGS/qmmm/step1_dftb3_preflight_post61710861_job61712692"
 job="${SLURM_JOB_ID:?}"
 OUT="$TASK/candidates/nylc_C18_trueT267_freeGS/qmmm/step1_production_qm_smoke_job_${job}"
