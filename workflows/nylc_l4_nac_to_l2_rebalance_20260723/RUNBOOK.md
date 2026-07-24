@@ -577,3 +577,23 @@ OG1--HG1 >= 1.25 A and C12--N3 <= 1.70 A.
 Even a scientific seed PASS is only a constrained tetrahedral-side bracket for
 subsequent TS search. It is not a Step1 TS, committor, PMF, activation barrier,
 or evidence that the restrained pathway is dynamically preferred.
+
+
+### Bracket protocol correction
+
+Jobs 61721079 (OD1) and 61721080 (OD2) are superseded and were cancelled
+after their first-window geometries exposed premature proton pulling. In the
+OD2 w00 restart, OG1--HG1 was 4.506 A while HG1--OD2 was still 4.163 A and the
+attack distance had worsened to 3.869 A: this is a detached proton, not a
+chemical proton-transfer seed. OD1 retained OG1--HG1 at 1.008 A, but its attack
+distance relaxed to 3.604 A rather than approaching the intended target. These
+coordinates must not seed TS, committor or PMF work.
+
+The corrected schedule was regression-tested on SCNet (5/5) and submitted as
+OD1 job 61721914 and OD2 job 61721915. Windows w00 and w01 now bias only the
+OG1--C12 attack distance. Proton approach is introduced only in w02 and w03,
+after the nucleophile has approached the carbonyl. Non-QM heavy atoms receive a
+weak 1.0 kcal/mol/A^2 position restraint during this seed-generation step, with
+each window referenced to its own input restart. This restraint is not part of
+a reportable free-energy calculation and must be removed or consistently
+accounted for in later TS/PMF validation.
