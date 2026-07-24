@@ -44,7 +44,7 @@ def minimum_image_vector(left, right, cell):
 
 def distance(structure, left, right):
     cell = cell_from_box(structure.box)
-    vector = minimum_image_vector(structure.atoms[left - 1].xx, structure.atoms[right - 1].xx, cell)
+    vector = minimum_image_vector(structure.coordinates[left - 1], structure.coordinates[right - 1], cell)
     return float(np.linalg.norm(vector))
 
 
