@@ -597,3 +597,17 @@ weak 1.0 kcal/mol/A^2 position restraint during this seed-generation step, with
 each window referenced to its own input restart. This restraint is not part of
 a reportable free-energy calculation and must be removed or consistently
 accounted for in later TS/PMF validation.
+
+
+### Minimizer correction
+
+Replacement jobs 61721914 and 61721915 are also superseded. They correctly
+staged attack before proton motion, but Amber switched from steepest descent to
+conjugate gradient after step 50. By step 70 the shared w00 trajectory had
+RMS 44.28, GMAX 11648 and a rebounding energy, so no downstream restart was
+accepted. This is a numerical minimizer failure, not a chemical barrier.
+
+The tested replacement uses `ntmin=2`, `maxcyc=ncyc=75` and
+`dx0=0.005`, keeping every seed window in conservative steepest descent.
+It was submitted as OD1 job 61722528 and OD2 job 61722530. These are the only
+active authoritative bracket jobs at this stage.
