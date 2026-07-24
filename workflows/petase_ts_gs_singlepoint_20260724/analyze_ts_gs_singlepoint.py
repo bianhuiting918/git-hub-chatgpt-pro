@@ -32,9 +32,37 @@ def read_rst7_coordinates(path: Path) -> list[float]:
     raise ValueError(f"not enough coordinates in {path}")
 
 
+FINAL_ENERGY_COMPONENTS = (
+    "BOND",
+    "ANGLE",
+    "DIHED",
+    "VDWAALS",
+    "EEL",
+    "HBOND",
+    "1-4 VDW",
+    "1-4 EEL",
+    "RESTRAINT",
+    "DFTBESCF",
+)
+
+
 def parse_final_energy(text: str) -> float:
     marker = text.rfind("FINAL RESULTS")
     region = text[marker:] if marker >= 0 else text
+
+    components: dict[str, float] = {}
+    for label in FINAL_ENERGY_COMPONENTS:
+        matches = re.findall(
+            rf"(?m)(?<!\S){re.escape(label)}\s*=\s*({FLOAT})",
+            region,
+        )
+        if matches:
+            components[label] = float(matches[-1])
+    if len(components) == len(FINAL_ENERGY_COMPONENTS):
+        return math.fsum(components.values())
+
+    # Retain a low-precision fallback so incomplete outputs are explicitly
+    # detectable instead of silently disappearing from the audit.
     match = re.search(
         rf"(?m)^\s*NSTEP\s+ENERGY\s+RMS\s+GMAX.*?^\s*\d+\s+({FLOAT})\s+{FLOAT}\s+{FLOAT}",
         region,
@@ -42,10 +70,10 @@ def parse_final_energy(text: str) -> float:
     )
     if match:
         return float(match.group(1))
-    candidates = re.findall(rf"(?m)^\s*ENERGY\s*=\s*({FLOAT})", region)
-    if candidates:
-        return float(candidates[-1])
-    raise ValueError("final minimization ENERGY not found")
+    raise ValueError(
+        "final energy components missing: "
+        + ",".join(label for label in FINAL_ENERGY_COMPONENTS if label not in components)
+    )
 
 
 def parse_cases(path: Path) -> list[dict[str, str]]:
@@ -63,7 +91,12 @@ def analyze(task: Path) -> dict:
         text = out.read_text(errors="replace") if out.exists() else ""
         err_text = stderr.read_text(errors="replace") if stderr.exists() else ""
         hard_patterns = {
-            "amber_error": len(re.findall(r"(?i)\bERROR\b|FATAL", text + "\n" + err_text)),
+            "amber_error": len(
+                re.findall(
+                    r"(?im)^\s*(?:FATAL\b|SANDER BOMB\b|ERROR(?:\s*:|\s+opening\b|\s+reading\b))|QMMM[^\n]*\bERROR\b",
+                    text + "\n" + err_text,
+                )
+            ),
             "nan": len(re.findall(r"(?i)\bNaN\b", text + "\n" + err_text)),
             "scc_failure": len(re.findall(r"(?i)SCC.*(?:fail|not converg)", text + "\n" + err_text)),
             "vlimit": len(re.findall(r"(?i)vlimit", text + "\n" + err_text)),
