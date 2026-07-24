@@ -54,3 +54,9 @@ def test_runner_waits_for_postprocess_gate_and_uses_scnet_cpu_amber18():
     assert "02_qmmm_20_step.in" in text
     assert "NOT_EVALUATED.json" in text
     assert "TS search" in text
+
+
+def test_runner_converts_failed_postprocess_dependency_to_not_evaluated():
+    text = SBATCH.read_text()
+    assert "PASS_POSTPROCESS_TECHNICAL" in text
+    assert "NOT_EVALUATED_POSTPROCESS_GATE" in text
