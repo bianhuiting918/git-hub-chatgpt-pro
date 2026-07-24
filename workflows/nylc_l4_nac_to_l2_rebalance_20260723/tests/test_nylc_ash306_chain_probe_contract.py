@@ -46,3 +46,19 @@ def test_probe_exports_methionine_sulfur_as_pdb_element_s():
 def test_wrapper_accepts_single_chain_topology_written_directly_to_top():
     text = SBATCH.read_text()
     assert 'itp="$OUT/chainH.top"' in text
+
+
+def test_heavy_shift_is_invariant_to_terminal_oc1_oc2_name_swap():
+    namespace = {}
+    exec(PROBE.read_text(), namespace)
+    source = {
+        (354, "CA"): (1.0, 1.0, 1.0),
+        (355, "OC1"): (2.0, 2.0, 2.0),
+        (355, "OC2"): (3.0, 3.0, 3.0),
+    }
+    generated = {
+        (354, "CA"): (1.0, 1.0, 1.0),
+        (355, "OC1"): (3.0, 3.0, 3.0),
+        (355, "OC2"): (2.0, 2.0, 2.0),
+    }
+    assert namespace["max_heavy_shift_nm"](source, generated) == 0.0
