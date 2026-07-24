@@ -630,3 +630,22 @@ technically cleanly. This is progress toward an attack seed, not a TS/path
 failure. Wait for the identically parameterized OD2-labelled attack-only job,
 then compare the same-Hamiltonian endpoints before continuing additional
 attack-only relaxation from the better valid seed.
+
+
+### Attack-only duplicate resolution and continuation
+
+OD2-labelled job 61723171 completed 0:0 with the same scientific result as
+61723169: OG1--C12 2.954389 A, intact OG1--HG1 0.986120 A, C12--O2
+1.264072 A and C12--N3 1.357643 A. The two w01 restart files are byte-identical
+(SHA256 `10d9b662cdd0bb2e945b34b798e4688373e43e1cca5737b8c86f7658c1975f38`)
+and have the same final EAMBER -545443.5992 kcal/mol under the same restrained
+Hamiltonian. Therefore there is no energetic or structural basis to duplicate
+further attack-only work by acceptor label.
+
+Shared continuation job 61725801 starts from that locked restart. It performs
+up to three additional 300-step steepest-descent rounds using only the existing
+w01 OG1--C12 restraint. Every round checks Amber completion/error gates and the
+attack prerequisite geometry. It stops at the first
+`PASS_ATTACK_PREREQUISITE`; if all three fail, it records a scientific failure
+without running any proton-transfer restraint. The continuation requests four
+xahcnormal CPU cores for at most four hours.
