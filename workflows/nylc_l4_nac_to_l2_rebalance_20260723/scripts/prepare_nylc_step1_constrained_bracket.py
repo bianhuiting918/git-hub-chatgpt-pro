@@ -83,12 +83,12 @@ LISTOUT=POUT
 """
 
 
-def distance_restraint(atom1, atom2, target, force):
+def distance_restraint(iat, target, force):
     r1 = max(0.0, target - 0.30)
     r2 = max(0.0, target - 0.03)
     r3 = target + 0.03
     r4 = target + 0.30
-    return f"&rst iat={atom1},{atom2}, r1={r1:.3f}, r2={r2:.3f}, r3={r3:.3f}, r4={r4:.3f}, rk2={force:.2f}, rk3={force:.2f}, /"
+    return f"&rst {iat}, r1={r1:.3f}, r2={r2:.3f}, r3={r3:.3f}, r4={r4:.3f}, rk2={force:.2f}, rk3={force:.2f}, /"
 
 
 def main():
@@ -134,8 +134,8 @@ def main():
         name = window["name"]
         (output / f"{name}.in").write_text(amber_input(name, qmmask))
         restraints = [
-            distance_restraint(THR267_OG1, L2_C12, window["attack_A"], window["force"]),
-            distance_restraint(THR267_HG1, acceptor_atom, window["proton_A"], window["force"]),
+            distance_restraint(attack_iat, window["attack_A"], window["force"]),
+            distance_restraint(proton_iat, window["proton_A"], window["force"]),
         ]
         (output / f"{name}.RST").write_text("\n".join(restraints) + "\n")
 
