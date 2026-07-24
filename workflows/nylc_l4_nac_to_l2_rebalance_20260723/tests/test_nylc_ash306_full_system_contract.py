@@ -61,3 +61,32 @@ def test_builder_contract_keeps_gate_and_scientific_boundaries_explicit():
     assert "not a TS, RC, PMF, or barrier" in text
     assert "minimum_ligand_protein_heavy_distance_nm" in text
     assert "nac_distance_nm" in text and "nac_angle_deg" in text
+
+
+SBATCH = ROOT / "slurm" / "run_nylc_ash306_full_system_preflight.sbatch"
+AUDITOR = ROOT / "scripts" / "audit_nylc_ash306_full_system_preflight.py"
+
+
+def test_wrapper_is_cpu_only_grompp_without_dynamics_and_records_history():
+    assert SBATCH.exists(), "full-system preflight wrapper is not implemented"
+    text = SBATCH.read_text()
+    assert "#SBATCH -p xahcnormal" in text
+    assert "#SBATCH -c 4" in text
+    assert "gmx_mpi" in text and "grompp" in text
+    assert "mdrun" not in text
+    assert "ash306_full_system_preflight_job_" in text
+    assert "61717760" in text
+    assert "trap on_error ERR" in text
+    assert "run_history.tsv" in text and "run_history.jsonl" in text
+    assert "PASS_ASH306_FULL_SYSTEM_PREFLIGHT" in text
+
+
+def test_auditor_requires_neutral_133589_atom_parmed_system():
+    assert AUDITOR.exists(), "full-system preflight auditor is not implemented"
+    text = AUDITOR.read_text()
+    assert "import parmed as pmd" in text
+    assert "EXPECTED_ATOMS = 133589" in text
+    assert "abs(total_charge)" in text
+    assert "PASS_ASH306_FULL_SYSTEM_PREFLIGHT" in text
+    assert "PROBE_PASS_ASH306_CHAIN" in text
+    assert "not a TS, RC, PMF, or barrier" in text
