@@ -53,7 +53,7 @@ def parse_final_energy(text: str) -> float:
     components: dict[str, float] = {}
     for label in FINAL_ENERGY_COMPONENTS:
         matches = re.findall(
-            rf"(?m)(?<!\S){re.escape(label)}\s*=\s*({FLOAT})",
+            rf"(?m)(?<!1-4 )(?<!\S){re.escape(label)}\s*=\s*({FLOAT})",
             region,
         )
         if matches:
@@ -74,6 +74,18 @@ def parse_final_energy(text: str) -> float:
         "final energy components missing: "
         + ",".join(label for label in FINAL_ENERGY_COMPONENTS if label not in components)
     )
+
+
+def parse_final_component(text: str, label: str) -> float:
+    marker = text.rfind("FINAL RESULTS")
+    region = text[marker:] if marker >= 0 else text
+    matches = re.findall(
+        rf"(?m)(?<!1-4 )(?<!\S){re.escape(label)}\s*=\s*({FLOAT})",
+        region,
+    )
+    if not matches:
+        raise ValueError(f"final {label} component not found")
+    return float(matches[-1])
 
 
 def parse_cases(path: Path) -> list[dict[str, str]]:
@@ -103,9 +115,11 @@ def analyze(task: Path) -> dict:
         }
         try:
             energy = parse_final_energy(text)
+            dftbescf = parse_final_component(text, "DFTBESCF")
             energy_status = "PASS"
         except Exception as exc:
             energy = math.nan
+            dftbescf = math.nan
             energy_status = f"FAIL:{type(exc).__name__}:{exc}"
 
         output_rst = work / "sp.rst7"
@@ -118,6 +132,7 @@ def analyze(task: Path) -> dict:
         row = {
             **case,
             "energy_kcal_mol": energy,
+            "dftbescf_kcal_mol": dftbescf,
             "energy_status": energy_status,
             "max_coordinate_delta_angstrom": coord_delta,
             **hard_patterns,
@@ -143,6 +158,8 @@ def analyze(task: Path) -> dict:
             continue
         ets = ts[0]["energy_kcal_mol"]
         gaps = [ets - row["energy_kcal_mol"] for row in gs]
+        ets_dftb = ts[0]["dftbescf_kcal_mol"]
+        dftb_gaps = [ets_dftb - row["dftbescf_kcal_mol"] for row in gs]
         steps[step] = {
             "status": "DIAGNOSTIC_ONLY_FIXED_COORDINATE_DELTA_E",
             "ts_case": ts[0]["case_id"],
@@ -157,6 +174,12 @@ def analyze(task: Path) -> dict:
             "delta_e_sd_kcal_mol": statistics.stdev(gaps) if len(gaps) > 1 else 0.0,
             "delta_e_min_kcal_mol": min(gaps),
             "delta_e_max_kcal_mol": max(gaps),
+            "dftbescf_ts_kcal_mol": ets_dftb,
+            "dftbescf_delta_vs_each_gs_kcal_mol": {
+                row["case_id"]: ets_dftb - row["dftbescf_kcal_mol"] for row in gs
+            },
+            "dftbescf_delta_mean_kcal_mol": statistics.mean(dftb_gaps),
+            "dftbescf_delta_sd_kcal_mol": statistics.stdev(dftb_gaps) if len(dftb_gaps) > 1 else 0.0,
         }
 
     result = {
