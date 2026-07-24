@@ -30,7 +30,10 @@ def test_preparer_audits_true_thr267_and_complete_ligand_qm_region():
 def test_preparer_uses_declared_dftb3_charge_spin_and_short_smoke():
     text = PREP.read_text()
     assert "qm_theory='DFTB3'" in text
-    assert "qmcharge=0" in text
+    assert "QMCHARGE = 1" in text
+    assert "LINK_ATOMIC_NUMBER = 1" in text
+    assert "qmcharge={QMCHARGE}" in text
+    assert " + LINK_ATOMIC_NUMBER - QMCHARGE" in text
     assert "spin=1" in text
     assert "maxcyc=1" in text
     assert "maxcyc=20" in text
