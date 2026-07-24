@@ -53,7 +53,7 @@ cat > "$OUT/oxyanion_angles.ndx" <<'NDX'
 8240 8241 10288
 8240 8242 10288
 NDX
-printf 'OxyanionAngles\n' | "$GMX" angle -s "$FREE/run.tpr" -f "$FREE/run.xtc" \
+printf 'OxyanionAngles\n' | "$GMX" angle -f "$FREE/run.xtc" \
   -n "$OUT/oxyanion_angles.ndx" -type angle -all -xvg none -ov "$OUT/network_angles.xvg" \
   > "$OUT/angle.stdout" 2> "$OUT/angle.stderr"
 
