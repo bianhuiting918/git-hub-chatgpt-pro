@@ -649,3 +649,20 @@ attack prerequisite geometry. It stops at the first
 `PASS_ATTACK_PREREQUISITE`; if all three fail, it records a scientific failure
 without running any proton-transfer restraint. The continuation requests four
 xahcnormal CPU cores for at most four hours.
+
+
+### User-viewable PDB export from latest completed attack seed
+
+While continuation job 61725801 was writing r02, the latest immutable completed
+restart was r01 (OG1--C12 2.834598 A). SCNet exported two PDB views:
+
+- full explicit-water system, including all 40990 TIP3P waters, SHA256
+  `1694cb9558b0639760c54fbd99a93187d23041ac815273ca0e837db5c9d9360b`;
+- complete residues within 8 A of L2: 1380 atoms, 252 residues and 202 selected
+  solvent residues, SHA256
+  `c45f2a953badbe76b201e93f19ca7331d487965b59cbdff76a1d7f9f4bd112a1`.
+
+The first focus export lacked a cpptraj reference and was rejected. The
+corrected exporter sets r01 as the reference before evaluating `:L2<:8.0`.
+Only the corrected v2 PDBs were downloaded. They are visualization artifacts
+from an attack-only seed, not TS/PMF evidence.
