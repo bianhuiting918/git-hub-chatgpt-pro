@@ -460,3 +460,42 @@ production TS region.
 
 Compact correction audit:
 `audit/nylc_C18_trueT267_freeGS.direct_donor_gate_superseded.json`.
+
+
+## NylC-C18 neutral ASH306 full-system preflight (2026-07-24)
+
+The isolated active beta-chain protonation probe is authoritative at SCNet job
+61717760 (`PROBE_PASS_ASH306_CHAIN`). It regenerated chain H with amber99sb-ildn,
+renamed only Asp306 to neutral ASH, added HD2, retained the processed N-terminal
+Thr267 atoms, and moved no heavy atom after treating terminal Lys355 OC1/OC2 as
+chemically interchangeable. Jobs 61717442 and 61717623 were technical failures
+during probe plumbing; job 61717738 reached a scientifically valid chain product
+but its first audit compared equivalent terminal oxygen names literally. Keep
+all failure records; use job 61717760 as the authoritative probe.
+
+The neutral full-system preflight replaces complete chain H, removes the Na+
+farthest from protein plus L2 under the triclinic periodic box, and changes the
+topology molecule count from NA 144 to NA 143. The removed ion is source global
+atom 133463, residue 41488, 3.950970 nm from the nearest solute heavy atom. This
+keeps 133589 atoms and total topology charge effectively zero.
+
+Job 61718597 built the correct neutral system but failed grompp because the
+position-restraint reference coordinate was omitted. The wrapper now supplies
+`-r system.gro`. Authoritative job 61718715 completed 0:0 and produced
+`PASS_ASH306_FULL_SYSTEM_PREFLIGHT`:
+
+- total charge 1.46e-10 e; ASH306 charge approximately 0;
+- one 13-atom ASH306 including HD2; one 79-atom PA66-L2;
+- Thr267 OG1 to L2 C12 distance 0.339423 nm and attack angle 114.036894 degrees;
+- minimum ligand-protein heavy distance 0.280318 nm;
+- GROMACS grompp and ParmEd/Amber conversion passed;
+- new indices: Thr267 OG1 8961, L2 C12/O2 10288/10289, L2 range 10274-10352.
+
+This is a neutral topology/numerical-entry preflight only. It is not a GS
+thermodynamic ranking, reaction coordinate, Step1 TS, Step2 TS, PMF, or barrier.
+Next compare the ASH306/Asp308- microstate against the retained all-deprotonated
+microstate with the same DFTB3/3ob-3-1 numerical smoke gates before initiating
+any transition-path or umbrella workflow.
+
+Compact audit:
+`audit/nylc_C18_trueT267_freeGS.ash306_full_system_preflight.json`.
