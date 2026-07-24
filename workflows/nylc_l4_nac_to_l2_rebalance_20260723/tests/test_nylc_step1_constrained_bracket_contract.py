@@ -48,7 +48,7 @@ def test_audit_separates_technical_and_scientific_status():
     assert "PASS_SCIENTIFIC_TETRAHEDRAL_SEED_REACHED" in text
     assert "FAIL_SCIENTIFIC_TETRAHEDRAL_SEED_NOT_REACHED" in text
     assert "not a TS, committor, PMF, or barrier" in text
-    for token in ("FINAL RESULTS", "Run done", "SANDER BOMB", "NaN", "FATAL"):
+    for token in ("FINAL RESULTS", "Run done", "5.  TIMINGS", "SANDER BOMB", "NaN", "FATAL"):
         assert token in text
 
 
