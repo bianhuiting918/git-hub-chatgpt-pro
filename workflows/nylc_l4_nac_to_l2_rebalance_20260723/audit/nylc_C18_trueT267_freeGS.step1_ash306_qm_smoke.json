@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "status": "PASS_ASH306_QM_REGION_SMOKE",
+  "authoritative_job_id": 61719422,
+  "protonation_microstate": "Asp306H_Asp308-",
+  "qm_theory": "DFTB3",
+  "slater_koster_set": "3ob-3-1",
+  "dftb_telec_K": 200,
+  "regions": {
+    "core": {
+      "explicit_qm_atom_count": 111,
+      "boundary_count": 3,
+      "qmcharge": 0,
+      "electron_count_including_link_h": 388,
+      "final_results": true,
+      "run_done": true,
+      "bad_pattern_total": 0
+    },
+    "network": {
+      "explicit_qm_atom_count": 162,
+      "boundary_count": 7,
+      "qmcharge": 1,
+      "electron_count_including_link_h": 570,
+      "final_results": true,
+      "run_done": true,
+      "bad_pattern_total": 0
+    }
+  },
+  "interpretation": "Numerical one-step microstate smoke only; raw absolute energy is not comparable across different proton/ion compositions and this is not a TS, RC, PMF, or barrier."
+}
