@@ -21,6 +21,7 @@ L2_REACTIVE_O = 10288
 QMCHARGE = 1
 SPIN = 1
 LINK_ATOMIC_NUMBER = 1
+DFTB_TELEC_K = 100.0
 ATOMIC_NUMBERS = {"H": 1, "C": 6, "N": 7, "O": 8}
 
 
@@ -63,6 +64,7 @@ def qmmm_input(title, maxcyc, qmmask):
   qmcharge={QMCHARGE},
   spin=1,
   qm_theory='DFTB3',
+  dftb_telec={DFTB_TELEC_K},
   qmshake=0,
 /
 """
@@ -185,6 +187,11 @@ def main():
         "selected_gro_sha256": sha256(promoted),
         "qm_theory": "DFTB3",
         "slater_koster_set": "3ob-3-1",
+        "scc_convergence_rescue": {
+            "dftb_telec_K": DFTB_TELEC_K,
+            "reason": "Amber18-supported low electronic temperature after immutable zero-K SCC preflight failed at job 61712026",
+            "interpretation": "numerical rescue only; warnings remain a hard failure",
+        },
         "qmcharge": QMCHARGE,
         "spin": SPIN,
         "qm_atom_count": len(qm_atoms),
