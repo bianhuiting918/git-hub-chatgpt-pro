@@ -21,7 +21,7 @@ def test_smoke_audit_is_numerical_only_and_rejects_scc_warnings():
     text = AUDIT.read_text()
     assert "Convergence could not be achieved" in text
     assert "SANDER BOMB" in text
-    assert "Run done" in text
+    assert r're.search(r"Run\s+done"' in text
     assert "FINAL RESULTS" in text
     assert "PASS_PRODUCTION_QM_REGION_SMOKE" in text
     assert "not a TS, RC, PMF, or barrier" in text
