@@ -27,12 +27,23 @@ def lattice(box):
     return np.array([va, vb, [cx, cy, cz]])
 
 
-def distance(structure, left, right):
+def displacement(structure, left, right):
     cell = lattice(structure.box)
     delta = structure.coordinates[left - 1] - structure.coordinates[right - 1]
     frac = delta @ np.linalg.inv(cell)
     frac -= np.rint(frac)
-    return float(np.linalg.norm(frac @ cell))
+    return frac @ cell
+
+
+def distance(structure, left, right):
+    return float(np.linalg.norm(displacement(structure, left, right)))
+
+
+def angle(structure, left, center, right):
+    first = displacement(structure, left, center)
+    second = displacement(structure, right, center)
+    cosine = np.dot(first, second) / (np.linalg.norm(first) * np.linalg.norm(second))
+    return float(math.degrees(math.acos(np.clip(cosine, -1.0, 1.0))))
 
 
 def main():
@@ -52,8 +63,10 @@ def main():
     hacc = distance(structure, THR267_HG1, acceptor)
     co = distance(structure, L2_C12, L2_O2)
     cn = distance(structure, L2_C12, L2_N3)
+    attack_angle = angle(structure, L2_O2, L2_C12, THR267_OG1)
     proton_attached = min(ogh, hacc) <= DETACHED_MAX_A
-    chemistry_valid = 1.10 <= co <= 1.55 and cn <= 1.70
+    angle_valid = 95.0 <= attack_angle <= 115.0
+    chemistry_valid = 1.10 <= co <= 1.55 and cn <= 1.70 and angle_valid
     progress = attack <= spec["attack_gate_A"] and hacc <= spec["hacc_gate_A"]
     endpoint = args.stage == "p03" and attack <= 1.95 and hacc <= 1.30 and ogh >= 1.20
     passed = proton_attached and chemistry_valid and (endpoint if args.stage == "p03" else progress)
@@ -70,7 +83,8 @@ def main():
         "acceptor_hypothesis": manifest["acceptor_hypothesis"],
         "stage": args.stage,
         "distances_A": {"attack_og1_c12": attack, "thr_og1_hg1": ogh, "hg1_acceptor": hacc, "carbonyl_c12_o2": co, "amide_c12_n3": cn},
-        "gates": {"proton_attached": proton_attached, "chemistry_valid": chemistry_valid, "stage_progress": progress, "endpoint": endpoint},
+        "angles_deg": {"attack_angle_O2_C12_OG1_deg": attack_angle},
+        "gates": {"proton_attached": proton_attached, "attack_angle_valid": angle_valid, "chemistry_valid": chemistry_valid, "stage_progress": progress, "endpoint": endpoint},
         "thresholds_A": {"detached_proton_max_nearest_bond": DETACHED_MAX_A, "attack_stage_max": spec["attack_gate_A"], "hacc_stage_max": spec["hacc_gate_A"]},
         "interpretation": "A passing stage is a constrained bracket seed only; not a TS, committor, PMF, or barrier.",
     }
