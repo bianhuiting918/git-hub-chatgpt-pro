@@ -66,7 +66,7 @@ def main():
         text = out.read_text(errors="replace")
         hits = {token: text.count(token) for token in BAD_PATTERNS}
         final_results = "FINAL RESULTS" in text
-        run_done = "Run done" in text
+        run_done = "Run done" in text or "5.  TIMINGS" in text
         scc_warnings = text.lower().count("scc is not converged")
         if not final_results or not run_done or any(hits.values()) or scc_warnings:
             technical_failures.append(f"{name}:amber_completion_or_error_gate")
