@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
+source /Dell/Dell14/bianht/micromamba/envs/petase_stage1/amber.sh
+set -u
 
 ROOT=/Dell/Dell14/bianht/petase_blind_qmmm/repo/project01/phase2_blind_petase_qmmm_20260630
 BLIND="$ROOT/blind_work"
 TASK="$BLIND/10_energy_diagnostics/attempt155_petase_step1_step2_ts_gs_dftb3_singlepoint"
-source /Dell/Dell14/bianht/micromamba/envs/petase_stage1/amber.sh
 SANDER=/Dell/Dell14/bianht/micromamba/envs/petase_stage1/bin/sander
 MAX_PARALLEL="${MAX_PARALLEL:-4}"
 
