@@ -49,6 +49,7 @@ def test_wrapper_extracts_immutable_210ps_source_and_records_terminal_state():
     assert "grompp" in text and "-maxwarn 0" in text
     assert "run_history.tsv" in text and "run_history.jsonl" in text
     assert "trap on_error ERR" in text
+    assert 'cp "$BUILD/source_cycle.ndx" "$OUT/recapture.ndx"' in text
     assert "[ Tyr146_N ]" in text
     assert "[ Asn219_HD21 ]" in text
     assert "[ Gate ]" not in text
