@@ -12,7 +12,8 @@
 set -euo pipefail
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
-# Immutable inputs: npt300free/run.xtc and npt300free/run.tpr\nFREE="$TASK/candidates/nylc_C18_trueT267_freeGS/runs/rebalance_after_em_double/npt300free"
+# Immutable inputs: npt300free/run.xtc and npt300free/run.tpr
+FREE="$TASK/candidates/nylc_C18_trueT267_freeGS/runs/rebalance_after_em_double/npt300free"
 POST="$TASK/candidates/nylc_C18_trueT267_freeGS/runs/rebalance_after_em_double/postprocess_job_61710861"
 job="${SLURM_JOB_ID:?}"
 OUT="$TASK/candidates/nylc_C18_trueT267_freeGS/qmmm/step1_network_job_${job}"
