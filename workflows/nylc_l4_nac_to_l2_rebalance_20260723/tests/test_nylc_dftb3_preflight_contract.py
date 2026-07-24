@@ -60,3 +60,10 @@ def test_runner_converts_failed_postprocess_dependency_to_not_evaluated():
     text = SBATCH.read_text()
     assert "PASS_POSTPROCESS_TECHNICAL" in text
     assert "NOT_EVALUATED_POSTPROCESS_GATE" in text
+
+
+def test_minimal_smoke_qm_region_is_not_reused_as_production_ts_region():
+    text = PREP.read_text()
+    assert "minimal_numerical_smoke" in text
+    for residue in ("Tyr146", "Lys189", "Asn219", "Asp306", "Asp308"):
+        assert residue in text
