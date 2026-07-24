@@ -71,6 +71,28 @@ def group(atoms, resid, resname):
     return [atom for atom in atoms if atom["resid"] == resid and atom["resname"] == resname]
 
 
+def max_heavy_shift_nm(source_key, generated_key):
+    if set(source_key) != set(generated_key):
+        raise ValueError("heavy-atom key mismatch")
+    terminal_oxygens = {(355, "OC1"), (355, "OC2")}
+    ordinary_keys = set(source_key) - terminal_oxygens
+    shifts = [
+        max(abs(a - b) for a, b in zip(source_key[key], generated_key[key]))
+        for key in ordinary_keys
+    ]
+    if terminal_oxygens.issubset(source_key):
+        direct = max(
+            max(abs(a - b) for a, b in zip(source_key[key], generated_key[key]))
+            for key in terminal_oxygens
+        )
+        swapped = max(
+            max(abs(a - b) for a, b in zip(source_key[(355, source_name)], generated_key[(355, generated_name)]))
+            for source_name, generated_name in (("OC1", "OC2"), ("OC2", "OC1"))
+        )
+        shifts.append(min(direct, swapped))
+    return max(shifts, default=0.0)
+
+
 def audit_probe(source_gro, output_gro, itp, output):
     source = read_gro(source_gro)
     generated = read_gro(output_gro)
@@ -83,10 +105,7 @@ def audit_probe(source_gro, output_gro, itp, output):
     topology_ash = bool(re.search(r";\s*residue\s+306\s+ASH\s+rtp\s+ASH\s+q\s+0\.0", topology_text))
     source_key = {(atom["resid"], atom["atomname"]): atom["xyz_nm"] for atom in source[CHAIN_H_FIRST - 1:CHAIN_H_LAST] if not atom["atomname"].startswith("H")}
     generated_key = {(atom["resid"], atom["atomname"]): atom["xyz_nm"] for atom in generated if not atom["atomname"].startswith("H")}
-    max_heavy_shift = max(
-        max(abs(a - b) for a, b in zip(source_key[key], generated_key[key]))
-        for key in source_key
-    )
+    max_heavy_shift = max_heavy_shift_nm(source_key, generated_key)
     passed = (
         len(generated) == EXPECTED_CHAIN_ATOMS
         and len(ash) == 13
