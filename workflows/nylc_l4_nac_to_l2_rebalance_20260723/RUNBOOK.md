@@ -370,3 +370,56 @@ must expand at least through Asp306/Asp308 and explicitly test the sensitivity
 to including Tyr146/Lys189/Asn219.  The minimal Thr267+L2 smoke result can only
 validate file conversion, DFTB3 parameter availability and short-run numerical
 entry.
+
+
+### Fully unrestrained L2 result and clean DFTB3 entry (2026-07-24)
+
+Job 61708900 completed every GROMACS dynamics stage, including 1.000 ns fully
+unrestrained NPT. Its Slurm state is FAILED only because the original inline
+scientific-audit text had stale escaping. The independent repaired
+postprocessor job 61710861 completed 0:0 and is authoritative for the free
+window.
+
+For NylC-C18, the branch-specific bonded-graph mapping places the source
+reaction amide at L2 N3-C12(O2), not at the C23-only N4-C19(O3) mapping. The
+correct global reactive atoms are Thr267 OG1 8961, L2 C12 10287 and O2 10288.
+The L2 molecule occupies global atoms 10273-10351.
+
+The 501 fully unrestrained frames contain 24 strict NAC frames (4.7904%
+occupancy) in 20 visits. The longest continuous visit is 2 ps. The
+lowest-potential strict NAC is 434 ps: 0.339 nm, 114.037 degrees and
+-1832730.5 kJ/mol. The minimum all-atom and heavy-atom ligand-protein contacts
+are 0.170839 and 0.271442 nm. Gate opening (residues 261-266, excluding
+Thr267) is 2.7786 +/- 0.0845 nm. Temperature is 300.035 +/- 0.774 K. All six
+stages have zero FATAL, LINCS warning, SETTLE problem and NaN counts. This is
+scientific status PASS_UNRESTRAINED_L2_NAC_PRESENT, but it does not imply that
+NAC is the dominant equilibrium basin.
+
+The DFTB3 entry attempts are immutable and independently recorded:
+
+- 61710886: missing ParmEd GROMACS include root;
+- 61710981: protected prior output directory;
+- 61711287: stale L2 global range;
+- 61711453: neutral QM charge omitted the +1 processed N-terminal Thr267 and
+  link-H parity;
+- 61712026: zero-electronic-temperature SCC failure at the one-step gate;
+- 61712561: 100 K electronic-temperature rescue passed one step but retained
+  one SCC warning in 20 steps, so FAIL_DFTB3_PREFLIGHT;
+- 61712692: 200 K sensitivity run completed 0:0. Both the one-step and 20-step
+  stages have FINAL RESULTS and Run done with zero SCC, vlimit, SANDER BOMB,
+  NaN and FATAL hits.
+
+Job 61712692 uses the minimal numerical smoke region only: complete processed
+N-terminal Thr267 plus complete neutral 79-atom L2, one link H, one boundary
+bond, qmcharge=+1, singlet and 314 electrons including the link H. Amber18
+states that dftb_telec may aid difficult SCC convergence and should be used
+only when necessary with careful checking; the 200 K result is therefore a
+recorded numerical sensitivity, not a scientific TS/PMF setting. Its PASS.json
+SHA256 is
+`74a598b392b17998359996d1dd8f6d4468086ac05854778b900a536714e407c9`.
+
+Before Step1 TS/committor/PMF, construct and compare a production core QM region
+containing Thr267, Asp306, Asp308 and complete L2 against a sensitivity region
+that additionally contains Tyr146, Lys189 and Asn219. Audit formal charge,
+link atoms, boundary bonds and electron parity for each region before any
+reaction-coordinate scan.
