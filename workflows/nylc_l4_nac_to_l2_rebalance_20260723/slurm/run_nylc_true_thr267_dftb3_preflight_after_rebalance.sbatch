@@ -15,11 +15,11 @@ TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_2026
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
 POSTJOB=${POSTJOB:?set POSTJOB to the successful postprocess job id}
 POST="$TASK/candidates/nylc_C18_trueT267_freeGS/runs/rebalance_after_em_double/postprocess_job_$POSTJOB"
-OUT="$TASK/candidates/nylc_C18_trueT267_freeGS/qmmm/step1_dftb3_preflight_post$POSTJOB"
+job="${SLURM_JOB_ID:?}"
+OUT="$TASK/candidates/nylc_C18_trueT267_freeGS/qmmm/step1_dftb3_preflight_post${POSTJOB}_job${job}"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 GMX=/public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi
 AMBER_RUNTIME=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/nylc_gyaq_pa66_l2_nac_qmmm_20260723/amber_runtime
-job="${SLURM_JOB_ID:?}"
 set +u
 source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
 set -u
