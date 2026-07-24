@@ -611,3 +611,22 @@ The tested replacement uses `ntmin=2`, `maxcyc=ncyc=75` and
 `dx0=0.005`, keeping every seed window in conservative steepest descent.
 It was submitted as OD1 job 61722528 and OD2 job 61722530. These are the only
 active authoritative bracket jobs at this stage.
+
+
+### Attack prerequisite result: OD1 job 61723169
+
+Job 61723169 completed 0:0 after 75-step w00 and 300-step w01
+steepest-descent attack-only relaxation. It passed all local chemistry checks
+but failed the entry threshold for proton-transfer windows:
+
+- OG1--C12 2.954389 A (required <= 2.80 A);
+- OG1--HG1 0.986120 A;
+- C12--O2 1.264072 A;
+- C12--N3 1.357643 A.
+
+The wrapper therefore wrote `SCIENTIFIC_FAIL.json`, recorded
+`FAIL_SCIENTIFIC_ATTACK_PREREQUISITE`, did not run w02/w03, and exited
+technically cleanly. This is progress toward an attack seed, not a TS/path
+failure. Wait for the identically parameterized OD2-labelled attack-only job,
+then compare the same-Hamiltonian endpoints before continuing additional
+attack-only relaxation from the better valid seed.
