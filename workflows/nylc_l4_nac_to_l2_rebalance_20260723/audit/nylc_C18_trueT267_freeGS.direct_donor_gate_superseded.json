@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "status": "SUPERSEDED_INVALID_DIRECT_DONOR_ASSUMPTION",
+  "authoritative_correction": {
+    "doi": "10.1111/febs.16755",
+    "correction": "Tyr146 and Asn219 are not established direct oxyanion-hole donors to substrate O2. Tyr146 contributes to water/substrate binding; Lys189/Asn219 participate in a Thr267-centered hydrogen-bond/water network."
+  },
+  "superseded_jobs": {
+    "61713551": "direct Tyr146/Asn219-to-O2 gate, zero frames",
+    "61713841": "cross-subunit direct-donor audit, zero frames",
+    "61714772": "restrained direct-donor response at k=500; stable NAC but no response",
+    "61715211": "restrained direct-donor response at k=2000; stable NAC but no response"
+  },
+  "retained_valid_evidence": {
+    "free_1ns_job": "61710861",
+    "strict_nac_frames": 24,
+    "frame_count": 501,
+    "lowest_potential_strict_nac_time_ps": 434,
+    "distance_nm": 0.339,
+    "attack_angle_deg": 114.037,
+    "potential_energy_kj_mol": -1832730.5,
+    "minimum_heavy_ligand_protein_distance_nm": 0.271442,
+    "dftb3_preflight_job": "61712692",
+    "dftb3_preflight_status": "PASS_DFTB3_PREFLIGHT"
+  },
+  "next_gate": "Audit the paper-consistent Thr267-Lys189-Asn219 water network and Asp306-Asp308 network at 434 ps, then define production QM protonation microstates and Step1 reaction coordinates.",
+  "scientific_boundary": "The 434 ps frame is a low-potential strict-NAC GS hypothesis, not a proven transition state or equilibrium-dominant basin."
+}
