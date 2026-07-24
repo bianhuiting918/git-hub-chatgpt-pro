@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "status": "SUPERSEDED_SCIENTIFIC_PROTOCOL",
+  "superseded_jobs": [
+    {
+      "job_id": 61721079,
+      "acceptor": "OD1",
+      "w00_distances_A": {
+        "attack_og1_c12": 3.6038304945,
+        "thr_og1_hg1": 1.0084949519,
+        "hg1_acceptor": 3.4201660236,
+        "amide_c12_n3": 1.3595936936,
+        "carbonyl_c12_o2": 1.2603441794
+      }
+    },
+    {
+      "job_id": 61721080,
+      "acceptor": "OD2",
+      "w00_distances_A": {
+        "attack_og1_c12": 3.8687429885,
+        "thr_og1_hg1": 4.5064313556,
+        "hg1_acceptor": 4.1627687015,
+        "amide_c12_n3": 1.3545402475,
+        "carbonyl_c12_o2": 1.2714177602
+      }
+    }
+  ],
+  "reason": "The initial schedule applied a proton-distance restraint before nucleophilic attack was established; OD2 produced a detached proton and both attack coordinates worsened.",
+  "replacement_protocol": "attack-only w00-w01, proton approach added in w02-w03, weak non-QM-heavy positional restraint during seed generation",
+  "replacement_jobs": {
+    "OD1": 61721914,
+    "OD2": 61721915
+  },
+  "scientific_use_gate": "Superseded coordinates must not seed TS, committor, PMF, or barrier calculations."
+}
