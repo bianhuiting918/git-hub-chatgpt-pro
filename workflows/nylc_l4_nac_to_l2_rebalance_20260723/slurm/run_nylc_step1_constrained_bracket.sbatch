@@ -53,7 +53,21 @@ export AMBERHOME="$AMBER_RUNTIME"
 test -s "$AMBERHOME/dat/slko/3ob-3-1/C-C.skf"
 current="$SRC/selected_free_l2_nac.rst7"
 cd "$OUT/run"
-for window in w00 w01 w02 w03; do
+for window in w00 w01; do
+  sander -O -i "../input/${window}.in" -o "${window}.out" -p "$SRC/system.prmtop" -c "$current" -ref "$current" -r "${window}.rst7" -inf "${window}.mdinfo"
+  current="$OUT/run/${window}.rst7"
+done
+cd "$OUT"
+"$PY" "$FLOW/scripts/gate_nylc_step1_attack_prerequisite.py" --prmtop "$SRC/system.prmtop" --rst7 "$OUT/run/w01.rst7" --output "$OUT/attack_prerequisite_gate.json"
+gate_status=$("$PY" -c 'import json,sys;print(json.load(open(sys.argv[1]))["status"])' "$OUT/attack_prerequisite_gate.json")
+if [[ "$gate_status" != PASS_ATTACK_PREREQUISITE ]]; then
+  cp "$OUT/attack_prerequisite_gate.json" "$OUT/SCIENTIFIC_FAIL.json"
+  record FAIL_SCIENTIFIC "status=$gate_status;audit=$OUT/SCIENTIFIC_FAIL.json;proton_windows=NOT_RUN"
+  trap - ERR
+  exit 0
+fi
+cd "$OUT/run"
+for window in w02 w03; do
   sander -O -i "../input/${window}.in" -o "${window}.out" -p "$SRC/system.prmtop" -c "$current" -ref "$current" -r "${window}.rst7" -inf "${window}.mdinfo"
   current="$OUT/run/${window}.rst7"
 done
