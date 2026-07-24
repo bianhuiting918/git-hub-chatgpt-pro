@@ -68,3 +68,5 @@ def test_wrapper_records_history_and_uses_unique_outputs():
     assert "step1_network_job_" in text
     assert "source.tmp.gro" in text
     assert "GMX_MAXBACKUP=-1" in text
+    assert "trap on_error ERR" in text
+    assert 'record FAIL_TECHNICAL "exit_code=$rc;out=$OUT"' in text
