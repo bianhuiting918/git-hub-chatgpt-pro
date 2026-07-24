@@ -74,3 +74,10 @@ def test_response2_increases_only_bounded_donor_force_and_restarts_same_source()
     assert "step1_oxyanion_recapture_response2_job_" in wrapper
     assert "nvt100_step1_oxyanion_recapture_response2.mdp" in wrapper
     assert "run_history.tsv" in wrapper and "trap on_error ERR" in wrapper
+
+
+def test_direct_donor_recapture_wrappers_are_hard_blocked_as_superseded():
+    for wrapper in (SBATCH, SBATCH2):
+        text = wrapper.read_text()
+        assert "SUPERSEDED_INVALID_DIRECT_DONOR_ASSUMPTION" in text
+        assert "exit 42" in text
