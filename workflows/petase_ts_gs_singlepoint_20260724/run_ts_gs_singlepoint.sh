@@ -22,7 +22,7 @@ cat > "$TASK/input/step1_sp.in" <<'EOF'
 PETase step1 fixed-coordinate QM/MM single point
 &cntrl
  imin=1, maxcyc=0, ntmin=1,
- ntx=1, irest=0, ntb=1, cut=8.0,
+ ntx=1, ntxo=1, irest=0, ntb=1, cut=8.0,
  ifqnt=1, igb=0, nmropt=0, ntpr=1,
 /
 &qmmm
@@ -37,7 +37,7 @@ cat > "$TASK/input/step2_sp.in" <<'EOF'
 PETase step2 fixed-coordinate QM/MM single point
 &cntrl
  imin=1, maxcyc=0, ntmin=1,
- ntx=1, irest=0, ntb=1, cut=8.0,
+ ntx=1, ntxo=1, irest=0, ntb=1, cut=8.0,
  ifqnt=1, igb=0, nmropt=0, ntpr=1,
 /
 &qmmm
