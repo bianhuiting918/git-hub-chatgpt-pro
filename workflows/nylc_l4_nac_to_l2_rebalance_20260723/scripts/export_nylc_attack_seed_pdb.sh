@@ -25,6 +25,7 @@ run
 EOF
 cat > "$OUTDIR/${LABEL}.focus.cpptraj.in" <<EOF
 parm $PRMTOP
+reference $RST7
 trajin $RST7 1 1
 strip !(:L2<:8.0)
 trajout $FOCUS pdb
