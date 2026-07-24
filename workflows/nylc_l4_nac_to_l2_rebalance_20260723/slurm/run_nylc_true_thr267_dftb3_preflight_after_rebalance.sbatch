@@ -66,7 +66,17 @@ if grep -Eqi 'Convergence could not be achieved|SANDER BOMB|segmentation|forrtl|
 fi
 sander -O -i "$OUT/02_qmmm_20_step.in" -o "$OUT/02_qmmm_20_step.out" \
   -p "$OUT/system.prmtop" -c "$OUT/01_qmmm_one_step.rst7" -r "$OUT/02_qmmm_20_step.rst7"
+RESULT="$OUT/dftb3_preflight_result.json"
+set +e
 "$PY" "$FLOW/scripts/audit_nylc_dftb3_smoke.py" \
   --one-step "$OUT/01_qmmm_one_step.out" --segment "$OUT/02_qmmm_20_step.out" \
-  --audit "$OUT/qmmm_preflight_audit.json" --output "$OUT/PASS.json"
+  --audit "$OUT/qmmm_preflight_audit.json" --output "$RESULT"
+audit_rc=$?
+set -e
+audit_status=$("$PY" -c 'import json,sys;print(json.load(open(sys.argv[1]))["status"])' "$RESULT")
+if [[ "$audit_rc" -ne 0 || "$audit_status" != PASS_DFTB3_PREFLIGHT ]]; then
+  record FAIL_TECHNICAL "stage=final_audit;status=$audit_status;output=$RESULT"
+  exit 31
+fi
+cp "$RESULT" "$OUT/PASS.json"
 record PASS_TECHNICAL "output=$OUT/PASS.json;interpretation=not_TS_search_or_PMF"
