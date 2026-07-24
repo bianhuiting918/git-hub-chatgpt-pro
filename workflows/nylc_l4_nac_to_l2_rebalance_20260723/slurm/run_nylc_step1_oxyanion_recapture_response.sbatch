@@ -10,6 +10,9 @@
 #SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/step1_oxyresp_%j.out
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/step1_oxyresp_%j.err
 
+echo 'SUPERSEDED_INVALID_DIRECT_DONOR_ASSUMPTION: see RUNBOOK Step1 GS mechanism correction' >&2
+exit 42
+
 set -euo pipefail
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
