@@ -3,8 +3,8 @@
 #SBATCH -p xahcnormal
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -c 1
-#SBATCH --mem-per-cpu=8000M
+#SBATCH -c 4
+#SBATCH --mem-per-cpu=2500M
 #SBATCH -t 02:00:00
 #SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_dftb3_%j.out
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/logs/true_thr267_dftb3_%j.err
