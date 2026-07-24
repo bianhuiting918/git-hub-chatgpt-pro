@@ -54,7 +54,7 @@ test -s "$AMBERHOME/dat/slko/3ob-3-1/C-C.skf"
 current="$SRC/selected_free_l2_nac.rst7"
 cd "$OUT/run"
 for window in w00 w01 w02 w03; do
-  sander -O -i "../input/${window}.in" -o "${window}.out" -p "$SRC/system.prmtop" -c "$current" -r "${window}.rst7" -inf "${window}.mdinfo"
+  sander -O -i "../input/${window}.in" -o "${window}.out" -p "$SRC/system.prmtop" -c "$current" -ref "$current" -r "${window}.rst7" -inf "${window}.mdinfo"
   current="$OUT/run/${window}.rst7"
 done
 cd "$OUT"
