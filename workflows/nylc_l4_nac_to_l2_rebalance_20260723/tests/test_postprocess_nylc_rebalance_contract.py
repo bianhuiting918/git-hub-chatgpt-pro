@@ -3,6 +3,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 POST = ROOT / "scripts" / "postprocess_nylc_true_thr267_rebalance.py"
 SBATCH = ROOT / "slurm" / "run_postprocess_nylc_true_thr267_rebalance.sbatch"
+FREE_AUDIT = ROOT / "scripts" / "audit_nylc_true_thr267_l2_free.py"
+RECAPTURE_AUDIT = ROOT / "scripts" / "audit_true_thr267_recapture_pilot.py"
 
 
 def test_postprocessor_uses_existing_final_md_without_rerunning_mdrun():
@@ -48,3 +50,11 @@ def test_wrapper_is_cpu_only_and_records_dependency_target():
 def test_wrapper_uses_cpu_partition_available_without_dcu_gres():
     text = SBATCH.read_text()
     assert "#SBATCH -p xahcnormal" in text
+
+
+def test_free_l2_audit_identifies_actual_l2_residue_without_breaking_l4_default():
+    free_text = FREE_AUDIT.read_text()
+    recapture_text = RECAPTURE_AUDIT.read_text()
+    assert 'ligand_resname="L2"' in free_text
+    assert 'def minimum_ligand_protein_distance(atoms, box, ligand_resname="UNL")' in recapture_text
+    assert 'atom["resname"] == ligand_resname' in recapture_text
