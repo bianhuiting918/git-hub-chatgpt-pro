@@ -4,6 +4,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PREP = ROOT / "scripts" / "prepare_nylc_step1_production_qm_smoke.py"
 AUDIT = ROOT / "scripts" / "audit_nylc_step1_production_qm_smoke.py"
 SBATCH = ROOT / "slurm" / "run_nylc_step1_production_qm_smoke.sbatch"
+REAUDIT = ROOT / "slurm" / "run_nylc_step1_production_qm_smoke_reaudit.sbatch"
 
 
 def test_preparer_defines_audited_core_and_network_regions():
@@ -37,3 +38,13 @@ def test_wrapper_runs_both_regions_on_scnet_cpu_and_records_history():
     assert "step1_production_qm_smoke_job_" in text
     assert "run_history.tsv" in text and "run_history.jsonl" in text
     assert "trap on_error ERR" in text
+
+
+def test_reaudit_reuses_61716670_outputs_without_rerunning_sander():
+    text = REAUDIT.read_text()
+    assert "#SBATCH -p xahcnormal" in text
+    assert "step1_production_qm_smoke_job_61716670" in text
+    assert "audit_nylc_step1_production_qm_smoke.py" in text
+    assert "sander -O" not in text
+    assert "step1_production_qm_smoke_reaudit_job_" in text
+    assert "run_history.tsv" in text and "run_history.jsonl" in text
