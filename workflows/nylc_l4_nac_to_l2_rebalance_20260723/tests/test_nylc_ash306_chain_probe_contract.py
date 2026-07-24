@@ -35,3 +35,9 @@ def test_wrapper_is_cpu_only_pdb2gmx_probe_with_history():
     assert "ash306_chain_probe_job_" in text
     assert "run_history.tsv" in text and "run_history.jsonl" in text
     assert "trap on_error ERR" in text
+
+
+def test_probe_exports_methionine_sulfur_as_pdb_element_s():
+    namespace = {}
+    exec(PROBE.read_text(), namespace)
+    assert namespace["element"]("SD") == "S"
