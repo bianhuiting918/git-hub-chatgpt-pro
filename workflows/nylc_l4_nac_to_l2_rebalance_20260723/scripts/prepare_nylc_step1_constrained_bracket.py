@@ -22,10 +22,10 @@ EXPECTED_QM_ATOMS = 110
 QMCHARGE = -1
 MM_RESTRAINT_MASK = "!(@8949-8964,9568-9573,9587-9592,10273-10351,81218-81220)&!@H="
 WINDOWS = [
-    {"name": "w00", "attack_A": 3.20, "proton_A": None, "force": 50.0},
-    {"name": "w01", "attack_A": 2.60, "proton_A": None, "force": 60.0},
-    {"name": "w02", "attack_A": 2.10, "proton_A": 1.80, "force": 60.0},
-    {"name": "w03", "attack_A": 1.75, "proton_A": 1.10, "force": 75.0},
+    {"name": "w00", "attack_A": 3.20, "proton_A": None, "force": 50.0, "maxcyc": 75},
+    {"name": "w01", "attack_A": 2.60, "proton_A": None, "force": 75.0, "maxcyc": 300},
+    {"name": "w02", "attack_A": 2.10, "proton_A": 1.80, "force": 75.0, "maxcyc": 150},
+    {"name": "w03", "attack_A": 1.75, "proton_A": 1.10, "force": 90.0, "maxcyc": 150},
 ]
 SIDECHAIN_NAMES = {"CB", "HB1", "HB2", "CG", "OD1", "OD2"}
 
@@ -64,10 +64,10 @@ def boundaries(structure, atoms):
     return result
 
 
-def amber_input(name, qmmask):
+def amber_input(name, qmmask, maxcyc):
     return f"""NylC Step1 {name} constrained tetrahedral-seed bracket
 &cntrl
-  imin=1, ntmin=2, maxcyc=75, ncyc=75, dx0=0.005,
+  imin=1, ntmin=2, maxcyc={maxcyc}, ncyc={maxcyc}, dx0=0.005,
   ntb=1, cut=10.0, ntpr=5,
   ifqnt=1, nmropt=1, ntr=1,
   restraint_wt=1.0,
@@ -137,7 +137,7 @@ def main():
 
     for window in WINDOWS:
         name = window["name"]
-        (output / f"{name}.in").write_text(amber_input(name, qmmask))
+        (output / f"{name}.in").write_text(amber_input(name, qmmask, window["maxcyc"]))
         restraints = [distance_restraint(attack_iat, window["attack_A"], window["force"])]
         if window["proton_A"] is not None:
             restraints.append(distance_restraint(proton_iat, window["proton_A"], window["force"]))
