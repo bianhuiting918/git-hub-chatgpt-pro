@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "job_id": 61723169,
+  "acceptor_label": "OD1",
+  "technical_status": "COMPLETED_0_0",
+  "scientific_status": "FAIL_SCIENTIFIC_ATTACK_PREREQUISITE",
+  "distances_A": {
+    "attack_og1_c12": 2.9543891085,
+    "thr_og1_hg1": 0.9861199412,
+    "carbonyl_c12_o2": 1.2640718118,
+    "amide_c12_n3": 1.3576433330
+  },
+  "attack_threshold_A": 2.8,
+  "proton_windows": "NOT_RUN",
+  "interpretation": "Valid attack-only relaxation progress with intact chemistry, but not close enough to initiate proton-transfer seed generation; not a TS, committor, PMF, or barrier."
+}
