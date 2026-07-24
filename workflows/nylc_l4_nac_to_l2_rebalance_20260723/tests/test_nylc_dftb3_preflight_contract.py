@@ -46,6 +46,7 @@ def test_smoke_audit_is_numerical_only():
     text = AUDIT.read_text()
     assert "PASS_DFTB3_PREFLIGHT" in text
     assert "numerical preflight only" in text
+    assert 're.search(r"Run\\s+done"' in text
     for token in ("SANDER BOMB", "Convergence could not be achieved", "vlimit", "NaN", "FATAL"):
         assert token in text
 
@@ -62,6 +63,9 @@ def test_runner_waits_for_postprocess_gate_and_uses_scnet_cpu_amber18():
     assert "02_qmmm_20_step.in" in text
     assert "NOT_EVALUATED.json" in text
     assert 'step1_dftb3_preflight_post${POSTJOB}_job${job}' in text
+    assert 'dftb3_preflight_result.json' in text
+    assert 'cp "$RESULT" "$OUT/PASS.json"' in text
+    assert 'record FAIL_TECHNICAL' in text
     assert "TS search" in text
 
 
