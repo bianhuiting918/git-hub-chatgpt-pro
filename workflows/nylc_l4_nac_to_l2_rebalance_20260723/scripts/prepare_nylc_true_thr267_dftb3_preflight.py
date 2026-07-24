@@ -18,8 +18,9 @@ L2_FIRST = 10273
 L2_LAST = 10351
 L2_REACTIVE_C = 10287
 L2_REACTIVE_O = 10288
-QMCHARGE = 0
+QMCHARGE = 1
 SPIN = 1
+LINK_ATOMIC_NUMBER = 1
 ATOMIC_NUMBERS = {"H": 1, "C": 6, "N": 7, "O": 8}
 
 
@@ -59,7 +60,7 @@ def qmmm_input(title, maxcyc, qmmask):
 /
 &qmmm
   qmmask='{qmmask}',
-  qmcharge=0,
+  qmcharge={QMCHARGE},
   spin=1,
   qm_theory='DFTB3',
   qmshake=0,
@@ -140,10 +141,16 @@ def main():
     if structure.atoms[L2_REACTIVE_C - 1] not in ligand or structure.atoms[L2_REACTIVE_O - 1] not in ligand:
         raise ValueError("reactive L2 C/O is outside the complete ligand QM region")
 
+    active_topology_charge = sum(atom.charge for atom in active.residue.atoms)
+    ligand_topology_charge = sum(atom.charge for atom in ligand)
+    if abs(active_topology_charge - 1.0) > 1.0e-4:
+        raise ValueError(f"processed N-terminal Thr267 charge is not +1: {active_topology_charge}")
+    if abs(ligand_topology_charge) > 1.0e-4:
+        raise ValueError(f"audited PA66-L2 charge is not neutral: {ligand_topology_charge}")
     qm_atoms = list(active.residue.atoms) + ligand
     qm_indices = {atom.idx for atom in qm_atoms}
     qm_elements = [element(atom) for atom in qm_atoms]
-    electrons = sum(ATOMIC_NUMBERS[item] for item in qm_elements) - QMCHARGE
+    electrons = sum(ATOMIC_NUMBERS[item] for item in qm_elements) + LINK_ATOMIC_NUMBER - QMCHARGE
     if electrons % 2:
         raise ValueError(f"odd electron count {electrons} is incompatible with spin=1")
     boundary = []
@@ -182,8 +189,11 @@ def main():
         "spin": SPIN,
         "qm_atom_count": len(qm_atoms),
         "qm_elements": sorted(set(qm_elements)),
-        "electron_count": electrons,
+        "electron_count_including_link_h": electrons,
         "electron_parity": "even",
+        "link_atom_count": 1,
+        "active_residue_topology_charge": active_topology_charge,
+        "ligand_topology_charge": ligand_topology_charge,
         "active_residue": f"{active.residue.name}:{active.residue.idx + 1}",
         "active_og1_atom": THR267_OG1,
         "ligand_atom_range": [L2_FIRST, L2_LAST],
