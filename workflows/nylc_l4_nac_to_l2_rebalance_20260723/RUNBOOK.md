@@ -519,3 +519,33 @@ reaction-path/committor evidence, not the one-step smoke energy.
 
 Compact audit:
 `audit/nylc_C18_trueT267_freeGS.step1_ash306_qm_smoke.json`.
+
+
+## Step1 reaction-coordinate seed geometry audit (2026-07-24)
+
+SCNet job 61719995 completed 0:0 with
+`PASS_STEP1_RC_SEED_AUDIT`. Failed predecessor 61719848 used scalar x
+coordinates instead of full XYZ vectors and is retained as a technical failure.
+
+In the all-deprotonated reactant candidate, the 434 ps geometry is:
+
+- Thr267 OG1--L2 C12 attack distance: 3.394230 A;
+- Thr267 OG1--HG1 bond: 0.961873 A;
+- HG1--Asp306 OD1: 3.600236 A;
+- HG1--Asp306 OD2: 5.201077 A;
+- HG1--Thr267 N: 3.156755 A;
+- L2 C12--O2: 1.212683 A; C12--N3: 1.378985 A.
+
+Thus OD1 is the closer direct Asp306 proton-acceptor hypothesis, but it is not
+a pre-formed short hydrogen bond. OD2 remains a control path. In the separately
+built ASH306 reference, the OD2--HD2 bond is 0.998899 A and HD2 is 2.303454 A
+from the Asp306--Asp308 bridge-water oxygen, supporting an OD2-facing
+water-network reference rather than proving a direct Step1 path.
+
+The next calculation is a short constrained DFTB3 bracket from the
+all-deprotonated core region: OD1 is the primary branch and OD2 is retained as
+a negative-control/sensitivity branch. These bracket thresholds are seeds for
+find_ts only and are not a validated RC, TS, committor, PMF or barrier.
+
+Compact audit:
+`audit/nylc_C18_trueT267_freeGS.step1_rc_seed.json`.
