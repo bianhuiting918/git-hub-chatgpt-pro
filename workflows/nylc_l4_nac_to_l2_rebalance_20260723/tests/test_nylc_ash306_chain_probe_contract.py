@@ -41,3 +41,8 @@ def test_probe_exports_methionine_sulfur_as_pdb_element_s():
     namespace = {}
     exec(PROBE.read_text(), namespace)
     assert namespace["element"]("SD") == "S"
+
+
+def test_wrapper_accepts_single_chain_topology_written_directly_to_top():
+    text = SBATCH.read_text()
+    assert 'itp="$OUT/chainH.top"' in text
