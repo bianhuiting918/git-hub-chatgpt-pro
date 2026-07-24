@@ -57,7 +57,7 @@ def test_resume_wrapper_continues_only_a_valid_p00_scientific_failure():
     text = RESUME.read_text()
     assert "SOURCE_JOB=\"${SOURCE_JOB:?set SOURCE_JOB=failed_p00_job_id}\"" in text
     assert "FAIL_SCIENTIFIC_PROTON_BRACKET_STAGE" in text
-    assert '"stage" != "p00"' in text
+    assert 'data.get("stage") != "p00"' in text
     assert "run/p00.rst7" in text
     assert "for round in r01 r02 r03" in text
     assert "--stage p00" in text
