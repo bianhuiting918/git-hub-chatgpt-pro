@@ -90,3 +90,8 @@ def test_auditor_requires_neutral_133589_atom_parmed_system():
     assert "PASS_ASH306_FULL_SYSTEM_PREFLIGHT" in text
     assert "PROBE_PASS_ASH306_CHAIN" in text
     assert "not a TS, RC, PMF, or barrier" in text
+
+
+def test_wrapper_supplies_explicit_position_restraint_reference():
+    text = SBATCH.read_text()
+    assert "-r system.gro" in text
