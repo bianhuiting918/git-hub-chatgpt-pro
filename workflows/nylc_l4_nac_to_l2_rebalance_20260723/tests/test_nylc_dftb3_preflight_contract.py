@@ -54,6 +54,7 @@ def test_runner_waits_for_postprocess_gate_and_uses_scnet_cpu_amber18():
     assert "01_qmmm_one_step.in" in text
     assert "02_qmmm_20_step.in" in text
     assert "NOT_EVALUATED.json" in text
+    assert 'step1_dftb3_preflight_post${POSTJOB}_job${job}' in text
     assert "TS search" in text
 
 
