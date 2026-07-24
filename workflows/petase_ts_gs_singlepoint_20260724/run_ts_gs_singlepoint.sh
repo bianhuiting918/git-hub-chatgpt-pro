@@ -75,7 +75,13 @@ run_case() {
 export -f run_case
 export TASK SANDER HISTORY
 
-tail -n +2 "$TASK/input/cases.tsv" |
-  xargs -P "$MAX_PARALLEL" -n 6 bash -c 'run_case "$@"' _
-
-python3 "$TASK/analyze_ts_gs_singlepoint.py" --task "$TASK"
+if [[ -n "${CASE_FILTER:-}" ]]; then
+  awk -F '\t' -v id="$CASE_FILTER" 'NR > 1 && $1 == id' "$TASK/input/cases.tsv" |
+    xargs -P 1 -n 6 bash -c 'run_case "$@"' _
+  grep -E 'FINAL RESULTS|NSTEP|ENERGY|ERROR|NaN|SCC' "$TASK/work/$CASE_FILTER/sp.out" |
+    tail -20 > "$TASK/audit/${CASE_FILTER}_smoke_excerpt.txt" || true
+else
+  tail -n +2 "$TASK/input/cases.tsv" |
+    xargs -P "$MAX_PARALLEL" -n 6 bash -c 'run_case "$@"' _
+  python3 "$TASK/analyze_ts_gs_singlepoint.py" --task "$TASK"
+fi
