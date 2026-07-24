@@ -50,6 +50,9 @@ set -u
     -ff amber99sb-ildn -water tip3p -ignh > pdb2gmx.stdout 2> pdb2gmx.stderr
 )
 itp=$(find "$OUT" -maxdepth 1 -type f -name 'topol_Protein_chain_*.itp' -print -quit)
+if [[ -z "$itp" && -f "$OUT/chainH.top" ]]; then
+  itp="$OUT/chainH.top"
+fi
 test -n "$itp"
 set +e
 "$PY" "$FLOW/scripts/prepare_nylc_ash306_chain_probe.py" --source-gro "$SOURCE" \
