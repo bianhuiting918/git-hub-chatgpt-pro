@@ -37,7 +37,7 @@ def test_preparer_uses_declared_dftb3_charge_spin_and_short_smoke():
     assert "spin=1" in text
     assert "maxcyc=1" in text
     assert "maxcyc=20" in text
-    assert "DFTB_TELEC_K = 100.0" in text
+    assert "DFTB_TELEC_K = 200.0" in text
     assert "dftb_telec={DFTB_TELEC_K}" in text
     assert '"scc_convergence_rescue"' in text
 
