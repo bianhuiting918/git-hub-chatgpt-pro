@@ -58,8 +58,9 @@ source_status=$("$PY" -c 'import json,sys;print(json.load(open(sys.argv[1]))["st
 [[ "$source_status" == PASS_SOURCE_STRICT_NAC ]]
 mv "$OUT/source.tmp.gro" "$OUT/source.gro"
 
-printf 'q\\n' | "$GMX" make_ndx -f "$OUT/source.gro" -o "$OUT/recapture.ndx" > "$OUT/make_ndx.stdout" 2> "$OUT/make_ndx.stderr"
-cat >> "$OUT/recapture.ndx" <<'NDX'\n[ Thr267_OG1 ]
+printf 'q\n' | "$GMX" make_ndx -f "$OUT/source.gro" -o "$OUT/recapture.ndx" > "$OUT/make_ndx.stdout" 2> "$OUT/make_ndx.stderr"
+cat >> "$OUT/recapture.ndx" <<'NDX'
+[ Thr267_OG1 ]
 8961
 [ L2_C12 ]
 10287
