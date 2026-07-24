@@ -703,3 +703,42 @@ stage-specific attack/proton distances. A technical completion or intermediate
 stage pass is not a TS, committor, PMF or barrier. Only a p03
 `PASS_SCIENTIFIC_TETRAHEDRAL_SEED_REACHED` permits downstream Step1 path
 bracketing; one scientific failure does not cancel or block the other branch.
+
+### Step1 p00 scientific failures and same-Hamiltonian continuation
+
+Jobs 61730695 (OD1) and 61730697 (OD2) both completed technically with
+Slurm exit 0:0 and no hard Amber error. Both were scientifically rejected at
+p00 because the attack prerequisite alone missed its 2.65 A gate after only
+150 steepest-descent steps. OD1 ended at OG1--C12 2.767390 A and
+HG1--OD1 2.863936 A; OD2 ended at OG1--C12 2.793507 A and HG1--OD2
+4.630816 A. In both branches OG1--HG1 remained about 0.986 A,
+C12--O2 about 1.265 A and C12--N3 about 1.359 A, so the proton remained
+attached and carbonyl/amide chemistry remained valid. Final RMS was about
+0.495 and GMAX about 200, showing that p00 stopped before convergence.
+
+The failed p00 endpoints are retained under their original job directories.
+A tested continuation wrapper accepts only a p00
+`FAIL_SCIENTIFIC_PROTON_BRACKET_STAGE` with intact proton and chemistry,
+locks the source restart SHA256, and performs at most three additional
+same-Hamiltonian p00 minimization rounds. Only a new p00 stage PASS permits
+p01--p03. The contract suite passed 5 tests before submission.
+
+- OD1 continuation job 61732365, source job 61730695, source restart SHA256
+  `9877e88f7e3d6c5804dcf14b156ab18f143205e4a8fbb689f82492e8db8099b1`.
+- OD2 continuation job 61732369, source job 61730697, source restart SHA256
+  `d65ef1a4e7eb44b14ae977cf1c3482e79a73033457d798d062096c6ec193092a`.
+
+Both request four xahcnormal CPU cores and run independently. A p00
+continuation PASS remains a constrained seed only; TS, committor, Step2 and
+PMF remain not evaluated until their own gates pass.
+
+### Viewer residue-number mapping
+
+The Amber/cpptraj full-system PDB uses global residue numbering and blank chain
+IDs. The reactive protomer is the second 355-residue protein molecule:
+canonical Thr267 is PDB residue 622, canonical gate residues 261--266 are PDB
+616--621, Asp306 is PDB 661 and Asp308 is PDB 663. L2 is PDB residue 711.
+The authoritative reaction atoms are Thr622 OG1/HG1 (topology atoms
+8961/8962), L2 C12/O2/N3 (10287--10289), and Asp661 OD1/OD2 (9572/9573).
+The full PDB has no CONECT records, so viewer-inferred long bonds are display
+artifacts and are not present in the Amber topology.
