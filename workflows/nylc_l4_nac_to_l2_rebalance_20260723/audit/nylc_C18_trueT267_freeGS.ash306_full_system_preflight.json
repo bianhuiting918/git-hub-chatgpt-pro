@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "status": "PASS_ASH306_FULL_SYSTEM_PREFLIGHT",
+  "authoritative_job_id": 61718715,
+  "superseded_or_failed_predecessors": [
+    {
+      "job_id": 61717442,
+      "status": "FAIL_TECHNICAL_UNSUPPORTED_SULFUR_ELEMENT"
+    },
+    {
+      "job_id": 61717623,
+      "status": "FAIL_TECHNICAL_INLINE_TOPOLOGY_NOT_DETECTED"
+    },
+    {
+      "job_id": 61717738,
+      "status": "FAIL_AUDIT_TERMINAL_OC1_OC2_NAME_SWAP"
+    },
+    {
+      "job_id": 61718597,
+      "status": "FAIL_TECHNICAL_GROMPP_MISSING_RESTRAINT_REFERENCE"
+    }
+  ],
+  "source_gro_sha256": "182f68a41c72c490e0046323c9b8a0f8514ccf7af7dc4d578dcb87342c1c8e2d",
+  "probe_job_id": 61717760,
+  "probe_gro_sha256": "a3998b6b5f5df5a40c78861dfd4b65983dff5d96bba1cd7ed238c7d57528ea44",
+  "system_gro_sha256": "1ef56a5c2d4204c55c7ec5d6634cabee9519a8b24204e9f7277a5b9195041cbf",
+  "system_prmtop_sha256": "bf6fa73b819da92c1cb0fdc6f97c17bd3db37e1a49c0127ecac39fd9a8d1b8ae",
+  "system_rst7_sha256": "80a8c9371cf59799c25927c5d1da95e6ecbb4662ba3615f547fa752cf825289d",
+  "atom_count": 133589,
+  "total_topology_charge_e": 1.460165321987006e-10,
+  "ash306_atom_count": 13,
+  "ash306_has_hd2": true,
+  "ash306_topology_charge_e": 1.1102230246251565e-16,
+  "removed_sodium": {
+    "source_global_atom": 133463,
+    "residue_number": 41488,
+    "minimum_solute_distance_nm": 3.9509703543306935
+  },
+  "active_atom_mapping": {
+    "thr267_og1_new": 8961,
+    "l2_first_new": 10274,
+    "l2_last_new": 10352,
+    "l2_c12_new": 10288,
+    "l2_o2_new": 10289
+  },
+  "nac_distance_nm": 0.3394230398779673,
+  "nac_angle_deg": 114.03689389132796,
+  "minimum_ligand_protein_heavy_distance_nm": 0.28031767693101356,
+  "interpretation": "Neutral ASH306 GROMACS/ParmEd entry preflight only; not a GS ranking, TS, RC, PMF, or barrier."
+}
