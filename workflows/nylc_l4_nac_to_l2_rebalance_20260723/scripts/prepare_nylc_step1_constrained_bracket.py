@@ -67,7 +67,7 @@ def boundaries(structure, atoms):
 def amber_input(name, qmmask):
     return f"""NylC Step1 {name} constrained tetrahedral-seed bracket
 &cntrl
-  imin=1, maxcyc=100, ncyc=50,
+  imin=1, ntmin=2, maxcyc=75, ncyc=75, dx0=0.005,
   ntb=1, cut=10.0, ntpr=5,
   ifqnt=1, nmropt=1, ntr=1,
   restraint_wt=1.0,
