@@ -190,6 +190,11 @@ def main():
         "reactive_atoms": {"thr267_og1": THR267_OG1, "l2_c": L2_REACTIVE_C, "l2_o": L2_REACTIVE_O},
         "boundary_bonds": boundary,
         "qmmask": qmmask,
+        "qm_region_scope": "minimal_numerical_smoke",
+        "production_qm_region_gate": (
+            "Before Step1 TS/PMF, expand the mechanistic QM region to include Asp306 and Asp308 "
+            "and test inclusion/sensitivity of Tyr146, Lys189 and Asn219."
+        ),
         "interpretation": "Numerical preflight input only; not a TS, reaction coordinate, PMF, or barrier.",
     }
     (output / "qmmm_preflight_audit.json").write_text(json.dumps(audit, indent=2, sort_keys=True) + "\n")
