@@ -57,6 +57,8 @@ def test_wrapper_is_cpu_only_analysis_and_never_runs_md():
     assert "\nFREE=" in text
     assert "postprocess_job_61710861" in text
     assert "analyze_nylc_step1_network_nac.py" in text
+    angle_command = text.split('| "$GMX" angle', 1)[1].split('> "$OUT/angle.stdout"', 1)[0]
+    assert '-s "$FREE/run.tpr"' not in angle_command
 
 
 def test_wrapper_records_history_and_uses_unique_outputs():
