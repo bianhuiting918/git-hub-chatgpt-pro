@@ -20,11 +20,12 @@ ASP306_OD2 = 9573
 WATER_ASP_PAIR = (81218, 81219, 81220)
 EXPECTED_QM_ATOMS = 110
 QMCHARGE = -1
+MM_RESTRAINT_MASK = "!(@8949-8964,9568-9573,9587-9592,10273-10351,81218-81220)&!@H="
 WINDOWS = [
-    {"name": "w00", "attack_A": 3.30, "proton_A": 3.40, "force": 20.0},
-    {"name": "w01", "attack_A": 2.80, "proton_A": 2.70, "force": 25.0},
-    {"name": "w02", "attack_A": 2.30, "proton_A": 1.90, "force": 30.0},
-    {"name": "w03", "attack_A": 1.75, "proton_A": 1.10, "force": 35.0},
+    {"name": "w00", "attack_A": 3.20, "proton_A": None, "force": 50.0},
+    {"name": "w01", "attack_A": 2.60, "proton_A": None, "force": 60.0},
+    {"name": "w02", "attack_A": 2.10, "proton_A": 1.80, "force": 60.0},
+    {"name": "w03", "attack_A": 1.75, "proton_A": 1.10, "force": 75.0},
 ]
 SIDECHAIN_NAMES = {"CB", "HB1", "HB2", "CG", "OD1", "OD2"}
 
@@ -68,7 +69,9 @@ def amber_input(name, qmmask):
 &cntrl
   imin=1, maxcyc=100, ncyc=50,
   ntb=1, cut=10.0, ntpr=5,
-  ifqnt=1, nmropt=1,
+  ifqnt=1, nmropt=1, ntr=1,
+  restraint_wt=1.0,
+  restraintmask='{MM_RESTRAINT_MASK}',
 /
 &qmmm
   qmmask='{qmmask}',
@@ -84,10 +87,10 @@ LISTOUT=POUT
 
 
 def distance_restraint(iat, target, force):
-    r1 = max(0.0, target - 0.30)
-    r2 = max(0.0, target - 0.03)
-    r3 = target + 0.03
-    r4 = target + 0.30
+    r1 = max(0.0, target - 0.15)
+    r2 = max(0.0, target - 0.02)
+    r3 = target + 0.02
+    r4 = target + 0.15
     return f"&rst {iat}, r1={r1:.3f}, r2={r2:.3f}, r3={r3:.3f}, r4={r4:.3f}, rk2={force:.2f}, rk3={force:.2f}, /"
 
 
@@ -135,10 +138,9 @@ def main():
     for window in WINDOWS:
         name = window["name"]
         (output / f"{name}.in").write_text(amber_input(name, qmmask))
-        restraints = [
-            distance_restraint(attack_iat, window["attack_A"], window["force"]),
-            distance_restraint(proton_iat, window["proton_A"], window["force"]),
-        ]
+        restraints = [distance_restraint(attack_iat, window["attack_A"], window["force"])]
+        if window["proton_A"] is not None:
+            restraints.append(distance_restraint(proton_iat, window["proton_A"], window["force"]))
         (output / f"{name}.RST").write_text("\n".join(restraints) + "\n")
 
     manifest = {
@@ -155,7 +157,7 @@ def main():
         "reactive_atoms": {"thr267_og1": THR267_OG1, "thr267_hg1": THR267_HG1, "l2_c12": L2_C12, "l2_o2": L2_O2, "l2_n3": L2_N3},
         "qm_region": {"atom_count": len(qm_atoms), "boundary_count": len(boundary), "qmcharge": QMCHARGE, "electron_count": electrons, "bridge_water_atoms": list(WATER_ASP_PAIR), "qmmask": qmmask},
         "windows": WINDOWS,
-        "restraint_scope": "attack OG1-C12 and proton approach HG1-Asp306O only; OG1-HG1 bond is observed, not restrained",
+        "restraint_scope": "attack-only in w00-w01, then proton approach in w02-w03; OG1-HG1 is observed, not restrained; non-QM heavy atoms are weakly position restrained during seed generation",
         "interpretation": "Constrained minimization bracket seed only; not a TS, committor, PMF, or barrier.",
     }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
