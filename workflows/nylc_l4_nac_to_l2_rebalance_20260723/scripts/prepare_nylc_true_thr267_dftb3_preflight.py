@@ -21,7 +21,7 @@ L2_REACTIVE_O = 10288
 QMCHARGE = 1
 SPIN = 1
 LINK_ATOMIC_NUMBER = 1
-DFTB_TELEC_K = 100.0
+DFTB_TELEC_K = 200.0
 ATOMIC_NUMBERS = {"H": 1, "C": 6, "N": 7, "O": 8}
 
 
@@ -189,7 +189,7 @@ def main():
         "slater_koster_set": "3ob-3-1",
         "scc_convergence_rescue": {
             "dftb_telec_K": DFTB_TELEC_K,
-            "reason": "Amber18-supported low electronic temperature after immutable zero-K SCC preflight failed at job 61712026",
+            "reason": "Amber18-supported low electronic temperature after zero-K job 61712026 failed at step 1 and 100 K job 61712561 retained one SCC warning in 20 steps",
             "interpretation": "numerical rescue only; warnings remain a hard failure",
         },
         "qmcharge": QMCHARGE,
