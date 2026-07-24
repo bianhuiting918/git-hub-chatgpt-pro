@@ -129,6 +129,8 @@ def main():
         raise ValueError(f"unexpected electron count {electrons}")
     qmmask = "@" + ",".join(str(atom.idx + 1) for atom in qm_atoms)
     acceptor_atom = ASP306_OD1 if args.acceptor == "OD1" else ASP306_OD2
+    attack_iat = f"iat={THR267_OG1},{L2_C12}"
+    proton_iat = f"iat={THR267_HG1},{acceptor_atom}"
 
     for window in WINDOWS:
         name = window["name"]
