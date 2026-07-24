@@ -549,3 +549,31 @@ find_ts only and are not a validated RC, TS, committor, PMF or barrier.
 
 Compact audit:
 `audit/nylc_C18_trueT267_freeGS.step1_rc_seed.json`.
+
+
+## Step1 constrained DFTB3 bracket (submitted 2026-07-24)
+
+The authoritative source is the 434 ps low-potential strict-NAC frame in the
+fully unrestrained 1 ns L2 NPT window. The complete explicit TIP3P solvent box is
+retained. The production core QM region has 110 explicit QM atoms, three link
+atoms, QM charge -1 and 388 electrons including links: complete Thr267, complete
+79-atom L2, Asp306 and Asp308 sidechains, plus the Asp306--Asp308 bridge water.
+
+Four gradual constrained-minimization windows bias only two approach distances:
+Thr267 OG1--L2 C12 and Thr267 HG1--one Asp306 oxygen. The covalent OG1--HG1
+distance is observed but is not directly restrained. OD1 and OD2 are isolated
+as separate jobs so one hypothesis cannot block the other:
+
+- OD1 primary hypothesis: SCNet job 61721079;
+- OD2 sensitivity/control: SCNet job 61721080.
+
+Each job requests four CPU cores on xahcnormal for at most 12 hours and uses
+DFTB3/3ob-3-1 with `dftb_telec=200 K`. A technical PASS requires all four
+Amber stages to report FINAL RESULTS and Run done with no SCC, SANDER BOMB,
+NaN, FATAL, forrtl or segmentation gate. A separate scientific seed gate asks
+whether the endpoint reaches OG1--C12 <= 1.90 A, HG1--acceptor <= 1.25 A,
+OG1--HG1 >= 1.25 A and C12--N3 <= 1.70 A.
+
+Even a scientific seed PASS is only a constrained tetrahedral-side bracket for
+subsequent TS search. It is not a Step1 TS, committor, PMF, activation barrier,
+or evidence that the restrained pathway is dynamically preferred.
