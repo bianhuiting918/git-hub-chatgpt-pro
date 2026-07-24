@@ -18,8 +18,9 @@ def test_preparer_requires_free_l2_nac_and_selects_lowest_potential_frame():
 def test_preparer_audits_true_thr267_and_complete_ligand_qm_region():
     text = PREP.read_text()
     assert "THR267_OG1 = 8961" in text
-    assert "L2_FIRST = 10271" in text
-    assert "L2_LAST = 10349" in text
+    assert "PROTEIN_ATOMS = 10272" in text
+    assert "L2_FIRST = 10273" in text
+    assert "L2_LAST = 10351" in text
     assert "L2_REACTIVE_C = 10287" in text
     assert "L2_REACTIVE_O = 10288" in text
     assert "expected one QM/MM boundary bond" in text
