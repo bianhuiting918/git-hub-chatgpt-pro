@@ -11,7 +11,7 @@ def inspect(path):
     hard = ("SANDER BOMB", "segmentation", "forrtl", "NaN", "FATAL")
     return {
         "path": str(path),
-        "run_done": "Run done" in text,
+        "run_done": bool(re.search(r"Run\s+done", text)),
         "final_results": "FINAL RESULTS" in text,
         "scc_warnings": len(re.findall(r"Convergence could not be achieved", text, flags=re.I)),
         "vlimit_warnings": len(re.findall(r"vlimit\s+exceeded", text, flags=re.I)),
