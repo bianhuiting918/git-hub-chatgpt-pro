@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "main_job_id": "61708900",
+  "postprocess_job_id": "61710861",
+  "window": "fully_unrestrained_NPT_1ns",
+  "technical_status": "PASS",
+  "scientific_status": "PASS_UNRESTRAINED_L2_NAC_PRESENT",
+  "reactive_mapping": {
+    "source_candidate": "NylC-C18",
+    "l2_amide": "N3-C12(O2)",
+    "thr267_og1_global": 8961,
+    "l2_carbonyl_c_global": 10287,
+    "l2_carbonyl_o_global": 10288
+  },
+  "nac": {
+    "frame_count": 501,
+    "nac_frame_count": 24,
+    "occupancy": 0.04790419161676647,
+    "longest_continuous_ps": 2,
+    "lowest_potential_frame": {
+      "time_ps": 434,
+      "potential_energy_kj_mol": -1832730.5,
+      "distance_nm": 0.339,
+      "angle_deg": 114.037
+    }
+  },
+  "contact": {
+    "minimum_all_atom_nm": 0.170839,
+    "minimum_heavy_atom_nm": 0.271442
+  },
+  "gate": {
+    "definition": "residues 261-266; Thr267 excluded",
+    "mean_nm": 2.778628293675231,
+    "stdev_nm": 0.08454598430388592,
+    "min_nm": 2.5927417612346018,
+    "max_nm": 3.062072089437206
+  },
+  "thermo": {
+    "temperature_mean_K": 300.0348219161677,
+    "temperature_stdev_K": 0.7737193181198208,
+    "pressure_mean_bar": 5.020336403193612,
+    "pressure_stdev_bar": 72.12259027419513
+  },
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "settle_problem": 0,
+    "nan": 0
+  }
+}
