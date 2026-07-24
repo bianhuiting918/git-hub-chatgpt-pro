@@ -34,10 +34,13 @@ def geometry(path, cfg):
     return geom.norm(c_to_thr), geom.angle_deg(c_to_thr, c_to_o)
 
 
-def minimum_ligand_protein_distance(atoms, box):
-    ligand = [i for i, atom in atoms.items() if atom["resname"] == "UNL"]
+def minimum_ligand_protein_distance(atoms, box, ligand_resname="UNL"):
+    ligand = [
+        i for i, atom in atoms.items()
+        if atom["resname"] == ligand_resname
+    ]
     if not ligand:
-        raise ValueError("no UNL ligand atoms in GRO")
+        raise ValueError(f"no {ligand_resname} ligand atoms in GRO")
     first_ligand = min(ligand)
     protein = [i for i in atoms if i < first_ligand]
     if not protein:
