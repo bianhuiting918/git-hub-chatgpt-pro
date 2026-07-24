@@ -61,7 +61,7 @@ def main():
     }
     finished=bool(re.search(r"Finished mdrun",log))
     atoms,box,_=geom.read_gro(root/"run.gro")
-    contact=recapture.minimum_ligand_protein_distance(atoms,box)
+    contact=recapture.minimum_ligand_protein_distance(atoms,box,ligand_resname="L2")
     distance,angle=end_geometry(root/"run.gro")
     gate=[]
     for row in read_xvg(root/"gate_core_vector.xvg"):
