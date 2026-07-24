@@ -335,3 +335,27 @@ into a new `postprocess_job_61709209` directory.  It uses true Thr267 atom
 8961, L2 reactive C/O atoms 10287/10288, and the 261-266 gate group excluding
 Thr267.  If the final 1 ns artifacts are incomplete or any stage has a numerical
 failure, its status remains `NOT_EVALUATED_INCOMPLETE_OR_NUMERICAL_FAIL`.
+
+
+#### Gated Step1 DFTB3 numerical preflight
+
+Job 61709853 is queued with `afterany:61709209` on the SCNet CPU
+`xahcnormal` partition.  It first requires the independent postprocessor
+status `PASS_POSTPROCESS_TECHNICAL`.  It then requires at least one fully
+unrestrained L2 frame satisfying distance <=0.35 nm and angle 95-115 degrees
+and selects the lowest-potential frame only within that qualified NAC set.
+
+If no such frame exists, the job writes
+`NOT_EVALUATED_NO_FREE_L2_NAC` and exits without starting Sander.  If the gate
+passes, it audits a QM region containing the complete processed Thr267 residue
+plus the complete 79-atom PA66-L2 ligand, one protein QM/MM boundary bond,
+C/H/N/O 3OB-3-1 coverage, `qmcharge=0`, singlet spin and even electron parity.
+It then runs one DFTB3 minimization step plus one 20-step segment.  A numerical
+PASS is not a TS, reaction coordinate, barrier, PMF or Step2 endpoint.
+
+The PETase TS workflow is reused only methodologically: choose GS
+representatives within an audited reactant/NAC basin, validate any candidate RC
+with independent aimless shooting/committor outcomes and endpoint separation,
+and require PMF window overlap, block stability, hard-error scans and MBAR
+sensitivity.  PETase atom numbers and fitted RC weights are not transferable to
+NylC.
