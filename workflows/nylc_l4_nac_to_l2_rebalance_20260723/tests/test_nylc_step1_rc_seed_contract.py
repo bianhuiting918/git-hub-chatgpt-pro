@@ -37,3 +37,8 @@ def test_rc_seed_wrapper_is_light_cpu_only_and_audited():
     assert "mdrun" not in text and "sander" not in text
     assert "run_history.tsv" in text and "run_history.jsonl" in text
     assert "PASS_STEP1_RC_SEED_AUDIT" in text
+
+
+def test_rc_seed_wrapper_respects_partition_memory_per_cpu_limit():
+    text = SBATCH.read_text()
+    assert "#SBATCH --mem-per-cpu=2500M" in text
