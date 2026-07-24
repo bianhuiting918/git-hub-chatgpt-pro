@@ -37,6 +37,7 @@ def test_bracket_is_gradual_and_does_not_overdetermine_og_h_breaking():
     assert text.count('"proton_A": None') == 2
     assert 'if window["proton_A"] is not None:' in text
     assert "ntr=1" in text and "restraint_wt=1.0" in text
+    assert "ntmin=2" in text and "maxcyc=75, ncyc=75" in text
     assert "!@H=" in text
 
 
