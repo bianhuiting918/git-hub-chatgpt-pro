@@ -31,6 +31,15 @@ print(json.dumps({"timestamp":stamp,"event":"step1_network_screen","state":state
 PY
 }
 
+on_error() {
+  local rc=$?
+  trap - ERR
+  set +e
+  record FAIL_TECHNICAL "exit_code=$rc;out=$OUT"
+  exit "$rc"
+}
+trap on_error ERR
+
 record START "source=fully_unrestrained_NPT_1ns;postprocess=61710861"
 test -s "$FREE/run.xtc"
 test -s "$FREE/run.tpr"
