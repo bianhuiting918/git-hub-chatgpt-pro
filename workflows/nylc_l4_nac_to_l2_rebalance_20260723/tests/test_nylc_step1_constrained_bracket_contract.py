@@ -34,6 +34,8 @@ def test_bracket_is_gradual_and_does_not_overdetermine_og_h_breaking():
     assert "iat={THR267_HG1},{acceptor_atom}" in text
     assert "iat={THR267_OG1},{THR267_HG1}" not in text
     assert "dftb_telec=200.0" in text
+    assert text.count(\'"proton_A": None\') == 2
+    assert \'if window["proton_A"] is not None:\' in text
 
 
 def test_audit_separates_technical_and_scientific_status():
