@@ -4,6 +4,8 @@ ROOT = Path(__file__).resolve().parents[1]
 MDP = ROOT / "mdp" / "nvt100_step1_oxyanion_recapture_response.mdp"
 AUDIT = ROOT / "scripts" / "audit_nylc_step1_oxyanion_recapture.py"
 SBATCH = ROOT / "slurm" / "run_nylc_step1_oxyanion_recapture_response.sbatch"
+MDP2 = ROOT / "mdp" / "nvt100_step1_oxyanion_recapture_response2.mdp"
+SBATCH2 = ROOT / "slurm" / "run_nylc_step1_oxyanion_recapture_response2.sbatch"
 
 
 def test_response_mdp_is_bounded_and_not_scientific_sampling():
@@ -58,3 +60,17 @@ def test_wrapper_extracts_immutable_210ps_source_and_records_terminal_state():
     assert "[ Tyr146_N ]" in text
     assert "[ Asn219_HD21 ]" in text
     assert "[ Gate ]" not in text
+
+
+def test_response2_increases_only_bounded_donor_force_and_restarts_same_source():
+    mdp = MDP2.read_text()
+    assert mdp.count("pull-coord3-k            = 2000") == 1
+    assert mdp.count("pull-coord5-k            = 2000") == 1
+    assert "pull-coord3-rate         = -0.001000" in mdp
+    assert "pull-coord5-rate         = -0.001000" in mdp
+    assert "pull-coord1-init         = 0.330000" in mdp
+    wrapper = SBATCH2.read_text()
+    assert "-dump 210" in wrapper
+    assert "step1_oxyanion_recapture_response2_job_" in wrapper
+    assert "nvt100_step1_oxyanion_recapture_response2.mdp" in wrapper
+    assert "run_history.tsv" in wrapper and "trap on_error ERR" in wrapper
