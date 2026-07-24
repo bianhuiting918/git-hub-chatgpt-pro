@@ -36,6 +36,8 @@ def test_bracket_is_gradual_and_does_not_overdetermine_og_h_breaking():
     assert "dftb_telec=200.0" in text
     assert text.count('"proton_A": None') == 2
     assert 'if window["proton_A"] is not None:' in text
+    assert "ntr=1" in text and "restraint_wt=1.0" in text
+    assert "!@H=" in text
 
 
 def test_audit_separates_technical_and_scientific_status():
@@ -57,4 +59,5 @@ def test_wrapper_is_scnet_cpu_and_failure_isolated_by_acceptor():
     assert 'ACCEPTOR="${ACCEPTOR:?set ACCEPTOR=OD1_or_OD2}"' in text
     assert "run_history.tsv" in text and "run_history.jsonl" in text
     assert "sander" in text
+    assert '-ref "$current"' in text
     assert "mdrun" not in text
