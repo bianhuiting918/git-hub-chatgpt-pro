@@ -17,6 +17,8 @@ def test_response_mdp_is_bounded_and_not_scientific_sampling():
     assert "pull-coord2-init         = 105.000000" in text
     assert text.count("pull-coord3-rate         = -0.001000") == 1
     assert text.count("pull-coord5-rate         = -0.001000") == 1
+    assert "pull-coord4-groups       = 5 4 5 3" in text
+    assert "pull-coord6-groups       = 7 6 7 3" in text
     assert "Gate" not in text
 
 
@@ -51,6 +53,8 @@ def test_wrapper_extracts_immutable_210ps_source_and_records_terminal_state():
     assert "trap on_error ERR" in text
     assert '"$GMX" make_ndx -f "$OUT/source.gro" -o "$OUT/recapture.ndx"' in text
     assert 'cp "$BUILD/source_cycle.ndx"' not in text
+    assert r"<<'NDX'\n[" not in text
+    assert "<<'NDX'\n[ Thr267_OG1 ]" in text
     assert "[ Tyr146_N ]" in text
     assert "[ Asn219_HD21 ]" in text
     assert "[ Gate ]" not in text
