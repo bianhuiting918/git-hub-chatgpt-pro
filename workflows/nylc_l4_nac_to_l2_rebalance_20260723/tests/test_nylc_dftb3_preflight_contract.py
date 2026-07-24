@@ -47,7 +47,7 @@ def test_runner_waits_for_postprocess_gate_and_uses_scnet_cpu_amber18():
     text = SBATCH.read_text()
     assert "#SBATCH -p xahcnormal" in text
     assert "--gres=dcu" not in text
-    assert "61709209" in text
+    assert 'POSTJOB=${POSTJOB:?set POSTJOB to the successful postprocess job id}' in text
     assert "module load amber/2018" in text
     assert "3ob-3-1/C-C.skf" in text
     assert "01_qmmm_one_step.in" in text
