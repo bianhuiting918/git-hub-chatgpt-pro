@@ -38,6 +38,11 @@ PY
 
 record START "dependency_postprocess=$POSTJOB;numerical_preflight_only"
 test -s "$POST/postprocess_summary.json"
+post_status=$("$PY" -c 'import json,sys;print(json.load(open(sys.argv[1]))["status"])' "$POST/postprocess_summary.json")
+if [[ "$post_status" != PASS_POSTPROCESS_TECHNICAL ]]; then
+  record NOT_EVALUATED_POSTPROCESS_GATE "post_status=$post_status;output=$POST/postprocess_summary.json"
+  exit 0
+fi
 "$PY" "$FLOW/scripts/prepare_nylc_true_thr267_dftb3_preflight.py" \
   --task-root "$TASK" --post-root "$POST" --output "$OUT" --gmx "$GMX" \
   > "$TASK/logs/true_thr267_dftb3_prepare_$job.stdout" \
