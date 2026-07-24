@@ -23,6 +23,7 @@ job="${SLURM_JOB_ID:?}"
 set +u
 source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
 set -u
+export GMXDATA=/public/software/apps/Gromacs-DCU2/2022.1/mpi/share/gromacs
 export GMX_MAXBACKUP=-1
 
 record() {
