@@ -37,7 +37,7 @@ def read_gro(path):
 
 def element(atomname):
     letters = "".join(character for character in atomname if character.isalpha()).upper()
-    if not letters or letters[0] not in "HCNO":
+    if not letters or letters[0] not in "HCNOS":
         raise ValueError(f"unsupported element for {atomname}")
     return letters[0]
 
