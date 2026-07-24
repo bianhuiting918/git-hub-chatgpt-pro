@@ -682,3 +682,24 @@ proton-approach brackets from the same immutable attack seed. It is not a
 proton-transfer path, TS, committor, PMF or barrier. Every proton stage must
 reject a detached proton and preserve carbonyl/amide chemistry before its
 restart can be propagated.
+
+### Step1 OD1/OD2 proton-bracket submissions
+
+The branch contract test and Slurm syntax gate passed on SCNet before
+submission: `4 passed` for
+`tests/test_nylc_step1_proton_bracket_contract.py`. Both branches start from
+the same immutable attack seed SHA256
+`d5e607dd722be4fd6e5d33016afb4975d18b200a78d1fceedf5bfb9fed1b87bf`
+and use the audited 110-atom, charge -1, 388-electron DFTB3/3OB-3-1 core.
+
+- OD1 hypothesis: Slurm job 61730695, four xahcnormal CPU cores, eight-hour
+  limit.
+- OD2 control hypothesis: Slurm job 61730697, four xahcnormal CPU cores,
+  eight-hour limit.
+
+Both jobs began RUNNING with empty stderr and independent output directories.
+Each stage audits proton attachment, C12--O2/C12--N3 chemical integrity and
+stage-specific attack/proton distances. A technical completion or intermediate
+stage pass is not a TS, committor, PMF or barrier. Only a p03
+`PASS_SCIENTIFIC_TETRAHEDRAL_SEED_REACHED` permits downstream Step1 path
+bracketing; one scientific failure does not cancel or block the other branch.
