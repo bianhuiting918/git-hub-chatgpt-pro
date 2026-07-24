@@ -13,7 +13,7 @@
 set -eo pipefail
 TASK=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
-POSTJOB=61709209
+POSTJOB=${POSTJOB:?set POSTJOB to the successful postprocess job id}
 POST="$TASK/candidates/nylc_C18_trueT267_freeGS/runs/rebalance_after_em_double/postprocess_job_$POSTJOB"
 OUT="$TASK/candidates/nylc_C18_trueT267_freeGS/qmmm/step1_dftb3_preflight_post$POSTJOB"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
