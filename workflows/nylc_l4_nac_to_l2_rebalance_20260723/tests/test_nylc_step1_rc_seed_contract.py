@@ -42,3 +42,10 @@ def test_rc_seed_wrapper_is_light_cpu_only_and_audited():
 def test_rc_seed_wrapper_respects_partition_memory_per_cpu_limit():
     text = SBATCH.read_text()
     assert "#SBATCH --mem-per-cpu=2500M" in text
+
+
+def test_rc_seed_distance_uses_full_xyz_vectors_not_scalar_x():
+    text = SCRIPT.read_text()
+    assert "structure.coordinates[left - 1]" in text
+    assert "structure.coordinates[right - 1]" in text
+    assert ".xx" not in text
