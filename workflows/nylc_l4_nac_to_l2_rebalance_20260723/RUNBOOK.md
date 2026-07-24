@@ -423,3 +423,40 @@ containing Thr267, Asp306, Asp308 and complete L2 against a sensitivity region
 that additionally contains Tyr146, Lys189 and Asn219. Audit formal charge,
 link atoms, boundary bonds and electron parity for each region before any
 reaction-coordinate scan.
+
+
+## Step1 GS mechanism correction and retained 434 ps hypothesis (2026-07-24)
+
+Jobs 61713551 and 61713841 tested an assumed direct Tyr146/Asn219-to-substrate-O2
+oxyanion-hole gate. Restrained response jobs 61714772 (distance k=500) and
+61715211 (distance k=2000) then tested whether those direct contacts could be
+recaptured. Both response runs were numerically stable, retained strict
+Thr267 attack NAC and had no heavy-atom clash, but the direct donor distances
+did not shorten. These four jobs are now
+`SUPERSEDED_INVALID_DIRECT_DONOR_ASSUMPTION` and must not gate GS or TS.
+
+The primary NylC study (DOI 10.1111/febs.16755) supports a different
+interpretation: Tyr146 contributes to the water/substrate environment, while
+Lys189 and Asn219 participate in a Thr267-centered hydrogen-bond network that
+includes water. It does not establish Tyr146 and Asn219 as simultaneous direct
+hydrogen-bond donors to the substrate carbonyl oxygen. Do not resume the direct
+O2 recapture scripts or increase those forces.
+
+Retain the fully unrestrained 1 ns evidence from authoritative postprocessor
+job 61710861: 24/501 strict NAC frames (4.7904%), with the lowest-potential
+strict NAC at 434 ps (Thr267 OG1-C12 0.339 nm, attack angle 114.037 degrees,
+potential -1832730.5 kJ/mol). The minimum heavy ligand-protein distance for the
+free trajectory is 0.271442 nm. This 434 ps frame is the current low-potential
+strict-NAC GS hypothesis; it is not an equilibrium-dominant state or a TS.
+
+The 434 ps structure contains paper-consistent network evidence at a 0.40 nm
+heavy-atom graph cutoff: waters with oxygen atom indices 50165 and 51302 connect
+Thr267 OG1 to Asn219, water 81218 connects Asp306 to Asp308, and Lys189 NZ is
+0.285 nm from Asn219 OD1. These are structural diagnostics, not proof of a
+proton-transfer path. Before Step1 TS, reproduce this water-network audit,
+compare Asp306/Asp308 protonation microstates, and construct production QM
+regions. The numerical smoke PASS from job 61712692 remains valid but is not a
+production TS region.
+
+Compact correction audit:
+`audit/nylc_C18_trueT267_freeGS.direct_donor_gate_superseded.json`.
