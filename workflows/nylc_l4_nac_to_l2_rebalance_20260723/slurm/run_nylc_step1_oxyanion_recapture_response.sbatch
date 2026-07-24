@@ -58,7 +58,8 @@ source_status=$("$PY" -c 'import json,sys;print(json.load(open(sys.argv[1]))["st
 [[ "$source_status" == PASS_SOURCE_STRICT_NAC ]]
 mv "$OUT/source.tmp.gro" "$OUT/source.gro"
 
-cat > "$OUT/recapture.ndx" <<'NDX'
+cp "$BUILD/source_cycle.ndx" "$OUT/recapture.ndx"
+cat >> "$OUT/recapture.ndx" <<'NDX'
 [ Thr267_OG1 ]
 8961
 [ L2_C12 ]
