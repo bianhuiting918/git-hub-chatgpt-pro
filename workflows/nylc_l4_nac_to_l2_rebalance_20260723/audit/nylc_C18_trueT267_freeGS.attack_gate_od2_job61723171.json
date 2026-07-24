@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "job_id": 61723171,
+  "acceptor_label": "OD2",
+  "technical_status": "COMPLETED_0_0",
+  "scientific_status": "FAIL_SCIENTIFIC_ATTACK_PREREQUISITE",
+  "distances_A": {
+    "attack_og1_c12": 2.9543891085,
+    "thr_og1_hg1": 0.9861199412,
+    "carbonyl_c12_o2": 1.2640718118,
+    "amide_c12_n3": 1.3576433330
+  },
+  "attack_threshold_A": 2.8,
+  "proton_windows": "NOT_RUN",
+  "restart_sha256": "10d9b662cdd0bb2e945b34b798e4688373e43e1cca5737b8c86f7658c1975f38",
+  "identical_to_od1_job_61723169": true,
+  "interpretation": "Valid same-Hamiltonian attack-only seed identical to OD1-labelled run, but not close enough to initiate proton-transfer seed generation."
+}
