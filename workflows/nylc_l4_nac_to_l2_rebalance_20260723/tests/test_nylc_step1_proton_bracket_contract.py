@@ -4,6 +4,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PREP = ROOT / "scripts" / "prepare_nylc_step1_proton_bracket.py"
 AUDIT = ROOT / "scripts" / "audit_nylc_step1_proton_stage.py"
 SBATCH = ROOT / "slurm" / "run_nylc_step1_proton_bracket.sbatch"
+RESUME = ROOT / "slurm" / "run_nylc_step1_proton_resume.sbatch"
 
 
 def test_proton_bracket_locks_passed_attack_seed_and_two_acceptors():
@@ -49,3 +50,18 @@ def test_wrapper_is_independent_scnet_branch_with_stage_gates():
     for token in ("FINAL RESULTS", "5.  TIMINGS", "SCC is not converged", "SANDER BOMB", "FATAL", "NaN"):
         assert token in text
     assert "sander" in text and "mdrun" not in text
+
+
+def test_resume_wrapper_continues_only_a_valid_p00_scientific_failure():
+    assert RESUME.exists(), "p00 continuation wrapper is not implemented"
+    text = RESUME.read_text()
+    assert "SOURCE_JOB=\"${SOURCE_JOB:?set SOURCE_JOB=failed_p00_job_id}\"" in text
+    assert "FAIL_SCIENTIFIC_PROTON_BRACKET_STAGE" in text
+    assert '"stage" != "p00"' in text
+    assert "run/p00.rst7" in text
+    assert "for round in r01 r02 r03" in text
+    assert "--stage p00" in text
+    assert "for stage in p01 p02 p03" in text
+    assert "sha256sum" in text
+    assert "SCIENTIFIC_FAIL.json" in text
+    assert "run_history.tsv" in text and "run_history.jsonl" in text
