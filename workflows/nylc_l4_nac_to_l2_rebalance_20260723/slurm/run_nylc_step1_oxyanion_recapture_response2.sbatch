@@ -18,7 +18,7 @@ BUILD="$ROOT/build"
 # Immutable source trajectory: runs/rebalance_after_em_double/npt300free/run.xtc
 FREE="$ROOT/runs/rebalance_after_em_double/npt300free"
 job="${SLURM_JOB_ID:?}"
-OUT="$ROOT/qmmm/step1_oxyanion_recapture_response22_job_${job}"
+OUT="$ROOT/qmmm/step1_oxyanion_recapture_response2_job_${job}"
 PY=/work/home/acshdt1dks/anaconda3/bin/python3.9
 GMX=/public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi
 
