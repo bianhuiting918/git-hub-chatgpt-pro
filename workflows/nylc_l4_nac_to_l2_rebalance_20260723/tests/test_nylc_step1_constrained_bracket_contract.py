@@ -3,6 +3,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PREP = ROOT / "scripts" / "prepare_nylc_step1_constrained_bracket.py"
 AUDIT = ROOT / "scripts" / "audit_nylc_step1_constrained_bracket.py"
+GATE = ROOT / "scripts" / "gate_nylc_step1_attack_prerequisite.py"
 SBATCH = ROOT / "slurm" / "run_nylc_step1_constrained_bracket.sbatch"
 
 
@@ -37,7 +38,9 @@ def test_bracket_is_gradual_and_does_not_overdetermine_og_h_breaking():
     assert text.count('"proton_A": None') == 2
     assert 'if window["proton_A"] is not None:' in text
     assert "ntr=1" in text and "restraint_wt=1.0" in text
-    assert "ntmin=2" in text and "maxcyc=75, ncyc=75" in text
+    assert "ntmin=2" in text
+    assert \'"maxcyc": 300\' in text
+    assert \'amber_input(name, qmmask, window["maxcyc"])\' in text
     assert "!@H=" in text
 
 
@@ -62,3 +65,16 @@ def test_wrapper_is_scnet_cpu_and_failure_isolated_by_acceptor():
     assert "sander" in text
     assert '-ref "$current"' in text
     assert "mdrun" not in text
+
+
+def test_attack_prerequisite_gate_blocks_premature_proton_windows():
+    assert GATE.exists(), "attack prerequisite gate is not implemented"
+    text = GATE.read_text()
+    assert "PASS_ATTACK_PREREQUISITE" in text
+    assert "FAIL_SCIENTIFIC_ATTACK_PREREQUISITE" in text
+    assert "ATTACK_MAX_A = 2.80" in text
+    assert "OGH_MAX_A = 1.20" in text
+    wrapper = SBATCH.read_text()
+    assert "gate_nylc_step1_attack_prerequisite.py" in wrapper
+    assert wrapper.index("for window in w00 w01") < wrapper.index("gate_nylc_step1_attack_prerequisite.py")
+    assert wrapper.index("gate_nylc_step1_attack_prerequisite.py") < wrapper.index("for window in w02 w03")
