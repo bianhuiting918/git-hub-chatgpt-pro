@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "job_id": 61725801,
+  "technical_status": "COMPLETED_0_0",
+  "scientific_status": "PASS_ATTACK_PREREQUISITE",
+  "passed_round": "r02",
+  "distances_A": {
+    "attack_og1_c12": 2.7624997881,
+    "thr_og1_hg1": 0.9860291430,
+    "carbonyl_c12_o2": 1.2645712994,
+    "amide_c12_n3": 1.3588547373,
+    "hg1_asp306_od1": 3.0804921681,
+    "hg1_asp306_od2": 4.9058758442
+  },
+  "attack_seed_rst7_sha256": "d5e607dd722be4fd6e5d33016afb4975d18b200a78d1fceedf5bfb9fed1b87bf",
+  "hard_error_hits": 0,
+  "interpretation": "Attack prerequisite seed only; not a proton-transfer path, TS, committor, PMF, or barrier."
+}
