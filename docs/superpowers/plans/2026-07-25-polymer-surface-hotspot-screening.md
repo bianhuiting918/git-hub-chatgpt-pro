@@ -10,8 +10,8 @@
 
 ## Global Constraints
 
-- Remote CPU root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2.
-- Phase 1 remote root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725.
+- Remote CPU root: /work/home/acshdt1dks.
+- Phase 1 remote root: /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725.
 - Maximum CPU allocation: 64.
 - Do not run ESMFold on the CPU host.
 - Do not modify or recompute existing PASS artifacts.
@@ -80,7 +80,7 @@ Commit message:
 
 The inventory script must fail if the resolved project root is outside:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2
+    /work/home/acshdt1dks
 
 It must not write until the root check passes.
 
@@ -274,7 +274,9 @@ Commit message:
 
 Read but do not modify:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715
+    /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/outputs/saprot_structure_conditional_likelihood_20260723/run_manifest.tsv
+    /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_4556_20260725_confscale_v2/run_manifest_all_3497.tsv
+    /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_recovered_20260725_v7/run_manifest_ready_735.tsv
 
 Locate the existing PET and nylon assayed panels, structure manifests, activity labels, structure links, and catalytic annotations. Treat the legacy EXACT_OR_PUBLIC_STRUCTURE field as mixed-source until each row is reclassified from PDB/wwPDB metadata or the named prediction provider.
 
