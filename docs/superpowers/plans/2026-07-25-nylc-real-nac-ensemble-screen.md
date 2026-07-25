@@ -52,7 +52,7 @@
 - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_em_array.sbatch` — 12-way double-precision flexible-water EM.
 - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_stageA_array.sbatch` — 36-way restrained preparation followed by 100 ps free MD.
 - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_rank_stageA.sbatch` — independent Stage A aggregation/top-six manifest.
-- `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_stageB_array.sbatch` — 18-way 900 ps continuation.
+- `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_stageB_array.sbatch` — queue-submitted continuation array with 3 × N elements, where N is the number of Stage A-selected conformations and 0 ≤ N ≤ 6.
 - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_final_audit.sbatch` — final independent science audit and QM/MM eligibility.
 - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/tests/test_select_nylc_m1_nac_ensemble.py`.
 - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/tests/test_prepare_nylc_m1_nac_ensemble.py`.
@@ -521,6 +521,10 @@ Use fixed, pre-registered geometric annotations:
 
 These are preorganization annotations, not proton-transfer claims.
 
+Thermodynamic stability is pre-registered as: all values finite; temperature mean 295–305 K with no sampled value outside 270–330 K; absolute mean pressure ≤ 100 bar; volume coefficient of variation ≤ 0.02; and the absolute difference between first-half and second-half mean volume divided by overall mean volume ≤ 0.02. Pressure variance alone is not a failure because short explicit-solvent NPT pressure is noisy.
+
+Cross-replica NAC clustering uses the same local heavy-atom selection and backbone alignment as source selection, a 0.20 nm RMSD cutoff, at least four total NAC frames, and at least two contributing replicas with two or more member frames each.
+
 - [ ] **Step 3: Write failing ranking tests**
 
 Create six synthetic conformations with three replicas each and assert lexicographic ranking by:
@@ -572,16 +576,17 @@ git commit -m "feat: audit and rank NylC ensemble stage A"
 - Modify: `workflows/nylc_l4_nac_to_l2_rebalance_20260723/tests/test_rank_nylc_m1_ensemble.py`
 
 **Interfaces:**
-- Consumes: exact 18 Stage A checkpoints selected by `stageA_top6_manifest.json`.
-- Produces: 18 trajectories totaling 1 ns free time and conformation-level Stage B PASS/FAIL.
+- Consumes: the exact 3 × N Stage A checkpoints selected by `stageA_top6_manifest.json`, where 0 ≤ N ≤ 6.
+- Produces: at most 18 trajectories totaling 1 ns free time and conformation-level Stage B PASS/FAIL.
 
 - [ ] **Step 1: Write failing Slurm dependency/continuation tests**
 
 Assert the script:
 
 ```python
-assert "--array=0-17%6" in text
+assert "#SBATCH --array" not in text
 assert "stageA_top6_manifest.json" in text
+assert "STAGEB_COUNT" in text
 assert "run.cpt" in text
 assert "npt300free_m1_stageB_extend.mdp" in text
 assert "gen-vel" not in stage_b_override_text
@@ -590,9 +595,9 @@ assert "afterok" not in documented_stage_a_to_audit_dependency
 
 Also assert no Stage B output path contains legacy job IDs `61801874` or `61803121`.
 
-- [ ] **Step 2: Implement 18-way continuation**
+- [ ] **Step 2: Implement the dynamic continuation array**
 
-Use each exact Stage A `.gro/.cpt`; do not regenerate velocities. The Stage B job writes a new sibling `stageB_attempt_<jobid>_<arrayid>` and records its Stage A parent SHA256/checkpoint.
+Use each exact Stage A `.gro/.cpt`; do not regenerate velocities. The script validates `SLURM_ARRAY_TASK_COUNT == 3 * selected_conformation_count`. If N=0, do not submit Stage B and run the final audit directly with a zero-candidate manifest. If 1≤N≤6, submit indices 0 through 3N−1. Each task writes a new sibling `stageB_attempt_<jobid>_<arrayid>` and records its Stage A parent SHA256/checkpoint.
 
 - [ ] **Step 3: Extend conformation gate tests**
 
@@ -660,7 +665,7 @@ Do not import `rank_nylc_m1_ensemble.py`. Reimplement the small gate calculation
   "scientific_status": "PASS_UNRESTRAINED_M1_ENSEMBLE_NAC",
   "candidate_universe": 12,
   "stageA_expected_replicas": 36,
-  "stageB_expected_replicas": 18,
+  "stageB_expected_replicas": "3 * stageA_selected_conformation_count",
   "scientific_pass_count": 0,
   "qmmm_eligible_count": 0,
   "qmmm_eligibility": []
@@ -822,8 +827,15 @@ Do not advance a candidate merely because Slurm exited 0.
 - [ ] **Step 8: Submit Stage B and final audit**
 
 ```bash
-jid_b=$(sbatch --parsable --dependency=afterok:$jid_rank_a workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_stageB_array.sbatch)
-jid_final=$(sbatch --parsable --dependency=afterany:$jid_b workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_final_audit.sbatch)
+stageb_n=$(python -c 'import json; print(len(json.load(open("ensemble/stageA_top6_manifest.json"))["selected"]))')
+if [ "$stageb_n" -eq 0 ]; then
+  jid_b=NONE
+  jid_final=$(sbatch --parsable --dependency=afterok:$jid_rank_a workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_final_audit.sbatch)
+else
+  stageb_last=$((3 * stageb_n - 1))
+  jid_b=$(sbatch --parsable --array=0-${stageb_last}%6 --dependency=afterok:$jid_rank_a workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_stageB_array.sbatch)
+  jid_final=$(sbatch --parsable --dependency=afterany:$jid_b workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_m1_ensemble_final_audit.sbatch)
+fi
 ```
 
 Report all exact job IDs and expected array sizes.
