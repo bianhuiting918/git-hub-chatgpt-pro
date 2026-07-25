@@ -783,3 +783,44 @@ CPU job 61803323 read only the already complete 0-400 ps portion of the running 
 Rebalance job 61801789 completed 0:0. All restrained and release stages were technically clean, and the final 1 ns NPT window was fully unconstrained. The 501 frames had 0 strict NAC frames. End attack geometry was 1.025632 nm and 158.724 degrees. Mean temperature was 300.0217 K, mean pressure 4.8443 bar, minimum heavy ligand-protein contact 0.258745 nm, and FATAL/LINCS/SETTLE/NaN counts were zero. Scientific status is FAIL_UNRESTRAINED_M1_NO_NAC and the current Step1 post-relay QM/MM gate is not eligible.
 
 This 1 ns scientific failure does not stop the planned longer sampling. Dependent job 61801874 started automatically and extends the same fully unconstrained M1 checkpoint from 1 to 20 ns. Independent full-window audit job 61803121 remains queued afterany:61801874.
+
+
+## Twelve-event real-NAC M1 ensemble (2026-07-25)
+
+The authority is `manifests/nylc_C18_m1_real_nac_ensemble.authority.json`.
+Selection job 61813011 sampled twelve event-distinct fully unrestrained true-Thr267
+NAC frames from the preserved M0 coordinate trajectory, using the corrected
+reactive atoms and gate residues 261--266 only.  The selected set contains four
+three-carbonyl, four two-carbonyl, three central-window and one legacy-window
+events.  Every promoted source GRO hash and source time/geometry was independently
+verified.  These are starting hypotheses, not stable-GS claims.
+
+Build array 61813799 produced eleven `PASS_TECHNICAL_BUILD` candidates.
+`nac_evt21_time1250ps` failed the frozen minimum active-chain/rest contact gate
+and is retained as `NOT_EVALUATED_BUILD_FAIL`; the cutoff was not loosened and
+the candidate is not retried.  The full regression suite for the EM and Stage A
+workflow passed 214 tests.
+
+EM array 61814393 is a preserved technical launch failure: all twelve elements
+exited in one second because the SCNet GROMACS environment was sourced while
+Bash nounset was active.  No minimization started, so this is not a structural or
+scientific failure.  The source sequence is now regression-tested by temporarily
+disabling nounset only while loading each GROMACS environment, then immediately
+restoring it.  All twelve launch failures are present in both run-history files.
+
+Corrected EM array 61814617 uses double-precision flexible-water conjugate
+gradient minimization.  All eleven eligible candidates passed the technical
+Fmax <= 500 kJ mol-1 nm-1 gate (range 166.135--449.249); the ineligible build is
+`NOT_EVALUATED_BUILD_FAIL`.  EM is not NAC or GS evidence.
+
+Stage A array 61814751 depends on completion of 61814617 and maps twelve
+candidates across velocity seeds 26711, 26723 and 26737.  Only the eleven
+`PASS_TECHNICAL_EM` candidates execute dynamics (33 replicas); the three array
+tasks for the build-failed candidate record `NOT_EVALUATED_EM_FAIL`.  Each
+eligible replica performs restrained low-temperature equilibration, gradual
+release, and a final 100 ps fully unrestrained NPT window.  The final TPR must
+contain zero position and distance restraints.  Restrained stages never count as
+scientific evidence, and scheduler completion alone is not a NAC pass.  Stage A
+is a triage window; candidates require the planned additional 900 ps fully
+unrestrained Stage B and a common audit before any >=1 ns stability ranking or
+QM/MM eligibility decision.
