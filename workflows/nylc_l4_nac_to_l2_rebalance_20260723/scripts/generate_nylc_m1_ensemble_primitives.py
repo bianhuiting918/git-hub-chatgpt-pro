@@ -89,7 +89,7 @@ def _local_resname_matches_m1(record: dict, residue) -> bool:
         expected == "ASP"
         and observed == "ASH"
         and int(record.get("resid", -1)) == 306
-        and int(residue.resid) == 306
+        and int(record.get("residue_instance", -1)) == 661
     )
 
 
