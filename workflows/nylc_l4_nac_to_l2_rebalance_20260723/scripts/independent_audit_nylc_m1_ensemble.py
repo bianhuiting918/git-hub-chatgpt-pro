@@ -263,6 +263,7 @@ def audit_final(payload: dict) -> dict:
                 {
                     **decision,
                     "recurrent_nac_cluster_count": int(cluster.get("cluster_count", 0)),
+                    "medoid_is_qmmm_optimized_gs": False,
                     "medoid": medoid,
                 }
             )
