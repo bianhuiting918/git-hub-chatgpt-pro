@@ -742,3 +742,23 @@ The authoritative reaction atoms are Thr622 OG1/HG1 (topology atoms
 8961/8962), L2 C12/O2/N3 (10287--10289), and Asp661 OD1/OD2 (9572/9573).
 The full PDB has no CONECT records, so viewer-inferred long bonds are display
 artifacts and are not present in the Amber topology.
+
+
+## M1 NalphaH2 / Asp306H classical microstate (2026-07-25)
+
+Scientific definition: Thr267-NalphaH2, Thr267-OgammaH, Asp306H (ASH-HD2), Asp308-, with total proton count and active-chain charge conserved. This is a classical fixed-topology neutral-Nalpha proxy, not a new RESP fit and not evidence that a proton transfers.
+
+Authoritative technical gates:
+
+- build/preflight job 61801089: Nalpha H1/H2 only, Asp306 HD2, Asp308-, active-chain charge -4 before and after, grompp -maxwarn 0, minimum chain-rest distance 0.1054703 nm;
+- selected coordinate is the lowest instantaneous-potential fully unrestrained NAC frame from the preserved M0 coordinate trajectory: 1462 ps, 0.339 nm, 110.677 degrees;
+- EM job 61801703: PASS_TECHNICAL_EM, double-precision flexible-water CG, Fmax 449.248847 kJ mol-1 nm-1, no hard numerical warning;
+- analyzer contract: actual TPR reports Nalpha hydrogen names H1/H2, Asp306 proton HD2, 40990 explicit waters, and microstate label M1_NalphaH2_Asp306H.
+
+Run chain:
+
+1. `sbatch slurm/run_nylc_m1_em.sbatch` (job 61801703).
+2. `sbatch --export=ALL,M1_EM_JOB=61801703 slurm/run_nylc_m1_rebalance.sbatch` (job 61801789): 50/150 K strong protein+L2 heavy-atom restraints, 300 K weak restraints, gradual release, then 1 ns fully unrestrained NPT.
+3. `sbatch --dependency=afterok:61801789 --export=ALL,M1_REBAL_JOB=61801789 slurm/run_nylc_m1_free20ns.sbatch` (job 61801874): extend the fully unrestrained window from 1 to 20 ns only after technical completion of the rebalance chain.
+
+Restrained stages are never scientific PASS. Judge only the fully unrestrained window using NAC distance <=0.35 nm, attack angle 95-115 degrees, gate residues 261-266 excluding Thr267, temperature/pressure stability, and LINCS/SETTLE/NaN/FATAL counts. Fixed-topology MM geometry ranks preorganization only and cannot execute proton transfer or determine a barrier.
