@@ -16,6 +16,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--chains", required=True, help="Comma-separated PDB chain IDs")
+    parser.add_argument(
+        "--protein-only",
+        action="store_true",
+        help="Retain ATOM records only; exclude all HETATM records explicitly.",
+    )
     return parser.parse_args()
 
 
@@ -38,6 +43,8 @@ def main() -> int:
         for line in handle:
             record = line[:6]
             if record in COORDINATE_RECORDS:
+                if args.protein_only and record != "ATOM  ":
+                    continue
                 chain = line[21] if len(line) > 21 else ""
                 if chain in requested:
                     selected.append(line.rstrip("\r\n") + "\n")
@@ -56,6 +63,8 @@ def main() -> int:
     with args.output.open("x", encoding="ascii", newline="\n") as handle:
         handle.write(f"REMARK 999 SOURCE {args.input.resolve()}\n")
         handle.write(f"REMARK 999 SELECTED CHAINS {','.join(requested)}\n")
+        record_policy = "PROTEIN_ONLY" if args.protein_only else "ATOM_AND_HETATM"
+        handle.write(f"REMARK 999 RECORD POLICY {record_policy}\n")
         handle.writelines(selected)
         handle.write("END\n")
     return 0
