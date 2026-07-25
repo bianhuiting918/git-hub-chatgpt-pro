@@ -3,7 +3,7 @@
 #SBATCH --partition=xahcnormal
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=2
 #SBATCH --mem-per-cpu=1G
 #SBATCH --time=01:00:00
 #SBATCH --output=/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/logs/%x_%j.out
@@ -11,6 +11,9 @@
 
 set -euo pipefail
 ROOT=/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725
+REPO="$ROOT/repo"
+PYTHON=/work/home/acshdt1dks/python3.11/bin/python3.11
+EXTRACT="$REPO/projects/03-polymer-surface-hotspot-screening/scripts/extract_pdb_context.py"
 ADFR="$ROOT/software/ADFRsuite-1.0/bin"
 RUN="$ROOT/results/autosite_technical_smoke_20260726"
 SUMMARY="$RUN/summary.tsv"
@@ -20,26 +23,41 @@ if [ -e "$RUN" ]; then
   exit 2
 fi
 mkdir -p "$RUN"
-printf 'candidate_id\tinput_pdb\tinput_sha256\tprepare_rc\tautosite_rc\toutput_files\ttechnical_status\n' > "$SUMMARY"
+printf 'candidate_id\tstructure_context\tselected_chains\tinput_pdb\tinput_sha256\textracted_sha256\textract_rc\tprepare_rc\tautosite_rc\toutput_files\ttechnical_status\n' > "$SUMMARY"
 
 run_one() {
   candidate_id=$1
-  input_pdb=$2
+  structure_context=$2
+  selected_chains=$3
+  input_pdb=$4
   candidate_dir="$RUN/$candidate_id"
   mkdir -p "$candidate_dir"
   input_sha=$(sha256sum "$input_pdb" | awk '{print $1}')
+  context_pdb="$candidate_dir/context.pdb"
   receptor="$candidate_dir/receptor.pdbqt"
 
   set +e
-  "$ADFR/prepare_receptor" -r "$input_pdb" -o "$receptor" \
-    -A checkhydrogens -U nphs_lps_waters_nonstdres \
-    >"$candidate_dir/prepare.stdout.log" 2>"$candidate_dir/prepare.stderr.log"
-  prepare_rc=$?
+  "$PYTHON" "$EXTRACT" --input "$input_pdb" --output "$context_pdb" --chains "$selected_chains" \
+    >"$candidate_dir/extract.stdout.log" 2>"$candidate_dir/extract.stderr.log"
+  extract_rc=$?
   set -e
 
+  extracted_sha=NA
+  prepare_rc=NA
   autosite_rc=NA
-  status=NOT_EVALUATED_RECEPTOR_PREP
-  if [ "$prepare_rc" -eq 0 ] && [ -s "$receptor" ]; then
+  status=NOT_EVALUATED_CONTEXT_EXTRACTION
+  if [ "$extract_rc" -eq 0 ] && [ -s "$context_pdb" ]; then
+    extracted_sha=$(sha256sum "$context_pdb" | awk '{print $1}')
+    set +e
+    "$ADFR/prepare_receptor" -r "$context_pdb" -o "$receptor" \
+      -A checkhydrogens -U nphs_lps_waters_nonstdres \
+      >"$candidate_dir/prepare.stdout.log" 2>"$candidate_dir/prepare.stderr.log"
+    prepare_rc=$?
+    set -e
+    status=NOT_EVALUATED_RECEPTOR_PREP
+  fi
+
+  if [ "$prepare_rc" = "0" ] && [ -s "$receptor" ]; then
     set +e
     "$ADFR/autosite" -r "$receptor" -o "$candidate_dir/autosite" -n 10 \
       >"$candidate_dir/autosite.stdout.log" 2>"$candidate_dir/autosite.stderr.log"
@@ -52,15 +70,20 @@ run_one() {
     fi
   fi
   output_files=$(find "$candidate_dir" -type f | wc -l)
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-    "$candidate_id" "$input_pdb" "$input_sha" "$prepare_rc" "$autosite_rc" "$output_files" "$status" \
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$candidate_id" "$structure_context" "$selected_chains" "$input_pdb" "$input_sha" \
+    "$extracted_sha" "$extract_rc" "$prepare_rc" "$autosite_rc" "$output_files" "$status" \
     >> "$SUMMARY"
 }
 
-run_one PET_6ILW /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/inputs/receptors/SEQMD5_8ddcd9d7d7bbf5872959258e293cb55b.pdb
-run_one NYLC_3AXG /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/structures/saprot_nylonase_structure_recovery_20260725_v4/priority813_public/SEQMD5_b48a5e7e77b3b427ca89ac65da361050.pdb
+run_one PET_6ILW_CHAIN_A MONOMER_STANDARDIZED A \
+  /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/inputs/receptors/SEQMD5_8ddcd9d7d7bbf5872959258e293cb55b.pdb
+run_one NYLC_3AXG_CHAIN_A MONOMER_STANDARDIZED A \
+  /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/structures/saprot_nylonase_structure_recovery_20260725_v4/priority813_public/SEQMD5_b48a5e7e77b3b427ca89ac65da361050.pdb
+run_one NYLC_3AXG_BIO1 TETRAMER_PDB_BIOMOLECULE_1 A,B,C,D \
+  /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/structures/saprot_nylonase_structure_recovery_20260725_v4/priority813_public/SEQMD5_b48a5e7e77b3b427ca89ac65da361050.pdb
 
-sha256sum "$SUMMARY" > "$RUN/SHA256SUMS"
+find "$RUN" -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > "$RUN/SHA256SUMS"
 if grep -q 'NOT_EVALUATED' "$SUMMARY"; then
   printf '%s COMPLETE_WITH_TECHNICAL_FAILURES output=%s\n' "$(date -Is)" "$RUN"
   exit 1
