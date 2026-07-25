@@ -118,6 +118,10 @@ def test_independent_audit_passes_complete_recurrent_candidate():
 
 def test_explicit_stage_b_technical_failure_is_retained_without_primitives():
     payload = valid_payload()
+    for replica in payload["stageB"]["replica_records"]:
+        replica["advertised_scientific_status"] = (
+            "NOT_EVALUATED_PENDING_ENSEMBLE_AUDIT"
+        )
     record = payload["stageB"]["replica_records"][0]
     record["complete_json"] = {"status": "FAIL_TECHNICAL_STAGE_B"}
     record.pop("primitive_frames")
