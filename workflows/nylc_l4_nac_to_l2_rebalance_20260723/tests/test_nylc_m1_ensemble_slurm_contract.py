@@ -98,6 +98,10 @@ def test_stage_b_is_dynamic_checkpoint_continuation_without_legacy_paths():
     assert "run.cpt" in text
     assert "npt300free_m1_stageB_extend.mdp" in text
     assert "stageB_attempt_" in text
-    assert "gen-vel" not in stage_b_mdp
+    assert "gen-vel" not in text
+    assert any(
+        line.split(";", 1)[0].replace(" ", "").lower() == "gen-vel=no"
+        for line in stage_b_mdp.splitlines()
+    )
     assert "61801874" not in text
     assert "61803121" not in text
