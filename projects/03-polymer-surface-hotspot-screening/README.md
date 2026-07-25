@@ -108,11 +108,11 @@ Large structures, installers, affinity maps, caches, and result shards stay on t
 
 Server project root:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2
+    /work/home/acshdt1dks
 
 Phase 1 working directory:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+    /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725
 
 All environments, installers, caches, scripts copied for execution, manifests, logs, and results must remain under that remote directory. CPU usage is capped at 64 threads. No ESMFold inference is started on the CPU host.
 
@@ -120,5 +120,6 @@ All environments, installers, caches, scripts copied for execution, manifests, l
 
 - Research design: approved for implementation.
 - GitHub branch: codex/polymer-surface-hotspot-screening-phase1.
-- Remote installation: blocked until the configured SSH route is reachable.
-- Production calculation: not started.
+- Remote connection: verified on Sugon login10 via eshell111.hpccube.com.
+- Structure inputs: PET 8,343 structure-linked rows; nylon primary and recovered manifests are frozen separately.
+- Remote installation: inventory in progress; production calculation not started.
