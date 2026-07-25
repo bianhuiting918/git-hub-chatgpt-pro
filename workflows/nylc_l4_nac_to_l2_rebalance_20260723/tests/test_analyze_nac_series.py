@@ -5,6 +5,8 @@ from pathlib import Path
 
 FLOW = Path(__file__).resolve().parents[1]
 SCRIPT = FLOW / "scripts" / "analyze_nac_series.py"
+sys.path.insert(0, str(SCRIPT.parent))
+from analyze_nac_series import audit_series
 
 
 def _write_xvg(path: Path, values):
@@ -106,3 +108,49 @@ def test_rejects_misaligned_time_series(tmp_path):
 
     assert result.returncode != 0
     assert "time series do not align" in result.stderr
+
+def test_reports_explicit_events_inside_requested_analysis_window():
+    distance_rows = [(0.0, 0.30), (2.0, 0.31), (4.0, 0.40), (6.0, 0.32), (8.0, 0.33)]
+    angle_rows = [(0.0, 100.0), (2.0, 101.0), (4.0, 105.0), (6.0, 106.0), (8.0, 107.0)]
+
+    audit = audit_series(
+        distance_rows,
+        angle_rows,
+        0.35,
+        95.0,
+        115.0,
+        analysis_start_ps=2.0,
+        analysis_end_ps=8.0,
+        sample_interval_ps=2.0,
+    )
+
+    assert audit["schema_version"] == 2
+    assert audit["analysis_window_ps"] == [2.0, 8.0]
+    assert [
+        (event["event_id"], event["start_ps"], event["end_ps"], event["frame_count"])
+        for event in audit["nac_events"]
+    ] == [
+        ("event_0001", 2.0, 2.0, 1),
+        ("event_0002", 6.0, 8.0, 2),
+    ]
+    assert audit["nac_occupancy"] == 3 / 4
+
+
+def test_time_discontinuity_starts_a_new_nac_event():
+    distance_rows = [(0.0, 0.30), (2.0, 0.31), (6.1, 0.32)]
+    angle_rows = [(0.0, 100.0), (2.0, 101.0), (6.1, 102.0)]
+
+    audit = audit_series(
+        distance_rows,
+        angle_rows,
+        0.35,
+        95.0,
+        115.0,
+        sample_interval_ps=2.0,
+    )
+
+    assert [(event["start_ps"], event["end_ps"]) for event in audit["nac_events"]] == [
+        (0.0, 2.0),
+        (6.1, 6.1),
+    ]
+
