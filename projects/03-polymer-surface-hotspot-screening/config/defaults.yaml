@@ -1,0 +1,87 @@
+schema_version: 1
+project:
+  name: polymer_surface_hotspot_screen
+  remote_cpu_root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2
+  remote_phase_root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+  max_total_cpus: 64
+  authoritative_handoff_root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715
+
+receptor:
+  primary_context: monomer_standardized
+  sensitivity_context: biological_assembly_context
+  altloc_policy: highest_occupancy_then_lexical
+  remove_waters: true
+  remove_unlisted_hetero: true
+  retain_cofactors_from_manifest_only: true
+
+grid:
+  spacing_angstrom: 0.75
+  margin_angstrom: 5.0
+  tile_overlap_angstrom: 8.0
+  atom_types:
+    - C
+    - OA
+    - HD
+  dimension_limit: detect_from_installed_build
+  overlap_merge: most_favorable_energy
+
+surface_shell:
+  connectivity: 26
+  include_exterior_boundary_connected_solvent_only: true
+  near_surface_min_angstrom: 0.0
+  near_surface_max_angstrom: 2.25
+  shell_sensitivity_max_angstrom:
+    - 1.50
+    - 2.25
+    - 3.00
+  freesasa_probe_radius_angstrom: 1.40
+
+catalytic_regions:
+  graph_radius_angstrom:
+    catalytic_core: 6.0
+    catalytic_neighborhood: 10.0
+    catalytic_extended: 14.0
+  autosite_overlap_max_distance_angstrom: 4.0
+  off_target_exclusion_buffer_angstrom: 4.0
+  off_target_seed_method: deterministic_farthest_point
+  patch_summary_top_fraction: 0.20
+
+affinity:
+  transform: favorable_affinity_equals_negative_map_energy
+  primary_selection: pareto_channel_metrics
+  pet_channels:
+    - C
+    - OA
+  nylon_channels:
+    - C
+    - OA
+    - HD
+  secondary_composite:
+    PET:
+      C: 0.5
+      OA: 0.5
+    NYLON:
+      C: 0.3333333333
+      OA: 0.3333333333
+      HD: 0.3333333334
+  cross_protein_normalization: frozen_exact_structure_median_mad
+  within_protein_normalization: connected_patch_percentile
+
+phases:
+  phase1a: exact_public_structures
+  phase1b: exact_sequence_predicted_structures
+  phase1c: deterministic_stratified_benchmark
+  phase1d: full_structure_linked_production
+  benchmark_seed: 20260725
+
+gates:
+  require_install_pass: true
+  require_smoke_pass_before_benchmark: true
+  require_benchmark_pass_before_production: true
+  accept_scheduler_exit_zero_as_scientific_pass: false
+  missing_is_not_evaluated: true
+
+retention:
+  retain_raw_maps_until_benchmark_audit: true
+  compact_shell_arrays: true
+  destructive_cleanup_requires_separate_audited_step: true
