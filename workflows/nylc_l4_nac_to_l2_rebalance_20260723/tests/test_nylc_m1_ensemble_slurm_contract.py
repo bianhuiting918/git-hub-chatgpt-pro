@@ -43,3 +43,19 @@ def test_stage_a_array_maps_candidate_and_seed_and_runs_one_dcu():
         text,
         "source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh",
     )
+
+
+def test_stage_a_rank_job_audits_complete_universe_afterany():
+    text = (SLURM / "run_nylc_m1_ensemble_rank_stageA.sbatch").read_text()
+
+    assert "#SBATCH -p xahcnormal" in text
+    assert "STAGEA_ARRAY_JOB_ID" in text
+    assert "for task_id in $(seq 0 35)" in text
+    assert "STAGE_A_COMPLETE.json" in text
+    assert "NOT_EVALUATED.json" in text
+    assert "generate_nylc_m1_ensemble_primitives.py" in text
+    assert "audit_nylc_m1_ensemble_replica.py" in text
+    assert "rank_nylc_m1_ensemble.py" in text
+    assert "expected_stageA_slots=36" in text
+    assert "dependency=afterany" in text
+    assert "afterok" not in text
