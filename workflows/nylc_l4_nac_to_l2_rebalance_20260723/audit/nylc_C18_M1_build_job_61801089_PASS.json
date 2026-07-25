@@ -1,0 +1,99 @@
+{
+  "build_audit": {
+    "active_chain_atom_count": 1324,
+    "atom_mapping_global_index1": {
+      "asp306_HD2": 9573,
+      "asp306_OD1": 9571,
+      "asp306_OD2": 9572,
+      "asp308_OD1": 9591,
+      "asp308_OD2": 9592,
+      "l2_C": 10287,
+      "l2_N": 10289,
+      "l2_O": 10288,
+      "thr267_H1": 8950,
+      "thr267_H2": 8951,
+      "thr267_HG1": 8961,
+      "thr267_N": 8949,
+      "thr267_OG1": 8960
+    },
+    "candidate_id": "nylc_C18_trueT267_freeGS",
+    "forcefield": "amber99sb-ildn",
+    "full_atom_count": 133589,
+    "gro_rewrite": {
+      "box_line": "   4.31500   4.12847   4.15384",
+      "new_atom_count": 1324,
+      "old_atom_count": 1325,
+      "removed_atom": {
+        "index1": 4,
+        "name": "H3"
+      }
+    },
+    "itp_rewrite": {
+      "charge_delta_e": -1.0,
+      "dropped_interaction_counts": {
+        "angles": 3,
+        "bonds": 1,
+        "dihedrals": 3
+      },
+      "nalpha_charge_e": -0.6254,
+      "new_atom_count": 1324,
+      "new_charge_e": -4.0,
+      "old_atom_count": 1325,
+      "old_charge_e": -3.0,
+      "removed_atom": {
+        "charge_e": 0.1934,
+        "index1": 4,
+        "name": "H3"
+      }
+    },
+    "merge": {
+      "box_line": "  12.36592  12.36592   8.74403   0.00000   0.00000   0.00000   0.00000   6.18296   6.18296",
+      "full_atom_count": 133589,
+      "replaced_atom_count": 1324,
+      "replacement_end_index1": 10272,
+      "replacement_start_index1": 8949
+    },
+    "microstate": {
+      "Asp306": "ASH_HD2_neutral",
+      "Asp308": "ASP_minus",
+      "Thr267_Nalpha": "NH2_neutral_proxy",
+      "Thr267_Ogamma": "OH"
+    },
+    "new_chain_charge_e": -4.0,
+    "old_chain_charge_e": -4.0,
+    "parameterization_note": "Nalpha neutral amine proxy retains N3/H bonded types; N charge -0.62540 gives exact residue neutralization and N+2H group charge -0.23860 e, close to force-field neutral LYN amine group -0.26373 e; not a new RESP fit.",
+    "reaction_geometry": {
+      "attack_angle_deg": 110.67742761881539,
+      "attack_distance_nm": 0.3385985823951424
+    },
+    "schema_version": 1,
+    "sha256": {
+      "chainH_itp": "87ead6b58e91211f104f3171d10545b57a47d3146d9558098cb103df80dcbb49",
+      "source_selected_gro": "0240b3740c8fe3374aa6cc3f85c78ad8df78825e15e4019f2f8b5abf0d5018b2",
+      "system_M1_gro": "254f78534a3d0d1f772717c4615db38beafce55b6914c24b34c25d9eabf25d53"
+    },
+    "source_job_id": "61780674",
+    "source_selected_time_ps": 1462.0,
+    "status": "PASS_M1_BUILD_AUDIT_PRE_GROMPP"
+  },
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "grompp_maxwarn": 0,
+  "minimum_chainH_rest_distance_nm": 0.1054703,
+  "next_gate": "EM then restrained low-temperature heating/release then fully unrestrained M1 NPT",
+  "schema_version": 1,
+  "scientific_status": "M1_CLASSICAL_PROXY_READY_FOR_EM_NOT_MECHANISM_PASS",
+  "slurm_job_id": "61801089",
+  "source_selection": {
+    "nac_frame_count": 85,
+    "nac_occupancy": 0.014577259475218658,
+    "rule": "lowest instantaneous potential among fully unrestrained NAC frames",
+    "selected": {
+      "angle_deg": 110.677,
+      "distance_nm": 0.339,
+      "potential_energy_kj_mol": -1832719.0,
+      "time_ps": 1462.0
+    },
+    "trajectory_frame_count": 5831
+  },
+  "status": "PASS_TECHNICAL_M1_BUILD_GROMPP"
+}
