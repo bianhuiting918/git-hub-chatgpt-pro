@@ -11,6 +11,7 @@ from select_nylc_m1_nac_ensemble import (
     kabsch_rmsd,
     read_gro,
     select_twelve,
+    _write_frame_index,
 )
 
 
@@ -134,3 +135,11 @@ def test_selection_batch_does_not_launch_mpi_gromacs_inside_an_srun_step():
 
     assert 'srun -n 1 -c "${SLURM_CPUS_PER_TASK:-8}" "$PYTHON"' not in text
     assert '"$PYTHON" \\\n    "$FLOW/scripts/select_nylc_m1_nac_ensemble.py"' in text
+
+
+def test_gromacs_frame_index_file_converts_zero_based_source_indices(tmp_path):
+    frame_index = tmp_path / "frames.ndx"
+
+    _write_frame_index(frame_index, [0, 14, 5830])
+
+    assert frame_index.read_text() == "[ frames ]\\n1 15 5831\\n"
