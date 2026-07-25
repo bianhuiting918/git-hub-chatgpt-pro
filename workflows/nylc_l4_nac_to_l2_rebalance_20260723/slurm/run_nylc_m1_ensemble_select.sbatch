@@ -60,7 +60,11 @@ mkdir -p "$TASK_ROOT/ensemble"
 append_history START "source_job=61780674;selection_audit_job=61801089;expected_events=72;expected_selected=12"
 
 set +e
-srun -n 1 -c "${SLURM_CPUS_PER_TASK:-8}" "$PYTHON"     "$FLOW/scripts/select_nylc_m1_nac_ensemble.py"     --authority "$AUTHORITY"     --output-root "$OUTPUT_ROOT"     --gmx "$GMX"
+"$PYTHON" \
+    "$FLOW/scripts/select_nylc_m1_nac_ensemble.py" \
+    --authority "$AUTHORITY" \
+    --output-root "$OUTPUT_ROOT" \
+    --gmx "$GMX"
 rc=$?
 set -e
 
