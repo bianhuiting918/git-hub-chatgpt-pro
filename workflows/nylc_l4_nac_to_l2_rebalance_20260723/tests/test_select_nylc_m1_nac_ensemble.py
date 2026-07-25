@@ -126,3 +126,11 @@ def test_reads_gro_and_kabsch_is_translation_rotation_invariant(tmp_path):
     assert len(atoms) == 3
     assert box == (1.0, 1.0, 1.0)
     assert kabsch_rmsd(reference, mobile) < 1e-12
+
+
+def test_selection_batch_does_not_launch_mpi_gromacs_inside_an_srun_step():
+    batch = FLOW / "slurm" / "run_nylc_m1_ensemble_select.sbatch"
+    text = batch.read_text()
+
+    assert 'srun -n 1 -c "${SLURM_CPUS_PER_TASK:-8}" "$PYTHON"' not in text
+    assert '"$PYTHON" \\\n    "$FLOW/scripts/select_nylc_m1_nac_ensemble.py"' in text
