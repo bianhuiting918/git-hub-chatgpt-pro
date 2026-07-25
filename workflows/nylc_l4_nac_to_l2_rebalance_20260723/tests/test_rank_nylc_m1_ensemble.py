@@ -44,6 +44,8 @@ def test_stage_a_ranks_conformations_not_replicas_and_excludes_all_zero_nac():
     audits += candidate("c_two_repro", [(8, 0.08, 6.0), (7, 0.07, 5.0), (0, 0.00, 0.0)], cluster_count=1)
     audits += candidate("c_one_repro", [(9, 0.09, 8.0), (0, 0.00, 0.0), (0, 0.00, 0.0)])
     audits += candidate("c_low_occ", [(2, 0.02, 2.0), (2, 0.02, 2.0), (1, 0.01, 0.0)])
+    audits += candidate("c_extra_a", [(3, 0.03, 2.0), (1, 0.01, 0.0), (0, 0.00, 0.0)])
+    audits += candidate("c_extra_b", [(1, 0.01, 0.0), (1, 0.01, 0.0), (1, 0.01, 0.0)])
     audits += candidate("c_unbound", [(5, 0.05, 4.0), (4, 0.04, 2.0), (3, 0.03, 2.0)], status="FAIL_UNBOUND")
     audits += candidate("c_technical", [(5, 0.05, 4.0), (4, 0.04, 2.0), (3, 0.03, 2.0)], status="FAIL_TECHNICAL")
     audits += candidate("c_zero", [(0, 0.00, 0.0), (0, 0.00, 0.0), (0, 0.00, 0.0)])
@@ -55,6 +57,8 @@ def test_stage_a_ranks_conformations_not_replicas_and_excludes_all_zero_nac():
     assert len(selected) == 6
     assert len(set(selected)) == 6
     assert "c_zero" not in selected
+    assert "c_unbound" not in selected
+    assert "c_technical" not in selected
     assert result["excluded"]["c_zero"] == "FAIL_UNRESTRAINED_NO_NAC_EARLY"
     assert result["ranking"][0]["replica_count_with_nac_after_20ps"] == 3
     assert result["ranking"][0]["pooled_nac_occupancy_after_20ps"] == 21 / 300
