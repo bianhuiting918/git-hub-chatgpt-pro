@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "source_job_id": "61780674",
+  "selection_audit_job_id": "61801089",
+  "source_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/runs/mm_proton_geometry_ext19ns_job_61780674",
+  "selection_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/candidates/nylc_C18_trueT267_freeGS/microstates/M1_nalphaH2_Asp306H/build_job_61801089/selection",
+  "source_tpr": "run.tpr",
+  "source_xtc": "run.part0002.xtc",
+  "source_edr": "run.part0002.edr",
+  "analysis_window_ps": [
+    1000,
+    12660
+  ],
+  "sample_interval_ps": 2,
+  "nac_gate": {
+    "distance_max_nm": 0.35,
+    "angle_min_deg": 95,
+    "angle_max_deg": 115
+  },
+  "central_gate": {
+    "distance_max_nm": 0.32,
+    "angle_min_deg": 100,
+    "angle_max_deg": 110
+  },
+  "expected_frame_count": 5831,
+  "expected_nac_frame_count": 85,
+  "expected_event_count": 72,
+  "old_control_time_ps": 1462,
+  "reactive_global_index1_m0": {
+    "thr267_og1": 8961,
+    "l2_c": 10287,
+    "l2_o": 10288,
+    "l2_n": 10289
+  },
+  "gate_residues": [
+    261,
+    262,
+    263,
+    264,
+    265,
+    266
+  ],
+  "excluded_gate_residues": [
+    267
+  ],
+  "velocity_seeds": [
+    26711,
+    26723,
+    26737
+  ],
+  "active_chain_global_index1_range_m0": [
+    8949,
+    10272
+  ],
+  "protein_global_index1_range_m0": [
+    1,
+    10272
+  ],
+  "ligand_resname": "L2",
+  "local_environment_cutoff_nm": 0.6,
+  "local_rmsd_dedup_nm": 0.1,
+  "selection_allocation": {
+    "three_frame_medoid": 4,
+    "two_frame_medoid": 4,
+    "central_low_energy": 3,
+    "legacy_control": 1
+  }
+}
