@@ -47,8 +47,9 @@ The existing enzyme-scaffold project contains multiple non-equivalent universes.
 
 - canonical candidate IDs;
 - exact experimental sequences;
-- exact public structures;
-- exact-sequence predicted structures;
+- PDB experimental structures;
+- public exact-sequence predicted structures;
+- project exact-sequence ESMFold structures;
 - structure-linked candidates;
 - final plotted or filtered points.
 
@@ -77,9 +78,9 @@ PET and nylon candidate universes must not be merged before family-specific metr
 
 ## 4. Phased cohort expansion
 
-### Phase 1A: exact-structure controls
+### Phase 1A: PDB experimental-structure controls
 
-Begin with exact public structures and experimentally characterized positive and negative controls from the frozen project manifests.
+Begin with PDB experimental structures and experimentally characterized positive and negative controls. The legacy handoff field EXACT_OR_PUBLIC_STRUCTURE is mixed-source and must be reclassified row by row before inclusion.
 
 Minimum PET positive-control seeds already present in the authoritative handoff include:
 
@@ -91,21 +92,27 @@ Minimum PET positive-control seeds already present in the authoritative handoff 
 
 The exact manifest, rather than this short seed list, is authoritative for the full PET control panel.
 
-Minimum nylon positive-control structure:
+Minimum nylon PDB experimental controls:
 
-- NylC 3AXG, analyzed both as a standardized chain-level receptor and in its documented oligomeric context as a separate sensitivity analysis.
+- NylC 3AXG, analyzed both as a standardized chain-level receptor and in its documented oligomeric context;
+- NylB 1WYB, an X-ray structure of 6-aminohexanoate-dimer hydrolase;
+- Nyl50 9DYS, an X-ray structure of a PA66 hydrolase bound to tetraethylene glycol.
 
-The frozen nylon exact-structure manifest is authoritative for additional NylA, NylB, NylC, engineered NylC, and substrate-complex controls.
+The frozen project manifests supply candidate and activity provenance, while RCSB/wwPDB metadata determine whether a coordinate set is genuinely experimental.
 
-### Phase 1B: exact-sequence predicted structures
+### Phase 1B: public exact-sequence predicted structures
 
-Only after Phase 1A gates pass, add experimentally tested sequences having exact-sequence ESMFold or other predicted structures. Label structure source explicitly. Do not pool exact and predicted structures silently.
+Only after Phase 1A gates pass, add experimentally tested sequences having public exact-sequence AFDB or other computed models. Label provider, model version, and exact-sequence mapping explicitly.
 
-### Phase 1C: candidate-scale benchmark shard
+### Phase 1C: project exact-sequence ESMFold structures
+
+Add project ESMFold structures as a separate stratum after Phase 1B. Do not pool PDB, public predicted, and project ESMFold structures silently.
+
+### Phase 1D: candidate-scale benchmark shard
 
 Select a deterministic, stratified shard from each canonical candidate universe. Stratify by family, structure source, sequence-length bin, and existing project score bin. The shard is used to estimate runtime, map-size distribution, failure rate, and score stability.
 
-### Phase 1D: production
+### Phase 1E: production
 
 Launch the full structure-linked universe only after installation, smoke, benchmark, and independent audit gates pass. Missing or unparsable structures remain NOT_EVALUATED and do not become biological failures.
 
@@ -198,7 +205,7 @@ Algorithm:
 
 FreeSASA is used as an independent per-residue SASA and total-SASA quality check, not as the sole source of patch geometry.
 
-Sensitivity analyses test at least two shell thicknesses and two grid spacings on the exact-structure controls.
+Sensitivity analyses test at least two shell thicknesses and two grid spacings on the PDB-experimental controls.
 
 ## 10. Material channel definitions
 
@@ -247,7 +254,7 @@ Each surface voxel and connected patch receives a percentile relative to patches
 
 ### Cross-protein magnitude
 
-Raw map-derived patch summaries are standardized against a frozen exact-structure calibration cohort using median and median absolute deviation. The calibration statistics are versioned and are not recalculated after inspecting candidate results.
+Raw map-derived patch summaries are standardized against a frozen PDB-experimental calibration cohort using median and median absolute deviation. The calibration statistics are versioned and are not recalculated after inspecting candidate results.
 
 This separation prevents per-protein normalization from erasing absolute differences while preventing global magnitude from being confused with localization.
 
@@ -328,8 +335,9 @@ AutoLigand fixed-volume pseudo-ligands may be used before conventional docking. 
 ### Positive controls
 
 - known PET hydrolase catalytic grooves;
-- NylC exact structure;
-- additional exact nylon hydrolase or substrate-complex structures from the frozen manifest.
+- NylC PDB experimental structure;
+- NylB 1WYB and Nyl50 9DYS;
+- additional PDB experimental nylon hydrolase or substrate-complex structures after row-level provenance verification.
 
 ### Negative controls
 
@@ -364,7 +372,7 @@ Pass only if:
 
 Pass only if:
 
-- at least one PET and one nylon exact structure complete;
+- at least one PET and one nylon PDB experimental structure complete;
 - C, OA, and HD maps share geometry;
 - exterior shell is nonempty and exterior-connected;
 - catalytic residues map successfully;
@@ -426,7 +434,7 @@ Do not launch the entire structure-linked collection merely because smoke jobs e
 
 Expand only when:
 
-1. the exact-structure control panel has been audited;
+1. the PDB-experimental control panel has been audited;
 2. results are stable to grid translation and reasonable spacing changes;
 3. catalytic-region enrichment is not explained solely by pocket depth;
 4. monomer and assembly-context differences are characterized;
@@ -440,7 +448,7 @@ Expand only when:
 - server-local environment and software inventory;
 - frozen explicit-probe manifest;
 - frozen structure manifest with provenance and catalytic annotations;
-- exact-control smoke results;
+- PDB-experimental-control smoke results;
 - stratified benchmark results;
 - compact per-protein and per-patch tables;
 - failure ledger;
