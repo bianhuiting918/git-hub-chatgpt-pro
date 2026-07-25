@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --mem-per-cpu=1G
 #SBATCH --time=02:00:00
 #SBATCH --output=/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/logs/%x_%j.out
 #SBATCH --error=/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/logs/%x_%j.err
