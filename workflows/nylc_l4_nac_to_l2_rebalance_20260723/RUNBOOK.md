@@ -771,3 +771,8 @@ The M1 geometry analyzer passed a multi-trajectory contract: two input XTCs are 
 Independent audit job 61803121 is queued with dependency afterany:61801874. It analyzes the first free 1 ns and the 19 ns extension as one 0-20 ns denominator. It independently recomputes NAC distance/angle and lowest-potential NAC selection, Thr-OH routes to Nalpha/water/Asp, gate opening using residues 261-266 excluding Thr267, temperature/pressure/volume stability, final ligand-protein contact and numerical warnings. Post-relay QM/MM construction is eligible only if the complete technical/thermodynamic/contact gates pass, at least one NAC frame exists, and at least one favorable Thr-OH-to-Nalpha geometry occurs within NAC frames. This is a preorganization gate, not proof of proton transfer.
 
 The first audit submission requested 4000 MB per CPU and was rejected by SCNet before any job was created. The corrected 2500 MB per CPU request is job 61803121; both events are retained in run_history.
+
+
+### M1 partial 0-400 ps diagnostic
+
+CPU job 61803323 read only the already complete 0-400 ps portion of the running fully unrestrained trajectory and completed 0:0. This is PARTIAL_DIAGNOSTIC evidence only: 0/201 strict NAC frames; favorable Thr-OH-to-Nalpha geometry 1/201 (0.50%, one frame at 82 ps); favorable Thr-OH-to-water geometry 175/201 (87.06%, 107 strong frames); favorable direct Thr-OH-to-Asp306/Asp308 geometry 0/201. Because no NAC occurred in this partial window, it cannot approve or reject a post-relay mechanism. The 1 ns and 20 ns jobs continue unchanged.
