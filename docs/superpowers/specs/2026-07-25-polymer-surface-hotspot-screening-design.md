@@ -398,7 +398,7 @@ Failure of biological separation does not mean the software failed; it means the
 
 Remote root:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+    /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725
 
 Required subdirectories:
 
