@@ -15,7 +15,8 @@ REPO="$ROOT/repo"
 PYTHON=/work/home/acshdt1dks/python3.11/bin/python3.11
 EXTRACT="$REPO/projects/03-polymer-surface-hotspot-screening/scripts/extract_pdb_context.py"
 ADFR="$ROOT/software/ADFRsuite-1.0/bin"
-RUN="$ROOT/results/autosite_technical_smoke_20260726"
+RUN_ID=${RUN_ID:?RUN_ID is required}
+RUN="$ROOT/results/$RUN_ID"
 SUMMARY="$RUN/summary.tsv"
 
 if [ -e "$RUN" ]; then
@@ -58,6 +59,7 @@ run_one() {
   fi
 
   if [ "$prepare_rc" = "0" ] && [ -s "$receptor" ]; then
+    mkdir -p "$candidate_dir/autosite"
     set +e
     "$ADFR/autosite" -r "$receptor" -o "$candidate_dir/autosite" -n 10 \
       >"$candidate_dir/autosite.stdout.log" 2>"$candidate_dir/autosite.stderr.log"
