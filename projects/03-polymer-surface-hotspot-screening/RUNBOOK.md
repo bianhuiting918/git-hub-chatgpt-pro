@@ -18,15 +18,22 @@ Branch during development:
 
 Remote CPU project:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2
+    /work/home/acshdt1dks
 
 Remote Phase 1 root:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+    /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725
 
-Authoritative existing result package to inspect read-only:
+Authoritative read-only structure manifests:
 
-    /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715
+    PET (8,343 structure-linked rows):
+    /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/outputs/saprot_structure_conditional_likelihood_20260723/run_manifest.tsv
+
+    Nylon primary authority (3,497 routes; use only files readable on Sugon):
+    /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_4556_20260725_confscale_v2/run_manifest_all_3497.tsv
+
+    Nylon recovered and preflight-ready (735 rows):
+    /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_recovered_20260725_v7/run_manifest_ready_735.tsv
 
 CPU limit:
 
@@ -36,7 +43,7 @@ CPU limit:
 
 Use the configured SSH route:
 
-    ssh bianht@210.73.40.29
+    ssh eshell111.hpccube.com
 
 Do not bypass the SSH configuration. If the configured BindAddress is unavailable, stop and restore the approved network route.
 
@@ -62,7 +69,7 @@ No directory is created before the root check succeeds.
 
 From a commit-pinned source snapshot on the server:
 
-    cd /Dell/Dell14/bianht/enzyme_scaffold_search_v2
+    cd /work/home/acshdt1dks
     bash polymer_surface_hotspot_screen_20260725/scripts/inventory_remote.sh
 
 Record:
@@ -80,7 +87,7 @@ Expected: no mutation.
 
 The installer is unprivileged and idempotent.
 
-    cd /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+    cd /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725
     bash scripts/install_phase1.sh
 
 Required components:
@@ -121,7 +128,9 @@ Required checks:
 Generate manifests only from frozen authoritative inputs:
 
     python scripts/build_structure_manifest.py \
-      --handoff-root /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715 \
+      --pet-manifest /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/outputs/saprot_structure_conditional_likelihood_20260723/run_manifest.tsv \
+      --nylon-manifest /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_4556_20260725_confscale_v2/run_manifest_all_3497.tsv \
+      --nylon-recovered-manifest /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_recovered_20260725_v7/run_manifest_ready_735.tsv \
       --output-dir manifests \
       --seed 20260725
 
