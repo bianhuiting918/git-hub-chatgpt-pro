@@ -41,11 +41,11 @@ def test_pocket_retained_contract(contact_count, com_nm, expected):
 @pytest.mark.parametrize(
     "record,residue,expected",
     [
-        ({"resid": 306, "resname": "ASP"}, SimpleNamespace(resid=306, resname="ASP"), True),
-        ({"resid": 306, "resname": "ASP"}, SimpleNamespace(resid=306, resname="ASH"), True),
-        ({"resid": 308, "resname": "ASP"}, SimpleNamespace(resid=308, resname="ASH"), False),
-        ({"resid": 306, "resname": "GLU"}, SimpleNamespace(resid=306, resname="GLH"), False),
-        ({"resid": 306, "resname": "ASP"}, SimpleNamespace(resid=307, resname="ASH"), False),
+        ({"resid": 306, "residue_instance": 661, "resname": "ASP"}, SimpleNamespace(resid=999, resname="ASP"), True),
+        ({"resid": 306, "residue_instance": 661, "resname": "ASP"}, SimpleNamespace(resid=999, resname="ASH"), True),
+        ({"resid": 308, "residue_instance": 663, "resname": "ASP"}, SimpleNamespace(resid=999, resname="ASH"), False),
+        ({"resid": 306, "residue_instance": 662, "resname": "ASP"}, SimpleNamespace(resid=999, resname="ASH"), False),
+        ({"resid": 306, "residue_instance": 661, "resname": "GLU"}, SimpleNamespace(resid=999, resname="GLH"), False),
     ],
 )
 def test_local_resname_equivalence_is_limited_to_m1_ash306(record, residue, expected):
