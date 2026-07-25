@@ -96,6 +96,28 @@ def _validate_path(path: str, forbidden: list[str]) -> None:
 
 def _replica_metrics(record: dict, forbidden: list[str]) -> dict:
     _validate_path(str(record["path"]), forbidden)
+    complete_status = str((record.get("complete_json") or {}).get("status", ""))
+    if not complete_status:
+        raise ValueError("Stage B replica lacks an explicit completion status")
+    if complete_status != "PASS_TECHNICAL_STAGE_B":
+        if not complete_status.startswith(("FAIL_", "NOT_EVALUATED_")):
+            raise ValueError(f"unknown Stage B completion status: {complete_status}")
+        return {
+            "candidate_id": str(record["candidate_id"]),
+            "velocity_seed": int(record["velocity_seed"]),
+            "technical_pass": False,
+            "thermodynamic_pass": False,
+            "frame_count": 0,
+            "nac_frame_count": 0,
+            "nac_occupancy": 0.0,
+            "longest_nac_event_ps": 0.0,
+            "bound": False,
+            "severe_clash": False,
+            "advertised_scientific_status": record.get(
+                "advertised_scientific_status"
+            ),
+            "path": str(record["path"]),
+        }
     if "primitive_frames" not in record:
         raise ValueError("COMPLETE.json without primitive frame evidence is not auditable")
     contract = record["free_tpr_contract"]
