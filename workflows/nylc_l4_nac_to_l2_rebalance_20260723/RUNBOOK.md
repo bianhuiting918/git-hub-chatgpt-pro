@@ -885,3 +885,66 @@ scientific evidence, and scheduler completion alone is not a NAC pass.  Stage A
 is a triage window; candidates require the planned additional 900 ps fully
 unrestrained Stage B and a common audit before any >=1 ns stability ranking or
 QM/MM eligibility decision.
+
+
+## 2026-07-25 Stage A resume, checkpoint recovery, and final-audit chain
+
+The first Stage A array attempt, 61814751, was cancelled after the audit
+identified an empty processed-MDP `define` value being mistaken for an active
+restraint. Its outputs are retained and superseded; they are not a scientific
+result. The corrected resume array is 61816740. It reuses only immutable
+completed checkpoints and generates a new 100 ps fully unrestrained NPT window
+under a TPR contract with zero position restraints, zero distance restraints,
+and no nonempty `define` values.
+
+Array slot 23 (`nac_evt02_time1042ps`, seed 26737) completed all 100 ps of
+`nvt50`, wrote final GRO/CPT/EDR/XTC files, and recorded `Finished mdrun`.
+After completion, the DCU/HIP cleanup thread on node `b17r3n19` terminated
+with signal 4 in `hiprtcGetCodeSize/hipExtStreamCreateWithCUMask`. This is
+retained as `FAIL_TECHNICAL_STAGEA_RESUME` with exit code 132 and is not a
+scientific NAC failure. Recovery job 61820974 validates the completed checkpoint
+and its numerical log, records immutable coordinate/checkpoint hashes in
+`nvt50/RECOVERY_AUDIT.json`, and continues only the missing stages without
+overwriting the failed run.
+
+The Stage A audit/rank job is 61816790. Its dependency is
+`afterany:61816740:61820974`, so ranking cannot start before both the full
+array and checkpoint recovery finish. It audits the complete 36-slot universe,
+preserves technical and scientific failure categories separately, recomputes
+NAC from the 100 ps unrestrained windows, and selects at most six conformations.
+Stage A selection is triage only.
+
+Selected conformations enter the dynamic Stage B array as three velocity
+replicas each. Stage B continues the exact Stage A GRO/CPT state for 900 ps
+without regenerating velocities and requires a zero-restraint TPR. The primary
+scientific window is 100--1000 ps. The independent final audit recomputes NAC
+from raw per-frame distance and angle primitives, uses the fixed
+distance <= 0.35 nm and 95--115 degree angle definition, verifies binding,
+thermodynamics and numerical logs, and requires a recurrent 0.20 nm NAC cluster
+containing at least four frames with at least two replicas contributing at least
+two frames each.
+
+A candidate passes the final ensemble gate only when at least two of three
+replicas contain NAC after 100 ps, pooled NAC occupancy is at least 1 percent,
+the longest continuous NAC event is at least 4 ps, all three replicas remain
+bound, thermodynamics and numerical checks pass, and a cross-replica cluster is
+reproduced. Explicit Stage B technical failures remain
+`NOT_EVALUATED_TECHNICAL_FAILURE`; one failure does not block auditing other
+candidates. Up to three recurrent-cluster medoids may be nominated for QM/MM
+preflight. These medoids are classical-MM NAC coordinates, not QM/MM-optimized
+ground states, transition states, PMFs, or barrier estimates.
+
+The production final-audit path is implemented by:
+
+- `scripts/assemble_nylc_m1_final_audit_input.py`
+- `scripts/independent_audit_nylc_m1_ensemble.py`
+- `slurm/run_nylc_m1_ensemble_stageB_array.sbatch`
+- `slurm/run_nylc_m1_ensemble_final_audit.sbatch`
+- `slurm/run_nylc_m1_stageA_checkpoint_recovery.sbatch`
+
+The full server-side regression with the audited L2, NylC-L4 and Nyl12-L4 ITP
+inputs passed 254 tests before adding the recovery job; the recovery-specific
+syntax and contract checks passed 3 tests. Only scripts, documentation, tests,
+compact JSON/TSV audits and run history belong in GitHub. Trajectories, large
+topologies, checkpoints, medoid coordinate systems, credentials and secrets
+remain outside GitHub.
