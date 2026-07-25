@@ -57,5 +57,21 @@ class MdpContractTests(unittest.TestCase):
         self.assertEqual(float(values["ref-p"]), 1.0)
 
 
+    def test_m1_stage_a_is_100_ps_fully_unrestrained_continuation(self):
+        values = parse_mdp("npt300free_m1_stageA.mdp")
+        self.assertEqual(float(values["dt"]) * int(values["nsteps"]), 100.0)
+        self.assertNotIn("define", values)
+        self.assertEqual(values["gen-vel"].lower(), "no")
+        self.assertEqual(values["continuation"].lower(), "yes")
+
+    def test_m1_stage_b_adds_900_ps_without_restraints(self):
+        values = parse_mdp("npt300free_m1_stageB_extend.mdp")
+        self.assertEqual(float(values["dt"]) * int(values["nsteps"]), 900.0)
+        self.assertNotIn("define", values)
+        self.assertEqual(values["gen-vel"].lower(), "no")
+        self.assertEqual(values["continuation"].lower(), "yes")
+
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
