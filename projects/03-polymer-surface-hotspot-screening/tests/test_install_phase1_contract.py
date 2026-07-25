@@ -20,6 +20,15 @@ class InstallPhase1ContractTests(unittest.TestCase):
         self.assertIn("cache/pip", text)
         self.assertIn("-m venv", text)
 
+    def test_slurm_spool_copy_uses_explicit_repo_project_path(self):
+        text = INSTALL.read_text(encoding="utf-8")
+        self.assertIn(
+            "/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/"
+            "repo/projects/03-polymer-surface-hotspot-screening",
+            text,
+        )
+        self.assertNotIn('dirname "${BASH_SOURCE[0]}"', text)
+
     def test_gate_is_written_only_after_version_and_import_checks(self):
         text = INSTALL.read_text(encoding="utf-8")
         checks = [
