@@ -198,10 +198,15 @@ mdp = open(mdp_path, errors="replace").read()
 position_counts = [int(value) for value in re.findall(r"#posres_xA\s*=\s*(\d+)", dump)]
 position_restraints = sum(position_counts)
 distance_restraints = len(re.findall(r"(?i)\bDISRES\b", dump))
-define_present = any(
-    line.split(";", 1)[0].strip().lower().startswith("define")
-    for line in mdp.splitlines()
-)
+define_values = []
+for line in mdp.splitlines():
+    body = line.split(";", 1)[0].strip()
+    if "=" not in body:
+        continue
+    key, value = body.split("=", 1)
+    if key.strip().lower() == "define" and value.strip():
+        define_values.append(value.strip())
+define_present = bool(define_values)
 payload = {
     "position_restraints": 0,
     "distance_restraints": 0,
@@ -209,6 +214,7 @@ payload = {
     "observed_position_restraints": position_restraints,
     "observed_distance_restraint_tokens": distance_restraints,
     "processed_mdp_define_present": define_present,
+    "processed_mdp_nonempty_define_values": define_values,
 }
 open(output_path, "w").write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 if position_restraints != 0 or distance_restraints != 0 or define_present:
