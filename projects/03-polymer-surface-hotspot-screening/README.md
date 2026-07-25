@@ -28,11 +28,11 @@ Phase 1 is limited to PET hydrolases and nylon-related hydrolases with traceable
 It starts with a small benchmark, not the full candidate universe:
 
 - PET exact experimental structures and active/inactive controls from the frozen project manifest;
-- nylon exact experimental structures, including NylC 3AXG, plus active/inactive or screen-negative controls from the frozen project manifest;
-- a structure-source-stratified extension using exact-sequence predicted structures only after the exact-structure benchmark passes;
+- nylon PDB experimental structures, initially NylC 3AXG, NylB 1WYB, and PA66 hydrolase Nyl50 9DYS, plus additional controls only after row-level provenance verification;
+- a structure-source-stratified extension using public exact-sequence predicted structures and project ESMFold structures only after the PDB-experimental benchmark passes;
 - candidate-scale production only after runtime, failure-rate, and positive-control gates are met.
 
-The existing PET and nylon candidate universes remain separate. Candidate IDs, exact experimental sequences, structure-linked records, and final plotted points must never be reported as the same denominator.
+The existing PET and nylon candidate universes remain separate. Candidate IDs, exact experimental sequences, structure-linked records, and final plotted points must never be reported as the same denominator. The legacy handoff label EXACT_OR_PUBLIC_STRUCTURE is also not treated as synonymous with PDB experiment because it includes public predicted models.
 
 ## Material representations
 
