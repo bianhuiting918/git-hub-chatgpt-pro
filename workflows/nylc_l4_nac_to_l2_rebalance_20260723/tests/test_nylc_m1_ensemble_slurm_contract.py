@@ -59,3 +59,28 @@ def test_stage_a_rank_job_audits_complete_universe_afterany():
     assert "expected_stageA_slots=36" in text
     assert "dependency=afterany" in text
     assert "afterok" not in text
+
+
+def test_free_tpr_contract_only_rejects_nonempty_define_values():
+    for name in (
+        "run_nylc_m1_ensemble_stageA_array.sbatch",
+        "run_nylc_m1_ensemble_stageA_resume_array.sbatch",
+    ):
+        text = (SLURM / name).read_text()
+        assert "define_values = []" in text
+        assert 'key.strip().lower() == "define" and value.strip()' in text
+        assert "define_present = bool(define_values)" in text
+
+
+def test_stage_a_resume_uses_immutable_parent_checkpoints_and_new_outputs():
+    text = (SLURM / "run_nylc_m1_ensemble_stageA_resume_array.sbatch").read_text()
+
+    assert "#SBATCH --array=0-35%8" in text
+    assert "#SBATCH --gres=dcu:1" in text
+    assert "SOURCE_STAGEA_ARRAY_JOB_ID" in text
+    assert "stageA_resume_job_" in text
+    assert '[[ -s "$SOURCE_ROOT/$stage/PASS.json" ]]' in text
+    assert 'ln -s "$SOURCE_ROOT/$stage" "$RUN_ROOT/$stage"' in text
+    assert "npt300free_m1_stageA.mdp" in text
+    assert '"fully_unrestrained": True' in text
+    assert "refuse_overwrite=yes" in text
