@@ -38,7 +38,7 @@ run_one() {
   receptor="$candidate_dir/receptor.pdbqt"
 
   set +e
-  "$PYTHON" "$EXTRACT" --input "$input_pdb" --output "$context_pdb" --chains "$selected_chains" \
+  "$PYTHON" "$EXTRACT" --input "$input_pdb" --output "$context_pdb" --chains "$selected_chains" --protein-only \
     >"$candidate_dir/extract.stdout.log" 2>"$candidate_dir/extract.stderr.log"
   extract_rc=$?
   set -e
