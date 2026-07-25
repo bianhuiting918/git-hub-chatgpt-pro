@@ -142,4 +142,4 @@ def test_gromacs_frame_index_file_converts_zero_based_source_indices(tmp_path):
 
     _write_frame_index(frame_index, [0, 14, 5830])
 
-    assert frame_index.read_text() == "[ frames ]\\n1 15 5831\\n"
+    assert frame_index.read_text().splitlines() == ["[ frames ]", "1 15 5831"]
