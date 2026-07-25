@@ -1,0 +1,45 @@
+{
+  "nac": {
+    "attack_angle_deg": {
+      "max": 110.67732912225205,
+      "mean": 110.67732912225205,
+      "median": 110.67732912225205,
+      "min": 110.67732912225205,
+      "n": 1,
+      "p05": 110.67732912225205
+    },
+    "attack_distance_A": {
+      "max": 3.3859800381186536,
+      "mean": 3.3859800381186536,
+      "median": 3.3859800381186536,
+      "min": 3.3859800381186536,
+      "n": 1,
+      "p05": 3.3859800381186536
+    },
+    "definition": "OG1-carbonylC <= 3.5 A and O-C-OG1 angle 95-115 deg",
+    "frame_count": 1,
+    "longest_episode": {
+      "duration_ps": 0.0,
+      "end_frame": 0,
+      "end_ps": 1462.0,
+      "frame_count": 1,
+      "start_frame": 0,
+      "start_ps": 1462.0
+    },
+    "occupancy": 1.0
+  },
+  "status": "PASS_M1_ANALYZER_CONTRACT",
+  "topology_state": {
+    "asp306_proton_names": [
+      "HD2"
+    ],
+    "explicit_water_oxygen_count": 40990,
+    "fixed_topology_warning": "Classical MD cannot move a proton between molecules or residues.",
+    "microstate_label": "M1_NalphaH2_Asp306H",
+    "thr267_nalpha_hydrogen_count": 2,
+    "thr267_nalpha_hydrogen_names": [
+      "H1",
+      "H2"
+    ]
+  }
+}
