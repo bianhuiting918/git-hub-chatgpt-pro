@@ -85,3 +85,19 @@ def test_stage_a_resume_uses_immutable_parent_checkpoints_and_new_outputs():
     assert "npt300free_m1_stageA.mdp" in text
     assert '"fully_unrestrained": True' in text
     assert "refuse_overwrite=yes" in text
+
+
+def test_stage_b_is_dynamic_checkpoint_continuation_without_legacy_paths():
+    text = (SLURM / "run_nylc_m1_ensemble_stageB_array.sbatch").read_text()
+    stage_b_mdp = (FLOW / "mdp" / "npt300free_m1_stageB_extend.mdp").read_text()
+
+    assert "#SBATCH --array" not in text
+    assert "stageA_top6_manifest.json" in text
+    assert "STAGEB_COUNT" in text
+    assert "SLURM_ARRAY_TASK_COUNT" in text
+    assert "run.cpt" in text
+    assert "npt300free_m1_stageB_extend.mdp" in text
+    assert "stageB_attempt_" in text
+    assert "gen-vel" not in stage_b_mdp
+    assert "61801874" not in text
+    assert "61803121" not in text
