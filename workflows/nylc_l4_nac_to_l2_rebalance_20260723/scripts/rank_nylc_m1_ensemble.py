@@ -7,10 +7,98 @@ import argparse
 import csv
 import json
 import pathlib
-from collections import defaultdict
+from collections import Counter, defaultdict
+
+import numpy as np
 
 EXPECTED_SEEDS = (26711, 26723, 26737)
 UNBOUND_STATUSES = {"FAIL_UNBOUND", "FAIL_SEVERE_CLASH"}
+
+
+def _align_local(reference_alignment, alignment, local):
+    reference_alignment = np.asarray(reference_alignment, dtype=float)
+    alignment = np.asarray(alignment, dtype=float)
+    local = np.asarray(local, dtype=float)
+    if alignment.shape != reference_alignment.shape or alignment.ndim != 2:
+        raise ValueError("alignment fingerprints have inconsistent shapes")
+    moving_center = alignment.mean(axis=0)
+    reference_center = reference_alignment.mean(axis=0)
+    moving = alignment - moving_center
+    reference = reference_alignment - reference_center
+    left, _, right_t = np.linalg.svd(moving.T @ reference)
+    rotation = left @ right_t
+    if np.linalg.det(rotation) < 0:
+        left[:, -1] *= -1
+        rotation = left @ right_t
+    return (local - moving_center) @ rotation + reference_center
+
+
+def count_reproduced_clusters(fingerprints, cutoff_nm: float = 0.20) -> int:
+    if cutoff_nm <= 0:
+        raise ValueError("RMSD cutoff must be positive")
+    frames = []
+    for seed, path in fingerprints:
+        data = np.load(path)
+        alignment = np.asarray(data["alignment_A"], dtype=float)
+        local = np.asarray(data["local_A"], dtype=float)
+        if alignment.ndim != 3 or local.ndim != 3 or len(alignment) != len(local):
+            raise ValueError(f"{path}: invalid fingerprint arrays")
+        for frame_alignment, frame_local in zip(alignment, local):
+            frames.append((int(seed), frame_alignment, frame_local))
+    if not frames:
+        return 0
+    reference = frames[0][1]
+    aligned = [
+        (seed, _align_local(reference, alignment, local))
+        for seed, alignment, local in frames
+    ]
+    cutoff_A = cutoff_nm * 10.0
+    adjacency = [[] for _ in aligned]
+    for left in range(len(aligned)):
+        for right in range(left + 1, len(aligned)):
+            if aligned[left][1].shape != aligned[right][1].shape:
+                raise ValueError("local fingerprints have inconsistent shapes")
+            rmsd = float(np.sqrt(np.mean((aligned[left][1] - aligned[right][1]) ** 2)))
+            if rmsd <= cutoff_A:
+                adjacency[left].append(right)
+                adjacency[right].append(left)
+    seen = set()
+    reproduced = 0
+    for start in range(len(aligned)):
+        if start in seen:
+            continue
+        stack = [start]
+        component = []
+        seen.add(start)
+        while stack:
+            node = stack.pop()
+            component.append(node)
+            for neighbor in adjacency[node]:
+                if neighbor not in seen:
+                    seen.add(neighbor)
+                    stack.append(neighbor)
+        seed_counts = Counter(aligned[index][0] for index in component)
+        contributing = sum(count >= 2 for count in seed_counts.values())
+        if len(component) >= 4 and contributing >= 2:
+            reproduced += 1
+    return reproduced
+
+
+def annotate_cross_replica_clusters(audits, fingerprint_map, cutoff_nm: float = 0.20):
+    grouped = defaultdict(list)
+    for audit in audits:
+        grouped[str(audit["candidate_id"])].append(audit)
+    for candidate_id, candidate_audits in grouped.items():
+        paths = fingerprint_map.get(candidate_id, {})
+        fingerprints = [
+            (int(audit["velocity_seed"]), pathlib.Path(paths[str(audit["velocity_seed"])]))
+            for audit in candidate_audits
+            if str(audit["velocity_seed"]) in paths
+        ]
+        count = count_reproduced_clusters(fingerprints, cutoff_nm=cutoff_nm)
+        for audit in candidate_audits:
+            audit["cross_replica_cluster_count"] = count
+    return audits
 
 
 def _candidate_summary(candidate_id: str, audits: list[dict]) -> tuple[dict | None, str | None]:
@@ -175,9 +263,14 @@ def main() -> int:
     parser.add_argument("--audits", type=pathlib.Path, required=True)
     parser.add_argument("--output-dir", type=pathlib.Path, required=True)
     parser.add_argument("--top-n", type=int, default=6)
+    parser.add_argument("--fingerprint-map", type=pathlib.Path)
     args = parser.parse_args()
     payload = json.loads(args.audits.read_text())
     audits = payload["replica_audits"] if isinstance(payload, dict) else payload
+    if args.fingerprint_map:
+        audits = annotate_cross_replica_clusters(
+            audits, json.loads(args.fingerprint_map.read_text())
+        )
     result = rank_stage_a(audits, top_n=args.top_n)
     _write_outputs(result, audits, args.output_dir)
     print(json.dumps(result, sort_keys=True))
