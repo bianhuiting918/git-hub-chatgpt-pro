@@ -1,5 +1,6 @@
 import pathlib
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -7,6 +8,7 @@ SCRIPTS = pathlib.Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from generate_nylc_m1_ensemble_primitives import (
+    _local_resname_matches_m1,
     gate_opening_nm,
     parse_ndx,
     pocket_retained,
@@ -34,3 +36,17 @@ def test_gate_opening_uses_frozen_axis_and_baseline():
 )
 def test_pocket_retained_contract(contact_count, com_nm, expected):
     assert pocket_retained(contact_count, com_nm) is expected
+
+
+@pytest.mark.parametrize(
+    "record,residue,expected",
+    [
+        ({"resid": 306, "resname": "ASP"}, SimpleNamespace(resid=306, resname="ASP"), True),
+        ({"resid": 306, "resname": "ASP"}, SimpleNamespace(resid=306, resname="ASH"), True),
+        ({"resid": 308, "resname": "ASP"}, SimpleNamespace(resid=308, resname="ASH"), False),
+        ({"resid": 306, "resname": "GLU"}, SimpleNamespace(resid=306, resname="GLH"), False),
+        ({"resid": 306, "resname": "ASP"}, SimpleNamespace(resid=307, resname="ASH"), False),
+    ],
+)
+def test_local_resname_equivalence_is_limited_to_m1_ash306(record, residue, expected):
+    assert _local_resname_matches_m1(record, residue) is expected
