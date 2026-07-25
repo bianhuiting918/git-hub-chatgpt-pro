@@ -27,7 +27,9 @@ seeds=(26711 26723 26737)
 seed="${seeds[$seed_index]}"
 EVENT=nylc_m1_real_nac_stageA
 
+set +u
 source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
+set -u
 export GMX_MAXBACKUP=-1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
 
