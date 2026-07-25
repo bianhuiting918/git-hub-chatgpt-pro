@@ -155,3 +155,13 @@ def test_build_candidate_rejects_wrong_reactive_atom_identity(tmp_path):
 
     with pytest.raises(ValueError, match="reactive identity mismatch"):
         ensemble_build.build_candidate(source, tmp_path / "candidate", authority)
+
+
+def test_build_array_maps_all_twelve_frozen_candidates_without_nested_srun():
+    batch = FLOW / "slurm" / "run_nylc_m1_ensemble_build_array.sbatch"
+    text = batch.read_text()
+
+    assert "#SBATCH --array=0-11%4" in text
+    assert "selection_job_61813011/ensemble_selection.json" in text
+    assert 'srun -n 1' not in text
+    assert 'build_job_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}' in text
