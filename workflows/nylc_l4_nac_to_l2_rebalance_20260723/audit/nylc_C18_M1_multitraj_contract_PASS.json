@@ -1,0 +1,22 @@
+{
+  "status": "PASS_M1_MULTITRAJ_DEDUP_CONTRACT",
+  "topology_state": {
+    "asp306_proton_names": [
+      "HD2"
+    ],
+    "explicit_water_oxygen_count": 40990,
+    "fixed_topology_warning": "Classical MD cannot move a proton between molecules or residues.",
+    "microstate_label": "M1_NalphaH2_Asp306H",
+    "thr267_nalpha_hydrogen_count": 2,
+    "thr267_nalpha_hydrogen_names": [
+      "H1",
+      "H2"
+    ]
+  },
+  "trajectory": {
+    "frame_count": 1,
+    "median_frame_spacing_ps": null,
+    "time_end_ps": 1462.0,
+    "time_start_ps": 1462.0
+  }
+}
