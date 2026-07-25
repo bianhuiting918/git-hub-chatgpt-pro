@@ -19,7 +19,7 @@ GMX=/public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi
 JOB_ID="${SLURM_JOB_ID:?SLURM_JOB_ID is required}"
 OUTPUT_ROOT="$TASK_ROOT/ensemble/selection_job_${JOB_ID}"
 EVENT=nylc_m1_real_nac_ensemble_select
-COMMAND="srun -n 1 -c 8 python select_nylc_m1_nac_ensemble.py --authority AUTHORITY --output-root OUTPUT_ROOT"
+COMMAND="python select_nylc_m1_nac_ensemble.py --authority AUTHORITY --output-root OUTPUT_ROOT"
 
 source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
 export GMX_MAXBACKUP=-1
