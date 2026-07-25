@@ -1,10 +1,12 @@
 import pathlib
 import sys
 
+import numpy as np
+
 SCRIPTS = pathlib.Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from rank_nylc_m1_ensemble import rank_stage_a
+from rank_nylc_m1_ensemble import count_reproduced_clusters, rank_stage_a
 
 
 SEEDS = (26711, 26723, 26737)
@@ -72,3 +74,40 @@ def test_fewer_than_six_evaluable_candidates_is_explicit():
 
     assert result["selected_candidate_ids"] == ["c_pass"]
     assert result["selection_status"] == "NOT_EVALUATED_STAGEB_FEWER_THAN_SIX"
+
+
+def write_fingerprints(path, alignment_frames, local_frames):
+    np.savez_compressed(
+        path,
+        time_ps=np.arange(len(alignment_frames), dtype=float),
+        alignment_A=np.asarray(alignment_frames, dtype=float),
+        local_A=np.asarray(local_frames, dtype=float),
+    )
+
+
+def test_reproduced_cluster_requires_four_frames_and_two_replicas(tmp_path):
+    alignment = np.asarray([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    local = np.asarray([[0.0, 0.0, 1.0], [1.0, 1.0, 1.0]])
+    rotation = np.asarray([[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+    shifted_alignment = alignment @ rotation + np.asarray([5.0, -2.0, 3.0])
+    shifted_local = local @ rotation + np.asarray([5.0, -2.0, 3.0])
+
+    paths = []
+    for seed, a, loc in (
+        (26711, alignment, local),
+        (26723, shifted_alignment, shifted_local),
+    ):
+        path = tmp_path / f"{seed}.npz"
+        write_fingerprints(path, [a, a], [loc, loc])
+        paths.append((seed, path))
+
+    assert count_reproduced_clusters(paths, cutoff_nm=0.20) == 1
+
+
+def test_single_replica_cluster_is_not_reproduced(tmp_path):
+    alignment = np.asarray([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    local = np.asarray([[0.0, 0.0, 1.0], [1.0, 1.0, 1.0]])
+    path = tmp_path / "single.npz"
+    write_fingerprints(path, [alignment] * 4, [local] * 4)
+
+    assert count_reproduced_clusters([(26711, path)], cutoff_nm=0.20) == 0
