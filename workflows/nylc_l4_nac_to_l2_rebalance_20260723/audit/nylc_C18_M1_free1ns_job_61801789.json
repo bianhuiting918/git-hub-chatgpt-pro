@@ -1,0 +1,95 @@
+{
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "end_geometry": {
+    "angle_deg": 158.724,
+    "distance_nm": 1.025632,
+    "joint_nac": false
+  },
+  "gate_definition": "NylC residues 261-266; Thr267 excluded",
+  "gate_opening_nm": {
+    "frame_count": 501,
+    "max": 3.0784089700414548,
+    "mean": 2.8648164399244966,
+    "min": 2.6498106500549747,
+    "stdev": 0.0829265106820956
+  },
+  "microstate": "M1_NalphaH2_Asp306H",
+  "minimum_ligand_protein_contact": {
+    "distance_nm": 0.164332,
+    "ligand_global_index": 10305,
+    "ligand_identity": {
+      "atomname": "O5",
+      "resid": 356,
+      "resname": "L2"
+    },
+    "minimum_heavy_atom_contact": {
+      "distance_nm": 0.258745,
+      "ligand_global_index": 10305,
+      "ligand_identity": {
+        "atomname": "O5",
+        "resid": 356,
+        "resname": "L2"
+      },
+      "protein_global_index": 8896,
+      "protein_identity": {
+        "atomname": "OG1",
+        "resid": 262,
+        "resname": "THR"
+      }
+    },
+    "protein_global_index": 8897,
+    "protein_identity": {
+      "atomname": "HG1",
+      "resid": 262,
+      "resname": "THR"
+    }
+  },
+  "nac": {
+    "frame_count": 501,
+    "gates": {
+      "angle_max_deg": 115.0,
+      "angle_min_deg": 95.0,
+      "distance_max_nm": 0.35
+    },
+    "longest_continuous_nac": null,
+    "lowest_potential_nac_frame": null,
+    "nac_frame_count": 0,
+    "nac_occupancy": 0.0,
+    "nac_run_count": 0,
+    "schema_version": 1,
+    "time_end_ps": 1000.0,
+    "time_start_ps": 0.0
+  },
+  "numerical_issue_counts": {
+    "fatal": 0,
+    "lincs_warning": 0,
+    "nan": 0,
+    "settle_problem": 0
+  },
+  "schema_version": 1,
+  "scientific_status": "FAIL_UNRESTRAINED_M1_NO_NAC",
+  "slurm_job_id": "61801789",
+  "step1_qmmm_gate": "NOT_ELIGIBLE_NO_FREE_L2_NAC",
+  "technical_status": "PASS",
+  "thermodynamics": {
+    "pressure_bar": {
+      "max": 241.487625,
+      "mean": 4.844286792415169,
+      "min": -235.772354,
+      "stdev": 68.7065641174252
+    },
+    "temperature_K": {
+      "max": 302.246643,
+      "mean": 300.0217206566866,
+      "min": 297.395447,
+      "stdev": 0.8407014570930428
+    },
+    "volume_nm3": {
+      "max": 1345.9375,
+      "mean": 1339.8247913473053,
+      "min": 1334.757935,
+      "stdev": 1.838102298990465
+    }
+  },
+  "window_type": "fully_unrestrained_M1_NPT_1ns"
+}
