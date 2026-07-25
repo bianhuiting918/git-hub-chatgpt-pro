@@ -943,8 +943,8 @@ The production final-audit path is implemented by:
 - `slurm/run_nylc_m1_stageA_checkpoint_recovery.sbatch`
 
 The full server-side regression with the audited L2, NylC-L4 and Nyl12-L4 ITP
-inputs passed 254 tests before adding the recovery job; the recovery-specific
-syntax and contract checks passed 3 tests. Only scripts, documentation, tests,
+inputs passed 257 tests after adding the checkpoint-recovery path. Only scripts,
+documentation, tests,
 compact JSON/TSV audits and run history belong in GitHub. Trajectories, large
 topologies, checkpoints, medoid coordinate systems, credentials and secrets
 remain outside GitHub.
