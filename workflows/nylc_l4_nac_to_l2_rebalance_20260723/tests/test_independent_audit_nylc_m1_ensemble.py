@@ -15,7 +15,15 @@ SEEDS = (26711, 26723, 26737)
 
 def stage_b_replica(candidate_id, seed):
     frames = [
-        {"time_ps": time, "nac": True, "bound": True}
+        {
+            "time_ps": time,
+            "distance_nm": 0.32,
+            "angle_deg": 105.0,
+            "pocket_contact_count": 6,
+            "ligand_pocket_com_nm": 0.8,
+            "nac": False,
+            "bound": False,
+        }
         for time in (100.0, 102.0, 104.0, 106.0)
     ]
     return {
@@ -36,6 +44,10 @@ def stage_b_replica(candidate_id, seed):
             "nan": 0,
         },
         "thermodynamics": {"stable": True},
+        "minimum_contact": {
+            "minimum_ligand_protein_heavy_nm": 0.22,
+            "minimum_ligand_water_heavy_nm": 0.20,
+        },
         "primitive_frames": frames,
         "advertised_scientific_status": "PASS_UNRESTRAINED_M1_ENSEMBLE_NAC",
     }
@@ -164,7 +176,15 @@ def test_independent_audit_rejects_corrupt_or_superseded_inputs(mutator, match):
 def test_advertised_pass_is_rejected_when_primitive_occupancy_is_below_one_percent():
     payload = valid_payload()
     frames = [
-        {"time_ps": 100.0 + 2.0 * index, "nac": index == 0, "bound": True}
+        {
+            "time_ps": 100.0 + 2.0 * index,
+            "distance_nm": 0.32 if index == 0 else 0.50,
+            "angle_deg": 105.0,
+            "pocket_contact_count": 6,
+            "ligand_pocket_com_nm": 0.8,
+            "nac": True,
+            "bound": True,
+        }
         for index in range(200)
     ]
     for record in payload["stageB"]["replica_records"]:
