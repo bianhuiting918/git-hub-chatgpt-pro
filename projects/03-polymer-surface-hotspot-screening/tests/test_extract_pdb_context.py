@@ -40,6 +40,41 @@ class ExtractPdbContextCliTests(unittest.TestCase):
             self.assertEqual([line[21] for line in coordinate_lines], ["A", "A"])
             self.assertTrue(text.endswith("END\n"))
 
+    def test_protein_only_excludes_chain_heteroatoms(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "source.pdb"
+            output = root / "protein_only.pdb"
+            source.write_text(
+                atom_line(1, "ATOM", "CA", "ALA", "A", 1)
+                + atom_line(2, "HETATM", "NA", "NA", "A", 401)
+                + "END\n",
+                encoding="ascii",
+            )
+            run = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    "--input",
+                    str(source),
+                    "--output",
+                    str(output),
+                    "--chains",
+                    "A",
+                    "--protein-only",
+                ],
+                text=True,
+                capture_output=True,
+            )
+            self.assertEqual(run.returncode, 0, run.stderr)
+            coordinate_lines = [
+                line for line in output.read_text(encoding="ascii").splitlines()
+                if line.startswith(("ATOM  ", "HETATM"))
+            ]
+            self.assertEqual(len(coordinate_lines), 1)
+            self.assertTrue(coordinate_lines[0].startswith("ATOM  "))
+            self.assertIn("REMARK 999 RECORD POLICY PROTEIN_ONLY", output.read_text(encoding="ascii"))
+
     def test_extracts_exact_abcd_tetramer_not_fifteen_chain_asymmetric_unit(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
