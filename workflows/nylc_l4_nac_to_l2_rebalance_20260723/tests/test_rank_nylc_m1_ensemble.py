@@ -2,11 +2,12 @@ import pathlib
 import sys
 
 import numpy as np
+import pytest
 
 SCRIPTS = pathlib.Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
-from rank_nylc_m1_ensemble import count_reproduced_clusters, rank_stage_a
+from rank_nylc_m1_ensemble import count_reproduced_clusters, gate_stage_b, rank_stage_a
 
 
 SEEDS = (26711, 26723, 26737)
@@ -111,3 +112,99 @@ def test_single_replica_cluster_is_not_reproduced(tmp_path):
     write_fingerprints(path, [alignment] * 4, [local] * 4)
 
     assert count_reproduced_clusters([(26711, path)], cutoff_nm=0.20) == 0
+
+
+def stage_b_replica(
+    seed,
+    *,
+    nac_frames=5,
+    denominator=100,
+    longest=4.0,
+    bound=True,
+    technical=True,
+    reproduced_clusters=1,
+):
+    return {
+        "candidate_id": "stage_b_candidate",
+        "velocity_seed": seed,
+        "technical_status": "PASS" if technical else "FAIL",
+        "scientific_status": "PASS_REPLICA_NAC_PRESENT",
+        "analysis": {"window_ps": [100.0, 1000.0]},
+        "nac": {
+            "nac_frame_count": nac_frames,
+            "frame_count": denominator,
+            "nac_occupancy": nac_frames / denominator,
+            "longest_event": {"duration_ps": longest},
+        },
+        "bound_state": {
+            "final_frame_retained": bound,
+            "severe_clash": False,
+        },
+        "thermodynamics": {"stable": True},
+        "cross_replica_cluster_count": reproduced_clusters,
+    }
+
+
+def passing_stage_b_audits():
+    return [stage_b_replica(seed) for seed in SEEDS]
+
+
+def test_stage_b_exact_pass_gate():
+    decision = gate_stage_b(passing_stage_b_audits())
+
+    assert decision["replicas_with_nac_after_100ps"] >= 2
+    assert decision["pooled_nac_occupancy_100_1000ps"] >= 0.01
+    assert decision["longest_continuous_nac_ps"] >= 4.0
+    assert decision["bound_replica_count"] == 3
+    assert decision["technical_failure_count"] == 0
+    assert decision["cross_replica_cluster_reproduced"] is True
+    assert decision["scientific_status"] == "PASS_UNRESTRAINED_M1_ENSEMBLE_NAC"
+    assert decision["failed_gates"] == []
+
+
+@pytest.mark.parametrize(
+    "audits,reason",
+    [
+        (
+            [
+                stage_b_replica(SEEDS[0], nac_frames=30),
+                stage_b_replica(SEEDS[1], nac_frames=0),
+                stage_b_replica(SEEDS[2], nac_frames=0),
+            ],
+            "INSUFFICIENT_NAC_REPLICA_REPRODUCTION",
+        ),
+        (
+            [stage_b_replica(seed, nac_frames=1, denominator=200) for seed in SEEDS],
+            "POOLED_NAC_OCCUPANCY_BELOW_0.01",
+        ),
+        (
+            [stage_b_replica(seed, longest=2.0) for seed in SEEDS],
+            "LONGEST_NAC_EVENT_BELOW_4PS",
+        ),
+        (
+            [
+                stage_b_replica(SEEDS[0], bound=False),
+                stage_b_replica(SEEDS[1]),
+                stage_b_replica(SEEDS[2]),
+            ],
+            "UNBOUND_REPLICA",
+        ),
+        (
+            [
+                stage_b_replica(SEEDS[0], technical=False),
+                stage_b_replica(SEEDS[1]),
+                stage_b_replica(SEEDS[2]),
+            ],
+            "TECHNICAL_FAILURE",
+        ),
+        (
+            [stage_b_replica(seed, reproduced_clusters=0) for seed in SEEDS],
+            "NO_REPRODUCED_CROSS_REPLICA_CLUSTER",
+        ),
+    ],
+)
+def test_stage_b_preserves_each_failed_gate_reason(audits, reason):
+    decision = gate_stage_b(audits)
+
+    assert decision["scientific_status"] == "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC"
+    assert reason in decision["failed_gates"]
