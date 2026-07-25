@@ -1,0 +1,19 @@
+{
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "flexible_water": true,
+  "fmax_kj_mol_nm": 449.248847472395,
+  "gromacs_version": "2023.1",
+  "hard_warning_count": 0,
+  "integrator": "cg",
+  "microstate": "M1_NalphaH2_Asp306H",
+  "precision": "double",
+  "protein_and_l2_heavy_atom_restraints": true,
+  "run_gro_sha256": "869127ced660026d290080c8ae960b6f67520c59446e65ef6abeeeb309f526f2",
+  "schema_version": 1,
+  "scientific_nac_evidence": false,
+  "slurm_job_id": "61801703",
+  "source_build_job_id": "61801089",
+  "stage": "m1_em_cg_flexible_double",
+  "status": "PASS_TECHNICAL_EM",
+  "threshold_kj_mol_nm": 500.0
+}
