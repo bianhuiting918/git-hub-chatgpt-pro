@@ -50,6 +50,7 @@ def test_stage_a_rank_job_audits_complete_universe_afterany():
 
     assert "#SBATCH -p xahcnormal" in text
     assert "STAGEA_ARRAY_JOB_ID" in text
+    assert "STAGEA_RUN_PREFIX" in text
     assert "for task_id in $(seq 0 35)" in text
     assert "STAGE_A_COMPLETE.json" in text
     assert "NOT_EVALUATED.json" in text
