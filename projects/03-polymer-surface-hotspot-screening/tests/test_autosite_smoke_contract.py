@@ -22,6 +22,12 @@ class AutoSiteSmokeContractTests(unittest.TestCase):
         self.assertIn('RUN_ID=${RUN_ID:?RUN_ID is required}', text)
         self.assertIn('RUN="$ROOT/results/$RUN_ID"', text)
 
+    def test_receptor_context_explicitly_excludes_nonprotein_heteroatoms(self):
+        text = SMOKE.read_text(encoding="utf-8")
+        extract_invocation = '"$PYTHON" "$EXTRACT"'
+        self.assertIn(extract_invocation, text)
+        self.assertIn('--protein-only', text[text.index(extract_invocation):])
+
 
 if __name__ == "__main__":
     unittest.main()
