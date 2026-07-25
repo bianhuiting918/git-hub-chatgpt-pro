@@ -26,22 +26,40 @@ if [ "$actual_sha" != "$EXPECTED_SHA256" ]; then
 fi
 tar -tzf "$TARBALL" >/dev/null
 
-if [ -e "$SOURCE_DIR" ] || [ -e "$INSTALL_DIR" ]; then
-  printf '%s FAIL_EXISTING_PATH source=%s install=%s\n' "$(date -Is)" "$SOURCE_DIR" "$INSTALL_DIR"
+required=(autosite autogrid4 prepare_receptor)
+if [ -e "$INSTALL_DIR" ]; then
+  complete=1
+  for command_name in "${required[@]}"; do
+    [ -x "$INSTALL_DIR/bin/$command_name" ] || complete=0
+  done
+  if [ "$complete" -eq 1 ]; then
+    printf '%s PASS_EXISTING sha256=%s\n' "$(date -Is)" "$actual_sha"
+    exit 0
+  fi
+  printf '%s FAIL_PARTIAL_INSTALL path=%s\n' "$(date -Is)" "$INSTALL_DIR"
   exit 4
 fi
 
-tar -xzf "$TARBALL" -C "$SOURCE_ROOT"
+if [ -e "$SOURCE_DIR" ]; then
+  if [ ! -x "$SOURCE_DIR/install.sh" ]; then
+    printf '%s FAIL_INVALID_SOURCE path=%s\n' "$(date -Is)" "$SOURCE_DIR"
+    exit 5
+  fi
+  printf '%s REUSE_VERIFIED_SOURCE path=%s\n' "$(date -Is)" "$SOURCE_DIR"
+else
+  tar -xzf "$TARBALL" -C "$SOURCE_ROOT"
+  printf '%s EXTRACTED_SOURCE path=%s\n' "$(date -Is)" "$SOURCE_DIR"
+fi
+
 (
   cd "$SOURCE_DIR"
   ./install.sh -d "$INSTALL_DIR" -c 0
 )
 
-required=(autosite autogrid4 prepare_receptor)
 for command_name in "${required[@]}"; do
   if [ ! -x "$INSTALL_DIR/bin/$command_name" ]; then
     printf '%s FAIL_MISSING_EXECUTABLE path=%s\n' "$(date -Is)" "$INSTALL_DIR/bin/$command_name"
-    exit 5
+    exit 6
   fi
 done
 
