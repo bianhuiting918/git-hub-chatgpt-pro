@@ -486,7 +486,7 @@ def _gro_time(path):
 def _write_frame_index(path, frame_indices):
     lines = ["[ frames ]"]
     for start in range(0, len(frame_indices), 15):
-        lines.append(" ".join(str(index) for index in frame_indices[start : start + 15]))
+        lines.append(" ".join(str(index + 1) for index in frame_indices[start : start + 15]))
     path.write_text("\n".join(lines) + "\n")
 
 
