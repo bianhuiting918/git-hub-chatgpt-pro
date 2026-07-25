@@ -80,12 +80,25 @@ def _heavy(group):
     return group.select_atoms("not name H*")
 
 
+def _local_resname_matches_m1(record: dict, residue) -> bool:
+    expected = str(record["resname"])
+    observed = str(residue.resname)
+    if observed == expected:
+        return True
+    return (
+        expected == "ASP"
+        and observed == "ASH"
+        and int(record.get("resid", -1)) == 306
+        and int(residue.resid) == 306
+    )
+
+
 def _local_groups(universe, selection: dict, thr_atom):
     local_indices = []
     for record in selection["local_rmsd"]["local_residues"]:
         residue_instance = int(record["residue_instance"])
         residue = universe.residues[residue_instance - 1]
-        if residue.resname != record["resname"]:
+        if not _local_resname_matches_m1(record, residue):
             raise ValueError(
                 f"residue instance {residue_instance} is {residue.resname}, "
                 f"expected {record['resname']}"
