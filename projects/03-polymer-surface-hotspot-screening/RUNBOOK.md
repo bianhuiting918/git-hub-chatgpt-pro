@@ -127,16 +127,18 @@ Generate manifests only from frozen authoritative inputs:
 
 Expected outputs:
 
-    manifests/phase1a_exact_structures.tsv
-    manifests/phase1b_exact_sequence_predicted.tsv
-    manifests/phase1c_benchmark_shard.tsv
+    manifests/phase1a_pdb_experimental.tsv
+    manifests/phase1b_public_exact_sequence_predicted.tsv
+    manifests/phase1c_project_esmfold.tsv
+    manifests/phase1d_benchmark_shard.tsv
     manifests/manifest_summary.json
     manifests/SHA256SUMS
 
 Before use, inspect:
 
 - PET versus nylon counts;
-- exact PDB versus predicted counts;
+- PDB experimental versus public predicted versus project ESMFold counts;
+- legacy EXACT_OR_PUBLIC_STRUCTURE rows reclassified by row-level provenance;
 - activity evidence labels;
 - sequence MD5 counts;
 - structure checksums;
@@ -149,10 +151,12 @@ Before use, inspect:
 Minimum smoke controls:
 
 - PET 6ILW;
-- at least one additional PET exact structure;
+- at least one additional PET PDB-experimental structure;
 - NylC 3AXG standardized-chain context;
 - NylC 3AXG biological-assembly context;
-- at least one exact inactive or screen-negative control if present in the frozen manifest.
+- NylB 1WYB;
+- PA66 hydrolase Nyl50 9DYS;
+- at least one PDB-experimental inactive or screen-negative control if present in the frozen manifest.
 
 Run with at most 8 CPUs:
 
@@ -178,7 +182,7 @@ Do not interpret results if SMOKE_PASS.json is absent.
 Only after smoke PASS:
 
     bash scripts/submit_benchmark.sh \
-      --manifest manifests/phase1c_benchmark_shard.tsv \
+      --manifest manifests/phase1d_benchmark_shard.tsv \
       --max-total-cpus 64 \
       --run-id benchmark_20260725_a
 
@@ -194,7 +198,7 @@ Do not cancel, resubmit, or overwrite completed records without explicit authori
 After all array tasks finish or have terminal failure records:
 
     python scripts/audit_results.py \
-      --manifest manifests/phase1c_benchmark_shard.tsv \
+      --manifest manifests/phase1d_benchmark_shard.tsv \
       --results results/benchmark_20260725_a \
       --audit-dir audits/benchmark_20260725_a
 
