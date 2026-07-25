@@ -776,3 +776,10 @@ The first audit submission requested 4000 MB per CPU and was rejected by SCNet b
 ### M1 partial 0-400 ps diagnostic
 
 CPU job 61803323 read only the already complete 0-400 ps portion of the running fully unrestrained trajectory and completed 0:0. This is PARTIAL_DIAGNOSTIC evidence only: 0/201 strict NAC frames; favorable Thr-OH-to-Nalpha geometry 1/201 (0.50%, one frame at 82 ps); favorable Thr-OH-to-water geometry 175/201 (87.06%, 107 strong frames); favorable direct Thr-OH-to-Asp306/Asp308 geometry 0/201. Because no NAC occurred in this partial window, it cannot approve or reject a post-relay mechanism. The 1 ns and 20 ns jobs continue unchanged.
+
+
+### M1 first 1 ns fully unconstrained result
+
+Rebalance job 61801789 completed 0:0. All restrained and release stages were technically clean, and the final 1 ns NPT window was fully unconstrained. The 501 frames had 0 strict NAC frames. End attack geometry was 1.025632 nm and 158.724 degrees. Mean temperature was 300.0217 K, mean pressure 4.8443 bar, minimum heavy ligand-protein contact 0.258745 nm, and FATAL/LINCS/SETTLE/NaN counts were zero. Scientific status is FAIL_UNRESTRAINED_M1_NO_NAC and the current Step1 post-relay QM/MM gate is not eligible.
+
+This 1 ns scientific failure does not stop the planned longer sampling. Dependent job 61801874 started automatically and extends the same fully unconstrained M1 checkpoint from 1 to 20 ns. Independent full-window audit job 61803121 remains queued afterany:61801874.
