@@ -18,6 +18,11 @@ SELECTION="$TASK_ROOT/ensemble/selection_job_61813011/ensemble_selection.json"
 PYTHON=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 GMX=/public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi
 STAGEA_ARRAY_JOB_ID="${STAGEA_ARRAY_JOB_ID:?submit with --export=ALL,STAGEA_ARRAY_JOB_ID=<Stage A array>}"
+STAGEA_RUN_PREFIX="${STAGEA_RUN_PREFIX:-stageA_job}"
+case "$STAGEA_RUN_PREFIX" in
+    stageA_job|stageA_resume_job) ;;
+    *) echo "invalid STAGEA_RUN_PREFIX: $STAGEA_RUN_PREFIX" >&2; exit 2 ;;
+esac
 JOB_ID="${SLURM_JOB_ID:?SLURM_JOB_ID is required}"
 OUT="$TASK_ROOT/ensemble/stageA_rank_job_$JOB_ID"
 expected_stageA_slots=36
@@ -61,7 +66,7 @@ if [[ -e "$OUT" ]]; then
     exit 2
 fi
 mkdir -p "$OUT"
-append_history START "parent_stageA_array=$STAGEA_ARRAY_JOB_ID;expected_stageA_slots=$expected_stageA_slots;dependency=afterany"
+append_history START "parent_stageA_array=$STAGEA_ARRAY_JOB_ID;stageA_run_prefix=$STAGEA_RUN_PREFIX;expected_stageA_slots=$expected_stageA_slots;dependency=afterany"
 
 failed=1
 current=initialization
@@ -118,7 +123,7 @@ PY
 )"
     CANDIDATE_ROOT="$TASK_ROOT/ensemble/candidates/$candidate_id"
     BUILD="$CANDIDATE_ROOT/build_job_61813799_$candidate_index/build"
-    RUN_ROOT="$CANDIDATE_ROOT/replicas/seed$seed/stageA_job_${STAGEA_ARRAY_JOB_ID}_${task_id}"
+    RUN_ROOT="$CANDIDATE_ROOT/replicas/seed$seed/${STAGEA_RUN_PREFIX}_${STAGEA_ARRAY_JOB_ID}_${task_id}"
     AUDIT_ROOT="$RUN_ROOT/stageA_audit_job_$JOB_ID"
     mkdir -p "$AUDIT_ROOT"
     AUDIT_JSON="$AUDIT_ROOT/replica_audit.json"
