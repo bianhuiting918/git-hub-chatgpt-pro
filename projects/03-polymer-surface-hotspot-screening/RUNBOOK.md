@@ -1,0 +1,275 @@
+# RUNBOOK: PET and nylon surface hotspot screening
+
+## Purpose
+
+Run the Phase 1 AutoSite/AutoGrid4 coarse-grained screen on Sugon while preserving exact input denominators, structure provenance, technical failures, and scientific interpretation boundaries.
+
+This runbook does not authorize recomputation of existing PASS artifacts.
+
+## Fixed locations
+
+Repository:
+
+    https://github.com/bianhuiting918/git-hub-chatgpt-pro
+
+Branch during development:
+
+    codex/polymer-surface-hotspot-screening-phase1
+
+Remote CPU project:
+
+    /Dell/Dell14/bianht/enzyme_scaffold_search_v2
+
+Remote Phase 1 root:
+
+    /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+
+Authoritative existing result package to inspect read-only:
+
+    /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715
+
+CPU limit:
+
+    64
+
+## Connection
+
+Use the configured SSH route:
+
+    ssh bianht@210.73.40.29
+
+Do not bypass the SSH configuration. If the configured BindAddress is unavailable, stop and restore the approved network route.
+
+## Required remote directory tree
+
+After confirming the resolved root, create:
+
+    software/downloads
+    software/ADFRsuite
+    envs
+    cache
+    inputs
+    manifests
+    work
+    results/gates
+    logs
+    scripts
+    audits
+
+No directory is created before the root check succeeds.
+
+## Phase 0: read-only inventory
+
+From a commit-pinned source snapshot on the server:
+
+    cd /Dell/Dell14/bianht/enzyme_scaffold_search_v2
+    bash polymer_surface_hotspot_screen_20260725/scripts/inventory_remote.sh
+
+Record:
+
+- hostname and filesystem;
+- scheduler visibility;
+- existing tools;
+- exact manifest locations;
+- free space;
+- whether the phase root already exists.
+
+Expected: no mutation.
+
+## Phase 1: software installation
+
+The installer is unprivileged and idempotent.
+
+    cd /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+    bash scripts/install_phase1.sh
+
+Required components:
+
+- ADFRsuite containing AutoSite, AutoGrid4, prepare_receptor, and AGFR;
+- isolated Python 3.11 analysis environment;
+- NumPy, SciPy, pandas, Biopython, PyYAML, RDKit, FreeSASA, pytest.
+
+The installer must write download URL, timestamp, byte count, and SHA256 for every installer/archive.
+
+Pass artifact:
+
+    results/gates/INSTALL_PASS.json
+
+If absent, do not proceed.
+
+## Phase 2: probe manifest
+
+The primary map scan has no explicit ligand file.
+
+The explicit probe manifest is for validation stages and chemistry controls. Build and validate it with RDKit:
+
+    python scripts/build_probe_library.py \
+      --manifest config/probes.tsv \
+      --output-dir inputs/probes \
+      --summary manifests/probe_summary.json
+
+Required checks:
+
+- every active SMILES parses;
+- formal charge matches;
+- heavy-atom and total-atom counts match;
+- canonical SMILES and SDF checksums are recorded;
+- deferred oligomers are not silently generated from guesses.
+
+## Phase 3: structure manifest
+
+Generate manifests only from frozen authoritative inputs:
+
+    python scripts/build_structure_manifest.py \
+      --handoff-root /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715 \
+      --output-dir manifests \
+      --seed 20260725
+
+Expected outputs:
+
+    manifests/phase1a_exact_structures.tsv
+    manifests/phase1b_exact_sequence_predicted.tsv
+    manifests/phase1c_benchmark_shard.tsv
+    manifests/manifest_summary.json
+    manifests/SHA256SUMS
+
+Before use, inspect:
+
+- PET versus nylon counts;
+- exact PDB versus predicted counts;
+- activity evidence labels;
+- sequence MD5 counts;
+- structure checksums;
+- catalytic mapping source;
+- biological assembly context;
+- exclusions and NOT_EVALUATED categories.
+
+## Phase 4: smoke test
+
+Minimum smoke controls:
+
+- PET 6ILW;
+- at least one additional PET exact structure;
+- NylC 3AXG standardized-chain context;
+- NylC 3AXG biological-assembly context;
+- at least one exact inactive or screen-negative control if present in the frozen manifest.
+
+Run with at most 8 CPUs:
+
+    bash scripts/run_smoke.sh \
+      --manifest manifests/phase1a_smoke.tsv \
+      --cpus 8 \
+      --run-id smoke_20260725_a
+
+Repeat under a second run ID for determinism.
+
+Required outputs:
+
+    results/smoke_20260725_a/summary.tsv
+    results/smoke_20260725_a/patches.tsv
+    results/smoke_20260725_a/failures.tsv
+    results/smoke_20260725_a/runtime.tsv
+    results/gates/SMOKE_PASS.json
+
+Do not interpret results if SMOKE_PASS.json is absent.
+
+## Phase 5: benchmark shard
+
+Only after smoke PASS:
+
+    bash scripts/submit_benchmark.sh \
+      --manifest manifests/phase1c_benchmark_shard.tsv \
+      --max-total-cpus 64 \
+      --run-id benchmark_20260725_a
+
+Monitor read-only:
+
+    squeue -u "$USER"
+    sacct -j JOB_ID --format=JobID,State,ExitCode,Elapsed,MaxRSS,AllocCPUS
+
+Do not cancel, resubmit, or overwrite completed records without explicit authorization.
+
+## Phase 6: merge and audit
+
+After all array tasks finish or have terminal failure records:
+
+    python scripts/audit_results.py \
+      --manifest manifests/phase1c_benchmark_shard.tsv \
+      --results results/benchmark_20260725_a \
+      --audit-dir audits/benchmark_20260725_a
+
+Required gate:
+
+    results/gates/BENCHMARK_PASS.json
+
+COMPLETE, scheduler exit 0, or presence of all shard files is not sufficient.
+
+## Output interpretation
+
+Primary outputs are channel-specific:
+
+- C catalytic enrichment;
+- OA catalytic enrichment;
+- HD catalytic enrichment;
+- maximum equal-area off-target patch;
+- within-protein catalytic percentile;
+- global sticky-surface fraction.
+
+Secondary composites:
+
+- PET = mean(z_C, z_OA);
+- nylon = mean(z_C, z_OA, z_HD).
+
+These are screening proxies, not binding energies.
+
+## Failure handling
+
+Examples:
+
+- NOT_EVALUATED_MISSING_STRUCTURE
+- NOT_EVALUATED_STRUCTURE_PARSE
+- NOT_EVALUATED_CATALYTIC_MAPPING
+- NOT_EVALUATED_RECEPTOR_PREP
+- NOT_EVALUATED_GRID
+- NOT_EVALUATED_SURFACE_SHELL
+- NOT_EVALUATED_PATCH_GENERATION
+- CATALYTIC_REGION_NO_AUTOSITE_CLUSTER
+- SHELL_SASA_DISAGREEMENT
+
+Later records continue after a single-record failure. Retry policy is decided only after failure counts are reviewed.
+
+## Run history
+
+Append one TSV row per actual run to:
+
+    logs/run_history.tsv
+
+Columns:
+
+    timestamp_local
+    timestamp_utc
+    git_commit
+    run_id
+    script
+    parameters
+    input_manifest
+    input_sha256
+    output_path
+    scheduler_job_id
+    exit_status
+    n_input
+    n_evaluated
+    n_failed
+    n_not_evaluated
+    summary
+
+Never write secrets into this file.
+
+## Recovery
+
+- Re-run inventory before resuming after a connection outage.
+- Use checksum-validated record completion markers.
+- Never infer completion from a nonempty directory.
+- Never overwrite existing run IDs.
+- Create a new run ID for parameter changes.
+- Preserve failed logs until the failure ledger and audit are complete.
