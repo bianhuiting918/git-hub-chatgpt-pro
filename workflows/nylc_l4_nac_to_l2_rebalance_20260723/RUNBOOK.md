@@ -762,3 +762,12 @@ Run chain:
 3. `sbatch --dependency=afterok:61801789 --export=ALL,M1_REBAL_JOB=61801789 slurm/run_nylc_m1_free20ns.sbatch` (job 61801874): extend the fully unrestrained window from 1 to 20 ns only after technical completion of the rebalance chain.
 
 Restrained stages are never scientific PASS. Judge only the fully unrestrained window using NAC distance <=0.35 nm, attack angle 95-115 degrees, gate residues 261-266 excluding Thr267, temperature/pressure stability, and LINCS/SETTLE/NaN/FATAL counts. Fixed-topology MM geometry ranks preorganization only and cannot execute proton transfer or determine a barrier.
+
+
+### M1 full 0-20 ns independent audit
+
+The M1 geometry analyzer passed a multi-trajectory contract: two input XTCs are accepted, a shared boundary timestamp is de-duplicated, and the actual topology remains Nalpha H1/H2 plus Asp306 HD2.
+
+Independent audit job 61803121 is queued with dependency afterany:61801874. It analyzes the first free 1 ns and the 19 ns extension as one 0-20 ns denominator. It independently recomputes NAC distance/angle and lowest-potential NAC selection, Thr-OH routes to Nalpha/water/Asp, gate opening using residues 261-266 excluding Thr267, temperature/pressure/volume stability, final ligand-protein contact and numerical warnings. Post-relay QM/MM construction is eligible only if the complete technical/thermodynamic/contact gates pass, at least one NAC frame exists, and at least one favorable Thr-OH-to-Nalpha geometry occurs within NAC frames. This is a preorganization gate, not proof of proton transfer.
+
+The first audit submission requested 4000 MB per CPU and was rejected by SCNet before any job was created. The corrected 2500 MB per CPU request is job 61803121; both events are retained in run_history.
