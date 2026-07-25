@@ -153,4 +153,3 @@ def test_time_discontinuity_starts_a_new_nac_event():
         (0.0, 2.0),
         (6.1, 6.1),
     ]
-
