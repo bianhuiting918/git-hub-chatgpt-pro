@@ -21,7 +21,9 @@ JOB_ID="${SLURM_ARRAY_JOB_ID:?SLURM_ARRAY_JOB_ID is required}"
 ARRAY_ID="${SLURM_ARRAY_TASK_ID:?SLURM_ARRAY_TASK_ID is required}"
 EVENT=nylc_m1_real_nac_em
 
+set +u
 source /work/home/acshdt1dks/opt/gmx-cp2k/env.sh
+set -u
 export GMX_MAXBACKUP=-1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
 
