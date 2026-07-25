@@ -276,7 +276,7 @@ Read but do not modify:
 
     /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715
 
-Locate the existing PET and nylon exact experimental panels, structure manifests, activity labels, structure links, and catalytic annotations.
+Locate the existing PET and nylon assayed panels, structure manifests, activity labels, structure links, and catalytic annotations. Treat the legacy EXACT_OR_PUBLIC_STRUCTURE field as mixed-source until each row is reclassified from PDB/wwPDB metadata or the named prediction provider.
 
 **Step 2: Define manifest columns**
 
@@ -319,9 +319,10 @@ Tests must reject:
 
 Generate:
 
-    manifests/phase1a_exact_structures.tsv
-    manifests/phase1b_exact_sequence_predicted.tsv
-    manifests/phase1c_benchmark_shard.tsv
+    manifests/phase1a_pdb_experimental.tsv
+    manifests/phase1b_public_exact_sequence_predicted.tsv
+    manifests/phase1c_project_esmfold.tsv
+    manifests/phase1d_benchmark_shard.tsv
     manifests/manifest_summary.json
 
 The benchmark shard selection uses a fixed seed and stores the selection rationale.
@@ -507,7 +508,7 @@ Commit message:
 
     feat: compare catalytic and off-target surface patches
 
-## Task 10: Run exact-structure smoke tests
+## Task 10: Run PDB-experimental smoke tests
 
 **Files:**
 
@@ -518,11 +519,13 @@ Commit message:
 
 Minimum:
 
-- one PET exact structure, preferably 6ILW;
-- one additional PET family control;
+- PET 6ILW;
+- one additional PET PDB-experimental family control;
 - NylC 3AXG standardized-chain receptor;
 - NylC 3AXG biological assembly context;
-- at least one experimentally inactive or screen-negative exact structure if available.
+- NylB 1WYB;
+- PA66 hydrolase Nyl50 9DYS;
+- at least one experimentally inactive or screen-negative PDB-experimental structure if available.
 
 **Step 2: Run in foreground or a small Slurm job**
 
@@ -668,4 +671,4 @@ Check that no local or server-only artifacts are committed and all planned comma
 
 **Step 3: Keep Draft status**
 
-Do not mark ready or merge until exact-structure smoke and benchmark audit artifacts are reviewed.
+Do not mark ready or merge until PDB-experimental smoke and benchmark audit artifacts are reviewed.
