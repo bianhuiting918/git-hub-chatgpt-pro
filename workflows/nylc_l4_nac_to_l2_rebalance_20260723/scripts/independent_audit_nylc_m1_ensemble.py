@@ -122,18 +122,57 @@ def _replica_metrics(record: dict, forbidden: list[str]) -> dict:
         right <= left for left, right in zip(times, times[1:])
     ):
         raise ValueError("primitive frame times are non-finite, duplicated or unordered")
-    nac_count = sum(bool(frame["nac"]) for frame in frames)
-    bound = all(bool(frame["bound"]) for frame in frames)
+    required_geometry = (
+        "distance_nm",
+        "angle_deg",
+        "pocket_contact_count",
+        "ligand_pocket_com_nm",
+    )
+    for frame in frames:
+        missing = [key for key in required_geometry if key not in frame]
+        if missing:
+            raise ValueError(f"primitive frame lacks raw geometric values: {missing}")
+        if any(
+            not math.isfinite(float(frame[key]))
+            for key in ("distance_nm", "angle_deg", "ligand_pocket_com_nm")
+        ):
+            raise ValueError("primitive frame contains non-finite geometry")
+    recomputed_frames = [
+        {
+            **frame,
+            "nac": (
+                float(frame["distance_nm"]) <= 0.35
+                and 95.0 <= float(frame["angle_deg"]) <= 115.0
+            ),
+        }
+        for frame in frames
+    ]
+    nac_count = sum(bool(frame["nac"]) for frame in recomputed_frames)
+    minimum_contact = record.get("minimum_contact")
+    if not isinstance(minimum_contact, dict):
+        raise ValueError("Stage B replica lacks minimum-contact primitives")
+    minimum_protein = float(minimum_contact["minimum_ligand_protein_heavy_nm"])
+    minimum_water = float(minimum_contact["minimum_ligand_water_heavy_nm"])
+    if not all(math.isfinite(value) for value in (minimum_protein, minimum_water)):
+        raise ValueError("minimum-contact primitives contain non-finite values")
+    severe_clash = minimum_protein < 0.18
+    final_frame = recomputed_frames[-1]
+    bound = (
+        not severe_clash
+        and int(final_frame["pocket_contact_count"]) >= 3
+        and float(final_frame["ligand_pocket_com_nm"]) <= 1.2
+    )
     return {
         "candidate_id": str(record["candidate_id"]),
         "velocity_seed": int(record["velocity_seed"]),
         "technical_pass": technical,
         "thermodynamic_pass": bool(record["thermodynamics"]["stable"]),
-        "frame_count": len(frames),
+        "frame_count": len(recomputed_frames),
         "nac_frame_count": nac_count,
-        "nac_occupancy": nac_count / len(frames),
-        "longest_nac_event_ps": _longest_event(frames),
+        "nac_occupancy": nac_count / len(recomputed_frames),
+        "longest_nac_event_ps": _longest_event(recomputed_frames),
         "bound": bound,
+        "severe_clash": severe_clash,
         "advertised_scientific_status": record.get("advertised_scientific_status"),
         "path": str(record["path"]),
     }
