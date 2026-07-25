@@ -163,7 +163,7 @@ def test_stage_b_exact_pass_gate():
 
 
 @pytest.mark.parametrize(
-    "audits,reason",
+    "audits,reason,expected_status",
     [
         (
             [
@@ -172,14 +172,17 @@ def test_stage_b_exact_pass_gate():
                 stage_b_replica(SEEDS[2], nac_frames=0),
             ],
             "INSUFFICIENT_NAC_REPLICA_REPRODUCTION",
+            "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC",
         ),
         (
             [stage_b_replica(seed, nac_frames=1, denominator=200) for seed in SEEDS],
             "POOLED_NAC_OCCUPANCY_BELOW_0.01",
+            "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC",
         ),
         (
             [stage_b_replica(seed, longest=2.0) for seed in SEEDS],
             "LONGEST_NAC_EVENT_BELOW_4PS",
+            "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC",
         ),
         (
             [
@@ -188,6 +191,7 @@ def test_stage_b_exact_pass_gate():
                 stage_b_replica(SEEDS[2]),
             ],
             "UNBOUND_REPLICA",
+            "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC",
         ),
         (
             [
@@ -196,15 +200,17 @@ def test_stage_b_exact_pass_gate():
                 stage_b_replica(SEEDS[2]),
             ],
             "TECHNICAL_FAILURE",
+            "NOT_EVALUATED_TECHNICAL_FAILURE",
         ),
         (
             [stage_b_replica(seed, reproduced_clusters=0) for seed in SEEDS],
             "NO_REPRODUCED_CROSS_REPLICA_CLUSTER",
+            "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC",
         ),
     ],
 )
-def test_stage_b_preserves_each_failed_gate_reason(audits, reason):
+def test_stage_b_preserves_each_failed_gate_reason(audits, reason, expected_status):
     decision = gate_stage_b(audits)
 
-    assert decision["scientific_status"] == "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC"
+    assert decision["scientific_status"] == expected_status
     assert reason in decision["failed_gates"]
