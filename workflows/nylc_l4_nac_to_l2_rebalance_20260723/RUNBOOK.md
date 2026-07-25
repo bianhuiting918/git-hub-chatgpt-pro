@@ -353,6 +353,7 @@ C/H/N/O 3OB-3-1 coverage, `qmcharge=0`, singlet spin and even electron parity.
 It then runs one DFTB3 minimization step plus one 20-step segment.  A numerical
 PASS is not a TS, reaction coordinate, barrier, PMF or Step2 endpoint.
 
+
 The PETase TS workflow is reused only methodologically: choose GS
 representatives within an audited reactant/NAC basin, validate any candidate RC
 with independent aimless shooting/committor outcomes and endpoint separation,
@@ -744,25 +745,88 @@ The full PDB has no CONECT records, so viewer-inferred long bonds are display
 artifacts and are not present in the Amber topology.
 
 
+
+## NylC fixed-topology MM proton-geometry extension (2026-07-24)
+
+Purpose: extend the fully unrestrained NylC-C18 PA66-L2 M0-like trajectory from 1 ns to 20 ns total and rank geometric preorganization of Thr267 Oγ-Hγ toward Asp306, Asp308, explicit water, and Thr267 Nα.
+
+Scientific boundary: this is a fixed-topology classical-MM geometry screen. It cannot move a proton, prove NαH3+ becomes NαH2, establish a proton-transfer free-energy barrier, or identify a transition state.
+
+Authoritative source:
+- candidate: `nylc_C18_trueT267_freeGS`
+- source job: `61708900`
+- source window: fully unrestrained `npt300free`
+- source TPR SHA256: `9c8ba480b5b485e00b411e426db568a82b182fb94c76d47215794a2f45e05fae`
+- source CPT SHA256: `2e064837a3f1e375cd942adbf65b236b8f021a3784a0ec646f851ba84f25dda3`
+- gate residues remain 261-266; Thr267 is excluded from the gate group.
+
+Run:
+```bash
+sbatch slurm/run_nylc_mm_proton_geometry_ext19ns.sbatch
+```
+
+The job creates `runs/mm_proton_geometry_ext19ns_job_<jobid>`, performs a 19 ns continuation with no positional restraints, runs the saved proton-geometry analyzer, and writes `PASS.json` only after numerical and duration checks. `PASS_TECHNICAL_MM_GEOMETRY_EXTENSION` is not evidence of proton transfer.
+
+## Provisional 11.24 ns proton-geometry screen (job 61797226)
+
+This interim analysis used a stable snapshot of the still-running fully
+unrestrained trajectory from 1000 to 11240 ps at 10 ps spacing (1025 frames).
+It is marked PROVISIONAL_PARTIAL_MM_GEOMETRY_SCREEN and cannot replace the
+completed 20 ns audit or prove proton transfer.
+
+Strict favorable geometry was donor-acceptor <= 3.5 A, hydrogen-acceptor <=
+2.5 A, and donor-H-acceptor angle >= 135 degrees. Across all frames:
+Thr-OgH->water was 297/1025 (28.98%; strong 230/1025), Thr-OgH->Asp306 was
+41/1025 (4.00%; strong 30/1025), and both Thr-OgH->Nalpha and
+Thr-OgH->Asp308 were 0/1025. The maximum Thr-OgH->Nalpha angle was only
+109.14 degrees, so its failure is angular rather than a simple heavy-atom
+distance cutoff.
+
+Only 15/1025 downsampled frames met the strict NAC definition, and none of
+the four proton-acceptor routes met the strict favorable geometry
+simultaneously in those 15 frames. Therefore the provisional Nalpha
+preorganization gate is NOT_SUPPORTED; the conditional
+NalphaH3+/Og-/Asp306H/Asp308- post-relay QM/MM builder must not be activated
+from this interim result. The main 20 ns job 61780674 continues, and only its
+completed full-resolution audit is final.
+
+## Provisional same-water two-hop relay screen (job 61798355)
+
+- Source: partial fixed-topology MM snapshot, 1000-11240 ps, 10 ps stride, 1025 frames.
+- Scope: same-water two-hop geometry only; no proton transfer and no final scientific gate.
+- Thr->water favorable: 297/1025; same-water relay to Nalpha: 0/1025; Asp306: 2/1025; Asp308: 0/1025.
+- Corrected output: `/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/analysis/water_relay_partial_job_61798355/summary.json`; the original literal `${job}` directory name was an sbatch escaping defect and scientific data were unchanged.
+- Final authority remains the complete 20 ns trajectory analyzed at 2 ps stride.
+
+## M0 interpretation guard for the 20 ns geometry screen
+
+The running job 61780674 uses fixed-topology `M0_like_NalphaH3`. Its final 2-ps analysis may rank geometric preorganization, NAC conditioning, water/Asp contacts and numerical stability, but it cannot observe proton transfer. Zero Nalpha-preorganization occupancy must be reported as `NOT_SUPPORTED_IN_M0`, not as exclusion of an `NalphaH2` mechanism. A positive M0 proxy may nominate a proton- and charge-conserving post-relay QM/MM hypothesis; a negative proxy requires a conserved neutral-Nalpha microstate control before mechanistic rejection. Technical completion remains distinct from scientific mechanism support.
+
+Machine-readable policy: `audit/mm_m0_interpretation_gate_20260725.json`.
+
 ## M1 NalphaH2 / Asp306H classical microstate (2026-07-25)
 
 Scientific definition: Thr267-NalphaH2, Thr267-OgammaH, Asp306H (ASH-HD2), Asp308-, with total proton count and active-chain charge conserved. This is a classical fixed-topology neutral-Nalpha proxy, not a new RESP fit and not evidence that a proton transfers.
 
-Authoritative technical gates:
-
-- build/preflight job 61801089: Nalpha H1/H2 only, Asp306 HD2, Asp308-, active-chain charge -4 before and after, grompp -maxwarn 0, minimum chain-rest distance 0.1054703 nm;
-- selected coordinate is the lowest instantaneous-potential fully unrestrained NAC frame from the preserved M0 coordinate trajectory: 1462 ps, 0.339 nm, 110.677 degrees;
-- EM job 61801703: PASS_TECHNICAL_EM, double-precision flexible-water CG, Fmax 449.248847 kJ mol-1 nm-1, no hard numerical warning;
-- analyzer contract: actual TPR reports Nalpha hydrogen names H1/H2, Asp306 proton HD2, 40990 explicit waters, and microstate label M1_NalphaH2_Asp306H.
+Authoritative build/preflight:
+- job 61801089
+- build PASS: candidates/nylc_C18_trueT267_freeGS/microstates/M1_nalphaH2_Asp306H/build_job_61801089/PASS.json
+- selected source: lowest instantaneous potential among fully unrestrained NAC frames from preserved job 61780674 coordinates, at 1462 ps (0.339 nm, 110.677 deg)
+- Nalpha has H1/H2 only; Asp306 is ASH-HD2; Asp308 remains ASP-
+- active-chain charge -4 before and after; grompp -maxwarn 0; minimum chain-rest distance 0.1054703 nm
 
 Run chain:
+1. EM: sbatch slurm/run_nylc_m1_em.sbatch
+   - job 61801703; PASS_TECHNICAL_EM; Fmax 449.248847 kJ mol-1 nm-1; no hard numerical warning.
+2. Rebalance and first free window:
+   - sbatch --export=ALL,M1_EM_JOB=61801703 slurm/run_nylc_m1_rebalance.sbatch
+   - job 61801789
+   - strong protein+L2 heavy-atom restraints at 50/150 K, weak restraints at 300 K, gradual release, then 1 ns fully unrestrained NPT.
+3. Long fully unrestrained extension:
+   - sbatch --dependency=afterok:61801789 --export=ALL,M1_REBAL_JOB=61801789 slurm/run_nylc_m1_free20ns.sbatch
+   - job 61801874; extends the free window from 1 ns to 20 ns if and only if the rebalance job exits technically cleanly.
 
-1. `sbatch slurm/run_nylc_m1_em.sbatch` (job 61801703).
-2. `sbatch --export=ALL,M1_EM_JOB=61801703 slurm/run_nylc_m1_rebalance.sbatch` (job 61801789): 50/150 K strong protein+L2 heavy-atom restraints, 300 K weak restraints, gradual release, then 1 ns fully unrestrained NPT.
-3. `sbatch --dependency=afterok:61801789 --export=ALL,M1_REBAL_JOB=61801789 slurm/run_nylc_m1_free20ns.sbatch` (job 61801874): extend the fully unrestrained window from 1 to 20 ns only after technical completion of the rebalance chain.
-
-Restrained stages are never scientific PASS. Judge only the fully unrestrained window using NAC distance <=0.35 nm, attack angle 95-115 degrees, gate residues 261-266 excluding Thr267, temperature/pressure stability, and LINCS/SETTLE/NaN/FATAL counts. Fixed-topology MM geometry ranks preorganization only and cannot execute proton transfer or determine a barrier.
-
+Scientific gate: restrained stages are never scientific PASS. The fully unrestrained window is judged using NAC distance <=0.35 nm, attack angle 95-115 deg, gate residues 261-266 excluding Thr267, temperature/pressure stability, and LINCS/SETTLE/NaN/FATAL counts. Fixed-topology MM distances/angles rank proton-transfer preorganization only; they do not perform proton transfer or establish a barrier.
 
 ### M1 full 0-20 ns independent audit
 
@@ -772,18 +836,15 @@ Independent audit job 61803121 is queued with dependency afterany:61801874. It a
 
 The first audit submission requested 4000 MB per CPU and was rejected by SCNet before any job was created. The corrected 2500 MB per CPU request is job 61803121; both events are retained in run_history.
 
-
 ### M1 partial 0-400 ps diagnostic
 
 CPU job 61803323 read only the already complete 0-400 ps portion of the running fully unrestrained trajectory and completed 0:0. This is PARTIAL_DIAGNOSTIC evidence only: 0/201 strict NAC frames; favorable Thr-OH-to-Nalpha geometry 1/201 (0.50%, one frame at 82 ps); favorable Thr-OH-to-water geometry 175/201 (87.06%, 107 strong frames); favorable direct Thr-OH-to-Asp306/Asp308 geometry 0/201. Because no NAC occurred in this partial window, it cannot approve or reject a post-relay mechanism. The 1 ns and 20 ns jobs continue unchanged.
-
 
 ### M1 first 1 ns fully unconstrained result
 
 Rebalance job 61801789 completed 0:0. All restrained and release stages were technically clean, and the final 1 ns NPT window was fully unconstrained. The 501 frames had 0 strict NAC frames. End attack geometry was 1.025632 nm and 158.724 degrees. Mean temperature was 300.0217 K, mean pressure 4.8443 bar, minimum heavy ligand-protein contact 0.258745 nm, and FATAL/LINCS/SETTLE/NaN counts were zero. Scientific status is FAIL_UNRESTRAINED_M1_NO_NAC and the current Step1 post-relay QM/MM gate is not eligible.
 
 This 1 ns scientific failure does not stop the planned longer sampling. Dependent job 61801874 started automatically and extends the same fully unconstrained M1 checkpoint from 1 to 20 ns. Independent full-window audit job 61803121 remains queued afterany:61801874.
-
 
 ## Twelve-event real-NAC M1 ensemble (2026-07-25)
 
