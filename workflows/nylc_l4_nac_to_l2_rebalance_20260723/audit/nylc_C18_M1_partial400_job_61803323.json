@@ -1,0 +1,369 @@
+{
+  "candidate_id": "nylc_C18_trueT267_freeGS",
+  "fixed_topology_warning": "Geometry only; no proton transfer or barrier inference.",
+  "microstate": "M1_NalphaH2_Asp306H",
+  "nac": {
+    "frame_count": 201,
+    "gates": {
+      "angle_max_deg": 115.0,
+      "angle_min_deg": 95.0,
+      "distance_max_nm": 0.35
+    },
+    "longest_continuous_nac": null,
+    "lowest_potential_nac_frame": null,
+    "nac_frame_count": 0,
+    "nac_occupancy": 0.0,
+    "nac_run_count": 0,
+    "schema_version": 1,
+    "time_end_ps": 400.0,
+    "time_start_ps": 0.0
+  },
+  "proton_geometry": {
+    "OgH_to_Asp306": {
+      "all_frames": {
+        "d_a_A": {
+          "max": 6.263665955821069,
+          "mean": 5.034031507860127,
+          "median": 5.015348066610291,
+          "min": 3.8944926339724284,
+          "n": 201,
+          "p05": 4.379277290408034
+        },
+        "denominator_frames": 201,
+        "dha_deg": {
+          "max": 168.69309548939722,
+          "mean": 64.43528040102863,
+          "median": 54.926936831085165,
+          "min": 2.5606676494464224,
+          "n": 201,
+          "p05": 19.577693365010212
+        },
+        "favorable_frames": 0,
+        "favorable_occupancy": 0.0,
+        "h_a_A": {
+          "max": 7.201921189958996,
+          "mean": 5.344330486746152,
+          "median": 5.423105056798463,
+          "min": 3.7117207265615066,
+          "n": 201,
+          "p05": 4.245685391046744
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 0.0,
+          "end_frame": null,
+          "end_ps": null,
+          "frame_count": 0,
+          "start_frame": null,
+          "start_ps": null
+        },
+        "strong_frames": 0,
+        "strong_occupancy": 0.0,
+        "top_favorable_water": null
+      },
+      "nac_frames": {
+        "d_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "denominator_frames": 0,
+        "dha_deg": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "favorable_frames": 0,
+        "favorable_occupancy": null,
+        "h_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 0.0,
+          "end_frame": null,
+          "end_ps": null,
+          "frame_count": 0,
+          "start_frame": null,
+          "start_ps": null
+        },
+        "strong_frames": 0,
+        "strong_occupancy": null,
+        "top_favorable_water": null
+      }
+    },
+    "OgH_to_Asp308": {
+      "all_frames": {
+        "d_a_A": {
+          "max": 8.637992227534705,
+          "mean": 7.7657332814117925,
+          "median": 7.740575464431599,
+          "min": 6.750455228248647,
+          "n": 201,
+          "p05": 7.250834443998685
+        },
+        "denominator_frames": 201,
+        "dha_deg": {
+          "max": 125.03856827446326,
+          "mean": 44.60331118467938,
+          "median": 41.03466551232975,
+          "min": 1.771118302373795,
+          "n": 201,
+          "p05": 12.011208121808947
+        },
+        "favorable_frames": 0,
+        "favorable_occupancy": 0.0,
+        "h_a_A": {
+          "max": 9.410879092854623,
+          "mean": 8.364199191583316,
+          "median": 8.370305157461562,
+          "min": 6.501790983917844,
+          "n": 201,
+          "p05": 7.623043557041746
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 0.0,
+          "end_frame": null,
+          "end_ps": null,
+          "frame_count": 0,
+          "start_frame": null,
+          "start_ps": null
+        },
+        "strong_frames": 0,
+        "strong_occupancy": 0.0,
+        "top_favorable_water": null
+      },
+      "nac_frames": {
+        "d_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "denominator_frames": 0,
+        "dha_deg": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "favorable_frames": 0,
+        "favorable_occupancy": null,
+        "h_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 0.0,
+          "end_frame": null,
+          "end_ps": null,
+          "frame_count": 0,
+          "start_frame": null,
+          "start_ps": null
+        },
+        "strong_frames": 0,
+        "strong_occupancy": null,
+        "top_favorable_water": null
+      }
+    },
+    "OgH_to_Nalpha_preorg": {
+      "all_frames": {
+        "d_a_A": {
+          "max": 3.115845267298593,
+          "mean": 2.838512959514514,
+          "median": 2.8302638493854206,
+          "min": 2.5914642919712234,
+          "n": 201,
+          "p05": 2.67187180075799
+        },
+        "denominator_frames": 201,
+        "dha_deg": {
+          "max": 136.65269100851648,
+          "mean": 65.1105852469182,
+          "median": 57.82977125677389,
+          "min": 7.0445125833196895,
+          "n": 201,
+          "p05": 13.745698687358566
+        },
+        "favorable_frames": 1,
+        "favorable_occupancy": 0.004975124378109453,
+        "h_a_A": {
+          "max": 3.9598512779652735,
+          "mean": 3.0671866015663305,
+          "median": 3.2816813718562248,
+          "min": 1.84403658228954,
+          "n": 201,
+          "p05": 2.1910315675288503
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 0.0,
+          "end_frame": 41,
+          "end_ps": 82.0,
+          "frame_count": 1,
+          "start_frame": 41,
+          "start_ps": 82.0
+        },
+        "strong_frames": 0,
+        "strong_occupancy": 0.0,
+        "top_favorable_water": null
+      },
+      "nac_frames": {
+        "d_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "denominator_frames": 0,
+        "dha_deg": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "favorable_frames": 0,
+        "favorable_occupancy": null,
+        "h_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 0.0,
+          "end_frame": null,
+          "end_ps": null,
+          "frame_count": 0,
+          "start_frame": null,
+          "start_ps": null
+        },
+        "strong_frames": 0,
+        "strong_occupancy": null,
+        "top_favorable_water": null
+      }
+    },
+    "OgH_to_water": {
+      "all_frames": {
+        "d_a_A": {
+          "max": 3.9598673133639184,
+          "mean": 2.9281527353582693,
+          "median": 2.863791796663971,
+          "min": 2.5537987380429104,
+          "n": 201,
+          "p05": 2.6541063995386205
+        },
+        "denominator_frames": 201,
+        "dha_deg": {
+          "max": 178.37721212690727,
+          "mean": 154.55734965948463,
+          "median": 158.78909628672068,
+          "min": 52.8844489862524,
+          "n": 201,
+          "p05": 129.42986924090997
+        },
+        "favorable_frames": 175,
+        "favorable_occupancy": 0.8706467661691543,
+        "h_a_A": {
+          "max": 3.4046140656527926,
+          "mean": 2.058971297977358,
+          "median": 1.976307578363754,
+          "min": 1.6125783767057662,
+          "n": 201,
+          "p05": 1.7212224156210636
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 78.0,
+          "end_frame": 200,
+          "end_ps": 400.0,
+          "frame_count": 40,
+          "start_frame": 161,
+          "start_ps": 322.0
+        },
+        "strong_frames": 107,
+        "strong_occupancy": 0.5323383084577115,
+        "top_favorable_water": {
+          "atom_index1": 58091,
+          "favorable_frame_count": 56,
+          "occupancy_over_denominator": 0.27860696517412936,
+          "share_of_favorable_frames": 0.32,
+          "unique_favorable_water_count": 9
+        }
+      },
+      "nac_frames": {
+        "d_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "denominator_frames": 0,
+        "dha_deg": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "favorable_frames": 0,
+        "favorable_occupancy": null,
+        "h_a_A": {
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "n": 0,
+          "p05": null
+        },
+        "longest_favorable_episode": {
+          "duration_ps": 0.0,
+          "end_frame": null,
+          "end_ps": null,
+          "frame_count": 0,
+          "start_frame": null,
+          "start_ps": null
+        },
+        "strong_frames": 0,
+        "strong_occupancy": null,
+        "top_favorable_water": null
+      }
+    }
+  },
+  "qmmm_gate": "NOT_EVALUATED_REQUIRES_COMPLETE_20NS",
+  "schema_version": 1,
+  "scientific_status": "NOT_EVALUATED_PARTIAL_400PS",
+  "slurm_job_id": "61803323",
+  "source_job_id": "61801789",
+  "status": "PASS_TECHNICAL_PARTIAL_DIAGNOSTIC",
+  "trajectory": {
+    "frame_count": 201,
+    "median_frame_spacing_ps": 2.0,
+    "time_end_ps": 400.0,
+    "time_start_ps": 0.0
+  }
+}
