@@ -161,6 +161,90 @@ def _candidate_summary(candidate_id: str, audits: list[dict]) -> tuple[dict | No
     return summary, None
 
 
+def gate_stage_b(three_replica_audits: list[dict]) -> dict:
+    if len(three_replica_audits) != 3:
+        raise ValueError("Stage B gate requires exactly three replica audits")
+    candidate_ids = {str(item["candidate_id"]) for item in three_replica_audits}
+    seeds = {int(item["velocity_seed"]) for item in three_replica_audits}
+    if len(candidate_ids) != 1 or seeds != set(EXPECTED_SEEDS):
+        raise ValueError("Stage B audits do not form one complete candidate triplet")
+    for item in three_replica_audits:
+        if [float(value) for value in item["analysis"]["window_ps"]] != [100.0, 1000.0]:
+            raise ValueError("Stage B primary analysis window must be 100-1000 ps")
+
+    technical_failure_count = sum(
+        item["technical_status"] != "PASS" for item in three_replica_audits
+    )
+    valid = [
+        item for item in three_replica_audits if item["technical_status"] == "PASS"
+    ]
+    replicas_with_nac = sum(
+        int(item["nac"]["nac_frame_count"]) > 0 for item in valid
+    )
+    pooled_frames = sum(int(item["nac"]["nac_frame_count"]) for item in valid)
+    pooled_denominator = sum(int(item["nac"]["frame_count"]) for item in valid)
+    pooled_occupancy = (
+        pooled_frames / pooled_denominator if pooled_denominator else 0.0
+    )
+    longest = max(
+        (float(item["nac"]["longest_event"]["duration_ps"]) for item in valid),
+        default=0.0,
+    )
+    bound_replica_count = sum(
+        bool(item["bound_state"]["final_frame_retained"])
+        and not bool(item["bound_state"].get("severe_clash", False))
+        for item in three_replica_audits
+    )
+    thermo_failure_count = sum(
+        not bool(item.get("thermodynamics", {}).get("stable", False))
+        for item in valid
+    )
+    cluster_reproduced = max(
+        int(item.get("cross_replica_cluster_count", 0))
+        for item in three_replica_audits
+    ) > 0
+
+    failed = []
+    if technical_failure_count:
+        failed.append("TECHNICAL_FAILURE")
+    if replicas_with_nac < 2:
+        failed.append("INSUFFICIENT_NAC_REPLICA_REPRODUCTION")
+    if pooled_occupancy < 0.01:
+        failed.append("POOLED_NAC_OCCUPANCY_BELOW_0.01")
+    if longest < 4.0:
+        failed.append("LONGEST_NAC_EVENT_BELOW_4PS")
+    if bound_replica_count < 3:
+        failed.append("UNBOUND_REPLICA")
+    if thermo_failure_count:
+        failed.append("THERMODYNAMIC_INSTABILITY")
+    if not cluster_reproduced:
+        failed.append("NO_REPRODUCED_CROSS_REPLICA_CLUSTER")
+
+    if technical_failure_count:
+        scientific_status = "NOT_EVALUATED_TECHNICAL_FAILURE"
+    elif failed:
+        scientific_status = "FAIL_UNRESTRAINED_M1_ENSEMBLE_NAC"
+    else:
+        scientific_status = "PASS_UNRESTRAINED_M1_ENSEMBLE_NAC"
+    return {
+        "schema_version": 1,
+        "candidate_id": next(iter(candidate_ids)),
+        "analysis_window_ps": [100.0, 1000.0],
+        "replicas_with_nac_after_100ps": replicas_with_nac,
+        "pooled_nac_frame_count_100_1000ps": pooled_frames,
+        "pooled_denominator_100_1000ps": pooled_denominator,
+        "pooled_nac_occupancy_100_1000ps": pooled_occupancy,
+        "longest_continuous_nac_ps": longest,
+        "bound_replica_count": bound_replica_count,
+        "technical_failure_count": technical_failure_count,
+        "thermodynamic_failure_count": thermo_failure_count,
+        "cross_replica_cluster_reproduced": cluster_reproduced,
+        "failed_gates": failed,
+        "scientific_status": scientific_status,
+        "scientific_boundary": "Fixed-topology MM preorganization, not proton transfer or a barrier.",
+    }
+
+
 def rank_stage_a(candidate_audits: list[dict], top_n: int = 6) -> dict:
     if not 0 <= top_n <= 6:
         raise ValueError("top_n must be between zero and six")
