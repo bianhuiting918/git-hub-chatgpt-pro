@@ -229,10 +229,12 @@ def sanitize(x):
 
 def analyze(case, outdir):
     tpr = Path(case["tpr"])
-    xtc = Path(case["xtc"])
-    if not tpr.is_file() or not xtc.is_file():
-        raise FileNotFoundError(f"missing input for {case['id']}: {tpr} {xtc}")
-    u = mda.Universe(str(tpr), str(xtc))
+    xtc_raw = case["xtc"]
+    xtcs = [Path(x) for x in (xtc_raw if isinstance(xtc_raw, list) else [xtc_raw])]
+    missing = [str(x) for x in [tpr, *xtcs] if not x.is_file()]
+    if missing:
+        raise FileNotFoundError(f"missing input for {case['id']}: {missing}")
+    u = mda.Universe(str(tpr), *[str(x) for x in xtcs])
     atom = lambda index1: u.atoms[int(index1)-1]
     og = atom(case["thr267_og1_index1"])
     carbon_c = atom(case["carbonyl_c_index1"])
@@ -270,6 +272,8 @@ def analyze(case, outdir):
         "OgH_to_Nalpha_preorg", "OgH_via_water_to_Asp306", "OgH_via_water_to_Asp308",
     ]
     for ts in u.trajectory:
+        if frames and abs(float(ts.time) - frames[-1]["time_ps"]) < 1.0e-6:
+            continue
         box = ts.dimensions
         ogp = og.position.copy()
         hgp = hg[0].position.copy()
@@ -311,7 +315,7 @@ def analyze(case, outdir):
         "case": case,
         "technical_status": "PASS",
         "scientific_scope": "geometry_screen_only_no_classical_proton_transfer",
-        "input_sha256": {"tpr": sha256(tpr), "xtc": sha256(xtc)},
+        "input_sha256": {"tpr": sha256(tpr), "xtc": [sha256(x) for x in xtcs] if len(xtcs) > 1 else sha256(xtcs[0])},
         "atom_mapping": {
             "thr267": {"global_resid": int(thr.resid), "segid": thr.segid,
                        "og1_index1": int(og.index+1), "n_index1": int(nalpha[0].index+1),
