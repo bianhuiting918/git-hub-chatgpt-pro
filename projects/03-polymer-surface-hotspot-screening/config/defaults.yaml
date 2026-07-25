@@ -1,10 +1,13 @@
 schema_version: 1
 project:
   name: polymer_surface_hotspot_screen
-  remote_cpu_root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2
-  remote_phase_root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2/polymer_surface_hotspot_screen_20260725
+  remote_cpu_root: /work/home/acshdt1dks
+  remote_phase_root: /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725
   max_total_cpus: 64
-  authoritative_handoff_root: /Dell/Dell14/bianht/enzyme_scaffold_search_v2/results/FINAL_LAYER_SCORE_DATA_HANDOFF_20260715
+  authoritative_atlas_root: /work/home/acshdt1dks/petase_nylonase_activity_feature_atlas_20260716
+  pet_structure_manifest: /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/outputs/saprot_structure_conditional_likelihood_20260723/run_manifest.tsv
+  nylon_primary_structure_manifest: /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_4556_20260725_confscale_v2/run_manifest_all_3497.tsv
+  nylon_recovered_structure_manifest: /work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/manifests/saprot_nylonase_recovered_20260725_v7/run_manifest_ready_735.tsv
 
 receptor:
   primary_context: monomer_standardized
