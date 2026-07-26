@@ -58,7 +58,7 @@ trap finish EXIT
 
 if [[ ! -f "$FINAL_ARCHIVE" ]]; then
   TMP="$(mktemp "$AUDIT_DIR/AmberClassic-${AMBERCLASSIC_COMMIT}.tar.gz.tmp.XXXXXX")"
-  curl -4 --retry 8 --retry-delay 5 --retry-all-errors -fL \
+  curl -4 --retry 8 --retry-delay 5 -fL \
     --connect-timeout 30 --max-time 1800 "$URL" -o "$TMP"
   tar -tzf "$TMP" >"$AUDIT_DIR/archive_members.txt"
   mv -n "$TMP" "$FINAL_ARCHIVE"
