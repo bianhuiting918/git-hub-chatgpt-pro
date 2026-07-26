@@ -216,3 +216,42 @@ def test_noncollinear_probe_triplets_are_deterministic():
     assert triplets[0] == (0, 1, 2)
     assert all(len(set(item)) == 3 for item in triplets)
     assert (0, 1, 3) not in triplets
+
+
+
+@pytest.mark.parametrize("rotatable_bonds,expected", [(0, 8), (2, 8), (3, 32), (6, 32), (7, 64)])
+def test_conformer_budget_follows_frozen_rotatable_bond_tiers(rotatable_bonds, expected):
+    assert mod.conformer_budget(rotatable_bonds) == expected
+
+
+def test_rigid_transform_places_complete_probe_from_three_anchors():
+    complete = np.array(
+        [[0.0, 0.0, 0.0], [2.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, 2.0]]
+    )
+    anchor_indices = np.array([0, 1, 2])
+    rotation = np.array(
+        [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]]
+    )
+    target_anchors = complete[anchor_indices] @ rotation.T + np.array([5.0, 2.0, -1.0])
+    placed, anchor_rmsd = mod.place_from_anchor_match(
+        complete, anchor_indices, target_anchors
+    )
+    expected = complete @ rotation.T + np.array([5.0, 2.0, -1.0])
+    assert anchor_rmsd < 1e-8
+    assert np.allclose(placed, expected, atol=1e-8)
+
+
+def test_pose_field_score_sums_typed_favorable_autogrid_values():
+    grid_a = np.full((3, 3, 3), -2.0)
+    grid_oa = np.full((3, 3, 3), -3.0)
+    maps = {
+        "A": {"values": grid_a, "origin": np.zeros(3), "spacing": 1.0},
+        "OA": {"values": grid_oa, "origin": np.zeros(3), "spacing": 1.0},
+    }
+    score, inside = mod.score_pose_on_grids(
+        np.array([[0.5, 0.5, 0.5], [1.5, 1.5, 1.5]]),
+        ("A", "OA"),
+        maps,
+    )
+    assert inside.tolist() == [True, True]
+    assert score == pytest.approx(5.0)
