@@ -199,6 +199,10 @@ structure = pmd.load_file(prmtop, xyz=inpcrd)
 structure.save(top, format="gromacs", overwrite=False)
 structure.save(gro, format="gro", overwrite=False)
 PY
+set +u
+source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
+set -u
+export GMX_MAXBACKUP=-1
 "$GMX" editconf -f NTA1_CAP.gromacs.gro -o NTA1_CAP.gromacs.boxed.gro \
   -box 20 20 20 -center 10 10 10 >editconf.stdout 2>editconf.stderr
 
@@ -219,8 +223,6 @@ comm-mode                = None
 constraints              = none
 nstenergy                = 1
 EOF
-source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
-export GMX_MAXBACKUP=-1
 "$GMX" grompp -f single.mdp -c NTA1_CAP.gromacs.boxed.gro -p NTA1_CAP.gromacs.top \
   -o single.tpr -po single.expanded.mdp -maxwarn 0 >grompp.stdout 2>grompp.stderr
 "$GMX" mdrun -s single.tpr -deffnm gmx_single -ntmpi 1 -ntomp 1 \
