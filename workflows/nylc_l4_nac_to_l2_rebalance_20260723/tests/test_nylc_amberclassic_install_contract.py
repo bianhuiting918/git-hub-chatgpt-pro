@@ -23,6 +23,8 @@ class AmberClassicInstallContractTests(unittest.TestCase):
             "/home/case/AmberClassic",
             "dependency_relocation.json",
             "msander",
+            "set +u",
+            "set -u",
             'TOOLS_ROOT="$TASK_ROOT/tools"',
             "CONNECT.TPL",
             "antechamber -h",
