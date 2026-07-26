@@ -100,7 +100,7 @@ fi
 
 if [ ! -x "$ENV_DIR/bin/python" ]; then
   CONDA_PKGS_DIRS="$CONDA_CACHE" "$CONDA_BOOTSTRAP" create --prefix "$ENV_DIR" --yes \
-    "python=3.11" "pip=24.3.1" \
+    "python=3.11" "pip" \
     >"$LOG_DIR/conda_create.stdout.log" 2>"$LOG_DIR/conda_create.stderr.log"
 fi
 "$ENV_DIR/bin/python" -c "import ssl" >"$LOG_DIR/ssl_import.log" 2>&1
