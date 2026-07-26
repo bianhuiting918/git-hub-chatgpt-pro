@@ -78,7 +78,7 @@ pass_record = json.loads((prefix / "PASS.json").read_text(encoding="utf-8"))
 if pass_record != record:
     raise SystemExit("active AmberClassic manifest differs from installation PASS.json")
 for rel in ("AmberClassic.sh", "dat/antechamber/CONNECT.TPL", "bin/antechamber",
-            "bin/parmchk2", "bin/tleap", "bin/sqm", "bin/sander"):
+            "bin/parmchk2", "bin/tleap", "bin/sqm", "bin/msander"):
     if not (prefix / rel).is_file():
         raise SystemExit(f"missing audited AmberClassic file: {rel}")
 print(prefix)
@@ -93,7 +93,7 @@ export AMBER_PREFIX
 record_phase after_active_manifest
 source "$AMBER_PREFIX/AmberClassic.sh"
 record_phase after_amberclassic_source
-for exe in antechamber parmchk2 resp respgen tleap sqm sander; do
+for exe in antechamber parmchk2 resp respgen tleap sqm msander; do
   resolved="$(command -v "$exe")"
   case "$resolved" in
     "$AMBER_PREFIX"/bin/*) ;;
@@ -141,7 +141,7 @@ A1 one-step vacuum minimization for finite-energy audit
   ntpr=1,
 /
 EOF
-sander -O -i amber_single.in -p NTA1_CAP.prmtop -c NTA1_CAP.inpcrd \
+msander -O -i amber_single.in -p NTA1_CAP.prmtop -c NTA1_CAP.inpcrd \
   -o amber_single.out -r amber_single.rst
 AMBER_ENERGY="$(awk '/FINAL RESULTS/{seen=1} seen && /NSTEP/{getline; print $2; exit}' amber_single.out)"
 [[ "$AMBER_ENERGY" =~ ^[-+0-9.eE]+$ ]]
