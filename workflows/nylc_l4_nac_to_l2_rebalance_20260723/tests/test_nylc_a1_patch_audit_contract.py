@@ -114,6 +114,9 @@ class A1PatchAuditContractTests(unittest.TestCase):
             "pbc                      = xyz",
             "continuation             = yes",
             "OMP_NUM_THREADS=1",
+            '"$GMX" energy',
+            "gmx_single.edr",
+            "potential.xvg",
         ]:
             self.assertIn(token, text)
 
