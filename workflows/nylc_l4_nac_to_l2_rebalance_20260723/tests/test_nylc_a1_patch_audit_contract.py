@@ -140,6 +140,11 @@ class A1PatchAuditContractTests(unittest.TestCase):
             text.index('"$GMX" editconf'),
         )
         self.assertIn("/public/software/apps/gromacs/2022.2/hpcx-gcc7.3.1/bin/gmx_mpi", text)
+        self.assertIn("module unload compiler/gcc/11.4.0", text)
+        self.assertLess(
+            text.index("module unload compiler/gcc/11.4.0"),
+            text.index("module load gromacs/2022.2-hpcx-gcc-7.3.1"),
+        )
         self.assertNotIn("/Gromacs-DCU2/", text)
 
     def test_parameterization_runs_through_slurm(self):
