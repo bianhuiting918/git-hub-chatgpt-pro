@@ -210,12 +210,12 @@ def build_a1_capped_model(
     cap_h3 = _add(cap_c, _scale(d3, 0.109))
     model_atoms.extend(
         [
-            Atom("CAP_N", "N", "N.am", 0, cap_n, int(next_atoms["N"]["source_atom_id"]), "Cap268"),
-            Atom("CAP_H", "H", "H", 0, cap_h, int(next_atoms["H"]["source_atom_id"]), "Cap268"),
-            Atom("CAP_C", "C", "C.3", 0, cap_c, int(next_atoms["CA"]["source_atom_id"]), "Cap268"),
-            Atom("CAP_H1", "H", "H", 0, cap_h1, int(next_atoms["HA"]["source_atom_id"]), "Cap268"),
-            Atom("CAP_H2", "H", "H", 0, cap_h2, None, "GeneratedCap"),
-            Atom("CAP_H3", "H", "H", 0, cap_h3, None, "GeneratedCap"),
+            Atom("NCAP", "N", "N.am", 0, cap_n, int(next_atoms["N"]["source_atom_id"]), "Cap268"),
+            Atom("HCAP", "H", "H", 0, cap_h, int(next_atoms["H"]["source_atom_id"]), "Cap268"),
+            Atom("CCAP", "C", "C.3", 0, cap_c, int(next_atoms["CA"]["source_atom_id"]), "Cap268"),
+            Atom("HC1", "H", "H", 0, cap_h1, int(next_atoms["HA"]["source_atom_id"]), "Cap268"),
+            Atom("HC2", "H", "H", 0, cap_h2, None, "GeneratedCap"),
+            Atom("HC3", "H", "H", 0, cap_h3, None, "GeneratedCap"),
         ]
     )
 
@@ -224,9 +224,9 @@ def build_a1_capped_model(
         ("CA", "HA", "1"), ("CA", "CB", "1"), ("CA", "C", "1"),
         ("CB", "HB", "1"), ("CB", "CG2", "1"), ("CB", "OG1", "1"),
         ("CG2", "HG21", "1"), ("CG2", "HG22", "1"), ("CG2", "HG23", "1"),
-        ("C", "O", "2"), ("C", "CAP_N", "am"),
-        ("CAP_N", "CAP_H", "1"), ("CAP_N", "CAP_C", "1"),
-        ("CAP_C", "CAP_H1", "1"), ("CAP_C", "CAP_H2", "1"), ("CAP_C", "CAP_H3", "1"),
+        ("C", "O", "2"), ("C", "NCAP", "am"),
+        ("NCAP", "HCAP", "1"), ("NCAP", "CCAP", "1"),
+        ("CCAP", "HC1", "1"), ("CCAP", "HC2", "1"), ("CCAP", "HC3", "1"),
     ]
     return Model(model_atoms, [Bond(*row) for row in bond_rows])
 
