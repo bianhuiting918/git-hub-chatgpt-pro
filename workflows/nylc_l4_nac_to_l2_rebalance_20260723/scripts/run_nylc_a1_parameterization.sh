@@ -224,7 +224,7 @@ nstenergy                = 1
 EOF
 "$GMX" grompp -f single.mdp -c NTA1_CAP.gromacs.boxed.gro -p NTA1_CAP.gromacs.top \
   -o single.tpr -po single.expanded.mdp -maxwarn 0 >grompp.stdout 2>grompp.stderr
-OMP_NUM_THREADS=1 "$GMX" mdrun -s single.tpr -deffnm gmx_single -ntmpi 1 -ntomp 1 \
+OMP_NUM_THREADS=1 "$GMX" mdrun -s single.tpr -deffnm gmx_single -ntomp 1 \
   >mdrun.stdout 2>mdrun.stderr
 GMX_ENERGY="$(awk '/Potential Energy/{value=$3} END{print value}' gmx_single.log)"
 [[ "$GMX_ENERGY" =~ ^[-+0-9.eE]+$ ]]
