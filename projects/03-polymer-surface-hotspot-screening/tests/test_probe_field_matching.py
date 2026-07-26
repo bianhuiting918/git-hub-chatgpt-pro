@@ -255,3 +255,48 @@ def test_pose_field_score_sums_typed_favorable_autogrid_values():
     )
     assert inside.tolist() == [True, True]
     assert score == pytest.approx(5.0)
+
+
+
+def test_match_probe_conformer_accepts_joint_pattern_and_scores_complete_pose():
+    probe_xyz = np.array(
+        [[0.0, 0.0, 0.0], [2.0, 0.0, 0.0], [0.0, 2.0, 0.0]]
+    )
+    channels = ("A", "OA", "OA")
+    shell_xyz = probe_xyz + np.array([4.0, 4.0, 4.0])
+    shell_raw = {
+        "A": np.array([-2.0, 0.0, 0.0]),
+        "OA": np.array([0.0, -3.0, -3.0]),
+    }
+    values_a = np.full((10, 10, 10), -2.0)
+    values_oa = np.full((10, 10, 10), -3.0)
+    maps = {
+        "A": {"values": values_a, "origin": np.zeros(3), "spacing": 1.0},
+        "OA": {"values": values_oa, "origin": np.zeros(3), "spacing": 1.0},
+    }
+    poses = mod.match_probe_conformer(
+        complete_xyz=probe_xyz,
+        typed_atom_indices=np.array([0, 1, 2]),
+        typed_channels=channels,
+        heavy_atom_indices=np.array([0, 1, 2]),
+        heavy_atom_radii=np.array([1.7, 1.52, 1.52]),
+        region_indices=np.array([0, 1, 2]),
+        shell_xyz=shell_xyz,
+        shell_raw_channels=shell_raw,
+        maps=maps,
+        protein_xyz=np.empty((0, 3)),
+        protein_radii=np.empty(0),
+        relative_strain=0.5,
+        anchor_minimum_separation=1.5,
+        anchor_distance_tolerance=1.0,
+        hard_clash_fraction=0.75,
+        maximum_outside_shell_fraction=0.20,
+        shell_cutoff=0.6,
+        maximum_field_anchors=8,
+        maximum_probe_triplets=8,
+        maximum_matches=20,
+    )
+    assert poses
+    assert poses[0]["field_score"] == pytest.approx(8.0)
+    assert poses[0]["score"] == pytest.approx(7.5)
+    assert poses[0]["outside_shell_fraction"] == pytest.approx(0.0)
