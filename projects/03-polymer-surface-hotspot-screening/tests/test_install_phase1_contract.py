@@ -63,6 +63,13 @@ class InstallPhase1ContractTests(unittest.TestCase):
         )
         self.assertNotIn('dirname "${BASH_SOURCE[0]}"', text)
 
+    def test_freesasa_python_distribution_is_exercised_without_cli_assumption(self):
+        text = INSTALL.read_text(encoding="utf-8")
+        self.assertNotIn('"$ENV_DIR/bin/freesasa"', text)
+        self.assertIn('importlib.metadata.version("freesasa")', text)
+        self.assertIn("freesasa.calcCoord", text)
+        self.assertIn("totalArea()", text)
+
     def test_gate_is_written_only_after_version_and_import_checks(self):
         text = INSTALL.read_text(encoding="utf-8")
         checks = [
