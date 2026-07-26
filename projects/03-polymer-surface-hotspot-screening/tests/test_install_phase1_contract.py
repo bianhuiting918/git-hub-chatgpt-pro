@@ -41,6 +41,11 @@ class InstallPhase1ContractTests(unittest.TestCase):
         text = INSTALL.read_text(encoding="utf-8")
         self.assertIn('CONDA_ALWAYS_COPY=true CONDA_PKGS_DIRS="$CONDA_CACHE"', text)
 
+    def test_rdkit_pin_is_available_on_sugon_pypi_mirror(self):
+        lock_text = LOCK.read_text(encoding="utf-8")
+        self.assertIn("rdkit==2024.3.2", lock_text)
+        self.assertNotIn("rdkit==2024.9.6", lock_text)
+
     def test_each_run_uses_a_unique_log_directory(self):
         text = INSTALL.read_text(encoding="utf-8")
         stamp = "run_stamp=$(date -u +%Y%m%dT%H%M%SZ)"
