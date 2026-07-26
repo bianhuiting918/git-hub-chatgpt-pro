@@ -113,6 +113,7 @@ class A1PatchAuditContractTests(unittest.TestCase):
             "NTA1_CAP.gromacs.boxed.gro",
             "pbc                      = xyz",
             "continuation             = yes",
+            "OMP_NUM_THREADS=1",
         ]:
             self.assertIn(token, text)
 
