@@ -107,6 +107,12 @@ class A1PatchAuditContractTests(unittest.TestCase):
             "antechamber", "parmchk2", "tleap", "sqm", "msander",
             "run_history.tsv", "run_history.jsonl",
             "audit_nylc_a1_patch.py",
+            "charge_normalization.json",
+            "NTA1_CAP.am1bcc.raw.mol2",
+            "editconf",
+            "NTA1_CAP.gromacs.boxed.gro",
+            "pbc                      = xyz",
+            "continuation             = yes",
         ]:
             self.assertIn(token, text)
 
