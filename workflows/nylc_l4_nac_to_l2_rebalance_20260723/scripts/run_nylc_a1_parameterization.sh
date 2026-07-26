@@ -199,6 +199,7 @@ structure = pmd.load_file(prmtop, xyz=inpcrd)
 structure.save(top, format="gromacs", overwrite=False)
 structure.save(gro, format="gro", overwrite=False)
 PY
+module unload compiler/gcc/11.4.0
 module load gromacs/2022.2-hpcx-gcc-7.3.1
 export GMX_MAXBACKUP=-1
 "$GMX" editconf -f NTA1_CAP.gromacs.gro -o NTA1_CAP.gromacs.boxed.gro \
