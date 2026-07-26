@@ -64,10 +64,42 @@ trap finish EXIT
 
 module purge
 record_phase after_module_purge
-module load amber/2018-hpcx-gcc-7.3.1
-record_phase after_module_load
+AMBER_ACTIVE="$TASK_ROOT/tools/ACTIVE_AMBERCLASSIC.json"
+mapfile -t AMBER_META < <("$PY" - "$AMBER_ACTIVE" <<'PY'
+import json
+import pathlib
+import sys
+active = pathlib.Path(sys.argv[1])
+record = json.loads(active.read_text(encoding="utf-8"))
+if record.get("status") != "PASS_AMBERCLASSIC_INSTALL":
+    raise SystemExit("ACTIVE_AMBERCLASSIC.json is not PASS_AMBERCLASSIC_INSTALL")
+prefix = pathlib.Path(record["prefix"])
+pass_record = json.loads((prefix / "PASS.json").read_text(encoding="utf-8"))
+if pass_record != record:
+    raise SystemExit("active AmberClassic manifest differs from installation PASS.json")
+for rel in ("AmberClassic.sh", "dat/antechamber/CONNECT.TPL", "bin/antechamber",
+            "bin/parmchk2", "bin/tleap", "bin/sqm", "bin/sander"):
+    if not (prefix / rel).is_file():
+        raise SystemExit(f"missing audited AmberClassic file: {rel}")
+print(prefix)
+print(record["source_archive_sha256"])
+print(record["source_commit"])
+PY
+)
+AMBER_PREFIX="${AMBER_META[0]}"
+export AMBER_SOURCE_SHA256="${AMBER_META[1]}"
+export AMBER_SOURCE_COMMIT="${AMBER_META[2]}"
+export AMBER_PREFIX
+record_phase after_active_manifest
+source "$AMBER_PREFIX/AmberClassic.sh"
+record_phase after_amberclassic_source
 for exe in antechamber parmchk2 resp respgen tleap sqm sander; do
-  command -v "$exe" >"$OUT_DIR/$exe.path"
+  resolved="$(command -v "$exe")"
+  case "$resolved" in
+    "$AMBER_PREFIX"/bin/*) ;;
+    *) printf 'Resolved %s outside audited AmberClassic prefix: %s\n' "$exe" "$resolved" >&2; exit 4 ;;
+  esac
+  printf '%s\n' "$resolved" >"$OUT_DIR/$exe.path"
 done
 record_phase after_tool_resolution
 [[ -x "$GMX" ]]
