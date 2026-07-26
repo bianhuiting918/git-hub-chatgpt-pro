@@ -96,6 +96,22 @@ def box_literal(values: list[float]) -> str:
     return "[" + ",".join(str(float(value)) for value in values) + "]"
 
 
+def build_autosite_command(
+    autosite: Path,
+    receptor: Path,
+    outdir: Path,
+    spacing: float,
+    center: list[float],
+    boxdim: list[float],
+) -> list[str]:
+    return [
+        str(autosite), "-r", str(receptor), "-o", str(outdir),
+        "-n", "10", "--spacing", str(spacing),
+        "--boxcenter", box_literal(center),
+        "--boxdim", box_literal(boxdim),
+    ]
+
+
 def receptor_atom_types(path: Path) -> list[str]:
     atom_types = set()
     with path.open(encoding="ascii", errors="strict") as handle:
@@ -211,12 +227,10 @@ def main() -> int:
             boxdim = [float(n) * float(tile["spacing"]) for n in tile["npts"]]
             autosite_dir = tile_dir / "autosite"
             autosite_rc = run_command(
-                [
-                    str(args.autosite), "-r", str(receptor), "-o", str(autosite_dir),
-                    "-n", "10", "--spacing", str(tile["spacing"]),
-                    "--boxcenter", *[str(value) for value in tile["center"]],
-                    "--boxdim", *[str(value) for value in boxdim],
-                ],
+                build_autosite_command(
+                    args.autosite, receptor, autosite_dir,
+                    tile["spacing"], tile["center"], boxdim,
+                ),
                 tile_dir,
                 tile_dir / "autosite.stdout.log",
                 tile_dir / "autosite.stderr.log",
