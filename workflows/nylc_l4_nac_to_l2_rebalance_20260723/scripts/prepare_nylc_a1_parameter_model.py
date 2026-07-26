@@ -3,9 +3,13 @@
 
 from __future__ import annotations
 
+import argparse
+import hashlib
+import json
 import math
 from collections import namedtuple
-from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 Vector = Tuple[float, float, float]
 Atom = namedtuple(
@@ -251,3 +255,193 @@ def render_mol2(model: Model) -> str:
         )
     lines.extend(["@<TRIPOS>SUBSTRUCTURE", "     1 NTA1        1 TEMP              0 ****  ****    0 ROOT"])
     return "\n".join(lines) + "\n"
+
+
+def _parse_itp_atoms_and_bonds(text: str):
+    section = ""
+    atoms: Dict[int, Dict[str, Any]] = {}
+    bonds: List[Tuple[int, int]] = []
+    for raw in text.splitlines():
+        body = raw.split(";", 1)[0].strip()
+        if not body:
+            continue
+        if body.startswith("[") and body.endswith("]"):
+            section = body.strip("[] ").lower()
+            continue
+        fields = body.split()
+        if section == "atoms" and len(fields) >= 5:
+            atom_id = int(fields[0])
+            atoms[atom_id] = {
+                "resnr": int(fields[2]),
+                "resname": fields[3],
+                "atom_name": fields[4],
+            }
+        elif section == "bonds" and len(fields) >= 2:
+            bonds.append((int(fields[0]), int(fields[1])))
+    if not atoms or not bonds:
+        raise ModelError("ITP lacks atoms or bonds")
+    return atoms, bonds
+
+
+def _parse_gro_atoms(text: str) -> List[Dict[str, Any]]:
+    lines = text.splitlines()
+    if len(lines) < 3:
+        raise ModelError("GRO is truncated")
+    try:
+        count = int(lines[1].strip())
+    except ValueError as exc:
+        raise ModelError("GRO atom count is invalid") from exc
+    atom_lines = lines[2 : 2 + count]
+    if len(atom_lines) != count:
+        raise ModelError("GRO atom block is truncated")
+    rows = []
+    for sequential_id, line in enumerate(atom_lines, 1):
+        try:
+            rows.append(
+                {
+                    "sequential_id": sequential_id,
+                    "resid": int(line[0:5]),
+                    "resname": line[5:10].strip(),
+                    "atom_name": line[10:15].strip(),
+                    "printed_atom_id": int(line[15:20]),
+                    "coordinate_nm": (
+                        float(line[20:28]),
+                        float(line[28:36]),
+                        float(line[36:44]),
+                    ),
+                }
+            )
+        except (ValueError, IndexError) as exc:
+            raise ModelError(f"cannot parse GRO atom line {sequential_id}") from exc
+    return rows
+
+
+def model_from_gromacs_text(
+    itp_text: str,
+    gro_text: str,
+    *,
+    chain_first_global_atom: int,
+    thr_resnr: int = 267,
+    next_resnr: int = 268,
+) -> Model:
+    """Build A1 model by mapping the chain ITP graph onto the full-system GRO."""
+
+    if chain_first_global_atom < 1:
+        raise ModelError("chain_first_global_atom must be positive")
+    atoms, bond_ids = _parse_itp_atoms_and_bonds(itp_text)
+    gro_atoms = _parse_gro_atoms(gro_text)
+
+    relevant = {
+        local_id: row
+        for local_id, row in atoms.items()
+        if row["resnr"] in {thr_resnr, next_resnr}
+    }
+    thr_local = {
+        row["atom_name"]: local_id
+        for local_id, row in relevant.items()
+        if row["resnr"] == thr_resnr
+    }
+    next_local = {
+        row["atom_name"]: local_id
+        for local_id, row in relevant.items()
+        if row["resnr"] == next_resnr
+    }
+
+    def mapped_record(local_id: int, expected_name: str) -> Dict[str, Any]:
+        global_id = chain_first_global_atom + local_id - 1
+        if global_id > len(gro_atoms):
+            raise ModelError("global atom mapping exceeds GRO atom count")
+        gro = gro_atoms[global_id - 1]
+        if gro["atom_name"] != expected_name:
+            raise ModelError(
+                f"identity mismatch at global atom {global_id}: "
+                f"ITP {expected_name}, GRO {gro['atom_name']}"
+            )
+        return {
+            "source_atom_id": global_id,
+            "coordinate_nm": gro["coordinate_nm"],
+        }
+
+    thr_records = {
+        name: mapped_record(local_id, name)
+        for name, local_id in thr_local.items()
+    }
+    next_records = {
+        name: mapped_record(local_id, name)
+        for name, local_id in next_local.items()
+        if name in {"N", "H", "CA", "HA"}
+    }
+
+    local_labels: Dict[int, str] = {}
+    for name, local_id in thr_local.items():
+        local_labels[local_id] = name
+    for name, local_id in next_local.items():
+        local_labels[local_id] = "next:" + name
+
+    source_bonds = {
+        frozenset((local_labels[left], local_labels[right]))
+        for left, right in bond_ids
+        if left in local_labels and right in local_labels
+    }
+    return build_a1_capped_model(thr_records, next_records, source_bonds)
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def main(argv: Optional[Sequence[str]] = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--gro", type=Path, required=True)
+    parser.add_argument("--chain-itp", type=Path, required=True)
+    parser.add_argument("--chain-first-global-atom", type=int, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--parent-id", required=True)
+    args = parser.parse_args(argv)
+
+    model = model_from_gromacs_text(
+        args.chain_itp.read_text(encoding="utf-8"),
+        args.gro.read_text(encoding="utf-8"),
+        chain_first_global_atom=args.chain_first_global_atom,
+    )
+    args.output_dir.mkdir(parents=True, exist_ok=False)
+    mol2_path = args.output_dir / "NTA1_CAP.input.mol2"
+    mol2_path.write_text(render_mol2(model), encoding="utf-8")
+    atom_map_path = args.output_dir / "atom_map.json"
+    atom_map_path.write_text(
+        json.dumps(model.atom_map, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    audit = {
+        "schema_version": 1,
+        "parent_id": args.parent_id,
+        "source_gro": str(args.gro.resolve()),
+        "source_gro_sha256": _sha256(args.gro),
+        "chain_itp": str(args.chain_itp.resolve()),
+        "chain_itp_sha256": _sha256(args.chain_itp),
+        "chain_first_global_atom": args.chain_first_global_atom,
+        "model_atom_count": len(model.atoms),
+        "model_bond_count": len(model.bonds),
+        "formal_charge_e": sum(atom.formal_charge for atom in model.atoms),
+        "transferred_atom": {
+            "name": "HG1",
+            "source_atom_id": model.atom("HG1").source_atom_id,
+            "new_bond": ["N", "HG1"],
+            "removed_bond": ["OG1", "HG1"],
+        },
+        "mol2_sha256": _sha256(mol2_path),
+        "status": "PASS_MODEL_BUILD",
+    }
+    (args.output_dir / "model_audit.json").write_text(
+        json.dumps(audit, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
