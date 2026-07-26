@@ -112,3 +112,67 @@ def test_raw_monomer_controls_are_not_primary_composite_evidence():
     assert mod.composite_weight("primary_proxy") > 0.0
     assert mod.composite_weight("diagnostic") > 0.0
     assert mod.composite_weight("raw_monomer_control") == 0.0
+
+
+
+def test_field_anchor_extraction_prefers_favorable_values_and_enforces_spacing():
+    coordinates = np.array(
+        [[0.0, 0.0, 0.0], [0.5, 0.0, 0.0], [3.0, 0.0, 0.0], [7.0, 0.0, 0.0]]
+    )
+    raw_map_energy = np.array([-5.0, -4.0, -3.0, 2.0])
+    anchors = mod.extract_field_anchors(
+        coordinates,
+        raw_map_energy,
+        np.arange(4),
+        minimum_separation=1.5,
+        maximum_anchors=3,
+    )
+    assert anchors.tolist() == [0, 2, 3]
+
+
+def test_typed_anchor_enumeration_uses_joint_pairwise_geometry():
+    probe_xyz = np.array(
+        [[0.0, 0.0, 0.0], [2.8, 0.0, 0.0], [-2.8, 0.0, 0.0]]
+    )
+    probe_types = ("A", "OA", "OA")
+    field_xyz = np.array(
+        [
+            [10.0, 0.0, 0.0],
+            [12.8, 0.0, 0.0],
+            [7.2, 0.0, 0.0],
+            [16.0, 0.0, 0.0],
+            [4.0, 0.0, 0.0],
+        ]
+    )
+    field_types = ("A", "OA", "OA", "OA", "OA")
+    matches = mod.enumerate_typed_anchor_matches(
+        probe_xyz,
+        probe_types,
+        field_xyz,
+        field_types,
+        tolerance=1.0,
+        maximum_matches=20,
+    )
+    assert len(matches) == 1
+    assert matches[0] == (0, 1, 2)
+
+
+def test_probe_atom_channels_recover_pet_aromatic_and_ester_pattern():
+    from rdkit import Chem
+
+    molecule = Chem.AddHs(Chem.MolFromSmiles("COC(=O)c1ccc(C(=O)OC)cc1"))
+    channels = mod.probe_atom_channels(molecule)
+    assert channels.count("A") == 6
+    assert channels.count("OA") == 4
+    assert channels.count("C") == 4
+    assert channels.count("HD") == 0
+
+
+def test_probe_atom_channels_recover_nylon_amide_donor_and_acceptor():
+    from rdkit import Chem
+
+    molecule = Chem.AddHs(Chem.MolFromSmiles("CNC(C)=O"))
+    channels = mod.probe_atom_channels(molecule)
+    assert channels.count("OA") == 1
+    assert channels.count("HD") == 1
+    assert channels.count("C") == 2
