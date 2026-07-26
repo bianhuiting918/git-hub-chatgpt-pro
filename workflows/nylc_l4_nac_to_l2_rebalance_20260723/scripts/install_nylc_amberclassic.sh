@@ -2,7 +2,7 @@
 set -euo pipefail
 
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
-TOOLS_ROOT="$TASK_ROOT/tools"
+TOOLS_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/tools
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 AMBERCLASSIC_COMMIT=0b35bfeb96026ffa4e5876391a0828f39b3cfc8d
 JOB_ID="${SLURM_JOB_ID:?SLURM_JOB_ID is required}"
