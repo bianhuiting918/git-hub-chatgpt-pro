@@ -32,6 +32,11 @@ class InstallPhase1ContractTests(unittest.TestCase):
         self.assertNotIn("-m venv", text)
         self.assertNotIn("rm -rf", text)
 
+    def test_bootstrap_pip_is_not_pinned_to_unavailable_defaults_version(self):
+        text = INSTALL.read_text(encoding="utf-8")
+        self.assertIn('"python=3.11" "pip"', text)
+        self.assertNotIn('"pip=24.3.1"', text)
+
     def test_each_run_uses_a_unique_log_directory(self):
         text = INSTALL.read_text(encoding="utf-8")
         stamp = "run_stamp=$(date -u +%Y%m%dT%H%M%SZ)"
