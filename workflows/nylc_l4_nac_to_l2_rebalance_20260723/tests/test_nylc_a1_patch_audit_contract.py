@@ -129,5 +129,17 @@ class A1PatchAuditContractTests(unittest.TestCase):
         self.assertIn("trap - EXIT", finish_body)
 
 
+    def test_driver_records_phase_boundaries_before_ambertools(self):
+        text = RUNNER.read_text(encoding="utf-8")
+        self.assertIn("phase.tsv", text)
+        for phase in [
+            "before_module_purge",
+            "after_module_purge",
+            "after_module_load",
+            "after_tool_resolution",
+        ]:
+            self.assertIn(phase, text)
+
+
 if __name__ == "__main__":
     unittest.main()
