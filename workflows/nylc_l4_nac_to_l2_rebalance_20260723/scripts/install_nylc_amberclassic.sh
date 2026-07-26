@@ -73,7 +73,7 @@ tar -xzf "$STAGED_ARCHIVE" --strip-components=1 -C "$PREFIX"
 
 cd "$PREFIX"
 ./configure --noopenmp --noboost >configure.stdout 2>configure.stderr
-make -j "$CPUS" install >make_install.stdout 2>make_install.stderr
+make -j 1 install >make_install.stdout 2>make_install.stderr
 
 test -f "$PREFIX/dat/antechamber/CONNECT.TPL"
 test -x "$PREFIX/bin/antechamber"
