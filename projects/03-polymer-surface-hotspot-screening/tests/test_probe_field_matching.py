@@ -176,3 +176,43 @@ def test_probe_atom_channels_recover_nylon_amide_donor_and_acceptor():
     assert channels.count("OA") == 1
     assert channels.count("HD") == 1
     assert channels.count("C") == 3
+
+
+
+def test_trilinear_interpolation_recovers_linear_field():
+    x, y, z = np.meshgrid(
+        np.arange(3.0), np.arange(3.0), np.arange(3.0), indexing="ij"
+    )
+    values = x + 2.0 * y + 3.0 * z
+    points = np.array([[0.2, 0.3, 0.4], [1.25, 1.5, 0.75]])
+    sampled, inside = mod.trilinear_interpolate(
+        values, origin=np.zeros(3), spacing=1.0, points=points
+    )
+    assert inside.tolist() == [True, True]
+    assert sampled.tolist() == pytest.approx([2.0, 6.5])
+
+
+def test_trilinear_interpolation_marks_points_outside_grid():
+    values = np.zeros((2, 2, 2), dtype=float)
+    sampled, inside = mod.trilinear_interpolate(
+        values,
+        origin=np.zeros(3),
+        spacing=1.0,
+        points=np.array([[0.5, 0.5, 0.5], [2.0, 0.0, 0.0]]),
+    )
+    assert inside.tolist() == [True, False]
+    assert sampled[0] == pytest.approx(0.0)
+    assert np.isnan(sampled[1])
+
+
+def test_noncollinear_probe_triplets_are_deterministic():
+    coordinates = np.array(
+        [[0.0, 0.0, 0.0], [2.0, 0.0, 0.0], [0.0, 2.0, 0.0], [4.0, 0.0, 0.0]]
+    )
+    channels = ("A", "OA", "OA", "C")
+    triplets = mod.select_probe_anchor_triplets(
+        coordinates, channels, maximum_triplets=8, minimum_triangle_area=0.1
+    )
+    assert triplets[0] == (0, 1, 2)
+    assert all(len(set(item)) == 3 for item in triplets)
+    assert (0, 1, 3) not in triplets
