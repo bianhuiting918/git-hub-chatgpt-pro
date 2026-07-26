@@ -15,6 +15,74 @@ from scipy.spatial import cKDTree
 
 
 
+
+def conformer_budget(rotatable_bonds: int) -> int:
+    if rotatable_bonds < 0:
+        raise ValueError("rotatable bond count must be nonnegative")
+    if rotatable_bonds <= 2:
+        return 8
+    if rotatable_bonds <= 6:
+        return 32
+    return 64
+
+
+def place_from_anchor_match(
+    complete_xyz: np.ndarray,
+    anchor_indices: np.ndarray,
+    target_anchor_xyz: np.ndarray,
+) -> tuple[np.ndarray, float]:
+    complete_xyz = np.asarray(complete_xyz, dtype=float)
+    anchor_indices = np.asarray(anchor_indices, dtype=np.int64)
+    target_anchor_xyz = np.asarray(target_anchor_xyz, dtype=float)
+    source_anchors = complete_xyz[anchor_indices]
+    if source_anchors.shape != target_anchor_xyz.shape or len(source_anchors) < 3:
+        raise ValueError("invalid anchor placement")
+    source_center = source_anchors.mean(axis=0)
+    target_center = target_anchor_xyz.mean(axis=0)
+    source_zero = source_anchors - source_center
+    target_zero = target_anchor_xyz - target_center
+    left, _, right_t = np.linalg.svd(source_zero.T @ target_zero)
+    rotation = right_t.T @ left.T
+    if np.linalg.det(rotation) < 0:
+        right_t[-1, :] *= -1
+        rotation = right_t.T @ left.T
+    placed = (complete_xyz - source_center) @ rotation.T + target_center
+    placed_anchors = placed[anchor_indices]
+    rmsd = float(
+        np.sqrt(np.mean(np.sum((placed_anchors - target_anchor_xyz) ** 2, axis=1)))
+    )
+    return placed, rmsd
+
+
+def score_pose_on_grids(
+    atom_xyz: np.ndarray,
+    atom_channels: Iterable[str],
+    maps: dict[str, dict],
+) -> tuple[float, np.ndarray]:
+    atom_xyz = np.asarray(atom_xyz, dtype=float)
+    atom_channels = tuple(atom_channels)
+    if atom_xyz.shape != (len(atom_channels), 3):
+        raise ValueError("atom channels and coordinates differ")
+    inside = np.zeros(len(atom_xyz), dtype=bool)
+    total = 0.0
+    for channel in sorted(set(atom_channels)):
+        if channel not in maps:
+            raise ValueError(f"missing map channel {channel}")
+        indices = np.asarray(
+            [index for index, value in enumerate(atom_channels) if value == channel],
+            dtype=np.int64,
+        )
+        grid = maps[channel]
+        sampled, channel_inside = trilinear_interpolate(
+            np.asarray(grid["values"], dtype=float),
+            np.asarray(grid["origin"], dtype=float),
+            float(grid["spacing"]),
+            atom_xyz[indices],
+        )
+        inside[indices] = channel_inside
+        total += float(np.sum(-sampled[channel_inside]))
+    return total, inside
+
 def trilinear_interpolate(
     values: np.ndarray,
     origin: np.ndarray,
