@@ -120,6 +120,7 @@ class A1PatchAuditContractTests(unittest.TestCase):
             "source_archive_sha256",
             "set +u",
             "set -u",
+            "compiler/gcc/11.4.0",
         ]:
             self.assertIn(token, text)
         self.assertNotIn("module load amber/2018", text)
