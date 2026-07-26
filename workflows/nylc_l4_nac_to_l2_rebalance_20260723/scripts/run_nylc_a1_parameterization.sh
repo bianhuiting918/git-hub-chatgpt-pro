@@ -20,6 +20,10 @@ if [[ -e "$OUT_DIR" ]]; then
   exit 2
 fi
 mkdir -p "$OUT_DIR"
+record_phase() {
+  printf '%s\t%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$1" >>"$OUT_DIR/phase.tsv"
+}
+record_phase before_module_purge
 
 EVENT=nylc_a1_parameterization
 COMMAND="run_nylc_a1_parameterization.sh $OUT_DIR"
@@ -59,10 +63,13 @@ finish() {
 trap finish EXIT
 
 module purge
+record_phase after_module_purge
 module load amber/2018-hpcx-gcc-7.3.1
+record_phase after_module_load
 for exe in antechamber parmchk2 resp respgen tleap sqm sander; do
   command -v "$exe" >"$OUT_DIR/$exe.path"
 done
+record_phase after_tool_resolution
 [[ -x "$GMX" ]]
 [[ -x "$PY" ]]
 
