@@ -118,6 +118,8 @@ class A1PatchAuditContractTests(unittest.TestCase):
             "AmberClassic.sh",
             "AMBER_PREFIX",
             "source_archive_sha256",
+            "set +u",
+            "set -u",
         ]:
             self.assertIn(token, text)
         self.assertNotIn("module load amber/2018", text)
