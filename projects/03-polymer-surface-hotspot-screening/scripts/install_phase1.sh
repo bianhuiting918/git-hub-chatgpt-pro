@@ -99,7 +99,7 @@ if [ -d "$ENV_DIR" ] && { [ ! -x "$ENV_DIR/bin/python" ] || ! "$ENV_DIR/bin/pyth
 fi
 
 if [ ! -x "$ENV_DIR/bin/python" ]; then
-  CONDA_PKGS_DIRS="$CONDA_CACHE" "$CONDA_BOOTSTRAP" create --prefix "$ENV_DIR" --yes \
+  CONDA_ALWAYS_COPY=true CONDA_PKGS_DIRS="$CONDA_CACHE" "$CONDA_BOOTSTRAP" create --prefix "$ENV_DIR" --yes \
     "python=3.11" "pip" \
     >"$LOG_DIR/conda_create.stdout.log" 2>"$LOG_DIR/conda_create.stderr.log"
 fi
