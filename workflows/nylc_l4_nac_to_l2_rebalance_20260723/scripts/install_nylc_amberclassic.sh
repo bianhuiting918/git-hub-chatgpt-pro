@@ -121,7 +121,7 @@ test -x "$PREFIX/bin/antechamber"
 test -x "$PREFIX/bin/parmchk2"
 test -x "$PREFIX/bin/tleap"
 test -x "$PREFIX/bin/sqm"
-test -x "$PREFIX/bin/sander"
+test -x "$PREFIX/bin/msander"
 source "$PREFIX/AmberClassic.sh"
 antechamber -h >antechamber_help.stdout 2>antechamber_help.stderr
 
