@@ -92,7 +92,11 @@ def validate_map_set(paths: dict[str, Path]) -> dict:
     return headers["A"]
 
 
-def box_literal(values: list[float]) -> str:\n    return "[" + ",".join(str(float(value)) for value in values) + "]"\n\n\ndef receptor_atom_types(path: Path) -> list[str]:
+def box_literal(values: list[float]) -> str:
+    return "[" + ",".join(str(float(value)) for value in values) + "]"
+
+
+def receptor_atom_types(path: Path) -> list[str]:
     atom_types = set()
     with path.open(encoding="ascii", errors="strict") as handle:
         for line in handle:
