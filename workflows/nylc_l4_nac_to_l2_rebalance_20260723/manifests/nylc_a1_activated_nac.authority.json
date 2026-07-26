@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-07-26T00:00:00Z",
+  "workflow": "nylc_a1_activated_nac_rescreen",
+  "parent_audit": {
+    "job_id": 61841413,
+    "technical_status": "PASS",
+    "scientific_status": "PASS_UNRESTRAINED_M1_ENSEMBLE_NAC",
+    "results_path": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/final_audit_job_61841413/results/FINAL_AUDIT.json",
+    "eligible_top3_path": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/final_audit_job_61841413/results/qmmm_eligible_top3.json"
+  },
+  "parent_microstate": {
+    "Thr267_Nalpha": "NH2",
+    "Thr267_Ogamma": "OH",
+    "Asp306": "ASH",
+    "Asp308": "ASP"
+  },
+  "target_microstate": {
+    "Thr267_Nalpha": "NH3+",
+    "Thr267_Ogamma": "O-",
+    "Asp306": "ASH",
+    "Asp308": "ASP"
+  },
+  "topology_delta": {
+    "transferred_atom": "Thr267:HG1",
+    "removed_bonds": [
+      [
+        "Thr267:OG1",
+        "Thr267:HG1"
+      ]
+    ],
+    "added_bonds": [
+      [
+        "Thr267:N",
+        "Thr267:HG1"
+      ]
+    ],
+    "coordinate_changes_allowed": [
+      "Thr267:HG1"
+    ]
+  },
+  "invariants": {
+    "atom_count_delta": 0,
+    "system_charge_delta_e": 0,
+    "unchanged_microstates": [
+      "Asp306:ASH",
+      "Asp308:ASP"
+    ],
+    "unchanged_nonlocal_coordinates": true
+  },
+  "force_field": {
+    "name": "amber99sb-ildn",
+    "gromacs_version": "2022.1",
+    "native_a1_patch_found": false,
+    "native_patch_search_result": "No deprotonated N-terminal Thr/alkoxide residue template was found in the installed amber99sb-ildn.ff."
+  },
+  "parameter_source": {
+    "status": "NOT_EVALUATED_PENDING_GENERATION",
+    "required_method": "generated_and_independently_audited_local_A1_screening_patch",
+    "fallback_if_failed": "DIRECT_DFTB3_QMMM_PREFLIGHT_NO_CLASSICAL_A1_MD"
+  },
+  "parents": [
+    {
+      "id": "nac_evt18_time1206ps",
+      "seed": 26711,
+      "time_ps": 258.0,
+      "source_path": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/final_audit_job_61841413/assembled/medoids/nac_evt18_time1206ps/seed26711_time258.000ps.gro",
+      "coordinate_sha256": "c8b9c8bf8988b7c7b1b470579894eb9b7501cc71bda6bb856e1c291d792e23dc",
+      "distance_nm": 0.3117068011,
+      "angle_deg": 109.6471457,
+      "gate_nm": 2.959230876
+    },
+    {
+      "id": "nac_evt25_time1462ps",
+      "seed": 26711,
+      "time_ps": 606.0,
+      "source_path": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/final_audit_job_61841413/assembled/medoids/nac_evt25_time1462ps/seed26711_time606.000ps.gro",
+      "coordinate_sha256": "e1c292b7da52d68bdc3c41213d934f8fabcdc5f3dd953282274d793598690fae",
+      "distance_nm": 0.3460361793,
+      "angle_deg": 114.7746798,
+      "gate_nm": 3.165572727
+    },
+    {
+      "id": "nac_evt08_time1086ps",
+      "seed": 26711,
+      "time_ps": 100.0,
+      "source_path": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/final_audit_job_61841413/assembled/medoids/nac_evt08_time1086ps/seed26711_time100.000ps.gro",
+      "coordinate_sha256": "6cddb322d02425c040afaa86dd9b2939e8dd933b9651b793b0a2ffa907611124",
+      "distance_nm": 0.3134983074,
+      "angle_deg": 102.0559099,
+      "gate_nm": 3.069394973
+    }
+  ],
+  "scientific_scope": {
+    "mm_role": "same-Hamiltonian activated-NAC stability screening only",
+    "qmmm_ground_state_label": "GS_act",
+    "excluded_claim": "complete resting-state activation barrier"
+  }
+}
