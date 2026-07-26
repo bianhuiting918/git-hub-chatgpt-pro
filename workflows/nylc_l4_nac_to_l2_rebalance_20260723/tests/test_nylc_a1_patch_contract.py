@@ -68,20 +68,23 @@ def gromacs_text_fixture():
         atom_rows.append(
             f"{local_id:5d} CT {resnr:5d} {resname:4s} {name:5s} {local_id:5d} 0.0 1.0"
         )
-    name_to_local = {name: i + 1 for i, name in enumerate(local_names)}
+    thr_name_to_local = {name: i + 1 for i, name in enumerate(thr)}
+    next_name_to_local = {
+        name: len(thr) + i + 1 for i, name in enumerate(nxt)
+    }
     bond_rows = []
     for pair in bonds:
         left, right = tuple(pair)
         left_name = left.split(":", 1)[-1]
         right_name = right.split(":", 1)[-1]
         if left.startswith("next:"):
-            left_id = len(thr) + list(nxt).index(left_name) + 1
+            left_id = next_name_to_local[left_name]
         else:
-            left_id = name_to_local[left_name]
+            left_id = thr_name_to_local[left_name]
         if right.startswith("next:"):
-            right_id = len(thr) + list(nxt).index(right_name) + 1
+            right_id = next_name_to_local[right_name]
         else:
-            right_id = name_to_local[right_name]
+            right_id = thr_name_to_local[right_name]
         bond_rows.append(f"{left_id:5d} {right_id:5d} 1")
     itp = "[ atoms ]\n" + "\n".join(atom_rows) + "\n\n[ bonds ]\n" + "\n".join(bond_rows) + "\n"
 
@@ -155,7 +158,9 @@ class A1ParameterModelContractTests(unittest.TestCase):
     def test_gromacs_parser_rejects_wrong_global_atom_identity(self):
         module = load_module()
         itp, gro = gromacs_text_fixture()
-        bad = gro.replace("THR    N    1", "THR   XX    1", 1)
+        lines = gro.splitlines()
+        lines[2] = lines[2][:10] + f"{'XX':>5s}" + lines[2][15:]
+        bad = "\n".join(lines) + "\n"
         with self.assertRaisesRegex(module.ModelError, "identity mismatch"):
             module.model_from_gromacs_text(
                 itp, bad, chain_first_global_atom=1, thr_resnr=267, next_resnr=268
