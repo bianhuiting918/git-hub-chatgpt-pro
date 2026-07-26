@@ -89,7 +89,7 @@ class SurfaceShellUnitTests(unittest.TestCase):
         )
 
         self.assertEqual(first["coordinates"].shape, second["coordinates"].shape)
-        np.testing.assert_allclose(second["coordinates"] - first["coordinates"], shift)
+        np.testing.assert_allclose(\n            second["coordinates"] - first["coordinates"],\n            np.broadcast_to(shift, first["coordinates"].shape),\n        )
         for channel in ("A", "C", "OA", "HD"):
             np.testing.assert_array_equal(first[channel], second[channel])
         self.assertEqual(first["summary"]["n_shell_points"], second["summary"]["n_shell_points"])
