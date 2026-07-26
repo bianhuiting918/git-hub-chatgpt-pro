@@ -132,6 +132,13 @@ class A1PatchAuditContractTests(unittest.TestCase):
         self.assertNotIn("module load amber/2018", text)
         self.assertNotIn("\\nsander -O", text)
 
+    def test_gromacs_runtime_is_loaded_before_editconf(self):
+        text = RUNNER.read_text(encoding="utf-8")
+        self.assertLess(
+            text.index("source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh"),
+            text.index('"$GMX" editconf'),
+        )
+
     def test_parameterization_runs_through_slurm(self):
         self.assertTrue(SBATCH.is_file())
         text = SBATCH.read_text(encoding="utf-8")
