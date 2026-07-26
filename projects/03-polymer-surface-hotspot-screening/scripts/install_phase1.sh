@@ -114,11 +114,24 @@ CONDA_PKGS_DIRS="$CONDA_CACHE" "$CONDA_BOOTSTRAP" list --prefix "$ENV_DIR" \
 "$ADFR_BIN/autosite" --version >"$LOG_DIR/autosite.version.log" 2>&1
 "$ADFR_BIN/autogrid4" -h >"$LOG_DIR/autogrid4.version.log" 2>&1
 "$ADFR_BIN/prepare_receptor" -h >"$LOG_DIR/prepare_receptor.version.log" 2>&1
-"$ENV_DIR/bin/freesasa" --version >"$LOG_DIR/freesasa.version.log" 2>&1
+"$ENV_DIR/bin/python" - >"$LOG_DIR/freesasa.version.log" 2>&1 <<'PY'
+import importlib.metadata
+import freesasa
+
+version = importlib.metadata.version("freesasa")
+result = freesasa.calcCoord(
+    [0.0, 0.0, 0.0, 3.4, 0.0, 0.0],
+    [1.7, 1.7],
+)
+area = result.totalArea()
+if area <= 0:
+    raise RuntimeError(f"FreeSASA smoke calculation returned non-positive area: {area}")
+print(f"freesasa {version}")
+print(f"smoke_total_area={area:.6f}")
+PY
 "$ENV_DIR/bin/python" -c "import numpy, scipy, pandas, Bio, yaml" \
   >"$LOG_DIR/core_imports.log" 2>&1
 "$ENV_DIR/bin/python" -c "import rdkit" >"$LOG_DIR/rdkit_import.log" 2>&1
-"$ENV_DIR/bin/python" -c "import freesasa" >"$LOG_DIR/freesasa_import.log" 2>&1
 "$ENV_DIR/bin/python" -m pytest --version >"$LOG_DIR/pytest.version.log" 2>&1
 
 lock_sha=$(sha256sum "$LOCK" | awk '{print $1}')
