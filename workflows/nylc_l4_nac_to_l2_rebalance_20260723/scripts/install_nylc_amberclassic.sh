@@ -122,7 +122,9 @@ test -x "$PREFIX/bin/parmchk2"
 test -x "$PREFIX/bin/tleap"
 test -x "$PREFIX/bin/sqm"
 test -x "$PREFIX/bin/msander"
+set +u
 source "$PREFIX/AmberClassic.sh"
+set -u
 antechamber -h >antechamber_help.stdout 2>antechamber_help.stderr
 
 "$PY" - "$PREFIX" "$ACTIVE" "$AMBERCLASSIC_COMMIT" "$SOURCE_SHA256" "$JOB_ID" "$STAGED_ARCHIVE" <<'PY'
