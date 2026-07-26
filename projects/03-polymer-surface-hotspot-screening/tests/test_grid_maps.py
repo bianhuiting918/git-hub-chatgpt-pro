@@ -51,6 +51,17 @@ class GridMapTests(unittest.TestCase):
         runner = load_runner()
         self.assertEqual(runner.box_literal([1.0, 2.5, 3.0]), "[1.0,2.5,3.0]")
 
+    def test_autosite_command_uses_one_argument_per_box_option(self):
+        runner = load_runner()
+        command = runner.build_autosite_command(
+            Path("/opt/autosite"), Path("/tmp/receptor.pdbqt"),
+            Path("/tmp/out"), 0.75, [1.0, 2.5, 3.0], [15.0, 16.5, 18.0],
+        )
+        self.assertEqual(command[command.index("--boxcenter") + 1], "[1.0,2.5,3.0]")
+        self.assertEqual(command[command.index("--boxdim") + 1], "[15.0,16.5,18.0]")
+        self.assertEqual(command.count("--boxcenter"), 1)
+        self.assertEqual(command.count("--boxdim"), 1)
+
     def test_map_header_validation_accepts_identical_geometry(self):
         runner = load_runner()
         with tempfile.TemporaryDirectory() as tmp:
