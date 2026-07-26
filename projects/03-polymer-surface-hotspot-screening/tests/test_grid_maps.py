@@ -47,7 +47,11 @@ class GridMapTests(unittest.TestCase):
         self.assertIn("spacing 0.750000", text)
         self.assertIn("gridcenter 1.000000 2.000000 3.000000", text)
 
-    def test_autosite_box_values_are_single_list_literals(self):\n        runner = load_runner()\n        self.assertEqual(runner.box_literal([1.0, 2.5, 3.0]), "[1.0,2.5,3.0]")\n\n    def test_map_header_validation_accepts_identical_geometry(self):
+    def test_autosite_box_values_are_single_list_literals(self):
+        runner = load_runner()
+        self.assertEqual(runner.box_literal([1.0, 2.5, 3.0]), "[1.0,2.5,3.0]")
+
+    def test_map_header_validation_accepts_identical_geometry(self):
         runner = load_runner()
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
