@@ -146,6 +146,7 @@ class A1PatchAuditContractTests(unittest.TestCase):
             text.index("module load gromacs/2022.2-hpcx-gcc-7.3.1"),
         )
         self.assertNotIn("/Gromacs-DCU2/", text)
+        self.assertNotIn("-ntmpi 1", text)
 
     def test_parameterization_runs_through_slurm(self):
         self.assertTrue(SBATCH.is_file())
