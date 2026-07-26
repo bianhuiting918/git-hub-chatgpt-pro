@@ -62,6 +62,16 @@ class GridMapTests(unittest.TestCase):
         self.assertEqual(command.count("--boxcenter"), 1)
         self.assertEqual(command.count("--boxdim"), 1)
 
+    def test_autosite_output_directory_is_created_empty(self):
+        runner = load_runner()
+        with tempfile.TemporaryDirectory() as tmp:
+            outdir = Path(tmp) / "autosite"
+            runner.prepare_empty_directory(outdir)
+            self.assertTrue(outdir.is_dir())
+            (outdir / "partial").write_text("x", encoding="ascii")
+            with self.assertRaises(FileExistsError):
+                runner.prepare_empty_directory(outdir)
+
     def test_map_header_validation_accepts_identical_geometry(self):
         runner = load_runner()
         with tempfile.TemporaryDirectory() as tmp:
