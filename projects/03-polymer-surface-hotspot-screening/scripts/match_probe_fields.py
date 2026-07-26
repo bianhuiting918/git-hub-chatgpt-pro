@@ -14,6 +14,72 @@ from scipy.spatial import cKDTree
 
 
 
+
+def trilinear_interpolate(
+    values: np.ndarray,
+    origin: np.ndarray,
+    spacing: float,
+    points: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Sample a regular xyz AutoGrid array and mark points inside its union."""
+    values = np.asarray(values, dtype=float)
+    origin = np.asarray(origin, dtype=float)
+    points = np.asarray(points, dtype=float)
+    if values.ndim != 3 or origin.shape != (3,) or points.ndim != 2 or points.shape[1] != 3:
+        raise ValueError("invalid grid geometry")
+    if spacing <= 0:
+        raise ValueError("grid spacing must be positive")
+    fractional = (points - origin) / float(spacing)
+    upper = np.asarray(values.shape, dtype=float) - 1.0
+    inside = np.all((fractional >= 0.0) & (fractional <= upper), axis=1)
+    sampled = np.full(len(points), np.nan, dtype=float)
+    for row in np.flatnonzero(inside):
+        coordinate = fractional[row]
+        lower = np.floor(coordinate).astype(int)
+        upper_index = np.minimum(lower + 1, np.asarray(values.shape) - 1)
+        weight = coordinate - lower
+        x0, y0, z0 = lower
+        x1, y1, z1 = upper_index
+        wx, wy, wz = weight
+        sampled[row] = (
+            values[x0, y0, z0] * (1 - wx) * (1 - wy) * (1 - wz)
+            + values[x1, y0, z0] * wx * (1 - wy) * (1 - wz)
+            + values[x0, y1, z0] * (1 - wx) * wy * (1 - wz)
+            + values[x1, y1, z0] * wx * wy * (1 - wz)
+            + values[x0, y0, z1] * (1 - wx) * (1 - wy) * wz
+            + values[x1, y0, z1] * wx * (1 - wy) * wz
+            + values[x0, y1, z1] * (1 - wx) * wy * wz
+            + values[x1, y1, z1] * wx * wy * wz
+        )
+    return sampled, inside
+
+
+def select_probe_anchor_triplets(
+    coordinates: np.ndarray,
+    channels: Iterable[str],
+    maximum_triplets: int,
+    minimum_triangle_area: float,
+) -> list[tuple[int, int, int]]:
+    """Return deterministic non-collinear typed atom triples."""
+    from itertools import combinations
+
+    coordinates = np.asarray(coordinates, dtype=float)
+    channels = tuple(channels)
+    if coordinates.shape != (len(channels), 3):
+        raise ValueError("channel and coordinate counts differ")
+    if maximum_triplets < 1 or minimum_triangle_area < 0:
+        raise ValueError("invalid triplet parameters")
+    output: list[tuple[int, int, int]] = []
+    for triplet in combinations(range(len(channels)), 3):
+        left, middle, right = coordinates[np.asarray(triplet, dtype=np.int64)]
+        area = 0.5 * np.linalg.norm(np.cross(middle - left, right - left))
+        if area < minimum_triangle_area - 1e-12:
+            continue
+        output.append(tuple(int(value) for value in triplet))
+        if len(output) == maximum_triplets:
+            break
+    return output
+
 def extract_field_anchors(
     coordinates: np.ndarray,
     raw_map_energy: np.ndarray,
