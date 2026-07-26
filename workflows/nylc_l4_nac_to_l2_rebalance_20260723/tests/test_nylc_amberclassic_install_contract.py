@@ -22,7 +22,7 @@ class AmberClassicInstallContractTests(unittest.TestCase):
             "make -j 1 install",
             "/home/case/AmberClassic",
             "dependency_relocation.json",
-            "bin/msander",
+            "msander",
             'TOOLS_ROOT="$TASK_ROOT/tools"',
             "CONNECT.TPL",
             "antechamber -h",
@@ -57,7 +57,7 @@ class AmberClassicInstallContractTests(unittest.TestCase):
         for token in [
             "amberclassic_job_61898124_0b35bfeb9602",
             "PASS_DEPENDENCY_PATH_RELOCATION",
-            "bin/msander",
+            "msander",
             "ACTIVE_AMBERCLASSIC.json",
             "PASS_AMBERCLASSIC_INSTALL",
             "recovery_of_slurm_job",
