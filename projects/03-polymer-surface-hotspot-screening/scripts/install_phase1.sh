@@ -10,7 +10,8 @@ ADFR_BIN="$ROOT/software/ADFRsuite-1.0/bin"
 ENV_DIR="$ROOT/envs/surface-screen-py311"
 PIP_CACHE="$ROOT/cache/pip"
 CONDA_CACHE="$ROOT/cache/conda/pkgs"
-LOG_DIR="$ROOT/logs/install_phase1"
+run_stamp=$(date -u +%Y%m%dT%H%M%SZ)
+LOG_DIR="$ROOT/logs/install_phase1/$run_stamp"
 GATE_DIR="$ROOT/results/gates"
 PASS_GATE="$GATE_DIR/INSTALL_PASS.json"
 FAIL_GATE="$GATE_DIR/INSTALL_FAIL.json"
@@ -41,15 +42,14 @@ for guarded in "$ROOT/envs" "$ROOT/cache" "$ROOT/results" "$ROOT/logs"; do
 done
 
 mkdir -p "$ROOT/envs" "$PIP_CACHE" "$CONDA_CACHE" "$LOG_DIR" "$GATE_DIR"
-run_stamp=$(date -u +%Y%m%dT%H%M%SZ)
 if [ -e "$FAIL_GATE" ]; then
   mv "$FAIL_GATE" "$LOG_DIR/INSTALL_FAIL.preexisting.$run_stamp.json"
 fi
 on_failure() {
   status=$?
   if [ "$status" -ne 0 ]; then
-    printf '{"status":"INSTALL_FAIL","exit_code":%s,"timestamp":"%s"}\n' \
-      "$status" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$FAIL_GATE"
+    printf '{"status":"INSTALL_FAIL","exit_code":%s,"timestamp":"%s","log_dir":"%s"}\n' \
+      "$status" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$LOG_DIR" > "$FAIL_GATE"
   fi
   exit "$status"
 }
