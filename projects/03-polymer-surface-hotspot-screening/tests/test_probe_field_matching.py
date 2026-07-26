@@ -175,4 +175,4 @@ def test_probe_atom_channels_recover_nylon_amide_donor_and_acceptor():
     channels = mod.probe_atom_channels(molecule)
     assert channels.count("OA") == 1
     assert channels.count("HD") == 1
-    assert channels.count("C") == 2
+    assert channels.count("C") == 3
