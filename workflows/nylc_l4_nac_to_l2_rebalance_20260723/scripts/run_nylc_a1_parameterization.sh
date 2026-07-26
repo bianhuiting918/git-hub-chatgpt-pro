@@ -118,9 +118,51 @@ record_phase after_tool_resolution
 cd "$OUT_DIR"
 antechamber \
   -i model/NTA1_CAP.input.mol2 -fi mol2 \
-  -o NTA1_CAP.am1bcc.mol2 -fo mol2 \
+  -o NTA1_CAP.am1bcc.raw.mol2 -fo mol2 \
   -c bcc -nc 0 -m 1 -at gaff2 -rn NTA1 -s 2 \
   >antechamber.stdout 2>antechamber.stderr
+"$PY" - NTA1_CAP.am1bcc.raw.mol2 NTA1_CAP.am1bcc.mol2 charge_normalization.json <<'PY'
+import json
+import pathlib
+import sys
+source = pathlib.Path(sys.argv[1])
+output = pathlib.Path(sys.argv[2])
+audit = pathlib.Path(sys.argv[3])
+lines = source.read_text(encoding="utf-8").splitlines()
+in_atoms = False
+rows = []
+for index, line in enumerate(lines):
+    if line == "@<TRIPOS>ATOM":
+        in_atoms = True
+        continue
+    if line == "@<TRIPOS>BOND":
+        in_atoms = False
+    elif in_atoms and line.strip():
+        fields = line.split()
+        rows.append((index, fields))
+charge_before = sum(float(fields[8]) for _, fields in rows)
+if abs(charge_before) > 0.01:
+    raise SystemExit(f"AM1-BCC charge residual too large: {charge_before}")
+targets = [(index, fields) for index, fields in rows if fields[1] == "N"]
+if len(targets) != 1:
+    raise SystemExit("expected exactly one A1 N atom for charge normalization")
+index, fields = targets[0]
+old_charge = float(fields[8])
+fields[8] = f"{old_charge - charge_before:.6f}"
+lines[index] = " ".join(fields)
+charge_after = sum(float(fields[8]) for _, fields in rows)
+if abs(charge_after) > 5.0e-7:
+    raise SystemExit(f"normalized charge is not zero: {charge_after}")
+output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+audit.write_text(json.dumps({
+    "schema_version": 1,
+    "status": "PASS_AM1BCC_ROUNDING_NORMALIZATION",
+    "charge_before_e": charge_before,
+    "charge_after_e": charge_after,
+    "adjusted_atom": "N",
+    "adjustment_e": -charge_before,
+}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+PY
 parmchk2 -i NTA1_CAP.am1bcc.mol2 -f mol2 -o NTA1_CAP.frcmod -s gaff2 \
   >parmchk2.stdout 2>parmchk2.stderr
 
@@ -157,25 +199,29 @@ structure = pmd.load_file(prmtop, xyz=inpcrd)
 structure.save(top, format="gromacs", overwrite=False)
 structure.save(gro, format="gro", overwrite=False)
 PY
+"$GMX" editconf -f NTA1_CAP.gromacs.gro -o NTA1_CAP.gromacs.boxed.gro \
+  -box 20 20 20 -center 10 10 10 >editconf.stdout 2>editconf.stderr
 
 cat >single.mdp <<'EOF'
 integrator               = md
 dt                       = 0.001
 nsteps                   = 0
 cutoff-scheme            = Verlet
-nstlist                  = 1
+nstlist                  = 10
 rlist                    = 2.0
 rcoulomb                 = 2.0
 rvdw                     = 2.0
 coulombtype              = Cut-off
 vdwtype                  = Cut-off
-pbc                      = no
+pbc                      = xyz
+continuation             = yes
+comm-mode                = None
 constraints              = none
 nstenergy                = 1
 EOF
 source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
 export GMX_MAXBACKUP=-1
-"$GMX" grompp -f single.mdp -c NTA1_CAP.gromacs.gro -p NTA1_CAP.gromacs.top \
+"$GMX" grompp -f single.mdp -c NTA1_CAP.gromacs.boxed.gro -p NTA1_CAP.gromacs.top \
   -o single.tpr -po single.expanded.mdp -maxwarn 0 >grompp.stdout 2>grompp.stderr
 "$GMX" mdrun -s single.tpr -deffnm gmx_single -ntmpi 1 -ntomp 1 \
   >mdrun.stdout 2>mdrun.stderr
@@ -239,7 +285,7 @@ PY
   --provenance parameter_provenance.json \
   --output PATCH_AUDIT.json
 
-sha256sum   model/NTA1_CAP.input.mol2   NTA1_CAP.am1bcc.mol2   NTA1_CAP.frcmod   NTA1_CAP.prmtop   NTA1_CAP.inpcrd   NTA1_CAP.gromacs.top   NTA1_CAP.gromacs.gro   parameter_provenance.json   PATCH_AUDIT.json >sha256.tsv
+sha256sum   model/NTA1_CAP.input.mol2   NTA1_CAP.am1bcc.raw.mol2   NTA1_CAP.am1bcc.mol2   charge_normalization.json   NTA1_CAP.frcmod   NTA1_CAP.prmtop   NTA1_CAP.inpcrd   NTA1_CAP.gromacs.top   NTA1_CAP.gromacs.gro   NTA1_CAP.gromacs.boxed.gro   parameter_provenance.json   PATCH_AUDIT.json >sha256.tsv
 
 STATE=PASS_TECHNICAL
 DETAIL="parameter_status=PASS_A1_SCREENING_PATCH; output=$OUT_DIR"
