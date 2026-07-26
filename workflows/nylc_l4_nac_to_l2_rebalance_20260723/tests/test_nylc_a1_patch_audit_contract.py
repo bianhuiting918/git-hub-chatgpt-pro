@@ -104,7 +104,7 @@ class A1PatchAuditContractTests(unittest.TestCase):
     def test_driver_names_required_ambertools_and_history(self):
         text = RUNNER.read_text(encoding="utf-8")
         for token in [
-            "antechamber", "parmchk2", "tleap", "sqm",
+            "antechamber", "parmchk2", "tleap", "sqm", "msander",
             "run_history.tsv", "run_history.jsonl",
             "audit_nylc_a1_patch.py",
         ]:
@@ -121,6 +121,7 @@ class A1PatchAuditContractTests(unittest.TestCase):
         ]:
             self.assertIn(token, text)
         self.assertNotIn("module load amber/2018", text)
+        self.assertNotIn("\\nsander -O", text)
 
     def test_parameterization_runs_through_slurm(self):
         self.assertTrue(SBATCH.is_file())
