@@ -6,6 +6,8 @@ HERE = Path(__file__).resolve().parents[1]
 INSTALLER = HERE / "scripts" / "install_nylc_amberclassic.sh"
 STAGER = HERE / "scripts" / "stage_nylc_amberclassic_source.sh"
 SBATCH = HERE / "slurm" / "run_install_nylc_amberclassic.sbatch"
+RECOVER = HERE / "scripts" / "recover_nylc_amberclassic_install.sh"
+RECOVER_SBATCH = HERE / "slurm" / "run_recover_nylc_amberclassic_install.sbatch"
 
 
 class AmberClassicInstallContractTests(unittest.TestCase):
@@ -20,6 +22,7 @@ class AmberClassicInstallContractTests(unittest.TestCase):
             "make -j 1 install",
             "/home/case/AmberClassic",
             "dependency_relocation.json",
+            "bin/msander",
             'TOOLS_ROOT="$TASK_ROOT/tools"',
             "CONNECT.TPL",
             "antechamber -h",
@@ -47,6 +50,26 @@ class AmberClassicInstallContractTests(unittest.TestCase):
             "PASS_SOURCE.json",
         ]:
             self.assertIn(token, text)
+
+
+    def test_recovery_wraps_completed_build_without_mutating_it(self):
+        text = RECOVER.read_text(encoding="utf-8")
+        for token in [
+            "amberclassic_job_61898124_0b35bfeb9602",
+            "PASS_DEPENDENCY_PATH_RELOCATION",
+            "bin/msander",
+            "ACTIVE_AMBERCLASSIC.json",
+            "PASS_AMBERCLASSIC_INSTALL",
+            "recovery_of_slurm_job",
+            "run_history.tsv",
+            "run_history.jsonl",
+        ]:
+            self.assertIn(token, text)
+        self.assertNotIn("make install", text)
+        self.assertNotIn("curl ", text)
+        sbatch = RECOVER_SBATCH.read_text(encoding="utf-8")
+        self.assertIn("#SBATCH -p xahcnormal", sbatch)
+        self.assertIn("recover_nylc_amberclassic_install.sh", sbatch)
 
     def test_install_runs_on_scnet_compute_node(self):
         text = SBATCH.read_text(encoding="utf-8")
