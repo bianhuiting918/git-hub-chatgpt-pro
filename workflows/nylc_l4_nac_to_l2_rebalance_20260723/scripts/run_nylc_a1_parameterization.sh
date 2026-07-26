@@ -91,7 +91,9 @@ export AMBER_SOURCE_SHA256="${AMBER_META[1]}"
 export AMBER_SOURCE_COMMIT="${AMBER_META[2]}"
 export AMBER_PREFIX
 record_phase after_active_manifest
+set +u
 source "$AMBER_PREFIX/AmberClassic.sh"
+set -u
 record_phase after_amberclassic_source
 for exe in antechamber parmchk2 resp respgen tleap sqm msander; do
   resolved="$(command -v "$exe")"
