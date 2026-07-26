@@ -117,20 +117,12 @@ def total_pose_score(field_score: float, relative_strain: float) -> float:
 
 
 def _pose_rmsd(left: np.ndarray, right: np.ndarray) -> float:
+    """RMSD in the fixed receptor frame; translated sites are distinct poses."""
     left = np.asarray(left, dtype=float)
     right = np.asarray(right, dtype=float)
     if left.shape != right.shape:
         return float("inf")
-    centered_left = left - left.mean(axis=0)
-    centered_right = right - right.mean(axis=0)
-    covariance = centered_left.T @ centered_right
-    u, _, vt = np.linalg.svd(covariance)
-    rotation = vt.T @ u.T
-    if np.linalg.det(rotation) < 0:
-        vt[-1, :] *= -1
-        rotation = vt.T @ u.T
-    aligned = centered_left @ rotation.T
-    return float(np.sqrt(np.mean(np.sum((aligned - centered_right) ** 2, axis=1))))
+    return float(np.sqrt(np.mean(np.sum((left - right) ** 2, axis=1))))
 
 
 def cluster_pose_records(
