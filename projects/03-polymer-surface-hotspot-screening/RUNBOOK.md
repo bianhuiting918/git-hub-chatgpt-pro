@@ -47,6 +47,12 @@ Use the configured SSH route:
 
 Do not bypass the SSH configuration. If the configured BindAddress is unavailable, stop and restore the approved network route.
 
+The Sugon server does not need outbound GitHub access. Deploy exact files from a GitHub commit through the connected workstation into:
+
+    /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/deployments/COMMIT_SHA/
+
+For every deployed file, compare the server-side `git hash-object` value with the GitHub blob SHA before execution. Never modify the server repository checkout to work around an outbound network failure.
+
 ## Required remote directory tree
 
 After confirming the resolved root, create:
@@ -108,12 +114,14 @@ If absent, do not proceed.
 
 The primary map scan has no explicit ligand file.
 
-The explicit probe manifest is for validation stages and chemistry controls. Build and validate it with RDKit:
+The explicit probe manifest is for validation stages and chemistry controls. From a blob-verified commit snapshot, build and validate it with the pinned RDKit environment:
 
-    python scripts/build_probe_library.py \
-      --manifest config/probes.tsv \
-      --output-dir inputs/probes \
-      --summary manifests/probe_summary.json
+    /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/envs/surface-screen-py311/bin/python \
+      deployments/COMMIT_SHA/projects/03-polymer-surface-hotspot-screening/scripts/build_probe_library.py \
+      --manifest deployments/COMMIT_SHA/projects/03-polymer-surface-hotspot-screening/config/probes.tsv \
+      --output-dir results/probes_v1
+
+The builder retains an existing `PROBES_PASS.json` without overwrite and refuses partial pre-existing outputs. Stage 3 capped oligomers remain deferred.
 
 Required checks:
 
