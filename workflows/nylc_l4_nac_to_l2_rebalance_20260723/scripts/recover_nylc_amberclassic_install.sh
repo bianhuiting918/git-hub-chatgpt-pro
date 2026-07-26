@@ -45,7 +45,9 @@ for rel in bin dat lib include AmberClassic.sh dependency_relocation.json compil
   test -e "$SOURCE_PREFIX/$rel"
   ln -s "$SOURCE_PREFIX/$rel" "$PREFIX/$rel"
 done
+set +u
 source "$PREFIX/AmberClassic.sh"
+set -u
 for exe in antechamber parmchk2 resp respgen tleap sqm msander; do
   resolved="$(command -v "$exe")"
   case "$resolved" in "$PREFIX"/bin/*) ;; *) printf 'Resolved %s outside recovered prefix: %s\n' "$exe" "$resolved" >&2; exit 4 ;; esac
