@@ -163,6 +163,28 @@ Before use, inspect:
 - biological assembly context;
 - exclusions and NOT_EVALUATED categories.
 
+## Phase 3.5: exterior-connected surface shell
+
+Only run after a checksum-verified `MAPS_PASS.json`. Use the commit-pinned shell extractor and keep PET and nylon result roots separate:
+
+    python deployments/COMMIT_SHA/projects/03-polymer-surface-hotspot-screening/scripts/extract_surface_shell.py \
+      --maps-root results/grid_maps_smoke_RUN_ID/FAMILY_RECORD \
+      --receptor-pdbqt results/receptor_determinism_RUN_ID/FAMILY_RECORD/run1/receptor.pdbqt \
+      --receptor-pdb results/receptor_determinism_RUN_ID/FAMILY_RECORD/run1/selected.pdb \
+      --output-dir results/surface_shell_smoke_RUN_ID/FAMILY_RECORD \
+      --record-id FAMILY_RECORD
+
+Frozen shell definition:
+
+- boundary-connected solvent only;
+- 26-connectivity;
+- receptor occupancy from atomic van der Waals radii plus a 1.40 A solvent probe;
+- primary near-surface band 0.00-2.25 A;
+- sensitivity bands 0.00-1.50 A and 0.00-3.00 A;
+- compact coordinates, A/C/OA/HD values, CSR neighbor graph, nearest receptor residue, and tile provenance.
+
+The primary shell gate is `SHELL_PASS.json`. `SHELL_SASA_DISAGREEMENT` is a technical/scientific review flag, not evidence of inactivity. Verify `SHA256SUMS` before patch scoring. Never overwrite a partial or PASS shell directory.
+
 ## Phase 4: smoke test
 
 Minimum smoke controls:
@@ -229,16 +251,17 @@ COMPLETE, scheduler exit 0, or presence of all shard files is not sufficient.
 
 Primary outputs are channel-specific:
 
-- C catalytic enrichment;
-- OA catalytic enrichment;
-- HD catalytic enrichment;
+- A aromatic-carbon catalytic enrichment;
+- C aliphatic-carbon catalytic enrichment;
+- OA acceptor-oxygen catalytic enrichment;
+- HD donor-hydrogen catalytic enrichment;
 - maximum equal-area off-target patch;
 - within-protein catalytic percentile;
 - global sticky-surface fraction.
 
 Secondary composites:
 
-- PET = mean(z_C, z_OA);
+- PET = mean(z_A, z_C, z_OA);
 - nylon = mean(z_C, z_OA, z_HD).
 
 These are screening proxies, not binding energies.
