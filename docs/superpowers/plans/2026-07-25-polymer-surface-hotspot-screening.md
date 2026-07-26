@@ -4,7 +4,7 @@
 
 **Goal:** Install and validate a reproducible AutoSite/AutoGrid4 surface-affinity workflow on Sugon, freeze PET and nylon probe/structure manifests, benchmark exact experimental controls, and prepare an audited high-throughput launch.
 
-**Architecture:** ADFRsuite prepares receptors and produces AutoSite plus whole-receptor C/OA/HD maps. A Python 3 analysis environment extracts an exterior-connected surface shell, constructs connected equal-area patches, maps independently annotated catalytic residues to the shell, and reports catalytic enrichment versus the strongest off-target patch. Manifests, logs, compact tables, and independent audit artifacts remain on the server; source and plans live in GitHub.
+**Architecture:** ADFRsuite prepares receptors and produces AutoSite plus whole-receptor A/C/OA/HD maps. A Python 3 analysis environment extracts an exterior-connected surface shell, constructs connected equal-area patches, maps independently annotated catalytic residues to the shell, and reports catalytic enrichment versus the strongest off-target patch. Manifests, logs, compact tables, and independent audit artifacts remain on the server; source and plans live in GitHub.
 
 **Tech Stack:** Bash, Slurm, ADFRsuite 1.0/1.1rc1 as verified at installation, AutoGrid4.2, AutoSite 1.0/1.1, Python 3.11, NumPy, SciPy, pandas, Biopython, RDKit, FreeSASA, pytest, PyYAML.
 
@@ -393,7 +393,7 @@ Tests cover:
 - small receptor requiring one grid;
 - large receptor requiring tiles;
 - exact overlap;
-- nonidentical C/OA/HD geometry rejection;
+- nonidentical A/C/OA/HD geometry rejection;
 - tile escaping receptor margin.
 
 **Step 2: Implement grid plan**
@@ -406,7 +406,7 @@ Default:
 
 The script probes the installed AutoGrid4 build for dimension limits and stores the measured limit in installation metadata.
 
-**Step 3: Generate C, OA, and HD maps**
+**Step 3: Generate A, C, OA, and HD maps**
 
 Use identical geometry. Run AutoSite. Compress logs. Keep raw maps for smoke and benchmark until audit passes.
 
@@ -454,7 +454,7 @@ Use atomic van der Waals radii, map geometry, boundary-connected solvent flood-f
 Store compact shell arrays only:
 
     coordinates
-    C/OA/HD values
+    A/C/OA/HD values
     graph-neighbor index
     nearest receptor atom/residue
     tile provenance
@@ -498,7 +498,7 @@ Use deterministic farthest-point sampling and connected graph growth. Exclude th
 
 **Step 4: Preserve primary channel metrics**
 
-Report C, OA, and HD separately. Add PET and nylon secondary composites only after calibration statistics are frozen.
+Report A, C, OA, and HD separately. Add PET and nylon secondary composites only after calibration statistics are frozen.
 
 **Step 5: Add interpretation flags**
 
@@ -509,6 +509,54 @@ Generate POCKET_ENRICHED, GLOBAL_STICKY, OFF_POCKET_HOTSPOT, CATALYTIC_REGION_NO
 Commit message:
 
     feat: compare catalytic and off-target surface patches
+
+## Task 9A: Match explicit probe spatial patterns
+
+**Files:**
+
+- Create: projects/03-polymer-surface-hotspot-screening/config/probe_matching.yaml
+- Create: projects/03-polymer-surface-hotspot-screening/scripts/match_probe_fields.py
+- Create: projects/03-polymer-surface-hotspot-screening/tests/test_probe_field_matching.py
+- Modify: projects/03-polymer-surface-hotspot-screening/RUNBOOK.md
+
+**Interfaces:**
+
+- Consumes checksum-validated exterior-shell A/C/OA/HD fields, the checksum-validated probe SDF, catalytic and equal-area off-target patches, and frozen receptor coordinates.
+- Produces probe_pose_summary.tsv, probe_poses.sdf, probe_failures.tsv, runtime.tsv, and SHA256SUMS. PET and nylon outputs remain separate.
+
+**Step 1: Add synthetic spatial-pattern tests**
+
+Cover a DMT-like aromatic-plus-two-acceptor pattern with compatible geometry, identical channel marginals with incompatible inter-hotspot distances, rigid-transform invariance, hard clash rejection, conformer-strain ordering, catalytic versus equal-area off-target selection, and deterministic pose clustering.
+
+**Step 2: Freeze conformer generation**
+
+Use RDKit ETKDGv3 seed 12648430 and heavy-atom RMSD pruning at 0.5 angstrom. Generate 8 conformers for probes with at most 2 rotatable bonds, 32 for 3-6 rotatable bonds, and 64 for more than 6. Minimize with MMFF when parameterized and UFF otherwise. Store relative internal energy. Classify embedding failure as NOT_EVALUATED_PROBE_CONFORMER.
+
+**Step 3: Generate typed field anchors**
+
+Extract local favorable minima independently for A, C, OA, and HD with minimum anchor separation 1.5 angstrom. Candidate graph matches require identical types and every selected pairwise distance within 1.0 angstrom of the probe conformer.
+
+**Step 4: Place and score complete probes**
+
+Use three non-collinear matched anchors for initial rigid Kabsch placement, then optimize translation and rotation using trilinearly interpolated A/C/OA/HD values. Sum every typed probe atom's map value and add conformer strain.
+
+Hard-reject when any ligand-protein heavy-atom distance is below 0.75 times the summed van der Waals radii, any atom leaves the grid union, or more than 20 percent of heavy atoms leave the exterior shell band.
+
+**Step 5: Preserve interpretable metrics**
+
+Cluster accepted poses at 2.0 angstrom ligand heavy-atom RMSD and retain at most 20 clusters per probe and region. Report best total, top-5 mean, count within 2.0 kcal/mol of the best, conformer strain, clash-rejection fraction, catalytic-minus-best-off-target difference, and coordinates.
+
+Controls do not contribute positively to a composite. PET evidence uses DMT plus aromatic/ester diagnostic concordance with BHET secondary support. Nylon evidence uses N-methylacetamide plus n-hexane concordance with the two neutral PA66 fragments as secondary support.
+
+**Step 6: Benchmark cost before production**
+
+Run explicit-pattern matching only on the scientific smoke set and measured benchmark shard. Do not enable it for all 8,342 PET and 2,030 nylon readable structures until runtime, determinism, and storage gates pass.
+
+**Step 7: Commit**
+
+Commit message:
+
+    feat: match explicit probe geometry to surface fields
 
 ## Task 10: Run PDB-experimental smoke tests
 
