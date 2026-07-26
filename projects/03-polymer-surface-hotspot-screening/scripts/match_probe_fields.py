@@ -16,6 +16,140 @@ from scipy.spatial import cKDTree
 
 
 
+
+
+def match_probe_conformer(
+    *,
+    complete_xyz: np.ndarray,
+    typed_atom_indices: np.ndarray,
+    typed_channels: Iterable[str],
+    heavy_atom_indices: np.ndarray,
+    heavy_atom_radii: np.ndarray,
+    region_indices: np.ndarray,
+    shell_xyz: np.ndarray,
+    shell_raw_channels: dict[str, np.ndarray],
+    maps: dict[str, dict],
+    protein_xyz: np.ndarray,
+    protein_radii: np.ndarray,
+    relative_strain: float,
+    anchor_minimum_separation: float,
+    anchor_distance_tolerance: float,
+    hard_clash_fraction: float,
+    maximum_outside_shell_fraction: float,
+    shell_cutoff: float,
+    maximum_field_anchors: int,
+    maximum_probe_triplets: int,
+    maximum_matches: int,
+) -> list[dict]:
+    """Generate deterministic rigid placements for one explicit probe conformer."""
+    complete_xyz = np.asarray(complete_xyz, dtype=float)
+    typed_atom_indices = np.asarray(typed_atom_indices, dtype=np.int64)
+    typed_channels = tuple(typed_channels)
+    heavy_atom_indices = np.asarray(heavy_atom_indices, dtype=np.int64)
+    heavy_atom_radii = np.asarray(heavy_atom_radii, dtype=float)
+    region_indices = np.asarray(region_indices, dtype=np.int64)
+    shell_xyz = np.asarray(shell_xyz, dtype=float)
+    if len(typed_atom_indices) != len(typed_channels):
+        raise ValueError("typed atom indices and channels differ")
+    if len(heavy_atom_indices) != len(heavy_atom_radii):
+        raise ValueError("heavy atom indices and radii differ")
+    typed_xyz = complete_xyz[typed_atom_indices]
+    field_coordinates: list[np.ndarray] = []
+    field_types: list[str] = []
+    for channel in sorted(set(typed_channels)):
+        if channel not in shell_raw_channels:
+            raise ValueError(f"missing shell channel {channel}")
+        anchors = extract_field_anchors(
+            shell_xyz,
+            np.asarray(shell_raw_channels[channel], dtype=float),
+            region_indices,
+            minimum_separation=anchor_minimum_separation,
+            maximum_anchors=maximum_field_anchors,
+        )
+        for anchor in anchors:
+            field_coordinates.append(shell_xyz[int(anchor)])
+            field_types.append(channel)
+    if len(field_coordinates) < 3:
+        return []
+    field_xyz = np.vstack(field_coordinates)
+    triplets = select_probe_anchor_triplets(
+        typed_xyz,
+        typed_channels,
+        maximum_triplets=maximum_probe_triplets,
+        minimum_triangle_area=0.1,
+    )
+    records: list[dict] = []
+    seen = set()
+    for triplet in triplets:
+        triplet_array = np.asarray(triplet, dtype=np.int64)
+        source = typed_xyz[triplet_array]
+        source_types = tuple(typed_channels[index] for index in triplet)
+        matches = enumerate_typed_anchor_matches(
+            source,
+            source_types,
+            field_xyz,
+            tuple(field_types),
+            tolerance=anchor_distance_tolerance,
+            maximum_matches=maximum_matches,
+        )
+        for assignment in matches:
+            target = field_xyz[np.asarray(assignment, dtype=np.int64)]
+            placed, anchor_rmsd = place_from_anchor_match(
+                complete_xyz,
+                typed_atom_indices[triplet_array],
+                target,
+            )
+            heavy_xyz = placed[heavy_atom_indices]
+            if has_hard_clash(
+                heavy_xyz,
+                heavy_atom_radii,
+                protein_xyz,
+                protein_radii,
+                fraction=hard_clash_fraction,
+            ):
+                continue
+            outside = outside_shell_fraction(
+                heavy_xyz,
+                shell_xyz[region_indices],
+                cutoff=shell_cutoff,
+            )
+            if reject_outside_shell(outside, maximum_outside_shell_fraction):
+                continue
+            typed_placed = placed[typed_atom_indices]
+            field_score, inside = score_pose_on_grids(
+                typed_placed,
+                typed_channels,
+                maps,
+            )
+            if not bool(np.all(inside)):
+                continue
+            key = tuple(np.round(heavy_xyz.reshape(-1), 3).tolist())
+            if key in seen:
+                continue
+            seen.add(key)
+            records.append(
+                {
+                    "pose_id": f"pose_{len(records) + 1:06d}",
+                    "score": total_pose_score(field_score, relative_strain),
+                    "field_score": float(field_score),
+                    "relative_strain": float(relative_strain),
+                    "anchor_rmsd": float(anchor_rmsd),
+                    "outside_shell_fraction": float(outside),
+                    "heavy_xyz": heavy_xyz,
+                    "complete_xyz": placed,
+                    "probe_anchor_triplet": tuple(int(value) for value in triplet),
+                    "field_anchor_assignment": tuple(int(value) for value in assignment),
+                }
+            )
+    records.sort(
+        key=lambda row: (
+            -float(row["score"]),
+            float(row["anchor_rmsd"]),
+            str(row["pose_id"]),
+        )
+    )
+    return records
+
 def conformer_budget(rotatable_bonds: int) -> int:
     if rotatable_bonds < 0:
         raise ValueError("rotatable bond count must be nonnegative")
