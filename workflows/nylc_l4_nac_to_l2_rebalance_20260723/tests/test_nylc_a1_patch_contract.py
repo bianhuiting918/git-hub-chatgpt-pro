@@ -116,7 +116,7 @@ class A1ParameterModelContractTests(unittest.TestCase):
         model = module.build_a1_capped_model(thr, nxt, bonds)
         self.assertTrue(model.has_bond("N", "HG1"))
         self.assertFalse(model.has_bond("OG1", "HG1"))
-        self.assertTrue(model.has_bond("C", "CAP_N"))
+        self.assertTrue(model.has_bond("C", "NCAP"))
         self.assertEqual(model.atom("N").formal_charge, 1)
         self.assertEqual(model.atom("OG1").formal_charge, -1)
         self.assertEqual(sum(atom.formal_charge for atom in model.atoms), 0)
@@ -129,6 +129,14 @@ class A1ParameterModelContractTests(unittest.TestCase):
         bonds.remove(frozenset(("OG1", "HG1")))
         with self.assertRaisesRegex(module.ModelError, "OG1-HG1"):
             module.build_a1_capped_model(thr, nxt, bonds)
+
+    def test_all_mol2_atom_names_are_element_safe_and_four_chars_or_less(self):
+        module = load_module()
+        thr, nxt, bonds = parent_fixture()
+        model = module.build_a1_capped_model(thr, nxt, bonds)
+        for atom in model.atoms:
+            self.assertLessEqual(len(atom.name), 4)
+            self.assertEqual(atom.name[0], atom.element[0])
 
     def test_mol2_records_formal_ion_pair_and_exact_atom_map(self):
         module = load_module()
