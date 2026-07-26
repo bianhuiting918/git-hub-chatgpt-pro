@@ -112,6 +112,12 @@ def build_autosite_command(
     ]
 
 
+def prepare_empty_directory(path: Path) -> None:
+    if path.exists():
+        raise FileExistsError(f"refusing existing AutoSite output directory: {path}")
+    path.mkdir()
+
+
 def receptor_atom_types(path: Path) -> list[str]:
     atom_types = set()
     with path.open(encoding="ascii", errors="strict") as handle:
@@ -226,6 +232,7 @@ def main() -> int:
                 raise ValueError(f"map geometry differs from plan for {tile['tile_id']}")
             boxdim = [float(n) * float(tile["spacing"]) for n in tile["npts"]]
             autosite_dir = tile_dir / "autosite"
+            prepare_empty_directory(autosite_dir)
             autosite_rc = run_command(
                 build_autosite_command(
                     args.autosite, receptor, autosite_dir,
