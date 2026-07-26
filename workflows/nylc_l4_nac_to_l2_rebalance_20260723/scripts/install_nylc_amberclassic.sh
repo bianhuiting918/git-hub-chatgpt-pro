@@ -73,6 +73,47 @@ tar -xzf "$STAGED_ARCHIVE" --strip-components=1 -C "$PREFIX"
 
 cd "$PREFIX"
 ./configure --noopenmp --noboost >configure.stdout 2>configure.stderr
+"$PY" - "$PREFIX/src" "$PREFIX" "$PREFIX/dependency_relocation.json" <<'PY'
+import hashlib
+import json
+import pathlib
+import sys
+source_root = pathlib.Path(sys.argv[1])
+prefix = sys.argv[2]
+output = pathlib.Path(sys.argv[3])
+stale = "/home/case/AmberClassic"
+changes = []
+for path in sorted(source_root.rglob("depend")):
+    text = path.read_text(encoding="utf-8", errors="strict")
+    count = text.count(stale)
+    if not count:
+        continue
+    before = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    updated = text.replace(stale, prefix)
+    path.write_text(updated, encoding="utf-8")
+    changes.append({
+        "path": str(path.relative_to(source_root.parent)),
+        "occurrences": count,
+        "before_sha256": before,
+        "after_sha256": hashlib.sha256(updated.encode("utf-8")).hexdigest(),
+    })
+if not changes:
+    raise SystemExit("expected at least one stale AmberClassic dependency path")
+record = {
+    "schema_version": 1,
+    "status": "PASS_DEPENDENCY_PATH_RELOCATION",
+    "stale_prefix": stale,
+    "replacement_prefix": prefix,
+    "files_changed": changes,
+    "remaining_stale_occurrences": sum(
+        path.read_text(encoding="utf-8", errors="strict").count(stale)
+        for path in source_root.rglob("depend")
+    ),
+}
+if record["remaining_stale_occurrences"] != 0:
+    raise SystemExit("stale AmberClassic dependency paths remain")
+output.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+PY
 make -j 1 install >make_install.stdout 2>make_install.stderr
 
 test -f "$PREFIX/dat/antechamber/CONNECT.TPL"
@@ -93,6 +134,7 @@ prefix = pathlib.Path(sys.argv[1])
 active = pathlib.Path(sys.argv[2])
 commit, source_sha, job, staged_archive = sys.argv[3:]
 required = [
+    prefix / "dependency_relocation.json",
     prefix / "dat" / "antechamber" / "CONNECT.TPL",
     prefix / "bin" / "antechamber",
     prefix / "bin" / "parmchk2",
