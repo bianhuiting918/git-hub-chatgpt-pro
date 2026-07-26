@@ -32,6 +32,14 @@ class InstallPhase1ContractTests(unittest.TestCase):
         self.assertNotIn("-m venv", text)
         self.assertNotIn("rm -rf", text)
 
+    def test_each_run_uses_a_unique_log_directory(self):
+        text = INSTALL.read_text(encoding="utf-8")
+        stamp = "run_stamp=$(date -u +%Y%m%dT%H%M%SZ)"
+        log_dir = 'LOG_DIR="$ROOT/logs/install_phase1/$run_stamp"'
+        self.assertIn(stamp, text)
+        self.assertIn(log_dir, text)
+        self.assertLess(text.index(stamp), text.index(log_dir))
+
     def test_slurm_spool_copy_uses_explicit_repo_project_path(self):
         text = INSTALL.read_text(encoding="utf-8")
         self.assertIn(
