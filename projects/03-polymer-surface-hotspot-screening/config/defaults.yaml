@@ -12,7 +12,7 @@ project:
 receptor:
   primary_context: monomer_standardized
   sensitivity_context: biological_assembly_context
-  altloc_policy: highest_occupancy_then_lexical
+  altloc_policy: blank_then_A_then_occupancy
   remove_waters: true
   remove_unlisted_hetero: true
   retain_cofactors_from_manifest_only: true
@@ -22,10 +22,12 @@ grid:
   margin_angstrom: 5.0
   tile_overlap_angstrom: 8.0
   atom_types:
+    - A
     - C
     - OA
     - HD
-  dimension_limit: detect_from_installed_build
+  dimension_limit: 126
+  dimension_limit_source: installed_autogrid4_4_2_6_compatibility_default
   overlap_merge: most_favorable_energy
 
 surface_shell:
@@ -53,6 +55,7 @@ affinity:
   transform: favorable_affinity_equals_negative_map_energy
   primary_selection: pareto_channel_metrics
   pet_channels:
+    - A
     - C
     - OA
   nylon_channels:
@@ -61,14 +64,29 @@ affinity:
     - HD
   secondary_composite:
     PET:
-      C: 0.5
-      OA: 0.5
+      A: 0.3333333333
+      C: 0.3333333333
+      OA: 0.3333333334
     NYLON:
       C: 0.3333333333
       OA: 0.3333333333
       HD: 0.3333333334
   cross_protein_normalization: frozen_exact_structure_median_mad
   within_protein_normalization: connected_patch_percentile
+
+probe_geometry_matching:
+  channels:
+    - A
+    - C
+    - OA
+    - HD
+  conformer_seed: 12648430
+  anchor_spacing_angstrom: 1.5
+  anchor_distance_tolerance_angstrom: 1.0
+  hard_clash_vdw_fraction: 0.75
+  maximum_outside_shell_fraction: 0.20
+  pose_cluster_rmsd_angstrom: 2.0
+  maximum_pose_clusters: 20
 
 phases:
   phase1a: exact_public_structures
