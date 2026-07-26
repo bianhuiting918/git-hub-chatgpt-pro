@@ -64,6 +64,7 @@ trap finish EXIT
 
 module purge
 record_phase after_module_purge
+module load compiler/gcc/11.4.0
 AMBER_ACTIVE="$TASK_ROOT/tools/ACTIVE_AMBERCLASSIC.json"
 mapfile -t AMBER_META < <("$PY" - "$AMBER_ACTIVE" <<'PY'
 import json
