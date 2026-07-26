@@ -37,6 +37,10 @@ class InstallPhase1ContractTests(unittest.TestCase):
         self.assertIn('"python=3.11" "pip"', text)
         self.assertNotIn('"pip=24.3.1"', text)
 
+    def test_conda_uses_copy_mode_for_hpc_filesystem(self):
+        text = INSTALL.read_text(encoding="utf-8")
+        self.assertIn('CONDA_ALWAYS_COPY=true CONDA_PKGS_DIRS="$CONDA_CACHE"', text)
+
     def test_each_run_uses_a_unique_log_directory(self):
         text = INSTALL.read_text(encoding="utf-8")
         stamp = "run_stamp=$(date -u +%Y%m%dT%H%M%SZ)"
