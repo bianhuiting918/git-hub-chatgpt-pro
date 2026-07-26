@@ -9,6 +9,13 @@ from __future__ import annotations
 
 from typing import Iterable
 
+import argparse
+import csv
+import hashlib
+import json
+import time
+from pathlib import Path
+
 import numpy as np
 from scipy.spatial import cKDTree
 
@@ -451,13 +458,18 @@ def has_hard_clash(
         raise ValueError("protein radii do not match coordinates")
     if len(ligand_xyz) == 0 or len(protein_xyz) == 0:
         return False
-    distances = np.linalg.norm(
-        ligand_xyz[:, None, :] - protein_xyz[None, :, :], axis=2
-    )
-    thresholds = fraction * (
-        ligand_radii[:, None] + protein_radii[None, :]
-    )
-    return bool(np.any(distances < thresholds))
+    tree = cKDTree(protein_xyz)
+    maximum_protein_radius = float(protein_radii.max())
+    for coordinate, ligand_radius in zip(ligand_xyz, ligand_radii):
+        cutoff = fraction * (float(ligand_radius) + maximum_protein_radius)
+        for protein_index in tree.query_ball_point(coordinate, cutoff):
+            distance = float(np.linalg.norm(coordinate - protein_xyz[protein_index]))
+            threshold = fraction * (
+                float(ligand_radius) + float(protein_radii[protein_index])
+            )
+            if distance < threshold:
+                return True
+    return False
 
 
 def outside_shell_fraction(
@@ -537,3 +549,462 @@ def composite_weight(role: str) -> float:
     if role in {"primary_proxy", "diagnostic", "secondary_proxy"}:
         return 1.0
     return 0.0
+
+
+AUTODOCK_VDW_RADII = {
+    "H": 1.20,
+    "HD": 1.20,
+    "HS": 1.20,
+    "C": 1.70,
+    "A": 1.70,
+    "N": 1.55,
+    "NA": 1.55,
+    "NS": 1.55,
+    "O": 1.52,
+    "OA": 1.52,
+    "OS": 1.52,
+    "F": 1.47,
+    "P": 1.80,
+    "S": 1.80,
+    "SA": 1.80,
+    "CL": 1.75,
+    "BR": 1.85,
+    "I": 1.98,
+}
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def parse_autogrid_map(path: Path) -> dict:
+    spacing = None
+    n_elements = None
+    center = None
+    with path.open(encoding="ascii", errors="strict") as handle:
+        header = [handle.readline() for _ in range(6)]
+        for line in header:
+            fields = line.split()
+            if not fields:
+                continue
+            if fields[0] == "SPACING":
+                spacing = float(fields[1])
+            elif fields[0] == "NELEMENTS":
+                n_elements = np.array([int(value) for value in fields[1:4]], dtype=int)
+            elif fields[0] == "CENTER":
+                center = np.array([float(value) for value in fields[1:4]], dtype=float)
+        values = np.fromiter(
+            (float(line.strip()) for line in handle if line.strip()),
+            dtype=np.float32,
+        )
+    if spacing is None or n_elements is None or center is None:
+        raise ValueError(f"incomplete AutoGrid header: {path}")
+    shape = n_elements + 1
+    expected = int(np.prod(shape))
+    if values.size != expected:
+        raise ValueError(f"AutoGrid value count mismatch: {values.size} != {expected}")
+    values = values.reshape((shape[2], shape[1], shape[0])).transpose(2, 1, 0)
+    origin = center - n_elements.astype(float) * spacing / 2.0
+    return {
+        "spacing": float(spacing),
+        "origin": origin,
+        "center": center,
+        "n_elements": n_elements,
+        "values": values,
+    }
+
+
+def read_pdbqt_atoms(path: Path) -> tuple[np.ndarray, np.ndarray]:
+    coordinates = []
+    radii = []
+    with path.open(encoding="ascii", errors="strict") as handle:
+        for line in handle:
+            if line[:6] not in {"ATOM  ", "HETATM"}:
+                continue
+            coordinates.append(
+                [float(line[30:38]), float(line[38:46]), float(line[46:54])]
+            )
+            atom_type = line.split()[-1].upper()
+            radii.append(AUTODOCK_VDW_RADII.get(atom_type, 1.70))
+    if not coordinates:
+        raise ValueError(f"no receptor atoms in {path}")
+    return np.asarray(coordinates, dtype=float), np.asarray(radii, dtype=float)
+
+
+def typed_probe_atom_indices(molecule) -> tuple[np.ndarray, tuple[str, ...]]:
+    indices = []
+    channels = []
+    for atom in molecule.GetAtoms():
+        atomic_number = atom.GetAtomicNum()
+        channel = None
+        if atomic_number == 6:
+            channel = "A" if atom.GetIsAromatic() else "C"
+        elif atomic_number == 8 and atom.GetFormalCharge() <= 0:
+            channel = "OA"
+        elif atomic_number == 1:
+            neighbors = list(atom.GetNeighbors())
+            if len(neighbors) == 1 and neighbors[0].GetAtomicNum() in {7, 8, 16}:
+                channel = "HD"
+        if channel is not None:
+            indices.append(atom.GetIdx())
+            channels.append(channel)
+    return np.asarray(indices, dtype=np.int64), tuple(channels)
+
+
+def generate_probe_conformers(molecule, seed: int) -> list[dict]:
+    from rdkit import Chem
+    from rdkit.Chem import AllChem, Lipinski
+
+    work = Chem.Mol(molecule)
+    work.RemoveAllConformers()
+    rotors = int(Lipinski.NumRotatableBonds(work))
+    budget = conformer_budget(rotors)
+    parameters = AllChem.ETKDGv3()
+    parameters.randomSeed = int(seed)
+    parameters.pruneRmsThresh = 0.5
+    parameters.numThreads = 1
+    conformer_ids = list(AllChem.EmbedMultipleConfs(work, numConfs=budget, params=parameters))
+    if not conformer_ids:
+        return []
+    energies = []
+    if AllChem.MMFFHasAllMoleculeParams(work):
+        properties = AllChem.MMFFGetMoleculeProperties(work)
+        for conformer_id in conformer_ids:
+            AllChem.MMFFOptimizeMolecule(
+                work, mmffVariant="MMFF94s", confId=int(conformer_id), maxIters=500
+            )
+            force_field = AllChem.MMFFGetMoleculeForceField(
+                work, properties, confId=int(conformer_id)
+            )
+            energies.append(float(force_field.CalcEnergy()))
+        force_field_name = "MMFF94s"
+    else:
+        for conformer_id in conformer_ids:
+            AllChem.UFFOptimizeMolecule(work, confId=int(conformer_id), maxIters=500)
+            force_field = AllChem.UFFGetMoleculeForceField(work, confId=int(conformer_id))
+            energies.append(float(force_field.CalcEnergy()))
+        force_field_name = "UFF"
+    minimum = min(energies)
+    output = []
+    for conformer_id, energy in zip(conformer_ids, energies):
+        conformer = work.GetConformer(int(conformer_id))
+        coordinates = np.asarray(conformer.GetPositions(), dtype=float)
+        output.append(
+            {
+                "conformer_id": int(conformer_id),
+                "coordinates": coordinates,
+                "energy": float(energy),
+                "relative_strain": float(max(0.0, energy - minimum)),
+                "force_field": force_field_name,
+            }
+        )
+    output.sort(key=lambda row: (row["relative_strain"], row["conformer_id"]))
+    return output
+
+
+def _write_tsv(path: Path, rows: list[dict], columns: list[str]) -> None:
+    with path.open("x", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=columns, delimiter="\t", extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def _load_probe_manifest(path: Path, material_family: str, probe_ids: set[str]) -> list[dict]:
+    with path.open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle, delimiter="\t"))
+    output = []
+    for row in rows:
+        if row["material_family"].upper() != material_family:
+            continue
+        if probe_ids and row["probe_id"] not in probe_ids:
+            continue
+        if row.get("validation_status") != "PASS":
+            continue
+        output.append(row)
+    return output
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--shell-dir", type=Path, required=True)
+    parser.add_argument("--patch-dir", type=Path, required=True)
+    parser.add_argument("--maps-root", type=Path, required=True)
+    parser.add_argument("--probe-sdf", type=Path, required=True)
+    parser.add_argument("--probe-manifest", type=Path, required=True)
+    parser.add_argument("--receptor-pdbqt", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--record-id", required=True)
+    parser.add_argument("--material-family", choices=("PET", "NYLON"), required=True)
+    parser.add_argument("--probe-ids", default="")
+    parser.add_argument("--region", default="catalytic_neighborhood")
+    parser.add_argument("--conformer-seed", type=int, default=12648430)
+    parser.add_argument("--anchor-spacing", type=float, default=1.5)
+    parser.add_argument("--anchor-tolerance", type=float, default=1.0)
+    parser.add_argument("--hard-clash-fraction", type=float, default=0.75)
+    parser.add_argument("--maximum-outside-shell-fraction", type=float, default=0.20)
+    parser.add_argument("--pose-cluster-rmsd", type=float, default=2.0)
+    parser.add_argument("--maximum-pose-clusters", type=int, default=20)
+    parser.add_argument("--maximum-field-anchors", type=int, default=12)
+    parser.add_argument("--maximum-probe-triplets", type=int, default=8)
+    parser.add_argument("--maximum-matches", type=int, default=100)
+    return parser.parse_args()
+
+
+def main() -> int:
+    from rdkit import Chem
+
+    args = parse_args()
+    started = time.perf_counter()
+    if args.output_dir.exists():
+        raise SystemExit(f"refusing existing output directory: {args.output_dir}")
+    required = [
+        args.shell_dir / "SHELL_PASS.json",
+        args.shell_dir / "surface_shell.npz",
+        args.patch_dir / "PATCH_PASS.json",
+        args.patch_dir / "patch_membership.npz",
+        args.probe_sdf,
+        args.probe_manifest,
+        args.receptor_pdbqt,
+    ]
+    missing = [str(path) for path in required if not path.is_file()]
+    if missing:
+        raise SystemExit("missing required inputs: " + ", ".join(missing))
+    args.output_dir.mkdir(parents=True, exist_ok=False)
+
+    shell = np.load(args.shell_dir / "surface_shell.npz", allow_pickle=False)
+    shell_xyz = np.asarray(shell["coordinates"], dtype=float)
+    shell_raw = {
+        channel: np.asarray(shell[channel], dtype=float)
+        for channel in ("A", "C", "OA", "HD")
+    }
+    memberships = np.load(args.patch_dir / "patch_membership.npz", allow_pickle=False)
+    catalytic_key = f"catalytic__{args.region}"
+    off_target_key = f"off_target__{args.region}__composite"
+    if catalytic_key not in memberships or off_target_key not in memberships:
+        raise SystemExit("requested equal-area patch membership is unavailable")
+    regions = {
+        "catalytic": np.asarray(memberships[catalytic_key], dtype=np.int64),
+        "off_target": np.asarray(memberships[off_target_key], dtype=np.int64),
+    }
+
+    maps = {}
+    tile = args.maps_root / "tile_0001"
+    for channel in ("A", "C", "OA", "HD"):
+        maps[channel] = parse_autogrid_map(tile / f"whole_receptor.{channel}.map")
+    reference_shape = maps["A"]["values"].shape
+    reference_origin = maps["A"]["origin"]
+    reference_spacing = maps["A"]["spacing"]
+    for channel, grid in maps.items():
+        if (
+            grid["values"].shape != reference_shape
+            or not np.allclose(grid["origin"], reference_origin)
+            or not np.isclose(grid["spacing"], reference_spacing)
+        ):
+            raise SystemExit(f"map geometry mismatch for {channel}")
+
+    receptor_xyz, receptor_radii = read_pdbqt_atoms(args.receptor_pdbqt)
+    requested_probe_ids = {value for value in args.probe_ids.split(",") if value}
+    manifest_rows = _load_probe_manifest(
+        args.probe_manifest, args.material_family, requested_probe_ids
+    )
+    if not manifest_rows:
+        raise SystemExit("no validated probes selected")
+    molecules = {
+        molecule.GetProp("_Name"): molecule
+        for molecule in Chem.SDMolSupplier(str(args.probe_sdf), removeHs=False)
+        if molecule is not None and molecule.HasProp("_Name")
+    }
+
+    summaries = []
+    failures = []
+    sdf_path = args.output_dir / "probe_poses.sdf"
+    writer = Chem.SDWriter(str(sdf_path))
+    accepted_pose_count = 0
+    for manifest_row in manifest_rows:
+        probe_id = manifest_row["probe_id"]
+        molecule = molecules.get(probe_id)
+        if molecule is None:
+            failures.append(
+                {
+                    "record_id": args.record_id,
+                    "material_family": args.material_family,
+                    "probe_id": probe_id,
+                    "region": "all",
+                    "reason": "NOT_EVALUATED_PROBE_SDF_MISSING",
+                }
+            )
+            continue
+        conformers = generate_probe_conformers(molecule, args.conformer_seed)
+        if not conformers:
+            failures.append(
+                {
+                    "record_id": args.record_id,
+                    "material_family": args.material_family,
+                    "probe_id": probe_id,
+                    "region": "all",
+                    "reason": "NOT_EVALUATED_PROBE_CONFORMER",
+                }
+            )
+            continue
+        typed_indices, typed_channels = typed_probe_atom_indices(molecule)
+        heavy_indices = np.asarray(
+            [atom.GetIdx() for atom in molecule.GetAtoms() if atom.GetAtomicNum() > 1],
+            dtype=np.int64,
+        )
+        periodic = Chem.GetPeriodicTable()
+        heavy_radii = np.asarray(
+            [float(periodic.GetRvdw(molecule.GetAtomWithIdx(int(index)).GetAtomicNum())) for index in heavy_indices],
+            dtype=float,
+        )
+        for region_name, region_indices in regions.items():
+            pose_records = []
+            for conformer in conformers:
+                poses = match_probe_conformer(
+                    complete_xyz=conformer["coordinates"],
+                    typed_atom_indices=typed_indices,
+                    typed_channels=typed_channels,
+                    heavy_atom_indices=heavy_indices,
+                    heavy_atom_radii=heavy_radii,
+                    region_indices=region_indices,
+                    shell_xyz=shell_xyz,
+                    shell_raw_channels=shell_raw,
+                    maps=maps,
+                    protein_xyz=receptor_xyz,
+                    protein_radii=receptor_radii,
+                    relative_strain=conformer["relative_strain"],
+                    anchor_minimum_separation=args.anchor_spacing,
+                    anchor_distance_tolerance=args.anchor_tolerance,
+                    hard_clash_fraction=args.hard_clash_fraction,
+                    maximum_outside_shell_fraction=args.maximum_outside_shell_fraction,
+                    shell_cutoff=1.125,
+                    maximum_field_anchors=args.maximum_field_anchors,
+                    maximum_probe_triplets=args.maximum_probe_triplets,
+                    maximum_matches=args.maximum_matches,
+                )
+                for pose in poses:
+                    pose["conformer_id"] = conformer["conformer_id"]
+                    pose["force_field"] = conformer["force_field"]
+                pose_records.extend(poses)
+            clustered = cluster_pose_records(
+                pose_records,
+                rmsd_cutoff=args.pose_cluster_rmsd,
+                maximum_clusters=args.maximum_pose_clusters,
+            )
+            if not clustered:
+                failures.append(
+                    {
+                        "record_id": args.record_id,
+                        "material_family": args.material_family,
+                        "probe_id": probe_id,
+                        "region": region_name,
+                        "reason": "NOT_EVALUATED_PROBE_NO_ACCEPTED_POSE",
+                    }
+                )
+                continue
+            best = float(clustered[0]["score"])
+            top5 = [float(row["score"]) for row in clustered[:5]]
+            summaries.append(
+                {
+                    "record_id": args.record_id,
+                    "material_family": args.material_family,
+                    "probe_id": probe_id,
+                    "probe_role": manifest_row["role"],
+                    "primary_or_control": manifest_row["primary_or_control"],
+                    "region": region_name,
+                    "n_conformers": len(conformers),
+                    "n_raw_poses": len(pose_records),
+                    "n_pose_clusters": len(clustered),
+                    "best_total_score": best,
+                    "top5_mean_score": float(np.mean(top5)),
+                    "count_within_2_of_best": sum(
+                        float(row["score"]) >= best - 2.0 for row in clustered
+                    ),
+                    "best_field_score": float(clustered[0]["field_score"]),
+                    "best_relative_strain": float(clustered[0]["relative_strain"]),
+                    "best_anchor_rmsd": float(clustered[0]["anchor_rmsd"]),
+                    "scientific_scope": "explicit_probe_surface_field_screening_proxy_only",
+                }
+            )
+            for cluster_index, pose in enumerate(clustered, start=1):
+                output_molecule = Chem.Mol(molecule)
+                output_molecule.RemoveAllConformers()
+                conformer = Chem.Conformer(output_molecule.GetNumAtoms())
+                for atom_index, coordinate in enumerate(pose["complete_xyz"]):
+                    conformer.SetAtomPosition(
+                        atom_index,
+                        (float(coordinate[0]), float(coordinate[1]), float(coordinate[2])),
+                    )
+                output_molecule.AddConformer(conformer, assignId=True)
+                output_molecule.SetProp("_Name", f"{probe_id}_{region_name}_{cluster_index:03d}")
+                output_molecule.SetProp("record_id", args.record_id)
+                output_molecule.SetProp("material_family", args.material_family)
+                output_molecule.SetProp("region", region_name)
+                output_molecule.SetProp("score", f"{float(pose['score']):.8f}")
+                output_molecule.SetProp("field_score", f"{float(pose['field_score']):.8f}")
+                output_molecule.SetProp("relative_strain", f"{float(pose['relative_strain']):.8f}")
+                writer.write(output_molecule)
+                accepted_pose_count += 1
+    writer.close()
+
+    summary_columns = [
+        "record_id", "material_family", "probe_id", "probe_role",
+        "primary_or_control", "region", "n_conformers", "n_raw_poses",
+        "n_pose_clusters", "best_total_score", "top5_mean_score",
+        "count_within_2_of_best", "best_field_score",
+        "best_relative_strain", "best_anchor_rmsd", "scientific_scope",
+    ]
+    failure_columns = [
+        "record_id", "material_family", "probe_id", "region", "reason"
+    ]
+    _write_tsv(args.output_dir / "probe_pose_summary.tsv", summaries, summary_columns)
+    _write_tsv(args.output_dir / "probe_failures.tsv", failures, failure_columns)
+    elapsed = time.perf_counter() - started
+    _write_tsv(
+        args.output_dir / "runtime.tsv",
+        [{
+            "record_id": args.record_id,
+            "material_family": args.material_family,
+            "elapsed_seconds": f"{elapsed:.6f}",
+            "n_selected_probes": len(manifest_rows),
+            "n_summary_rows": len(summaries),
+            "n_failures": len(failures),
+            "n_written_pose_clusters": accepted_pose_count,
+        }],
+        [
+            "record_id", "material_family", "elapsed_seconds", "n_selected_probes",
+            "n_summary_rows", "n_failures", "n_written_pose_clusters",
+        ],
+    )
+    files = [
+        args.output_dir / "probe_pose_summary.tsv",
+        args.output_dir / "probe_poses.sdf",
+        args.output_dir / "probe_failures.tsv",
+        args.output_dir / "runtime.tsv",
+    ]
+    with (args.output_dir / "SHA256SUMS").open("x", encoding="ascii") as handle:
+        for output in files:
+            handle.write(f"{sha256(output)}  {output.name}\n")
+    gate = {
+        "status": "PROBE_MATCH_TECHNICAL_PASS" if summaries else "NOT_EVALUATED_PROBE_MATCH",
+        "record_id": args.record_id,
+        "material_family": args.material_family,
+        "region": args.region,
+        "selected_probe_ids": [row["probe_id"] for row in manifest_rows],
+        "n_summary_rows": len(summaries),
+        "n_failure_rows": len(failures),
+        "elapsed_seconds": elapsed,
+        "scientific_scope": "technical_smoke_only_not_binding_energy_or_activity",
+    }
+    gate_name = "PROBE_MATCH_PASS.json" if summaries else "PROBE_MATCH_NOT_EVALUATED.json"
+    with (args.output_dir / gate_name).open("x", encoding="utf-8") as handle:
+        json.dump(gate, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+    return 0 if summaries else 4
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
