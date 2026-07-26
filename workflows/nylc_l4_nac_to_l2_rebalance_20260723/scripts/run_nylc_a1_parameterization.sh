@@ -49,6 +49,7 @@ PY
 }
 finish() {
   code=$?
+  trap - EXIT
   if [[ $code -ne 0 ]]; then
     DETAIL="exit_code=$code; output=$OUT_DIR"
   fi
