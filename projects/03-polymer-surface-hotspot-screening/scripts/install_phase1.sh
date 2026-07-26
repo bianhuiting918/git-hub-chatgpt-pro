@@ -3,12 +3,13 @@ set -euo pipefail
 
 ROOT=${ROOT:-/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725}
 MAX_JOBS=${MAX_JOBS:-8}
-PYTHON_BOOTSTRAP=${PYTHON_BOOTSTRAP:-/work/home/acshdt1dks/python3.11/bin/python3.11}
+CONDA_BOOTSTRAP=${CONDA_BOOTSTRAP:-/work/home/acshdt1dks/anaconda3/bin/conda}
 PROJECT_DIR=${PROJECT_DIR:-/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/repo/projects/03-polymer-surface-hotspot-screening}
 LOCK="$PROJECT_DIR/config/analysis-requirements.lock"
 ADFR_BIN="$ROOT/software/ADFRsuite-1.0/bin"
 ENV_DIR="$ROOT/envs/surface-screen-py311"
 PIP_CACHE="$ROOT/cache/pip"
+CONDA_CACHE="$ROOT/cache/conda/pkgs"
 LOG_DIR="$ROOT/logs/install_phase1"
 GATE_DIR="$ROOT/results/gates"
 PASS_GATE="$GATE_DIR/INSTALL_PASS.json"
@@ -39,8 +40,11 @@ for guarded in "$ROOT/envs" "$ROOT/cache" "$ROOT/results" "$ROOT/logs"; do
   fi
 done
 
-mkdir -p "$ROOT/envs" "$PIP_CACHE" "$LOG_DIR" "$GATE_DIR"
-rm -f "$FAIL_GATE"
+mkdir -p "$ROOT/envs" "$PIP_CACHE" "$CONDA_CACHE" "$LOG_DIR" "$GATE_DIR"
+run_stamp=$(date -u +%Y%m%dT%H%M%SZ)
+if [ -e "$FAIL_GATE" ]; then
+  mv "$FAIL_GATE" "$LOG_DIR/INSTALL_FAIL.preexisting.$run_stamp.json"
+fi
 on_failure() {
   status=$?
   if [ "$status" -ne 0 ]; then
@@ -51,8 +55,8 @@ on_failure() {
 }
 trap on_failure EXIT
 
-if [ ! -x "$PYTHON_BOOTSTRAP" ]; then
-  printf 'bootstrap Python is not executable: %s\n' "$PYTHON_BOOTSTRAP" >&2
+if [ ! -x "$CONDA_BOOTSTRAP" ]; then
+  printf 'bootstrap conda is not executable: %s\n' "$CONDA_BOOTSTRAP" >&2
   exit 2
 fi
 if [ ! -d "$PROJECT_DIR" ]; then
@@ -83,16 +87,29 @@ if [ -e "$PASS_GATE" ]; then
   exit 0
 fi
 
-if [ ! -x "$ENV_DIR/bin/python" ]; then
-  "$PYTHON_BOOTSTRAP" -m venv "$ENV_DIR"
+if [ -d "$ENV_DIR" ] && { [ ! -x "$ENV_DIR/bin/python" ] || ! "$ENV_DIR/bin/python" -c "import ssl" >/dev/null 2>&1; }; then
+  env_real=$(readlink -f "$ENV_DIR")
+  if [ "$env_real" != "$ROOT_REAL/envs/surface-screen-py311" ]; then
+    printf 'refusing to move unexpected environment path: %s\n' "$env_real" >&2
+    exit 2
+  fi
+  quarantine="$ROOT/envs/quarantine"
+  mkdir -p "$quarantine"
+  mv "$ENV_DIR" "$quarantine/surface-screen-py311.incomplete.$run_stamp"
 fi
-"$ENV_DIR/bin/python" -m pip install --upgrade "pip==24.3.1" \
-  --cache-dir "$PIP_CACHE" --no-input \
-  >"$LOG_DIR/pip_bootstrap.stdout.log" 2>"$LOG_DIR/pip_bootstrap.stderr.log"
+
+if [ ! -x "$ENV_DIR/bin/python" ]; then
+  CONDA_PKGS_DIRS="$CONDA_CACHE" "$CONDA_BOOTSTRAP" create --prefix "$ENV_DIR" --yes \
+    "python=3.11" "pip=24.3.1" \
+    >"$LOG_DIR/conda_create.stdout.log" 2>"$LOG_DIR/conda_create.stderr.log"
+fi
+"$ENV_DIR/bin/python" -c "import ssl" >"$LOG_DIR/ssl_import.log" 2>&1
 "$ENV_DIR/bin/python" -m pip install --no-input --cache-dir "$PIP_CACHE" \
   -r "$LOCK" \
   >"$LOG_DIR/pip_install.stdout.log" 2>"$LOG_DIR/pip_install.stderr.log"
 "$ENV_DIR/bin/python" -m pip freeze > "$LOG_DIR/pip_freeze.txt"
+CONDA_PKGS_DIRS="$CONDA_CACHE" "$CONDA_BOOTSTRAP" list --prefix "$ENV_DIR" \
+  >"$LOG_DIR/conda_list.txt" 2>"$LOG_DIR/conda_list.stderr.log"
 
 "$ADFR_BIN/autosite" --version >"$LOG_DIR/autosite.version.log" 2>&1
 "$ADFR_BIN/autogrid4" -h >"$LOG_DIR/autogrid4.version.log" 2>&1
@@ -129,6 +146,5 @@ path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="
 PY
 mv "$PASS_GATE.tmp" "$GATE_DIR/INSTALL_PASS.json"
 sha256sum "$GATE_DIR/INSTALL_PASS.json" "$LOG_DIR/pip_freeze.txt" "$LOCK" > "$GATE_DIR/INSTALL_SHA256SUMS"
-rm -f "$FAIL_GATE"
 trap - EXIT
 printf 'INSTALL_PASS.json written: %s\n' "$GATE_DIR/INSTALL_PASS.json"
