@@ -4,8 +4,7 @@ set -euo pipefail
 ROOT=${ROOT:-/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725}
 MAX_JOBS=${MAX_JOBS:-8}
 PYTHON_BOOTSTRAP=${PYTHON_BOOTSTRAP:-/work/home/acshdt1dks/python3.11/bin/python3.11}
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
-PROJECT_DIR=$(cd "$SCRIPT_DIR/.." && pwd -P)
+PROJECT_DIR=${PROJECT_DIR:-/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/repo/projects/03-polymer-surface-hotspot-screening}
 LOCK="$PROJECT_DIR/config/analysis-requirements.lock"
 ADFR_BIN="$ROOT/software/ADFRsuite-1.0/bin"
 ENV_DIR="$ROOT/envs/surface-screen-py311"
@@ -27,14 +26,6 @@ if [ "$MAX_JOBS" -lt 1 ] || [ "$MAX_JOBS" -gt 64 ]; then
   printf 'MAX_JOBS must be between 1 and 64: %s\n' "$MAX_JOBS" >&2
   exit 2
 fi
-if [ ! -x "$PYTHON_BOOTSTRAP" ]; then
-  printf 'bootstrap Python is not executable: %s\n' "$PYTHON_BOOTSTRAP" >&2
-  exit 2
-fi
-if [ ! -f "$LOCK" ]; then
-  printf 'dependency lock is missing: %s\n' "$LOCK" >&2
-  exit 2
-fi
 for guarded in "$ROOT/envs" "$ROOT/cache" "$ROOT/results" "$ROOT/logs"; do
   if [ -L "$guarded" ]; then
     guarded_real=$(readlink -f "$guarded")
@@ -47,16 +38,6 @@ for guarded in "$ROOT/envs" "$ROOT/cache" "$ROOT/results" "$ROOT/logs"; do
     esac
   fi
 done
-for executable in autosite autogrid4 prepare_receptor; do
-  if [ ! -x "$ADFR_BIN/$executable" ]; then
-    printf 'required ADFRsuite executable is missing: %s\n' "$ADFR_BIN/$executable" >&2
-    exit 2
-  fi
-done
-if [ -e "$PASS_GATE" ]; then
-  printf 'existing installation PASS retained without overwrite: %s\n' "$PASS_GATE"
-  exit 0
-fi
 
 mkdir -p "$ROOT/envs" "$PIP_CACHE" "$LOG_DIR" "$GATE_DIR"
 rm -f "$FAIL_GATE"
@@ -69,6 +50,38 @@ on_failure() {
   exit "$status"
 }
 trap on_failure EXIT
+
+if [ ! -x "$PYTHON_BOOTSTRAP" ]; then
+  printf 'bootstrap Python is not executable: %s\n' "$PYTHON_BOOTSTRAP" >&2
+  exit 2
+fi
+if [ ! -d "$PROJECT_DIR" ]; then
+  printf 'repository project directory is missing: %s\n' "$PROJECT_DIR" >&2
+  exit 2
+fi
+PROJECT_REAL=$(readlink -f "$PROJECT_DIR")
+case "$PROJECT_REAL/" in
+  "$ROOT_REAL/repo/"*) ;;
+  *)
+    printf 'refusing project directory outside pinned repository: %s\n' "$PROJECT_REAL" >&2
+    exit 2
+    ;;
+esac
+if [ ! -f "$LOCK" ]; then
+  printf 'dependency lock is missing: %s\n' "$LOCK" >&2
+  exit 2
+fi
+for executable in autosite autogrid4 prepare_receptor; do
+  if [ ! -x "$ADFR_BIN/$executable" ]; then
+    printf 'required ADFRsuite executable is missing: %s\n' "$ADFR_BIN/$executable" >&2
+    exit 2
+  fi
+done
+if [ -e "$PASS_GATE" ]; then
+  printf 'existing installation PASS retained without overwrite: %s\n' "$PASS_GATE"
+  trap - EXIT
+  exit 0
+fi
 
 if [ ! -x "$ENV_DIR/bin/python" ]; then
   "$PYTHON_BOOTSTRAP" -m venv "$ENV_DIR"
