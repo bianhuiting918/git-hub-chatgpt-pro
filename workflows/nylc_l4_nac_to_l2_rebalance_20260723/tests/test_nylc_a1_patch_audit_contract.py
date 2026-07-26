@@ -123,5 +123,11 @@ class A1PatchAuditContractTests(unittest.TestCase):
             self.assertIn(token, text)
 
 
+    def test_exit_trap_disarms_before_returning_status(self):
+        text = RUNNER.read_text(encoding="utf-8")
+        finish_body = text.split("finish() {", 1)[1].split("}", 1)[0]
+        self.assertIn("trap - EXIT", finish_body)
+
+
 if __name__ == "__main__":
     unittest.main()
