@@ -226,7 +226,9 @@ EOF
   -o single.tpr -po single.expanded.mdp -maxwarn 0 >grompp.stdout 2>grompp.stderr
 OMP_NUM_THREADS=1 "$GMX" mdrun -s single.tpr -deffnm gmx_single -ntomp 1 \
   >mdrun.stdout 2>mdrun.stderr
-GMX_ENERGY="$(awk '/Potential Energy/{value=$3} END{print value}' gmx_single.log)"
+printf 'Potential\n0\n' | "$GMX" energy -f gmx_single.edr -o potential.xvg \
+  >energy.stdout 2>energy.stderr
+GMX_ENERGY="$(awk '!/^[@#]/{value=$2} END{print value}' potential.xvg)"
 [[ "$GMX_ENERGY" =~ ^[-+0-9.eE]+$ ]]
 
 "$PY" - "$OUT_DIR" "$AMBER_ENERGY" "$GMX_ENERGY" <<'PY'
