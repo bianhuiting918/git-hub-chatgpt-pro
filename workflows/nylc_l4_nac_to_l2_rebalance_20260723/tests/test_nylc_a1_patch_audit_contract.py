@@ -110,6 +110,17 @@ class A1PatchAuditContractTests(unittest.TestCase):
         ]:
             self.assertIn(token, text)
 
+    def test_driver_requires_audited_task_local_amberclassic(self):
+        text = RUNNER.read_text(encoding="utf-8")
+        for token in [
+            "ACTIVE_AMBERCLASSIC.json",
+            "PASS_AMBERCLASSIC_INSTALL",
+            "AmberClassic.sh",
+            "AMBER_PREFIX",
+            "source_archive_sha256",
+        ]:
+            self.assertIn(token, text)
+        self.assertNotIn("module load amber/2018", text)
 
     def test_parameterization_runs_through_slurm(self):
         self.assertTrue(SBATCH.is_file())
@@ -122,12 +133,10 @@ class A1PatchAuditContractTests(unittest.TestCase):
         ]:
             self.assertIn(token, text)
 
-
     def test_exit_trap_disarms_before_returning_status(self):
         text = RUNNER.read_text(encoding="utf-8")
         finish_body = text.split("finish() {", 1)[1].split("}", 1)[0]
         self.assertIn("trap - EXIT", finish_body)
-
 
     def test_driver_records_phase_boundaries_before_ambertools(self):
         text = RUNNER.read_text(encoding="utf-8")
@@ -135,7 +144,8 @@ class A1PatchAuditContractTests(unittest.TestCase):
         for phase in [
             "before_module_purge",
             "after_module_purge",
-            "after_module_load",
+            "after_active_manifest",
+            "after_amberclassic_source",
             "after_tool_resolution",
         ]:
             self.assertIn(phase, text)
