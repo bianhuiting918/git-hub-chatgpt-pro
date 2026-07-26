@@ -55,9 +55,11 @@ def validate_row(row: dict, root: Path) -> dict:
     maps_root = Path(row["maps_root"]).resolve()
     receptor = Path(row["receptor_pdbqt"]).resolve()
     output = Path(row["output_dir"]).resolve()
-    for path in (shell_dir, patch_dir, maps_root, receptor, output):
+    for path in (shell_dir, patch_dir, maps_root, receptor):
         if not _inside(path, root):
-            raise ValueError(f"path outside project root: {path}")
+            raise ValueError(f"input path outside project root: {path}")
+    if not _inside(output, root):
+        raise ValueError(f"output path outside project root: {output}")
     required_inputs = (
         shell_dir / "SHELL_PASS.json",
         patch_dir / "PATCH_PASS.json",
