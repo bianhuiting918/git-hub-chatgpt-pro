@@ -185,6 +185,30 @@ Frozen shell definition:
 
 The primary shell gate is `SHELL_PASS.json`. `SHELL_SASA_DISAGREEMENT` is a technical/scientific review flag, not evidence of inactivity. Verify `SHA256SUMS` before patch scoring. Never overwrite a partial or PASS shell directory.
 
+## Phase 3.6: equal-area catalytic and off-target patches
+
+Only run after a checksum-verified `SHELL_PASS.json`. Catalytic residues must come from an independent versioned annotation, not from the map values being scored.
+
+    python deployments/COMMIT_SHA/projects/03-polymer-surface-hotspot-screening/scripts/score_surface_patches.py \
+      --shell-dir results/surface_shell_smoke_RUN_ID/FAMILY_RECORD \
+      --receptor-pdbqt results/receptor_determinism_RUN_ID/FAMILY_RECORD/run1/receptor.pdbqt \
+      --output-dir results/patch_scoring_smoke_RUN_ID/FAMILY_RECORD \
+      --record-id FAMILY_RECORD \
+      --material-family PET_OR_NYLON \
+      --catalytic-residues CHAIN:RESNUM,CHAIN:RESNUM
+
+Frozen comparison:
+
+- graph radii 6, 10, and 14 A;
+- 4 A off-target exclusion buffer;
+- top 20 percent mean plus full-patch mean;
+- strongest connected off-target patch must contain exactly the same number of shell points as the catalytic patch;
+- deterministic hotspot and farthest-point seeds;
+- PET channels A/C/OA and nylon channels C/OA/HD remain separate;
+- the material composite is secondary and uses within-protein robust channel normalization.
+
+Required outputs are `PATCH_PASS.json`, `patches.tsv`, `patch_membership.npz`, and `SHA256SUMS`. Missing catalytic anchors or inability to form an equal-area off-target patch is `NOT_EVALUATED`, not inactivity. A positive or negative enrichment difference is a surface-field screening proxy, not binding energy or catalytic activity.
+
 ## Phase 4: smoke test
 
 Minimum smoke controls:
