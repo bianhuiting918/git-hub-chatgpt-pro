@@ -18,6 +18,8 @@ class AmberClassicInstallContractTests(unittest.TestCase):
             "gcc --version",
             "gfortran --version",
             "make -j 1 install",
+            "/home/case/AmberClassic",
+            "dependency_relocation.json",
             'TOOLS_ROOT="$TASK_ROOT/tools"',
             "CONNECT.TPL",
             "antechamber -h",
