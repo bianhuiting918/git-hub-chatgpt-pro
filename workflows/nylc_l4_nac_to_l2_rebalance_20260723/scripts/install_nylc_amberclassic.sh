@@ -142,7 +142,7 @@ required = [
     prefix / "bin" / "parmchk2",
     prefix / "bin" / "tleap",
     prefix / "bin" / "sqm",
-    prefix / "bin" / "sander",
+    prefix / "bin" / "msander",
 ]
 record = {
     "schema_version": 1,
