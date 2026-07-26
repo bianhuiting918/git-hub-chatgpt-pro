@@ -13,6 +13,109 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 
+
+def extract_field_anchors(
+    coordinates: np.ndarray,
+    raw_map_energy: np.ndarray,
+    region_indices: np.ndarray,
+    minimum_separation: float,
+    maximum_anchors: int,
+) -> np.ndarray:
+    """Select deterministic local representatives from most to least favorable."""
+    coordinates = np.asarray(coordinates, dtype=float)
+    raw_map_energy = np.asarray(raw_map_energy, dtype=float)
+    region_indices = np.unique(np.asarray(region_indices, dtype=np.int64))
+    if coordinates.ndim != 2 or coordinates.shape[1] != 3:
+        raise ValueError("coordinates must be N by 3")
+    if len(raw_map_energy) != len(coordinates):
+        raise ValueError("map values do not match coordinates")
+    if minimum_separation < 0 or maximum_anchors < 1:
+        raise ValueError("invalid anchor parameters")
+    order = sorted(
+        region_indices.tolist(),
+        key=lambda index: (float(raw_map_energy[index]), int(index)),
+    )
+    selected: list[int] = []
+    for index in order:
+        if all(
+            np.linalg.norm(coordinates[index] - coordinates[other])
+            >= minimum_separation - 1e-12
+            for other in selected
+        ):
+            selected.append(int(index))
+            if len(selected) == maximum_anchors:
+                break
+    return np.asarray(selected, dtype=np.int64)
+
+
+def enumerate_typed_anchor_matches(
+    probe_xyz: np.ndarray,
+    probe_types: Iterable[str],
+    field_xyz: np.ndarray,
+    field_types: Iterable[str],
+    tolerance: float,
+    maximum_matches: int,
+) -> list[tuple[int, ...]]:
+    """Enumerate deterministic typed field tuples satisfying all pair distances."""
+    from itertools import product
+
+    probe_xyz = np.asarray(probe_xyz, dtype=float)
+    field_xyz = np.asarray(field_xyz, dtype=float)
+    probe_types = tuple(probe_types)
+    field_types = tuple(field_types)
+    if len(probe_xyz) != len(probe_types) or len(field_xyz) != len(field_types):
+        raise ValueError("type and coordinate counts differ")
+    if maximum_matches < 1:
+        raise ValueError("maximum matches must be positive")
+    candidates = [
+        [index for index, channel in enumerate(field_types) if channel == probe_type]
+        for probe_type in probe_types
+    ]
+    if any(not group for group in candidates):
+        return []
+    matches: list[tuple[int, ...]] = []
+    for assignment in product(*candidates):
+        if len(set(assignment)) != len(assignment):
+            continue
+        canonical = True
+        for left in range(len(probe_types)):
+            for right in range(left + 1, len(probe_types)):
+                if probe_types[left] == probe_types[right] and assignment[left] > assignment[right]:
+                    canonical = False
+                    break
+            if not canonical:
+                break
+        if not canonical:
+            continue
+        target_xyz = field_xyz[np.asarray(assignment, dtype=np.int64)]
+        if typed_geometry_compatible(
+            probe_xyz,
+            probe_types,
+            target_xyz,
+            probe_types,
+            tolerance,
+        ):
+            matches.append(tuple(int(value) for value in assignment))
+            if len(matches) == maximum_matches:
+                break
+    return matches
+
+
+def probe_atom_channels(molecule) -> list[str]:
+    """Map explicit probe atoms to AutoGrid A/C/OA/HD field channels."""
+    channels: list[str] = []
+    for atom in molecule.GetAtoms():
+        atomic_number = atom.GetAtomicNum()
+        if atomic_number == 6:
+            channels.append("A" if atom.GetIsAromatic() else "C")
+        elif atomic_number == 8 and atom.GetFormalCharge() <= 0:
+            channels.append("OA")
+        elif atomic_number == 1:
+            neighbors = list(atom.GetNeighbors())
+            if len(neighbors) == 1 and neighbors[0].GetAtomicNum() in {7, 8, 16}:
+                channels.append("HD")
+    return channels
+
 def typed_geometry_compatible(
     probe_xyz: np.ndarray,
     probe_types: Iterable[str],
