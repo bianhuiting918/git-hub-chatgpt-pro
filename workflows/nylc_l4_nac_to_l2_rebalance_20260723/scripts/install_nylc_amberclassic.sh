@@ -61,6 +61,11 @@ finish() {
 }
 trap finish EXIT
 
+module purge
+module load compiler/gcc/11.4.0
+gcc --version >"$PREFIX/compiler_versions.txt"
+gfortran --version >>"$PREFIX/compiler_versions.txt"
+
 tar -tzf "$STAGED_ARCHIVE" >"$PREFIX/archive_members.txt"
 SOURCE_SHA256="$(sha256sum "$STAGED_ARCHIVE" | awk '{print $1}')"
 printf '%s  %s\n' "$SOURCE_SHA256" "$(basename "$STAGED_ARCHIVE")" >"$PREFIX/source.sha256"
@@ -75,6 +80,7 @@ test -x "$PREFIX/bin/antechamber"
 test -x "$PREFIX/bin/parmchk2"
 test -x "$PREFIX/bin/tleap"
 test -x "$PREFIX/bin/sqm"
+test -x "$PREFIX/bin/sander"
 source "$PREFIX/AmberClassic.sh"
 antechamber -h >antechamber_help.stdout 2>antechamber_help.stderr
 
@@ -92,6 +98,7 @@ required = [
     prefix / "bin" / "parmchk2",
     prefix / "bin" / "tleap",
     prefix / "bin" / "sqm",
+    prefix / "bin" / "sander",
 ]
 record = {
     "schema_version": 1,
