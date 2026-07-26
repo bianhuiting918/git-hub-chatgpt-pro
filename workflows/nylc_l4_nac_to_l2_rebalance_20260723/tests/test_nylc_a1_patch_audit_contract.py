@@ -11,6 +11,7 @@ HERE = Path(__file__).resolve().parents[1]
 AUDITOR = HERE / "scripts" / "audit_nylc_a1_patch.py"
 BUILDER = HERE / "scripts" / "prepare_nylc_a1_parameter_model.py"
 RUNNER = HERE / "scripts" / "run_nylc_a1_parameterization.sh"
+SBATCH = HERE / "slurm" / "run_nylc_a1_parameterization.sbatch"
 
 
 def load(path, name):
@@ -106,6 +107,18 @@ class A1PatchAuditContractTests(unittest.TestCase):
             "antechamber", "parmchk2", "tleap", "sqm",
             "run_history.tsv", "run_history.jsonl",
             "audit_nylc_a1_patch.py",
+        ]:
+            self.assertIn(token, text)
+
+
+    def test_parameterization_runs_through_slurm(self):
+        self.assertTrue(SBATCH.is_file())
+        text = SBATCH.read_text(encoding="utf-8")
+        for token in [
+            "#SBATCH -p xahcnormal",
+            "#SBATCH -c 4",
+            "run_nylc_a1_parameterization.sh",
+            "SLURM_JOB_ID",
         ]:
             self.assertIn(token, text)
 
