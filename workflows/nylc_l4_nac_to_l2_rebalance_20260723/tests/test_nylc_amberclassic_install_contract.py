@@ -17,6 +17,7 @@ class AmberClassicInstallContractTests(unittest.TestCase):
             "compiler/gcc/11.4.0",
             "gcc --version",
             "gfortran --version",
+            "make -j 1 install",
             'TOOLS_ROOT="$TASK_ROOT/tools"',
             "CONNECT.TPL",
             "antechamber -h",
@@ -49,7 +50,7 @@ class AmberClassicInstallContractTests(unittest.TestCase):
         text = SBATCH.read_text(encoding="utf-8")
         for token in [
             "#SBATCH -p xahcnormal",
-            "#SBATCH -c 8",
+            "#SBATCH -c 1",
             "install_nylc_amberclassic.sh",
             "SLURM_JOB_ID",
         ]:
