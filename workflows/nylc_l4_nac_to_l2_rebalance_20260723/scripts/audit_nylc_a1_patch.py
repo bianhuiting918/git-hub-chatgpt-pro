@@ -15,7 +15,7 @@ PASS_STATUS = "PASS_A1_SCREENING_PATCH"
 REQUIRED_ATOMS = {
     "N", "H1", "H2", "HG1", "CA", "HA", "CB", "HB", "CG2",
     "HG21", "HG22", "HG23", "OG1", "C", "O",
-    "CAP_N", "CAP_H", "CAP_C", "CAP_H1", "CAP_H2", "CAP_H3",
+    "NCAP", "HCAP", "CCAP", "HC1", "HC2", "HC3",
 }
 REQUIRED_PROVENANCE = {
     "model_definition", "net_charge_e", "charge_method", "atom_types",
