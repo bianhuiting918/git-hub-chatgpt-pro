@@ -4,7 +4,7 @@ set -euo pipefail
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK_ROOT/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
-GMX=/public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi
+GMX=/public/software/apps/gromacs/2022.2/hpcx-gcc7.3.1/bin/gmx_mpi
 SOURCE_GRO="$TASK_ROOT/ensemble/final_audit_job_61841413/assembled/medoids/nac_evt18_time1206ps/seed26711_time258.000ps.gro"
 CHAIN_ITP="$TASK_ROOT/ensemble/candidates/nac_evt18_time1206ps/build_job_61813799_6/build/topol_Protein_chain_H.itp"
 CHAIN_FIRST_GLOBAL_ATOM=8949
@@ -199,9 +199,7 @@ structure = pmd.load_file(prmtop, xyz=inpcrd)
 structure.save(top, format="gromacs", overwrite=False)
 structure.save(gro, format="gro", overwrite=False)
 PY
-set +u
-source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
-set -u
+module load gromacs/2022.2-hpcx-gcc-7.3.1
 export GMX_MAXBACKUP=-1
 "$GMX" editconf -f NTA1_CAP.gromacs.gro -o NTA1_CAP.gromacs.boxed.gro \
   -box 20 20 20 -center 10 10 10 >editconf.stdout 2>editconf.stderr
