@@ -135,9 +135,11 @@ class A1PatchAuditContractTests(unittest.TestCase):
     def test_gromacs_runtime_is_loaded_before_editconf(self):
         text = RUNNER.read_text(encoding="utf-8")
         self.assertLess(
-            text.index("source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh"),
+            text.index("module load gromacs/2022.2-hpcx-gcc-7.3.1"),
             text.index('"$GMX" editconf'),
         )
+        self.assertIn("/public/software/apps/gromacs/2022.2/hpcx-gcc7.3.1/bin/gmx_mpi", text)
+        self.assertNotIn("/Gromacs-DCU2/", text)
 
     def test_parameterization_runs_through_slurm(self):
         self.assertTrue(SBATCH.is_file())
