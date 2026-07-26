@@ -14,6 +14,9 @@ class AmberClassicInstallContractTests(unittest.TestCase):
         for token in [
             "0b35bfeb96026ffa4e5876391a0828f39b3cfc8d",
             "STAGED_ARCHIVE",
+            "compiler/gcc/11.4.0",
+            "gcc --version",
+            "gfortran --version",
             'TOOLS_ROOT="$TASK_ROOT/tools"',
             "CONNECT.TPL",
             "antechamber -h",
