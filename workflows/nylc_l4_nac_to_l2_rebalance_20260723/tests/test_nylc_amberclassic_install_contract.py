@@ -14,6 +14,7 @@ class AmberClassicInstallContractTests(unittest.TestCase):
         for token in [
             "0b35bfeb96026ffa4e5876391a0828f39b3cfc8d",
             "STAGED_ARCHIVE",
+            'TOOLS_ROOT="$TASK_ROOT/tools"',
             "CONNECT.TPL",
             "antechamber -h",
             "run_history.tsv",
@@ -21,7 +22,7 @@ class AmberClassicInstallContractTests(unittest.TestCase):
             "PASS.json",
         ]:
             self.assertIn(token, text)
-        self.assertIn("l4_nac_to_l2_rebalance_20260723/tools", text)
+        self.assertIn("l4_nac_to_l2_rebalance_20260723", text)
         self.assertNotIn("codeload.github.com", text)
         self.assertNotIn("curl ", text)
 
