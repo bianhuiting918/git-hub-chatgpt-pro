@@ -151,6 +151,16 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
             self.assertIn(token, combined)
 
 
+    def test_bond_length_uses_parmed_xyz_scalars(self):
+        fake_parmed = types.ModuleType("parmed")
+        with mock.patch.dict(sys.modules, {"parmed": fake_parmed}):
+            spec = importlib.util.spec_from_file_location("a1_dftb3_bond", PREPARE)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+        left = types.SimpleNamespace(xx=0.0, xy=0.0, xz=0.0)
+        right = types.SimpleNamespace(xx=3.0, xy=4.0, xz=12.0)
+        self.assertAlmostEqual(module.bond_length_A(left, right), 13.0)
+
     def test_qmmm_input_interpolates_complete_numeric_contract(self):
         fake_parmed = types.ModuleType("parmed")
         with mock.patch.dict(sys.modules, {"parmed": fake_parmed}):
