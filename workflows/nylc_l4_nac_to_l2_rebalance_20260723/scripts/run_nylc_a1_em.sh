@@ -2,6 +2,7 @@
 set -euo pipefail
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK_ROOT/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
+SCRIPT_ROOT="${A1_SCRIPT_ROOT:-$FLOW/scripts}"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 GMX=/public/software/apps/gromacs/2022.2/hpcx-gcc7.3.1/bin/gmx_mpi
 INDEX="${1:?usage: run_nylc_a1_em.sh INDEX}"; GITHUB_COMMIT="${A1_GITHUB_COMMIT:-unknown}"
@@ -83,6 +84,6 @@ cd "$OUT/em_hrelax"
 cd "$OUT/em_free"
 "$GMX" grompp -f em.mdp -c ../em_hrelax/run.gro -p ../input/topol.top -o run.tpr -maxwarn 0 >grompp.stdout 2>grompp.stderr
 "$GMX" mdrun -s run.tpr -deffnm run -ntomp "$OMP_NUM_THREADS" >mdrun.stdout 2>mdrun.stderr
-"$PY" "$FLOW/scripts/audit_nylc_a1_em.py" --gro run.gro --chain-itp ../input/topol_Protein_chain_H.itp --build-audit ../input/A1_FULL_SYSTEM_BUILD.json --log run.log --output A1_EM_AUDIT.json
+"$PY" "$SCRIPT_ROOT/audit_nylc_a1_em.py" --gro run.gro --chain-itp ../input/topol_Protein_chain_H.itp --build-audit ../input/A1_FULL_SYSTEM_BUILD.json --log run.log --output A1_EM_AUDIT.json
 sha256sum run.gro run.log run.edr A1_EM_AUDIT.json >sha256.tsv
 STATE=PASS_TECHNICAL; DETAIL="candidate=$CANDIDATE; status=PASS_A1_EM; output=$OUT"
