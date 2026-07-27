@@ -740,5 +740,19 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertIn("LC_ALL=C sort", runner)
 
 
+    def test_snapshot_includes_gate_primitive_import_dependency(self):
+        slurm = (
+            HERE / "slurm" / "run_nylc_a1_representative_frame.sbatch"
+        ).read_text(encoding="utf-8")
+        dependency = "analyze_nylc_m1_proton_geometry.py"
+        self.assertIn(dependency, slurm)
+        self.assertIn(
+            'grep -Fq "scripts/$dependency" '
+            '"$CODE_SOURCE/SNAPSHOT_SHA256.tsv"',
+            slurm,
+        )
+        self.assertIn("_load_existing_gate_opening()", slurm)
+
+
 if __name__ == "__main__":
     unittest.main()
