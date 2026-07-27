@@ -1164,3 +1164,38 @@ fresh immutable code snapshot and separate output directory; the completed
 demonstrate actual short-distance sampling plus C12--O2/C12--N3 response before
 any TS-coordinate or PMF design is approved.
 
+## Unified Step1 q_attack recovery array (2026-07-27)
+
+The user approved a bounded parallel recovery to reduce elapsed time after job
+`62012919` failed to reach the short-distance bracket. Test-first development
+was used: the new recovery contract failed before implementation, then passed
+5/5 after the recovery files were added; the original q_attack regression
+remained 7/7 PASS. Python compilation, Bash syntax and generated-input checks
+also passed.
+
+Immutable implementation commit:
+`bfb3a6252b5557ff4960498cf6e088ab7f0e50bf`.
+The deployed snapshot hash manifest passed before submission. Array job
+`62016429` runs three tasks concurrently on SCNet `xahcnormal`, each with
+eight CPU MPI ranks:
+
+| array task | distance force constant |
+| --- | ---: |
+| 0 | 50 kcal mol-1 A-2 |
+| 1 | 100 kcal mol-1 A-2 |
+| 2 | 200 kcal mol-1 A-2 |
+
+All tasks start from the same job-62012919 q03 restart (achieved OG1--C12
+2.846836 A), use six common targets from 2.65 to 1.65 A, 150 steepest-descent
+steps per window and `r4=4.50 A`. Only the distance force constant varies.
+The A1 microstate, 146-atom unified QM region, charge-zero/510-electron/six-link
+contract, 95--115 degree angle flat bottom and non-QM heavy-atom position
+restraint are unchanged.
+
+At launch all three tasks entered RUNNING and wrote their first-window restart;
+run-history START records exist independently. Completion remains technical
+until each PASS/NOT_EVALUATED authority is audited. Select the weakest-force
+replica that actually reaches the attack gate without hard numerical findings.
+Even a passing constrained seed is not a TS, committor, PMF, barrier or
+mechanism result, and Step2 remains blocked pending a defensible Step1 basin.
+
