@@ -382,5 +382,105 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
             )
 
 
+    def test_runner_contract_is_immutable_and_fail_closed(self):
+        runner_path = HERE / "scripts" / "run_nylc_a1_representative_frame.sh"
+        slurm_path = HERE / "slurm" / "run_nylc_a1_representative_frame.sbatch"
+        self.assertTrue(runner_path.is_file(), runner_path)
+        self.assertTrue(slurm_path.is_file(), slurm_path)
+        runner = runner_path.read_text(encoding="utf-8")
+        self.assertIn(
+            "attempt_61970146_4_61970151/npt300free", runner
+        )
+        self.assertIn(
+            "em/attempt_61968026_1_61968026/nac_evt25_time1462ps/input",
+            runner,
+        )
+        self.assertIn(
+            "ensemble/candidates/nac_evt25_time1462ps/"
+            "build_job_61813799_11/build/source_cycle.ndx",
+            runner,
+        )
+        self.assertIn(
+            "c60078a92c2ace51facde4ef64e453f690177fc88b4d6363427f935944fa2e43",
+            runner,
+        )
+        self.assertIn(
+            "1a54f1b5b9f139b746c22d9e0f7e9a4a94eb8154bf2b881888986eedca933d89",
+            runner,
+        )
+        self.assertIn('[[ ! -e "$OUT" ]]', runner)
+        self.assertIn("source.tmp.gro", runner)
+        self.assertIn("printf 'System\\n'", runner)
+        self.assertIn("trjconv", runner)
+        self.assertIn("-dump 354", runner)
+        self.assertIn("audit_nylc_a1_representative_frame.py", runner)
+        self.assertIn("flock -x 9", runner)
+        self.assertIn("run_history.tsv", runner)
+        self.assertIn("run_history.jsonl", runner)
+        self.assertIn("STATE=STARTED", runner)
+        self.assertIn("NOT_EVALUATED.json", runner)
+        self.assertIn("PASS.json", runner)
+        self.assertIn('mv "$OUT/source.tmp.gro"', runner)
+        self.assertLess(
+            runner.index("PASS_A1_REPRESENTATIVE_NAC_FRAME"),
+            runner.index('mv "$OUT/source.tmp.gro"'),
+        )
+        self.assertNotIn("analyze_nylc_m1_proton_geometry.py", runner)
+
+    def test_runner_removes_restrained_define_and_audits_preflight(self):
+        runner = (
+            HERE / "scripts" / "run_nylc_a1_representative_frame.sh"
+        ).read_text(encoding="utf-8")
+        self.assertIn("em_cg_flexible_m1.mdp", runner)
+        self.assertIn("preflight.unrestrained.mdp", runner)
+        self.assertIn('if key == "define":', runner)
+        self.assertIn("continue", runner)
+        self.assertNotIn(
+            'cp "$CODE_ROOT/mdp/em_cg_flexible_m1.mdp"', runner
+        )
+        self.assertIn("grompp", runner)
+        self.assertIn("-maxwarn 0", runner)
+        self.assertIn("-po", runner)
+        self.assertIn("gmx_mpi", runner)
+        self.assertIn("dump -s", runner)
+        self.assertIn("#posres_xA", runner)
+        self.assertIn("DISRES", runner)
+        self.assertIn("nonempty_defines", runner)
+        self.assertNotIn("mdrun", runner)
+
+    def test_runner_hashes_inputs_and_promoted_outputs(self):
+        runner = (
+            HERE / "scripts" / "run_nylc_a1_representative_frame.sh"
+        ).read_text(encoding="utf-8")
+        for token in (
+            '"$SOURCE_TPR"',
+            '"$SOURCE_XTC"',
+            '"$TOPOLOGY_ROOT/topol.top"',
+            '"$OUT/A1_REPRESENTATIVE_FRAME_AUDIT.json"',
+            '"$OUT/representative_354ps.gro"',
+            '"$OUT/representative_354ps.pdb"',
+        ):
+            self.assertIn(token, runner)
+        self.assertIn('find "$TOPOLOGY_ROOT"', runner)
+        self.assertIn("-name '*.itp'", runner)
+        self.assertIn("sha256sum", runner)
+
+    def test_slurm_wrapper_is_cpu_only_modest_and_snapshotted(self):
+        slurm = (
+            HERE / "slurm" / "run_nylc_a1_representative_frame.sbatch"
+        ).read_text(encoding="utf-8")
+        self.assertIn("#SBATCH -p xahcnormal", slurm)
+        self.assertIn("#SBATCH -c 4", slurm)
+        self.assertIn("#SBATCH --mem=16G", slurm)
+        self.assertIn("#SBATCH -t 00:30:00", slurm)
+        self.assertNotIn("#SBATCH --gres", slurm)
+        self.assertNotIn("mdrun", slurm)
+        self.assertIn("code_snapshots", slurm)
+        self.assertIn("SNAPSHOT_SHA256.tsv", slurm)
+        self.assertIn("run_nylc_a1_representative_frame.sh", slurm)
+        self.assertIn("audit_nylc_a1_representative_frame.py", slurm)
+        self.assertIn("em_cg_flexible_m1.mdp", slurm)
+
+
 if __name__ == "__main__":
     unittest.main()
