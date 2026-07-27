@@ -36,6 +36,39 @@ def test_validate_pdb_requires_coordinates_and_expected_id():
         module.validate_pdb_bytes(b"HEADER 1WYB\nEND\n", "1WYB")
 
 
+def test_validate_rcsb_legacy_bioassembly_placeholder_is_explicit():
+    module = load_module()
+    assembly = (
+        "HEADER    HYDROLASE                               04-APR-11   XXXX\n"
+        "TITLE     STRUCTURE OF 6-AMINOHEXANOATE-OLIGOMER HYDROLASE\n"
+        "ATOM      1  N   ALA A   1      10.000  10.000  10.000  1.00 20.00           N\n"
+        "END\n"
+    ).encode("ascii")
+    with pytest.raises(ValueError, match="expected PDB id"):
+        module.validate_pdb_bytes(assembly, "3AXG")
+    result = module.validate_pdb_bytes(
+        assembly,
+        "3AXG",
+        allow_legacy_assembly_placeholder=True,
+    )
+    assert result["identity_validation"] == "rcsb_legacy_bioassembly_header_xxxx"
+
+
+def test_legacy_bioassembly_flag_does_not_accept_arbitrary_header():
+    module = load_module()
+    wrong = (
+        "HEADER    HYDROLASE                               04-APR-11   YYYY\n"
+        "ATOM      1  N   ALA A   1      10.000  10.000  10.000  1.00 20.00           N\n"
+        "END\n"
+    ).encode("ascii")
+    with pytest.raises(ValueError, match="expected PDB id"):
+        module.validate_pdb_bytes(
+            wrong,
+            "3AXG",
+            allow_legacy_assembly_placeholder=True,
+        )
+
+
 def test_decode_source_supports_gzip():
     module = load_module()
     raw = (
