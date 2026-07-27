@@ -6,6 +6,7 @@ HERE=Path(__file__).resolve().parents[1]
 RUNNER=HERE/"scripts"/"run_nylc_a1_em.sh"
 AUDITOR=HERE/"scripts"/"audit_nylc_a1_em.py"
 SBATCH=HERE/"slurm"/"run_nylc_a1_em.sbatch"
+REAUDIT=HERE/"scripts"/"run_nylc_a1_em_reaudit.sh"
 
 class A1EMContract(unittest.TestCase):
     def test_artifacts_exist(self):
@@ -38,6 +39,14 @@ class A1EMContract(unittest.TestCase):
         spec.loader.exec_module(module)
         self.assertFalse(module.log_has_nonfinite_token("lincs-warnangle = 30"))
         self.assertTrue(module.log_has_nonfinite_token("Potential Energy = nan"))
+
+
+    def test_reaudit_runner_is_reproducible_and_non_overwriting(self):
+        self.assertTrue(REAUDIT.is_file())
+        text=REAUDIT.read_text() if REAUDIT.is_file() else ""
+        for token in ["A1_EM_REAUDIT.json","refusing to overwrite","run_history.tsv",
+                      "run_history.jsonl","audit_nylc_a1_em.py","sha256sum"]:
+            self.assertIn(token,text)
 
     @unittest.skipUnless(SBATCH.is_file(),"sbatch missing")
     def test_sbatch_snapshots_all_runtime_python_and_shell_sources(self):
