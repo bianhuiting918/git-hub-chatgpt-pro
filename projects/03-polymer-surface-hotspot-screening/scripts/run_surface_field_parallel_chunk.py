@@ -48,12 +48,13 @@ def load_rows(path: Path, start: int, end: int) -> list[tuple[int, dict[str, str
     return selected
 
 
-def valid_pass(root: Path, sequence_md5: str) -> bool:
+def valid_pass(root: Path, sequence_md5: str, family: str) -> bool:
     gate = root / sequence_md5 / "FIELD_PASS.json"
     if not gate.is_file():
         return False
     try:
-        return json.loads(gate.read_text(encoding="utf-8")).get("status") == "FIELD_PASS"
+        payload = json.loads(gate.read_text(encoding="utf-8"))
+        return payload.get("status") == "FIELD_PASS" and payload.get("material_family") == family
     except (OSError, json.JSONDecodeError):
         return False
 
@@ -97,7 +98,7 @@ def main() -> int:
     skipped_primary_pass = 0
     for row_index, row in rows:
         sequence_md5 = row.get("sequence_md5", "")
-        if len(sequence_md5) == 32 and valid_pass(args.existing_pass_root, sequence_md5):
+        if len(sequence_md5) == 32 and valid_pass(args.existing_pass_root, sequence_md5, args.family):
             skipped_primary_pass += 1
         else:
             runnable.append(row_index)
