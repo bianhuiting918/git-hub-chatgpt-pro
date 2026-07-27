@@ -69,9 +69,21 @@ PY
 trap finish EXIT
 append_history
 CURRENT=representative_gate
-[[ -s "$REP/PASS.json" && -s "$REP/representative_354ps.gro" ]]
+[[ -s "$REP/PASS.json" && -s "$REP/representative_354ps.gro" && -s "$REP/preflight.tpr" ]]
+CURRENT=pbc_whole
+set +u
+source /work/home/acshdt1dks/opt/gromacs-fastest/env.sh
+set -u
+echo 0 | /public/software/apps/Gromacs-DCU2/2022.1/mpi/bin/gmx_mpi trjconv \
+    -s "$REP/preflight.tpr" \
+    -f "$REP/representative_354ps.gro" \
+    -o "$OUT/representative_whole.gro" \
+    -pbc mol -ur compact >"$OUT/trjconv.stdout" 2>"$OUT/trjconv.stderr"
+test -s "$OUT/representative_whole.gro"
 CURRENT=preparation
-"$PY" "$CODE_ROOT/scripts/prepare_nylc_a1_dftb3_preflight.py" --output "$OUT/prepared" >"$OUT/prepare.stdout" 2>"$OUT/prepare.stderr"
+"$PY" "$CODE_ROOT/scripts/prepare_nylc_a1_dftb3_preflight.py" \
+    --coordinate "$OUT/representative_whole.gro" \
+    --output "$OUT/prepared" >"$OUT/prepare.stdout" 2>"$OUT/prepare.stderr"
 test -s "$OUT/prepared/qmmm_preflight_audit.json"
 # Amber18 runtime and the 3ob-3-1 Slater-Koster set are mandatory.
 module purge >/dev/null 2>&1 || true
@@ -94,7 +106,7 @@ if json.load(open(sys.argv[1],encoding="utf-8")).get("status")!="PASS_A1_DFTB3_N
     raise SystemExit("A1 DFTB3 audit did not PASS")
 PY
 CURRENT=hashing
-sha256sum "$REP/PASS.json" "$REP/representative_354ps.gro" "$OUT/prepared/qmmm_preflight_audit.json" "$OUT/prepared/system.prmtop" "$OUT/prepared/representative_354ps.rst7" "$OUT/prepared/01_qmmm_one_step.in" "$OUT/prepared/01_qmmm_one_step.out" "$OUT/prepared/02_qmmm_20_step.in" "$OUT/prepared/02_qmmm_20_step.out" "$OUT/A1_DFTB3_PREFLIGHT_RESULT.json" >"$OUT/SHA256.tsv"
+sha256sum "$REP/PASS.json" "$REP/representative_354ps.gro" "$OUT/representative_whole.gro" "$OUT/prepared/qmmm_preflight_audit.json" "$OUT/prepared/system.prmtop" "$OUT/prepared/representative_354ps.rst7" "$OUT/prepared/01_qmmm_one_step.in" "$OUT/prepared/01_qmmm_one_step.out" "$OUT/prepared/02_qmmm_20_step.in" "$OUT/prepared/02_qmmm_20_step.out" "$OUT/A1_DFTB3_PREFLIGHT_RESULT.json" >"$OUT/SHA256.tsv"
 PROMOTED=1
 cp "$OUT/A1_DFTB3_PREFLIGHT_RESULT.json" "$OUT/PASS.json"
 STATE=PASS_TECHNICAL
