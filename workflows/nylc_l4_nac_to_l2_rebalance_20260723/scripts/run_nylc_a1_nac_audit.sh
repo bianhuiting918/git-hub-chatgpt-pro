@@ -23,7 +23,7 @@ SOURCE_NDX="${VALUES[3]}"; COMPLETE="${VALUES[4]}"; SELECTION="${VALUES[5]}"
 ATTEMPT="${SLURM_ARRAY_JOB_ID:-manual}_${SLURM_ARRAY_TASK_ID:-$SLOT}_${SLURM_JOB_ID:-manual}"
 OUT="$TASK_ROOT/a1_activated_nac_20260726/nac_audit/attempt_$ATTEMPT/$CANDIDATE/seed$SEED"
 [[ ! -e "$OUT" ]] || { printf 'refusing to overwrite %s\n' "$OUT" >&2; exit 2; }
-mkdir -p "$OUT/primitives"
+mkdir -p "$OUT"
 EVENT=nylc_a1_nac_audit
 COMMAND="run_nylc_a1_nac_audit.sh $SLOT"
 STATE=FAIL_TECHNICAL
