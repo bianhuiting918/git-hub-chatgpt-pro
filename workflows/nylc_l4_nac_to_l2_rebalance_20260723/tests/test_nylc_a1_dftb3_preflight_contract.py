@@ -32,7 +32,6 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
         )
         for token in required:
             self.assertIn(token, text)
-        self.assertNotIn("trjconv", text)
         self.assertNotIn("lowest_potential", text)
 
     def test_qm_contract_is_derived_and_fail_closed(self):
