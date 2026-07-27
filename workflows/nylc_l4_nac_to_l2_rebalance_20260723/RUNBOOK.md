@@ -1124,3 +1124,43 @@ scouting only. TS, committor and PMF remain separately gated.
 
 Compact definition:
 `audit/nylc_a1_unified_core_definition_20260727.json`.
+
+## Unified Step1 q_attack scan outcome (2026-07-27)
+
+Unified-core preflight job `62011285` completed `0:0` in 3 min 10 s on
+eight MPI ranks with `PASS_A1_UNIFIED_CORE_DFTB3_NUMERICAL_PREFLIGHT`.
+The 146-explicit-atom, charge-zero, 510-electron, six-link-H contract passed;
+SCC, vlimit, bond-overflow, NaN, FATAL, SANDER BOMB, segmentation and forrtl
+counts were all zero. This remains a numerical entry gate only.
+
+Attack-only scouting job `62012919` completed `0:0` in 30 min 52 s from
+immutable GitHub commit
+`96af07f9e3295010ebfab94b578349347df209c6`. All nine sequential
+constrained minimization windows completed with zero hard numerical findings.
+Its technical status is
+`PASS_TECHNICAL_A1_UNIFIED_STEP1_QATTACK_SCAN`, but the scientific attack
+bracket gate is `NOT_EVALUATED_ATTACK_BRACKET_NOT_REACHED`.
+
+The target OG1--C12 distances were 3.27, 3.05, 2.85, 2.65, 2.45, 2.25,
+2.05, 1.85 and 1.65 A. The corresponding achieved distances were 3.293,
+3.164, 2.999, 2.847, 2.695, 2.623, 2.568, 2.531 and 2.508 A. At the final
+window, O2--C12--OG1 was 96.680 degrees, C12--O2 was 1.248 A and C12--N3
+was 1.381 A. The three N-alpha--H distances remained 1.034, 1.026 and
+1.030 A. These values do not show the required tetrahedral attack basin.
+
+The diagnosed protocol limitation is the distance-restraint outer boundary:
+the original generator used `r4 = target + 0.25 A`. Once the actual distance
+lay beyond `r4`, the Amber NMR distance restraint entered its linear outer
+tail, so the restoring slope was capped. The last windows therefore did not
+track their targets within 75 steepest-descent steps. Preserve this run as a
+technically clean negative bracket result; do not interpret its window energies
+as a PMF or barrier, and do not start Step2 from it.
+
+A corrected scan must change only the distance-restraint driving treatment
+while retaining the same A1 microstate, 146-atom unified QM core, charge,
+electron/link contract, angle definition and numerical gates. It requires a
+fresh immutable code snapshot and separate output directory; the completed
+`62012919` directory must not be overwritten. A successful correction must
+demonstrate actual short-distance sampling plus C12--O2/C12--N3 response before
+any TS-coordinate or PMF design is approved.
+
