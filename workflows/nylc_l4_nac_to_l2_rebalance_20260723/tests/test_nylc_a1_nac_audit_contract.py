@@ -5,6 +5,9 @@ from pathlib import Path
 
 HERE=Path(__file__).resolve().parents[1]
 MANIFEST=HERE/"manifests"/"nylc_a1_nac_audit_universe.json"
+RUNNER=HERE/"scripts"/"run_nylc_a1_nac_audit.sh"
+AUDITOR=HERE/"scripts"/"audit_nylc_a1_nac_replica.py"
+SBATCH=HERE/"slurm"/"run_nylc_a1_nac_audit.sbatch"
 
 class A1NACAuditContract(unittest.TestCase):
     def test_manifest_has_exact_nine_slot_universe(self):
@@ -38,6 +41,38 @@ class A1NACAuditContract(unittest.TestCase):
             self.assertIn("/npt300free",row["free_run_root"])
             self.assertIn("source_cycle.ndx",row["source_cycle_ndx"])
             self.assertIn("EQUILIBRATION_COMPLETE.json",row["completion_manifest"])
+
+
+    def test_a1_audit_runtime_files_exist(self):
+        self.assertTrue(RUNNER.is_file())
+        self.assertTrue(AUDITOR.is_file())
+        self.assertTrue(SBATCH.is_file())
+
+    @unittest.skipUnless(AUDITOR.is_file(),"A1 auditor missing")
+    def test_auditor_uses_joint_nac_and_excludes_proton_path_claims(self):
+        text=AUDITOR.read_text()
+        for token in ["A1_Thr267_Ogamma_minus_NalphaH3_plus","distance_max_nm",
+                      "angle_min_deg","angle_max_deg","longest_continuous_nac",
+                      "gate_opening_nm","thermodynamics","numerical_issue_counts"]:
+            self.assertIn(token,text)
+        self.assertNotIn("proton_preorganization",text)
+
+    @unittest.skipUnless(RUNNER.is_file(),"runner missing")
+    def test_runner_generates_primitives_and_preserves_failures(self):
+        text=RUNNER.read_text()
+        for token in ["generate_nylc_m1_ensemble_primitives.py",
+                      "audit_nylc_a1_nac_replica.py","gmx energy",
+                      "NOT_EVALUATED","refusing to overwrite",
+                      "run_history.tsv","run_history.jsonl","sha256sum"]:
+            self.assertIn(token,text)
+
+    @unittest.skipUnless(SBATCH.is_file(),"sbatch missing")
+    def test_sbatch_is_nine_way_immutable_array(self):
+        text=SBATCH.read_text()
+        for token in ["#SBATCH --array=0-8%9","#SBATCH -p xahcnormal",
+                      "code_snapshots","SNAPSHOT_SHA256.tsv",
+                      "A1_NAC_CODE_ROOT","SLURM_ARRAY_TASK_ID"]:
+            self.assertIn(token,text)
 
 if __name__=="__main__":
     unittest.main()
