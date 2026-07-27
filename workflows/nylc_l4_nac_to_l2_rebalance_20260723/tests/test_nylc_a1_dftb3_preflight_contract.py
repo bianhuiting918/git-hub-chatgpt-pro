@@ -89,6 +89,7 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
         for token in (
             "Amber18",
             "module load amber/2018-hpcx-gcc-7.3.1",
+            "GMXDATA=/public/software/apps/Gromacs-DCU2/2022.1/mpi/share/gromacs",
             'export AMBERHOME="$AMBER_RUNTIME"',
             "3ob-3-1",
             "sander",
@@ -102,6 +103,7 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
             "code snapshot",
         ):
             self.assertIn(token, text)
+        self.assertLess(text.index("export GMXDATA"), text.index("CURRENT=preparation"))
         for forbidden in ("gmx mdrun", "trjconv", "lowest_potential", 'source "$AMBER_RUNTIME/amber.sh"'):
             self.assertNotIn(forbidden, text)
 
