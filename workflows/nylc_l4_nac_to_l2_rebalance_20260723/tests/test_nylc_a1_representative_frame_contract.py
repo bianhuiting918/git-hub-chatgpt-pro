@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import pathlib
+import subprocess
 import tempfile
 import unittest
 from types import SimpleNamespace
@@ -480,6 +481,93 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertIn("run_nylc_a1_representative_frame.sh", slurm)
         self.assertIn("audit_nylc_a1_representative_frame.py", slurm)
         self.assertIn("em_cg_flexible_m1.mdp", slurm)
+
+
+    def test_shell_files_parse_and_runtime_variables_expand(self):
+        runner_path = HERE / "scripts" / "run_nylc_a1_representative_frame.sh"
+        slurm_path = HERE / "slurm" / "run_nylc_a1_representative_frame.sbatch"
+        for path in (runner_path, slurm_path):
+            subprocess.run(
+                ["bash", "-n", str(path)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotIn(r"\${", path.read_text(encoding="utf-8"))
+
+        runner = runner_path.read_text(encoding="utf-8")
+        code_root = next(
+            line for line in runner.splitlines() if line.startswith("CODE_ROOT=")
+        )
+        attempt = next(
+            line for line in runner.splitlines() if line.startswith("ATTEMPT=")
+        )
+        probe = subprocess.run(
+            [
+                "bash",
+                "-c",
+                (
+                    'FLOW=/canonical; A1_REP_CODE_ROOT=/verified; '
+                    'A1_REP_ATTEMPT=contract; SLURM_JOB_ID=999; '
+                    f'{code_root}; {attempt}; '
+                    'printf "%s\\n%s\\n" "$CODE_ROOT" "$ATTEMPT"'
+                ),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(probe.stdout.splitlines(), ["/verified", "contract"])
+
+        slurm = slurm_path.read_text(encoding="utf-8")
+        snap = next(line for line in slurm.splitlines() if line.startswith("SNAP="))
+        probe = subprocess.run(
+            ["bash", "-c", f'TASK_ROOT=/task; SLURM_JOB_ID=999; {snap}; printf "%s\\n" "$SNAP"'],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            probe.stdout.strip(),
+            "/task/a1_activated_nac_20260726/code_snapshots/"
+            "representative_frame_999",
+        )
+
+    def test_snapshot_source_is_commit_bound_and_hash_verified(self):
+        slurm = (
+            HERE / "slurm" / "run_nylc_a1_representative_frame.sbatch"
+        ).read_text(encoding="utf-8")
+        self.assertIn("A1_REP_CODE_SOURCE", slurm)
+        self.assertIn("GITHUB_COMMIT", slurm)
+        self.assertIn("SNAPSHOT_SHA256.tsv", slurm)
+        self.assertIn("sha256sum -c", slurm)
+        self.assertIn('cp "$CODE_SOURCE/scripts/$name"', slurm)
+        self.assertNotIn('cp "$FLOW/scripts/$name"', slurm)
+
+    def test_named_topology_inputs_have_frozen_hashes(self):
+        runner = (
+            HERE / "scripts" / "run_nylc_a1_representative_frame.sh"
+        ).read_text(encoding="utf-8")
+        expected = {
+            "topol.top": "af98733e218a8f83d0a5c46120d9d230a16c222f76d230654d44b542288cc205",
+            "topol_Protein_chain_H.itp": "8fd4398af1356b515720c1da3126d08b7795b24b3c112d98ef3235afa57c8179",
+            "PA66_L2_GMX.itp": "b0e753c60fd4b71c282d21cc6106a15e73d91d12a20d80e92dd01516162eb301",
+        }
+        for name, digest in expected.items():
+            self.assertIn(name, runner)
+            self.assertIn(digest, runner)
+        self.assertIn("sha256sum -c", runner)
+
+    def test_terminal_history_is_recorded_before_exit_trap_is_removed(self):
+        runner = (
+            HERE / "scripts" / "run_nylc_a1_representative_frame.sh"
+        ).read_text(encoding="utf-8")
+        terminal = runner.rindex("append_history")
+        disable = runner.rindex("trap - EXIT")
+        self.assertLess(terminal, disable)
+        self.assertIn("os.fsync", runner)
+        self.assertIn("truncate", runner)
+        self.assertIn("demote_promoted_outputs", runner)
 
 
 if __name__ == "__main__":
