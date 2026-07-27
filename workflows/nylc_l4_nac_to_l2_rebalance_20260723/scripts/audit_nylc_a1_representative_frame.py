@@ -173,6 +173,34 @@ def _maximum_pbc_displacement_nm(source_positions_A, extracted_positions_A, box)
     return float(np.max(np.linalg.norm(displacement_A, axis=1)) / 10.0)
 
 
+def _validate_atom_order_identity(source_atoms, extracted_atoms) -> bool:
+    if len(source_atoms) != len(extracted_atoms):
+        raise AuditError(
+            "atom order identity requires equal source/extracted atom counts",
+            stage="coordinate_identity",
+            gate="coordinate_identity",
+        )
+    for position, (source_atom, extracted_atom) in enumerate(
+        zip(source_atoms, extracted_atoms), start=1
+    ):
+        if (
+            int(source_atom.index) + 1 != position
+            or int(extracted_atom.index) + 1 != position
+            or str(source_atom.name) != str(extracted_atom.name)
+            or str(source_atom.resname) != str(extracted_atom.resname)
+        ):
+            raise AuditError(
+                f"atom order identity mismatch at position {position}: source "
+                f"{source_atom.resname}:{source_atom.name} index1="
+                f"{int(source_atom.index) + 1}, extracted "
+                f"{extracted_atom.resname}:{extracted_atom.name} index1="
+                f"{int(extracted_atom.index) + 1}",
+                stage="coordinate_identity",
+                gate="coordinate_identity",
+            )
+    return True
+
+
 def _validate_coordinate_identity(source_positions_A, extracted_positions_A, box) -> float:
     maximum_nm = _maximum_pbc_displacement_nm(
         source_positions_A, extracted_positions_A, box
@@ -601,6 +629,7 @@ def audit_frame(
         raise AuditError(
             "extracted/source atom counts differ before coordinate identity audit"
         )
+    _validate_atom_order_identity(source.atoms, extracted.atoms)
     box_record = _validate_box_identity(source_box, extracted_box)
     maximum_displacement_nm = _validate_coordinate_identity(
         source_positions_A, extracted_positions_A, source_box
