@@ -12,5 +12,5 @@ def test_figure_audit_matches_rows(tmp_path):
     assert audit["endpoint"]=="pa66_l2_color_span_px"
     assert audit["n_points"]==4
     assert audit["sequence_md5_sha256"]==expected
-    assert "pa6" not in audit["y_axis_label"].lower()
+    assert audit["y_axis_label"].startswith("PA66 L2")
     assert (tmp_path/"pa66_l2_color_span_px_3d.html").exists()
