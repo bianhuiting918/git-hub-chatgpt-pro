@@ -1339,3 +1339,39 @@ proton transfer, a TS, PMF, barrier or mechanism proof.
 
 Compact authority:
 `audit/nylc_a1_step1_pt2_coordinate_20260728.json`.
+
+
+## A1 NAC-conditioned PT2 preorganization across nine replicas (2026-07-28)
+
+SCNet CPU job `62044417` completed `0:0` in 2 min 43 s with empty stderr.
+It read the corrected audit-`61976600` source paths, independently verified
+all nine TPR/XTC SHA256 values and A1 atom/bond identities, and recomputed every
+strict NAC frame. The denominator was 9 fully unrestrained replicas and 4,509
+frames. Recomputed strict NAC counts matched every preserved replica audit:
+240 total NAC frames.
+
+Direct PT2 geometric preorganization was defined only within strict NAC frames
+as N-alpha--N3 <=0.35 nm, HG1--N3 <=0.25 nm and
+N-alpha--HG1--N3 >=135 degrees. Twenty-five frames passed, distributed across
+two independent velocity replicas of the reproducible evt25 conformation:
+
+| candidate / seed | strict NAC frames | PT2-preorganized NAC frames | preferred time | NAC distance / angle | HG1--N3 / PT2 angle |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| evt25 / 26723 | 165 | 17 | 378 ps | 0.303119 nm / 113.418937 deg | 0.193055 nm / 166.324617 deg |
+| evt25 / 26737 | 61 | 8 | 676 ps | 0.318670 nm / 108.096426 deg | 0.198227 nm / 158.227892 deg |
+
+The project reproducibility gate is
+`PASS_A1_PT2_PREORGANIZED_NAC_REPRODUCED`: two independent replicas support
+the same direct-PT2 geometry. This supersedes the conclusion from the single
+job-`62021985` seed, whose HG1 orientation was unsuitable; it does not imply
+that every evt25 NAC frame is PT2-ready.
+
+Next, extract and independently SHA-audit one preferred frame from each
+replica, convert each through the frozen A1 topology/QM contract, and run a
+small bounded `q_attack x q_PT2 x q_CN` scout followed by removal of all
+reactive restraints. A released candidate basin is still required before any
+PMF. This fixed-topology geometry result is not proton transfer, a transition
+state, PMF, activation barrier or mechanism proof.
+
+Compact authority:
+`audit/nylc_a1_pt2_nac_ensemble_20260728.json`.
