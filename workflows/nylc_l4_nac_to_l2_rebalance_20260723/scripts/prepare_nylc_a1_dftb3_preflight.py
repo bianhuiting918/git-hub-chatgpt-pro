@@ -14,6 +14,9 @@ TOPOLOGY_ROOT = TASK_ROOT / "a1_activated_nac_20260726/em/attempt_61968026_1_619
 EXPECTED_REPRESENTATIVE_STATUS = "PASS_A1_REPRESENTATIVE_FRAME_EXTRACTION"
 EXPECTED_SCIENTIFIC_STATUS = "PASS_A1_REPRESENTATIVE_NAC_FRAME"
 EXPECTED_GRO_SHA256 = "7b095b7d36a25327558b4bbab20a98a43edaab51d0cacaf7a888ff886bafe679"
+EXPECTED_REPRESENTATIVE_AUDIT_SHA256 = "8a61a57be0537a5fb0aac8f2379452fdb6980468cb06659c0953224d3a0aefa3"
+EXPECTED_ACTIVE_GLOBAL_RESID = 622
+EXPECTED_ACTIVE_ORIGINAL_RESID = 267
 EXPECTED_TOPOLOGY_HASHES = {
     "topol.top": "af98733e218a8f83d0a5c46120d9d230a16c222f76d230654d44b542288cc205",
     "topol_Protein_chain_H.itp": "8fd4398af1356b515720c1da3126d08b7795b24b3c112d98ef3235afa57c8179",
@@ -85,8 +88,12 @@ def derive_qm_contract(structure):
     if PROTEIN_ATOMS != L2_FIRST - 1:
         raise ValueError("frozen protein/L2 boundary is inconsistent")
     og1 = structure.atoms[THR267_OG1 - 1]
-    if og1.name != "OG1" or og1.residue.name != "THR" or og1.residue.number != 267:
-        raise ValueError("Thr267 OG1 identity changed")
+    if (
+        og1.name != "OG1"
+        or og1.residue.name != "THR"
+        or og1.residue.idx + 1 != EXPECTED_ACTIVE_GLOBAL_RESID
+    ):
+        raise ValueError("Thr267 OG1 global identity changed")
     active = og1.residue
     if len(active.atoms) != 15:
         raise ValueError(f"A1 Thr267 atom count {len(active.atoms)} != 15")
@@ -156,6 +163,7 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     pass_path = REPRESENTATIVE_ROOT / "PASS.json"
+    representative_audit_path = REPRESENTATIVE_ROOT / "A1_REPRESENTATIVE_FRAME_AUDIT.json"
     gro = REPRESENTATIVE_ROOT / "representative_354ps.gro"
     authority = json.loads(pass_path.read_text(encoding="utf-8"))
     if authority.get("status") != EXPECTED_REPRESENTATIVE_STATUS:
@@ -164,6 +172,22 @@ def main():
         raise ValueError("representative scientific status is not PASS")
     if sha256(gro) != EXPECTED_GRO_SHA256:
         raise ValueError("representative GRO hash differs from frozen authority")
+    if sha256(representative_audit_path) != EXPECTED_REPRESENTATIVE_AUDIT_SHA256:
+        raise ValueError("representative audit hash differs from frozen authority")
+    representative_audit = json.loads(
+        representative_audit_path.read_text(encoding="utf-8")
+    )
+    active_mapping = representative_audit.get("atom_mapping", {}).get("thr267_og1", {})
+    expected_mapping = {
+        "index1": THR267_OG1,
+        "resname": "THR",
+        "name": "OG1",
+        "source_global_resid": EXPECTED_ACTIVE_GLOBAL_RESID,
+        "extracted_original_resid": EXPECTED_ACTIVE_ORIGINAL_RESID,
+    }
+    for key, expected in expected_mapping.items():
+        if active_mapping.get(key) != expected:
+            raise ValueError(f"representative dual-namespace mapping mismatch for {key}")
     for name, expected in EXPECTED_TOPOLOGY_HASHES.items():
         observed = sha256(TOPOLOGY_ROOT / name)
         if observed != expected:
@@ -193,6 +217,9 @@ def main():
         "source_status": authority["status"],
         "source_scientific_status": authority["scientific_status"],
         "source_gro_sha256": EXPECTED_GRO_SHA256,
+        "representative_audit_sha256": EXPECTED_REPRESENTATIVE_AUDIT_SHA256,
+        "active_global_resid": EXPECTED_ACTIVE_GLOBAL_RESID,
+        "active_original_resid": EXPECTED_ACTIVE_ORIGINAL_RESID,
         "topology_sha256": EXPECTED_TOPOLOGY_HASHES,
         "qm_theory": "DFTB3",
         "slater_koster_set": "3ob-3-1",
