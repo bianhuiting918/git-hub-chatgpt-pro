@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "status": "PASS_TECHNICAL_A1_PT2_NAC_ENSEMBLE_SCAN",
+  "scientific_status": "NOT_EVALUATED_PROTON_TRANSFER_TS_PMF_BARRIER_MECHANISM",
+  "pt2_preorganization_gate": "PASS_A1_PT2_PREORGANIZED_NAC_REPRODUCED",
+  "job": {
+    "id": "62044417",
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:02:43",
+    "stderr_nonempty": false
+  },
+  "provenance": {
+    "code_commit": "2a8124d0ed1bf6d2fc20371ca3e347b3448fab29",
+    "corrected_nac_audit_array": "61976600",
+    "pass_sha256": "4ed714439920e10036d976b3265c1946901063b27b49ce6889ece8a370ced67c",
+    "candidate_frames_tsv_sha256": "1c73afe4d09e073d018bbc3d95c28d37782a8f7ffa329dd64aff4ab807953240"
+  },
+  "denominator": {
+    "replicas": 9,
+    "frames": 4509,
+    "strict_nac_frames": 240,
+    "pt2_preorganized_nac_frames": 25,
+    "independent_positive_replicas": 2
+  },
+  "definitions": {
+    "strict_nac": "OG1-C12 <= 0.35 nm and O2-C12-OG1 95-115 degrees",
+    "direct_pt2_preorganization": "Nalpha-N3 <= 0.35 nm, HG1-N3 <= 0.25 nm and Nalpha-HG1-N3 >= 135 degrees",
+    "scope": "fixed-topology geometric preorganization only"
+  },
+  "positive_replicas": [
+    {
+      "candidate_id": "nac_evt25_time1462ps",
+      "seed": 26723,
+      "strict_nac_frames": 165,
+      "pt2_preorganized_nac_frames": 17,
+      "tpr_sha256": "c60078a92c2ace51facde4ef64e453f690177fc88b4d6363427f935944fa2e43",
+      "xtc_sha256": "1a54f1b5b9f139b746c22d9e0f7e9a4a94eb8154bf2b881888986eedca933d89",
+      "preferred_seed_frame": {
+        "time_ps": 378,
+        "frame_index": 189,
+        "nac_distance_nm": 0.3031186720108689,
+        "nac_angle_deg": 113.41893695220983,
+        "nalpha_n3_nm": 0.29397677126198896,
+        "hg1_n3_nm": 0.19305461620734424,
+        "nalpha_hg1_n3_deg": 166.32461718554876
+      }
+    },
+    {
+      "candidate_id": "nac_evt25_time1462ps",
+      "seed": 26737,
+      "strict_nac_frames": 61,
+      "pt2_preorganized_nac_frames": 8,
+      "tpr_sha256": "dbd19a399547319d10630430ed494d33f6271bab0f30cb0de5a466c6af13ba20",
+      "xtc_sha256": "fcba14da98b331368061dcd990f2467628ad77b9b7a9c4ce88090f92e0831b05",
+      "preferred_seed_frame": {
+        "time_ps": 676,
+        "frame_index": 338,
+        "nac_distance_nm": 0.31866967958346293,
+        "nac_angle_deg": 108.09642649654822,
+        "nalpha_n3_nm": 0.2960844434966861,
+        "hg1_n3_nm": 0.19822727453227926,
+        "nalpha_hg1_n3_deg": 158.22789158895705
+      }
+    }
+  ],
+  "decision": "The two independent evt25 replicas satisfy the project reproducibility gate. Extract and independently hash-audit one preferred frame per replica, convert them with the frozen A1 topology, then perform a small bounded q_attack x q_PT2 x q_CN scout with reactive-restraint-free release. Do not start PMF before a released candidate basin exists.",
+  "interpretation": "This supports geometric eligibility of direct PT2/acylation scouting. It does not demonstrate proton transfer, a transition state, a PMF, a barrier or the mechanism."
+}
