@@ -197,6 +197,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pet-manifest", type=Path, required=True)
     parser.add_argument("--nylon-authority-manifest", type=Path, required=True)
+    parser.add_argument("--nylon-exact-manifest", type=Path)
     parser.add_argument("--nylon-manifest", type=Path, required=True)
     parser.add_argument("--nylon-recovered-manifest", type=Path, required=True)
     parser.add_argument("--nylon-extra-manifest", type=Path, required=True)
@@ -209,10 +210,16 @@ def main() -> int:
     authority = read_authority(args.nylon_authority_manifest)
     sources = [
         ("PET", "pet_primary", args.pet_manifest, 0),
+    ]
+    if args.nylon_exact_manifest is not None:
+        sources.append(
+            ("NYLON", "nylon_exact_dell", args.nylon_exact_manifest, -1)
+        )
+    sources.extend([
         ("NYLON", "nylon_primary", args.nylon_manifest, 0),
         ("NYLON", "nylon_recovered", args.nylon_recovered_manifest, 1),
         ("NYLON", "nylon_extra_physical", args.nylon_extra_manifest, 2),
-    ]
+    ])
     pet_included: List[Dict[str, str]] = []
     nylon_authority_included: List[Dict[str, str]] = []
     nylon_external_controls: List[Dict[str, str]] = []
@@ -291,7 +298,7 @@ def main() -> int:
         record.get("status", "") for record in authority.values()
     )
     summary = {
-        "schema_version": "structure_manifest_v2",
+        "schema_version": "structure_manifest_v3",
         "input_rows": dict(sorted(input_counts.items())),
         "included": {
             "PET": len(pet_included),
@@ -312,6 +319,7 @@ def main() -> int:
         "deduplication_key": "material_family + sequence_md5",
         "source_priority": {
             "pet_primary": 0,
+            "nylon_exact_dell": -1,
             "nylon_primary": 0,
             "nylon_recovered": 1,
             "nylon_extra_physical": 2,
