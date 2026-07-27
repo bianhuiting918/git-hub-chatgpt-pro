@@ -55,16 +55,16 @@ def element(atom):
 
 
 def qmmm_input(title, maxcyc, qmmask):
-    return f"""{{title}}
+    return f"""{title}
 &cntrl
-  imin=1, maxcyc={{maxcyc}}, ncyc={{max(1, maxcyc // 2)}},
+  imin=1, maxcyc={maxcyc}, ncyc={max(1, maxcyc // 2)},
   ntb=1, cut=10.0, ntpr=1, ntxo=1,
   ifqnt=1,
 /
 &qmmm
-  qmmask='{{qmmask}}',
-  qmcharge={{QMCHARGE}},
-  spin={{SPIN}},
+  qmmask='{qmmask}',
+  qmcharge={QMCHARGE},
+  spin={SPIN},
   qm_theory='DFTB3',
   dftb_telec=200.0,
   qmshake=0,
@@ -75,13 +75,13 @@ def qmmm_input(title, maxcyc, qmmask):
 def atom_by_name(residue, name):
     matches = [atom for atom in residue.atoms if atom.name == name]
     if len(matches) != 1:
-        raise ValueError(f"expected one {{residue.name}}:{{name}}, found {{len(matches)}}")
+        raise ValueError(f"expected one {residue.name}:{name}, found {len(matches)}")
     return matches[0]
 
 
 def derive_qm_contract(structure):
     if len(structure.atoms) != EXPECTED_SYSTEM_ATOMS:
-        raise ValueError(f"system atom count {{len(structure.atoms)}} != {{EXPECTED_SYSTEM_ATOMS}}")
+        raise ValueError(f"system atom count {len(structure.atoms)} != {EXPECTED_SYSTEM_ATOMS}")
     if PROTEIN_ATOMS != L2_FIRST - 1:
         raise ValueError("frozen protein/L2 boundary is inconsistent")
     og1 = structure.atoms[THR267_OG1 - 1]
@@ -89,14 +89,14 @@ def derive_qm_contract(structure):
         raise ValueError("Thr267 OG1 identity changed")
     active = og1.residue
     if len(active.atoms) != 15:
-        raise ValueError(f"A1 Thr267 atom count {{len(active.atoms)}} != 15")
+        raise ValueError(f"A1 Thr267 atom count {len(active.atoms)} != 15")
     nalpha = atom_by_name(active, "N")
     n_hydrogens = sorted(atom.name for atom in nalpha.bond_partners if atom.name.startswith("H"))
     if n_hydrogens != ["H1", "H2", "HG1"]:
-        raise ValueError(f"N bonded hydrogens {{n_hydrogens}} != H1/H2/HG1")
+        raise ValueError(f"N bonded hydrogens {n_hydrogens} != H1/H2/HG1")
     og1_bonded = sorted(atom.name for atom in og1.bond_partners)
     if og1_bonded != ["CB"]:
-        raise ValueError(f"OG1 bonded atoms {{og1_bonded}} != CB")
+        raise ValueError(f"OG1 bonded atoms {og1_bonded} != CB")
     ligand = list(structure.atoms[L2_FIRST - 1:L2_LAST])
     if len(ligand) != 79 or {atom.residue.name for atom in ligand} != {"L2"}:
         raise ValueError("complete neutral 79-atom L2 ordering changed")
@@ -107,16 +107,16 @@ def derive_qm_contract(structure):
     ):
         atom = structure.atoms[index1 - 1]
         if atom.name != name or atom.residue.name != "L2":
-            raise ValueError(f"reactive atom {{index1}} is not L2:{{name}}")
+            raise ValueError(f"reactive atom {index1} is not L2:{name}")
     active_charge = sum(atom.charge for atom in active.atoms)
     ligand_charge = sum(atom.charge for atom in ligand)
     if abs(active_charge) > 1.0e-4:
-        raise ValueError(f"A1 Thr267 patch net charge is not 0: {{active_charge}}")
+        raise ValueError(f"A1 Thr267 patch net charge is not 0: {active_charge}")
     if abs(ligand_charge) > 1.0e-4:
-        raise ValueError(f"L2 net charge is not 0: {{ligand_charge}}")
+        raise ValueError(f"L2 net charge is not 0: {ligand_charge}")
     qm_atoms = list(active.atoms) + ligand
     if len(qm_atoms) != EXPECTED_QM_ATOMS or len({atom.idx for atom in qm_atoms}) != EXPECTED_QM_ATOMS:
-        raise ValueError(f"QM atom count {{len(qm_atoms)}} != {{EXPECTED_QM_ATOMS}}")
+        raise ValueError(f"QM atom count {len(qm_atoms)} != {EXPECTED_QM_ATOMS}")
     qm_indices = {atom.idx for atom in qm_atoms}
     boundary = []
     for bond in structure.bonds:
@@ -127,13 +127,13 @@ def derive_qm_contract(structure):
                 "mm_atom": (right if left.idx in qm_indices else left).idx + 1,
             })
     if len(boundary) != 1:
-        raise ValueError(f"expected one QM/MM boundary bond, observed {{boundary}}")
+        raise ValueError(f"expected one QM/MM boundary bond, observed {boundary}")
     elements = [element(atom) for atom in qm_atoms]
     link_atom_count = len(boundary)
     electrons = sum(ATOMIC_NUMBERS[symbol] for symbol in elements) + link_atom_count - QMCHARGE
     if electrons != EXPECTED_ELECTRONS_WITH_LINKS:
         raise ValueError(
-            f"derived electron count {{electrons}} != {{EXPECTED_ELECTRONS_WITH_LINKS}}"
+            f"derived electron count {electrons} != {EXPECTED_ELECTRONS_WITH_LINKS}"
         )
     if electrons % 2 or SPIN != 1:
         raise ValueError("derived electron parity is incompatible with singlet spin")
@@ -167,7 +167,7 @@ def main():
     for name, expected in EXPECTED_TOPOLOGY_HASHES.items():
         observed = sha256(TOPOLOGY_ROOT / name)
         if observed != expected:
-            raise ValueError(f"topology hash mismatch for {{name}}: {{observed}}")
+            raise ValueError(f"topology hash mismatch for {name}: {observed}")
     previous = pathlib.Path.cwd()
     os.chdir(TOPOLOGY_ROOT)
     try:

@@ -21,17 +21,40 @@ append_history() {
     now="$(date '+%Y-%m-%dT%H:%M:%S%z')"
     (
         flock -x 9
-        printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$now" "$EVENT" "$COMMAND" "$STATE" "$GITHUB_COMMIT" "$DETAIL" >>"$TASK_ROOT/run_history.tsv"
-        "$PY" - "$now" "$EVENT" "$COMMAND" "$STATE" "$GITHUB_COMMIT" "$DETAIL" "$OUT" >>"$TASK_ROOT/run_history.jsonl" <<'PY'
-import json,sys
-now,event,command,state,commit,detail,output=sys.argv[1:]
-print(json.dumps({"time":now,"event":event,"command":command,"state":state,"git_commit":commit,"detail":detail,"output":output},sort_keys=True))
+        "$PY" - "$TASK_ROOT/run_history.tsv" "$TASK_ROOT/run_history.jsonl" \
+            "$now" "$EVENT" "$COMMAND" "$STATE" "$GITHUB_COMMIT" "$DETAIL" "$OUT" <<'PY'
+import json
+import os
+import sys
+tsv_path,jsonl_path,now,event,command,state,commit,detail,output=sys.argv[1:]
+tsv_row="\t".join((now,event,command,state,commit,detail))+"\n"
+jsonl_row=json.dumps({"time":now,"event":event,"command":command,"state":state,"git_commit":commit,"detail":detail,"output":output},sort_keys=True)+"\n"
+with open(tsv_path,"a+",encoding="utf-8") as tsv, open(jsonl_path,"a+",encoding="utf-8") as jsonl:
+    tsv.seek(0,os.SEEK_END); jsonl.seek(0,os.SEEK_END)
+    tsv_offset=tsv.tell(); jsonl_offset=jsonl.tell()
+    try:
+        tsv.write(tsv_row); tsv.flush(); os.fsync(tsv.fileno())
+        jsonl.write(jsonl_row); jsonl.flush(); os.fsync(jsonl.fileno())
+    except BaseException:
+        tsv.seek(tsv_offset); tsv.truncate(); tsv.flush(); os.fsync(tsv.fileno())
+        jsonl.seek(jsonl_offset); jsonl.truncate(); jsonl.flush(); os.fsync(jsonl.fileno())
+        raise
 PY
     ) 9>"$TASK_ROOT/.run_history.lock"
+}
+PROMOTED=0
+demote_promoted_outputs() {
+    if [[ -e "$OUT/PASS.json" ]]; then
+        mv "$OUT/PASS.json" "$OUT/FAILED_NOT_PROMOTED_PASS.json"
+    fi
+    PROMOTED=0
 }
 finish() {
     local code=$?
     trap - EXIT
+    if ((PROMOTED)); then
+        demote_promoted_outputs
+    fi
     STATE=NOT_EVALUATED
     DETAIL="stage=$CURRENT;exit_code=$code;scientific_status=NOT_EVALUATED;output=$OUT"
     "$PY" - "$OUT/NOT_EVALUATED.json" "$CURRENT" "$code" <<'PY'
@@ -39,7 +62,7 @@ import json,pathlib,sys
 path,stage,code=sys.argv[1:]
 pathlib.Path(path).write_text(json.dumps({"schema_version":1,"status":"NOT_EVALUATED_A1_DFTB3_TECHNICAL_FAILURE","scientific_status":"NOT_EVALUATED","failed_stage":stage,"exit_code":int(code),"promoted":False},indent=2,sort_keys=True)+"\n",encoding="utf-8")
 PY
-    append_history || true
+    append_history || printf 'failed to append terminal history\n' >&2
     exit "$code"
 }
 trap finish EXIT
@@ -74,6 +97,7 @@ if json.load(open(sys.argv[1],encoding="utf-8")).get("status")!="PASS_A1_DFTB3_N
 PY
 CURRENT=hashing
 sha256sum "$REP/PASS.json" "$REP/representative_354ps.gro" "$OUT/prepared/qmmm_preflight_audit.json" "$OUT/prepared/system.prmtop" "$OUT/prepared/representative_354ps.rst7" "$OUT/prepared/01_qmmm_one_step.in" "$OUT/prepared/01_qmmm_one_step.out" "$OUT/prepared/02_qmmm_20_step.in" "$OUT/prepared/02_qmmm_20_step.out" "$OUT/A1_DFTB3_PREFLIGHT_RESULT.json" >"$OUT/SHA256.tsv"
+PROMOTED=1
 cp "$OUT/A1_DFTB3_PREFLIGHT_RESULT.json" "$OUT/PASS.json"
 STATE=PASS_TECHNICAL
 CURRENT=terminal_history
