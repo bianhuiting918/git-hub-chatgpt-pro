@@ -23,6 +23,7 @@ def inspect(path):
         "final_results": "FINAL RESULTS" in text,
         "scc_warnings": len(re.findall(r"Convergence could not be achieved", text, re.I)),
         "vlimit_warnings": len(re.findall(r"vlimit\s+exceeded", text, re.I)),
+        "bond_overflow": len(re.findall(r"BOND\s*=\s*\*+", text, re.I)),
         "hard_error_hits": {
             name: len(re.findall(pattern, text, re.I))
             for name, pattern in HARD_PATTERNS.items()
@@ -49,16 +50,21 @@ def main():
         "link_atom_count": 1,
         "qm_theory": "DFTB3",
         "slater_koster_set": "3ob-3-1",
+        "bond_count_gt_3A": 0,
     }
     for key, value in expected.items():
         if input_audit.get(key) != value:
             raise SystemExit(f"input QM contract mismatch for {key}")
+    max_bond_length_A = input_audit.get("max_bond_length_A")
+    if not isinstance(max_bond_length_A, (int, float)) or max_bond_length_A > 2.0:
+        raise SystemExit("input bonded geometry is not whole and chemically plausible")
     stages = [inspect(args.one_step), inspect(args.segment)]
     clean = all(
         stage["run_done"]
         and stage["final_results"]
         and stage["scc_warnings"] == 0
         and stage["vlimit_warnings"] == 0
+        and stage["bond_overflow"] == 0
         and sum(stage["hard_error_hits"].values()) == 0
         and (not stage["nquant_values"] or set(stage["nquant_values"]) == {94})
         for stage in stages
