@@ -9,7 +9,7 @@ AMBER_RUNTIME="$TASK_ROOT/../nylc_gyaq_pa66_l2_nac_qmmm_20260723/amber_runtime"
 REP="$TASK_ROOT/a1_activated_nac_20260726/representative_frame/attempt_61990814"
 ATTEMPT="${A1_UNIFIED_CORE_DFTB3_ATTEMPT:-${SLURM_JOB_ID:-manual_$(date -u '+%Y%m%dT%H%M%SZ')}}"
 OUT="$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_unified_core_dftb3_preflight/attempt_$ATTEMPT"
-GITHUB_COMMIT="${A1_EXPANDED_GITHUB_COMMIT:-unknown}"
+GITHUB_COMMIT="${A1_UNIFIED_CORE_GITHUB_COMMIT:-unknown}"
 [[ ! -e "$OUT" ]] || { printf 'refusing to overwrite %s\n' "$OUT" >&2; exit 2; }
 mkdir -p "$OUT"
 EVENT=nylc_a1_unified_core_dftb3_numerical_preflight
