@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "status": "PASS_TECHNICAL_A1_STEP1_RELEASE_TEST",
+  "release_gate": "FAIL_RELEASE_RETURNED_TOWARD_REACTANT",
+  "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER",
+  "slurm_job_id": 62026754,
+  "slurm_state": "COMPLETED",
+  "exit_code": "0:0",
+  "elapsed": "00:38:06",
+  "github_commit": "55666899f226d79ae512daa64a5cdef9949ca91c",
+  "source_seed": {
+    "job_id": 62021985,
+    "og1_c12_A": 1.7581830008291393,
+    "o2_c12_og1_deg": 102.22575041400607,
+    "c12_o2_A": 1.271038563634681,
+    "c12_n3_A": 1.4329460688816056,
+    "carbonyl_neighbor_angle_sum_deg": 353.18562415841416,
+    "carbonyl_pyramidalization_deg": 6.814375841585843
+  },
+  "local_release": {
+    "og1_c12_A": 3.974975778087454,
+    "o2_c12_og1_deg": 93.93750402106045,
+    "c12_o2_A": 1.2637517858533132,
+    "c12_n3_A": 1.358524782012844,
+    "carbonyl_neighbor_angle_sum_deg": 359.96120690507547,
+    "carbonyl_pyramidalization_deg": 0.03879309492452876,
+    "scc_warnings": 0,
+    "vlimit_warnings": 0,
+    "bond_overflow": 0
+  },
+  "full_release": {
+    "og1_c12_A": 4.158148337274841,
+    "o2_c12_og1_deg": 88.83108671857929,
+    "c12_o2_A": 1.2616329569644793,
+    "c12_n3_A": 1.3711060680533678,
+    "carbonyl_neighbor_angle_sum_deg": 359.89421245935955,
+    "carbonyl_pyramidalization_deg": 0.10578754064044915,
+    "scc_warnings": 0,
+    "vlimit_warnings": 0,
+    "bond_overflow": 0,
+    "fatal": 0,
+    "nan": 0,
+    "sander_bomb": 0,
+    "segmentation": 0,
+    "forrtl": 0
+  },
+  "sha256": {
+    "PASS.json": "0b4b33a634a9f807a0962ebba289ff050714583d8e565b10561e63194af4f448",
+    "A1_STEP1_RELEASE_TEST_RESULT.json": "0b4b33a634a9f807a0962ebba289ff050714583d8e565b10561e63194af4f448",
+    "local_release_stage.rst7": "4f098e6890e3ccd4c5645387a0b480ba5d736e08a17e0ca67f40bd018f2fa62d",
+    "full_release_stage.rst7": "af333784c52d852ec9786761ae30125d93cb8e00f5c3533e836c556658468950",
+    "RELEASE_MANIFEST.json": "de8a921d264117537581d61f967ffa11c0a145a255230fb95af7996e335a921f"
+  },
+  "interpretation": "The constrained short contact is not a retained local attack basin under either local or full release. A one-dimensional OG1-C12 distance coordinate is insufficient for Step1 PMF production. This does not reject the A1 protonation microstate or the catalytic mechanism; it motivates a small coupled attack and carbonyl-rehybridization scan."
+}
