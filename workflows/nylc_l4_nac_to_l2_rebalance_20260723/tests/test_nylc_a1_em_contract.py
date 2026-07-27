@@ -40,6 +40,14 @@ class A1EMContract(unittest.TestCase):
         self.assertTrue(module.log_has_nonfinite_token("Potential Energy = nan"))
 
     @unittest.skipUnless(SBATCH.is_file(),"sbatch missing")
+    def test_sbatch_snapshots_all_runtime_python_and_shell_sources(self):
+        text=SBATCH.read_text()
+        for token in ["code_snapshots","SLURM_ARRAY_JOB_ID","SLURM_ARRAY_TASK_ID",
+                      "SLURM_JOB_ID","build_nylc_a1_full_system.py","sha256sum",
+                      "A1_SCRIPT_ROOT"]:
+            self.assertIn(token,text)
+
+    @unittest.skipUnless(SBATCH.is_file(),"sbatch missing")
     def test_em_is_three_way_array(self):
         text=SBATCH.read_text()
         for token in ["#SBATCH -p xahcnormal","#SBATCH --array=0-2%3",
