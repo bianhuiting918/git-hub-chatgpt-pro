@@ -59,7 +59,12 @@ def test_parallel_chunk_skips_primary_pass_and_isolates_row_failure(tmp_path):
     passed = primary / f"{0:032x}"
     passed.mkdir(parents=True)
     (passed / "FIELD_PASS.json").write_text(
-        json.dumps({"status": "FIELD_PASS"}), encoding="utf-8"
+        json.dumps({"status": "FIELD_PASS", "material_family": "PET"}), encoding="utf-8"
+    )
+    mismatched = primary / f"{1:032x}"
+    mismatched.mkdir(parents=True)
+    (mismatched / "FIELD_PASS.json").write_text(
+        json.dumps({"status": "FIELD_PASS", "material_family": "NYLON"}), encoding="utf-8"
     )
     recovery = tmp_path / "recovery"
 
