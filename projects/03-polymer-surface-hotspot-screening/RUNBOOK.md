@@ -341,3 +341,20 @@ Never write secrets into this file.
 - Never overwrite existing run IDs.
 - Create a new run ID for parameter changes.
 - Preserve failed logs until the failure ledger and audit are complete.
+
+
+## Four-core family-separated recovery (2026-07-27)
+
+Use this recovery path after a technical interruption such as shared-filesystem exhaustion. Do not delete or overwrite the original result tree.
+
+- Account scheduler limit observed on Sugon: 80 simultaneously running jobs; project policy caps this surface workflow at 64 job slots.
+- Production layout: 8 PET array tasks plus 8 nylon array tasks, each with 4 CPUs (16 jobs, 64 CPUs total).
+- Each task runs four independent run_surface_field_row.py subprocesses through run_surface_field_parallel_chunk.py.
+- The original result tree is a read-only PASS cache. A cached gate is skipped only when both status == FIELD_PASS and material_family matches.
+- Recovery outputs are family-separated under PET and NYLON directories.
+- A row failure is reported as NOT_EVALUATED, does not stop sibling rows, and is retried later in another versioned recovery tree.
+- The 2026-07-27 smoke job was 61997322: four PET rows, four PASS, zero failure, 4 CPUs, elapsed 00:01:16.
+- Production recovery jobs are PET 61997863 and nylon 61997864, pinned to executable commit 90a9af39ce6e82439c8eb6b8027e3c5f496a95ca.
+- Obsolete single-CPU recovery arrays 61995851 and 61995852 were cancelled only after the four-core smoke passed; their completed artifacts remain untouched.
+
+Scientific boundary: these jobs generate whole-receptor A/C/OA/HD field artifacts only. A technical PASS is not evidence of polymer binding, adsorption strength, catalytic geometry, or enzyme activity.
