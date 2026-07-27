@@ -169,63 +169,73 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
                 source, np.asarray(((9.90, 5.0, 5.0),)), box
             )
 
-    def test_reactive_atom_identities_use_topology_resnum_not_global_resid(self):
+    def test_reactive_identity_requires_dual_global_and_original_namespaces(self):
         module = load_module()
-        identities = (
-            (
-                FakeAtom(8959, "OG1", "THR", 622, resnum=267),
-                8960,
-                "THR",
-                "OG1",
-                267,
-            ),
-            (
-                FakeAtom(10286, "C12", "L2", 663, resnum=1),
-                10287,
-                "L2",
-                "C12",
-                None,
-            ),
-            (
-                FakeAtom(10287, "O2", "L2", 663, resnum=1),
-                10288,
-                "L2",
-                "O2",
-                None,
-            ),
-            (
-                FakeAtom(10288, "N3", "L2", 663, resnum=1),
-                10289,
-                "L2",
-                "N3",
-                None,
-            ),
+        source = FakeAtom(8959, "OG1", "THR", 622, resnum=622)
+        extracted = FakeAtom(8959, "OG1", "THR", 267, resnum=267)
+        record = module._require_dual_identity(
+            source,
+            extracted,
+            8960,
+            "THR",
+            "OG1",
+            source_global_resid=622,
+            extracted_original_resid=267,
         )
-        for atom, index1, resname, name, resnum in identities:
-            record = module._require_identity(atom, index1, resname, name, resnum)
-            self.assertEqual(record["resnum"], atom.resnum)
-            self.assertEqual(record["global_resid"], atom.resid)
-        with self.assertRaisesRegex(module.AuditError, "expected THR267:OG1"):
-            module._require_identity(
-                FakeAtom(8959, "HG1", "THR", 622, resnum=267),
+        self.assertEqual(record["index1"], 8960)
+        self.assertEqual(record["source_global_resid"], 622)
+        self.assertEqual(record["extracted_original_resid"], 267)
+        self.assertEqual(record["name"], "OG1")
+        self.assertEqual(module.THR267_CHAIN_H_LOCAL_ATOM_INDEX1, 12)
+        self.assertEqual(module.CHAIN_H_ATOM_OFFSET, 8948)
+
+    def test_dual_identity_fails_closed_on_missing_or_wrong_namespace_ids(self):
+        module = load_module()
+        source = FakeAtom(8959, "OG1", "THR", 622, resnum=622)
+        extracted = FakeAtom(8959, "OG1", "THR", 267, resnum=267)
+        with self.assertRaisesRegex(module.AuditError, "source global resid"):
+            module._require_dual_identity(
+                FakeAtom(8959, "OG1", "THR", 267, resnum=267),
+                extracted,
                 8960,
                 "THR",
                 "OG1",
-                267,
+                source_global_resid=622,
+                extracted_original_resid=267,
             )
-        with self.assertRaisesRegex(module.AuditError, "topology resnum"):
-            module._require_identity(
-                FakeAtom(8959, "OG1", "THR", 622, resnum=268),
+        with self.assertRaisesRegex(module.AuditError, "extracted original resid"):
+            module._require_dual_identity(
+                source,
+                FakeAtom(8959, "OG1", "THR", 622, resnum=622),
                 8960,
                 "THR",
                 "OG1",
-                267,
+                source_global_resid=622,
+                extracted_original_resid=267,
             )
-        missing_resnum = FakeAtom(8959, "OG1", "THR", 622, resnum=267)
-        del missing_resnum.resnum
-        with self.assertRaisesRegex(module.AuditError, "topology resnum"):
-            module._require_identity(
-                missing_resnum, 8960, "THR", "OG1", 267
+        missing_source_id = FakeAtom(8959, "OG1", "THR", 622, resnum=622)
+        del missing_source_id.resid
+        with self.assertRaisesRegex(module.AuditError, "source global resid"):
+            module._require_dual_identity(
+                missing_source_id,
+                extracted,
+                8960,
+                "THR",
+                "OG1",
+                source_global_resid=622,
+                extracted_original_resid=267,
+            )
+        missing_extracted_id = FakeAtom(8959, "OG1", "THR", 267, resnum=267)
+        del missing_extracted_id.resid
+        with self.assertRaisesRegex(module.AuditError, "extracted original resid"):
+            module._require_dual_identity(
+                source,
+                missing_extracted_id,
+                8960,
+                "THR",
+                "OG1",
+                source_global_resid=622,
+                extracted_original_resid=267,
             )
 
     def test_a1_bonds_require_n_h1_h2_hg1_and_og1_only_cb(self):
@@ -268,60 +278,100 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertAlmostEqual(passing["o_c_og1_angle_deg"], 105.0)
         self.assertTrue(passing["joint_pass"])
 
-    def test_gate_uses_topology_resnums_261_to_266_and_excludes_thr267(self):
+    def test_gate_requires_dual_global_and_original_residue_namespaces(self):
         module = load_module()
-        gate = FakeGroup(
+        source_gate = FakeGroup(
             [
-                FakeAtom(i, "CA", "THR", 616 + i, resnum=261 + i)
+                FakeAtom(i, "CA", "THR", 616 + i, resnum=616 + i)
                 for i in range(6)
             ]
         )
+        extracted_gate = FakeGroup(
+            [
+                FakeAtom(i, "CA", "THR", 261 + i, resnum=261 + i)
+                for i in range(6)
+            ]
+        )
+        record = module._validate_dual_gate_membership(
+            source_gate, extracted_gate
+        )
         self.assertEqual(
-            module._validate_gate_membership(gate),
+            record["source_global_resids"], [616, 617, 618, 619, 620, 621]
+        )
+        self.assertEqual(
+            record["extracted_original_resids"],
             [261, 262, 263, 264, 265, 266],
         )
-        gate.append(FakeAtom(99, "CA", "THR", 622, resnum=267))
-        with self.assertRaisesRegex(module.AuditError, "Gate topology resnums"):
-            module._validate_gate_membership(gate)
-        missing_resnum = FakeGroup(gate[:-1])
-        del missing_resnum[0].resnum
-        with self.assertRaisesRegex(module.AuditError, "topology resnum"):
-            module._validate_gate_membership(missing_resnum)
+        self.assertTrue(record["thr267_and_global622_excluded"])
 
-    def test_gate_record_reports_original_and_global_residue_numbers(self):
+        source_gate.append(FakeAtom(99, "CA", "THR", 622, resnum=622))
+        extracted_gate.append(FakeAtom(99, "CA", "THR", 267, resnum=267))
+        with self.assertRaisesRegex(module.AuditError, "dual Gate membership"):
+            module._validate_dual_gate_membership(
+                source_gate, extracted_gate
+            )
+
+    def test_gate_dual_namespace_ids_are_required(self):
         module = load_module()
-        core = FakeGroup(
-            [FakeAtom(0, "CA", "ALA", 455, (0.0, 0.0, 0.0), resnum=100)]
+        source_gate = FakeGroup(
+            [
+                FakeAtom(i, "CA", "THR", 616 + i, resnum=616 + i)
+                for i in range(6)
+            ]
         )
-        gate = FakeGroup(
+        extracted_gate = FakeGroup(
+            [
+                FakeAtom(i, "CA", "THR", 261 + i, resnum=261 + i)
+                for i in range(6)
+            ]
+        )
+        del source_gate[0].resid
+        with self.assertRaisesRegex(module.AuditError, "source global resid"):
+            module._validate_dual_gate_membership(
+                source_gate, extracted_gate
+            )
+
+    def test_gate_record_uses_extracted_coordinates_and_dual_numbering(self):
+        module = load_module()
+        extracted_core = FakeGroup(
+            [FakeAtom(0, "CA", "ALA", 100, (0.0, 0.0, 0.0))]
+        )
+        source_gate = FakeGroup(
+            [
+                FakeAtom(i + 1, "CA", "THR", 616 + i)
+                for i in range(6)
+            ]
+        )
+        extracted_gate = FakeGroup(
             [
                 FakeAtom(
                     i + 1,
                     "CA",
                     "THR",
-                    616 + i,
+                    261 + i,
                     (1.0, 0.0, 0.0),
-                    resnum=261 + i,
                 )
                 for i in range(6)
             ]
         )
         primitive = mock.Mock(return_value=0.25)
         record = module._gate_opening_record(
-            core,
-            gate,
+            extracted_core,
+            extracted_gate,
             np.asarray((10.0, 10.0, 10.0, 90.0, 90.0, 90.0)),
+            source_gate=source_gate,
             gate_opening=primitive,
         )
         self.assertEqual(record["core_atom_count"], 1)
         self.assertEqual(record["gate_atom_count"], 6)
         self.assertEqual(
-            record["gate_resnums"], [261, 262, 263, 264, 265, 266]
+            record["source_global_resids"], [616, 617, 618, 619, 620, 621]
         )
         self.assertEqual(
-            record["gate_global_resids"], [616, 617, 618, 619, 620, 621]
+            record["extracted_original_resids"],
+            [261, 262, 263, 264, 265, 266],
         )
-        self.assertTrue(record["thr267_excluded"])
+        self.assertTrue(record["thr267_and_global622_excluded"])
         self.assertAlmostEqual(record["opening_nm"], 0.25)
         np.testing.assert_allclose(primitive.call_args.args[0], (0.1, 0.0, 0.0))
 
@@ -372,8 +422,10 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertEqual(record["ligand"]["name"], "C12")
         self.assertEqual(record["partner"]["index1"], 22)
         self.assertEqual(record["partner"]["resname"], "LYS")
-        self.assertEqual(record["partner"]["resnum"], 15)
-        self.assertEqual(record["partner"]["global_resid"], 370)
+        self.assertEqual(record["partner"]["original_resid"], 370)
+        self.assertEqual(
+            record["partner"]["residue_namespace"], "extracted_gro_original"
+        )
         self.assertEqual(record["partner"]["name"], "NZ")
 
     def test_both_contact_classes_must_clear_the_same_severe_clash_cutoff(self):
