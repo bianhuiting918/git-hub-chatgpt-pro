@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "status": "PASS_A1_DFTB3_NUMERICAL_PREFLIGHT",
+  "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER",
+  "job_id": 61999607,
+  "slurm": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:03:14",
+    "alloc_cpus": 4,
+    "max_rss_kb": 1369808,
+    "partition": "xahcnormal"
+  },
+  "github_commit": "6ec20c208c71249dc58059888edeab6bf01e74c2",
+  "source": {
+    "representative_job": 61990814,
+    "representative_time_ps": 354,
+    "source_gro_sha256": "7b095b7d36a25327558b4bbab20a98a43edaab51d0cacaf7a888ff886bafe679",
+    "whole_coordinate_sha256": "a95e60617921d4b151f88c58fd3d377f9e52f61c6c4c84fc2908b68862036ca0",
+    "coordinate_preprocessing": "gmx trjconv -pbc mol -ur compact"
+  },
+  "bonded_geometry": {
+    "max_bond_length_A": 1.9149151417229877,
+    "bond_count_gt_3A": 0
+  },
+  "qmmm": {
+    "engine": "Amber18 sander",
+    "theory": "DFTB3",
+    "slater_koster_set": "3ob-3-1",
+    "qm_atom_count": 94,
+    "qmcharge": 0,
+    "spin": 1,
+    "link_atom_count": 1,
+    "electron_count_including_link_h": 314,
+    "scope": "minimal Thr267 plus complete PA66-L2 numerical preflight"
+  },
+  "stages": [
+    {
+      "name": "one_step",
+      "run_done": true,
+      "final_results": true,
+      "scc_warnings": 0,
+      "vlimit_warnings": 0,
+      "bond_overflow": 0,
+      "hard_error_hits": 0
+    },
+    {
+      "name": "twenty_step",
+      "run_done": true,
+      "final_results": true,
+      "scc_warnings": 0,
+      "vlimit_warnings": 0,
+      "bond_overflow": 0,
+      "hard_error_hits": 0,
+      "final_energy_kcal_mol": -489380,
+      "final_rms": 4.6124,
+      "final_gmax": 191.97
+    }
+  ],
+  "superseded_attempts": [
+    {
+      "job_id": 61997314,
+      "status": "SUPERSEDED_FALSE_PASS_PBC_SPLIT_COORDINATES",
+      "evidence": {
+        "max_bond_length_A": 123.61,
+        "bond_count_gt_3A": 845,
+        "bond_term": "overflow"
+      }
+    },
+    {
+      "job_id": 61998674,
+      "status": "NOT_EVALUATED_IMPLEMENTATION_BUG",
+      "reason": "bond-length code indexed ParmEd scalar atom.xx"
+    },
+    {
+      "job_id": 61998974,
+      "status": "NOT_EVALUATED_SHARED_MDINFO_COLLISION",
+      "reason": "Amber default mdinfo already existed"
+    }
+  ],
+  "production_gate": "Before Step1 TS/PMF, expand the QM region at least through Asp306 and Asp308 and test Tyr146/Lys189/Asn219/water sensitivity. This preflight is not a TS, reaction coordinate, PMF, barrier, or mechanism result.",
+  "resource_policy": "Keep small serial preflights at 4 CPU. Use additional CPU primarily through parallel independent reaction-coordinate or umbrella windows. Do not request DCU for Amber18 DFTB3 unless a validated accelerator backend is available."
+}
