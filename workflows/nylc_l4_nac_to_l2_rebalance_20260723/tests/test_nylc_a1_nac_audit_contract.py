@@ -62,6 +62,8 @@ class A1NACAuditContract(unittest.TestCase):
     @unittest.skipUnless(RUNNER.is_file(),"runner missing")
     def test_runner_generates_primitives_and_preserves_failures(self):
         text=RUNNER.read_text()
+        self.assertIn('mkdir -p "$OUT"',text)
+        self.assertNotIn('mkdir -p "$OUT/primitives"',text)
         for token in ["generate_nylc_m1_ensemble_primitives.py",
                       "audit_nylc_a1_nac_replica.py","gmx energy",
                       "NOT_EVALUATED","refusing to overwrite",
@@ -87,6 +89,7 @@ class A1NACAuditContract(unittest.TestCase):
         for token in ["expected_slots","missing_slots","NOT_EVALUATED_MISSING_AUDIT",
                       "replica_denominator","candidate_denominator",
                       "eligible_replica_count","nac_occupancy",
+                      "NOT_EVALUATED_NO_TECHNICAL_AUDITS",
                       "potential_energy_kj_mol","selected_replica"]:
             self.assertIn(token,text)
 
