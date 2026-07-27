@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import importlib.util
 import unittest
 from pathlib import Path
 HERE=Path(__file__).resolve().parents[1]
@@ -28,6 +29,15 @@ class A1EMContract(unittest.TestCase):
                       "minimum_nonbonded_distance_nm","converged to Fmax",
                       "nalpha_hydrogen_count","ogamma_hydrogen_count"]:
             self.assertIn(token,text)
+
+
+    @unittest.skipUnless(AUDITOR.is_file(),"auditor missing")
+    def test_nan_detection_ignores_warnangle_but_rejects_numeric_nan(self):
+        spec=importlib.util.spec_from_file_location("a1_em_audit",AUDITOR)
+        module=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        self.assertFalse(module.log_has_nonfinite_token("lincs-warnangle = 30"))
+        self.assertTrue(module.log_has_nonfinite_token("Potential Energy = nan"))
 
     @unittest.skipUnless(SBATCH.is_file(),"sbatch missing")
     def test_em_is_three_way_array(self):
