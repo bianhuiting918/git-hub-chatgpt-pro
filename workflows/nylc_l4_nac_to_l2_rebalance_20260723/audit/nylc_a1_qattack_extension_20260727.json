@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "PASS_TECHNICAL_A1_UNIFIED_STEP1_QATTACK_EXTENSION",
+  "attack_bracket_seed_gate": "PASS_CONSTRAINED_ATTACK_BRACKET_SEED",
+  "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER",
+  "slurm_job_id": 62021985,
+  "slurm_state": "COMPLETED",
+  "exit_code": "0:0",
+  "elapsed": "00:06:46",
+  "github_commit": "10ec50b0037c0de38285d802f3c712190459f1df",
+  "source": {
+    "recovery_job": "62016429_2",
+    "force_constant_kcal_mol_A2": 200.0,
+    "source_window": "q05_1p65A",
+    "source_og1_c12_A": 1.9222900373627165
+  },
+  "extension": {
+    "target_A": 1.45,
+    "observed_og1_c12_A": 1.7581830008291393,
+    "o2_c12_og1_deg": 102.22575041400607,
+    "c12_o2_A": 1.271038563634681,
+    "c12_n3_A": 1.4329460688816056,
+    "nalpha_h_A": [
+      1.0330159517828001,
+      1.0272219851878839,
+      1.028424469633653
+    ],
+    "scc_warnings": 0,
+    "vlimit_warnings": 0,
+    "bond_overflow": 0,
+    "fatal": 0,
+    "nan": 0,
+    "sander_bomb": 0,
+    "segmentation": 0,
+    "forrtl": 0
+  },
+  "qm_contract": {
+    "explicit_qm_atoms": 146,
+    "qmcharge": 0,
+    "electrons_including_links": 510,
+    "link_h": 6,
+    "step1_qm_water_count": 0,
+    "protein_residues": [
+      "Tyr146",
+      "Lys189",
+      "Asn219",
+      "Thr267",
+      "Asp306",
+      "Asp308"
+    ],
+    "ligand": "complete_PA66_L2"
+  },
+  "sha256": {
+    "PASS.json": "3083663f502f522974f7eac56e1b3a4c7015933c7d949562364d359006c25224",
+    "A1_UNIFIED_STEP1_QATTACK_EXTENSION_RESULT.json": "3083663f502f522974f7eac56e1b3a4c7015933c7d949562364d359006c25224",
+    "window.rst7": "548dca57cb623e69d5fefaa8e270267a5bd599bd5995113219cdf349c346e56c",
+    "SCAN_MANIFEST.json": "8ef95f418c415366b695f9d614a3108ad1354a170ef45089062756192ae8ba83"
+  },
+  "interpretation": "A constrained Step1 attack-bracket seed was obtained. This is not a transition state, committor result, PMF, activation barrier, or proof of mechanism."
+}
