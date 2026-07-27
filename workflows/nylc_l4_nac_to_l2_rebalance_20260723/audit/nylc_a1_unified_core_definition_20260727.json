@@ -208,5 +208,33 @@
       "disposition": "Preserve this scan as a technically clean negative bracket result. Do not label it TS/PMF/barrier and do not start Step2. A corrected single-variable scouting design requires explicit approval before implementation."
     },
     "interpretation": "Constrained attack-only scouting completed cleanly but did not reach an attack/tetrahedral bracket. Raw minimized energies across windows are not a PMF or activation barrier."
+  },
+  "step1_qattack_recovery": {
+    "slurm_array_job_id": 62016429,
+    "status_at_record": "RUNNING_3_OF_3",
+    "github_commit": "bfb3a6252b5557ff4960498cf6e088ab7f0e50bf",
+    "common_source_job": 62012919,
+    "common_source_window": "q03_2p65A",
+    "common_source_actual_og1_c12_A": 2.8468361035390255,
+    "force_constants_kcal_mol_A2": [
+      50,
+      100,
+      200
+    ],
+    "targets_A": [
+      2.65,
+      2.45,
+      2.25,
+      2.05,
+      1.85,
+      1.65
+    ],
+    "steps_per_window": 150,
+    "distance_outer_r4_A": 4.5,
+    "alloc_cpus_per_task": 8,
+    "array_tasks": 3,
+    "total_concurrent_cpus": 24,
+    "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER",
+    "interpretation": "Three controlled recovery replicas vary only distance force constant. Scheduler RUNNING is not an attack-bracket, TS, PMF or barrier result."
   }
 }
