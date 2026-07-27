@@ -55,6 +55,10 @@ class FakeGroup(list):
         return np.asarray([atom.name for atom in self], dtype=object)
 
     @property
+    def resnames(self):
+        return np.asarray([atom.resname for atom in self], dtype=object)
+
+    @property
     def resids(self):
         return np.asarray([atom.resid for atom in self], dtype=int)
 
@@ -168,6 +172,25 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
             module._validate_coordinate_identity(
                 source, np.asarray(((9.90, 5.0, 5.0),)), box
             )
+
+    def test_full_atom_order_requires_matching_indices_names_and_resnames(self):
+        module = load_module()
+        source = FakeGroup(
+            [
+                FakeAtom(0, "N", "ALA", 356),
+                FakeAtom(1, "CA", "ALA", 356),
+            ]
+        )
+        extracted = FakeGroup(
+            [
+                FakeAtom(0, "N", "ALA", 1),
+                FakeAtom(1, "CA", "ALA", 1),
+            ]
+        )
+        self.assertTrue(module._validate_atom_order_identity(source, extracted))
+        extracted[1].name = "CB"
+        with self.assertRaisesRegex(module.AuditError, "atom order identity"):
+            module._validate_atom_order_identity(source, extracted)
 
     def test_reactive_identity_requires_dual_global_and_original_namespaces(self):
         module = load_module()
