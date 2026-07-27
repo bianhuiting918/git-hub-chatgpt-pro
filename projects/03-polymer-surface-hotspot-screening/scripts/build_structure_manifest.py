@@ -14,6 +14,7 @@ from typing import Dict, Iterable, List, Tuple
 
 BASE_FIELDS = [
     "material_family",
+    "candidate_universe",
     "manifest_role",
     "source_manifest",
     "source_row_number",
@@ -26,8 +27,11 @@ BASE_FIELDS = [
     "receptor_observed_sha256",
     "input_status",
     "structure_provenance",
+    "authority_status",
+    "authority_reason",
 ]
 REJECT_FIELDS = BASE_FIELDS + ["exclusion_reason"]
+AUTHORITY_REQUIRED = {"candidate_id", "sequence_md5", "status"}
 
 
 def file_sha256(path: Path) -> str:
@@ -49,6 +53,25 @@ def read_rows(path: Path) -> Iterable[Tuple[int, Dict[str, str]]]:
             yield row_number, {key: (value or "").strip() for key, value in row.items()}
 
 
+def read_authority(path: Path) -> Dict[str, Dict[str, str]]:
+    authority: Dict[str, Dict[str, str]] = {}
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        missing = AUTHORITY_REQUIRED.difference(reader.fieldnames or [])
+        if missing:
+            raise ValueError(f"{path}: missing authority columns: {sorted(missing)}")
+        for row_number, raw in enumerate(reader, start=2):
+            row = {key: (value or "").strip() for key, value in raw.items()}
+            key = row["sequence_md5"]
+            if not key:
+                raise ValueError(f"{path}:{row_number}: empty sequence_md5")
+            if key in authority:
+                raise ValueError(f"{path}:{row_number}: duplicate authority sequence_md5 {key}")
+            row["_source_row_number"] = str(row_number)
+            authority[key] = row
+    return authority
+
+
 def normalized_row(
     row: Dict[str, str],
     *,
@@ -60,6 +83,7 @@ def normalized_row(
 ) -> Dict[str, str]:
     return {
         "material_family": family,
+        "candidate_universe": "",
         "manifest_role": role,
         "source_manifest": str(manifest.resolve()),
         "source_row_number": str(row_number),
@@ -72,7 +96,25 @@ def normalized_row(
         "receptor_observed_sha256": row.get("receptor_observed_sha256", "").lower(),
         "input_status": row.get("input_status", ""),
         "structure_provenance": row.get("structure_provenance", ""),
+        "authority_status": "",
+        "authority_reason": "",
     }
+
+
+def annotate_universe(
+    candidate: Dict[str, str],
+    authority: Dict[str, Dict[str, str]],
+) -> None:
+    if candidate["material_family"] == "PET":
+        candidate["candidate_universe"] = "PET_AUTHORITY"
+        return
+    record = authority.get(candidate["sequence_md5"])
+    if record is None:
+        candidate["candidate_universe"] = "NYLON_EXTERNAL_CONTROL"
+        return
+    candidate["candidate_universe"] = "NYLON_AUTHORITY_4556"
+    candidate["authority_status"] = record.get("status", "")
+    candidate["authority_reason"] = record.get("reason", "")
 
 
 def validate(candidate: Dict[str, str]) -> str:
@@ -108,6 +150,42 @@ def validate(candidate: Dict[str, str]) -> str:
     return ""
 
 
+def authority_exclusion_reason(status: str) -> str:
+    if status == "READY_AFTER_DELL_SYNC":
+        return "NOT_EVALUATED_STRUCTURE_NOT_ON_SUGON"
+    if status == "NOT_EVALUATED_NO_EXACT_STRUCTURE":
+        return "NOT_EVALUATED_NO_EXACT_STRUCTURE"
+    if status == "READY_FOR_STRUCTURE_EVALUATION":
+        return "NOT_EVALUATED_AUTHORITY_STRUCTURE_MISSING_FROM_SOURCES"
+    return "NOT_EVALUATED_AUTHORITY_NOT_IN_EVALUABLE_STRUCTURES"
+
+
+def authority_missing_row(
+    record: Dict[str, str],
+    *,
+    manifest: Path,
+) -> Dict[str, str]:
+    return {
+        "material_family": "NYLON",
+        "candidate_universe": "NYLON_AUTHORITY_4556",
+        "manifest_role": "nylon_authority",
+        "source_manifest": str(manifest.resolve()),
+        "source_row_number": record.get("_source_row_number", ""),
+        "source_priority": "",
+        "candidate_id": record.get("candidate_id", ""),
+        "sequence_md5": record.get("sequence_md5", ""),
+        "selected_chain": "",
+        "receptor_path": "",
+        "receptor_sha256": "",
+        "receptor_observed_sha256": "",
+        "input_status": record.get("status", ""),
+        "structure_provenance": "",
+        "authority_status": record.get("status", ""),
+        "authority_reason": record.get("reason", ""),
+        "exclusion_reason": authority_exclusion_reason(record.get("status", "")),
+    }
+
+
 def write_tsv(path: Path, rows: List[Dict[str, str]], fields: List[str]) -> None:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t", extrasaction="ignore")
@@ -118,6 +196,7 @@ def write_tsv(path: Path, rows: List[Dict[str, str]], fields: List[str]) -> None
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pet-manifest", type=Path, required=True)
+    parser.add_argument("--nylon-authority-manifest", type=Path, required=True)
     parser.add_argument("--nylon-manifest", type=Path, required=True)
     parser.add_argument("--nylon-recovered-manifest", type=Path, required=True)
     parser.add_argument("--nylon-extra-manifest", type=Path, required=True)
@@ -127,13 +206,16 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    authority = read_authority(args.nylon_authority_manifest)
     sources = [
         ("PET", "pet_primary", args.pet_manifest, 0),
         ("NYLON", "nylon_primary", args.nylon_manifest, 0),
         ("NYLON", "nylon_recovered", args.nylon_recovered_manifest, 1),
         ("NYLON", "nylon_extra_physical", args.nylon_extra_manifest, 2),
     ]
-    included = {"PET": [], "NYLON": []}
+    pet_included: List[Dict[str, str]] = []
+    nylon_authority_included: List[Dict[str, str]] = []
+    nylon_external_controls: List[Dict[str, str]] = []
     rejected: List[Dict[str, str]] = []
     seen = {"PET": set(), "NYLON": set()}
     input_counts = Counter()
@@ -149,6 +231,7 @@ def main() -> int:
                 row_number=row_number,
                 priority=priority,
             )
+            annotate_universe(candidate, authority)
             reason = validate(candidate)
             key = candidate["sequence_md5"]
             if not reason and key in seen[family]:
@@ -158,30 +241,74 @@ def main() -> int:
                 rejected.append(candidate)
                 continue
             seen[family].add(key)
-            included[family].append(candidate)
+            if family == "PET":
+                pet_included.append(candidate)
+            elif candidate["candidate_universe"] == "NYLON_AUTHORITY_4556":
+                nylon_authority_included.append(candidate)
+            else:
+                nylon_external_controls.append(candidate)
 
-    for family in included:
-        included[family].sort(key=lambda row: (row["sequence_md5"], row["candidate_id"]))
+    sort_key = lambda row: (row["sequence_md5"], row["candidate_id"])
+    pet_included.sort(key=sort_key)
+    nylon_authority_included.sort(key=sort_key)
+    nylon_external_controls.sort(key=sort_key)
     rejected.sort(
         key=lambda row: (
             row["material_family"],
-            int(row["source_priority"]),
-            int(row["source_row_number"]),
+            int(row["source_priority"] or 999),
+            int(row["source_row_number"] or 0),
         )
     )
 
+    evaluated_authority = {row["sequence_md5"] for row in nylon_authority_included}
+    authority_not_evaluated = [
+        authority_missing_row(record, manifest=args.nylon_authority_manifest)
+        for key, record in authority.items()
+        if key not in evaluated_authority
+    ]
+    authority_not_evaluated.sort(key=sort_key)
+
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    write_tsv(args.output_dir / "pet_structures.tsv", included["PET"], BASE_FIELDS)
-    write_tsv(args.output_dir / "nylon_structures.tsv", included["NYLON"], BASE_FIELDS)
+    write_tsv(args.output_dir / "pet_structures.tsv", pet_included, BASE_FIELDS)
+    write_tsv(args.output_dir / "nylon_structures.tsv", nylon_authority_included, BASE_FIELDS)
+    write_tsv(
+        args.output_dir / "nylon_external_controls.tsv",
+        nylon_external_controls,
+        BASE_FIELDS,
+    )
+    write_tsv(
+        args.output_dir / "nylon_authority_not_evaluated.tsv",
+        authority_not_evaluated,
+        REJECT_FIELDS,
+    )
     write_tsv(args.output_dir / "not_evaluated.tsv", rejected, REJECT_FIELDS)
 
-    reason_counts = Counter(row["exclusion_reason"] for row in rejected)
+    rejection_counts = Counter(row["exclusion_reason"] for row in rejected)
+    authority_reason_counts = Counter(
+        row["exclusion_reason"] for row in authority_not_evaluated
+    )
+    authority_status_counts = Counter(
+        record.get("status", "") for record in authority.values()
+    )
     summary = {
-        "schema_version": "structure_manifest_v1",
+        "schema_version": "structure_manifest_v2",
         "input_rows": dict(sorted(input_counts.items())),
-        "included": {family: len(rows) for family, rows in included.items()},
-        "not_evaluated_or_duplicate": len(rejected),
-        "exclusion_reasons": dict(sorted(reason_counts.items())),
+        "included": {
+            "PET": len(pet_included),
+            "NYLON": len(nylon_authority_included),
+        },
+        "nylon_authority": {
+            "denominator": len(authority),
+            "structure_evaluable": len(nylon_authority_included),
+            "not_evaluated": len(authority_not_evaluated),
+            "source_status_counts": dict(sorted(authority_status_counts.items())),
+            "not_evaluated_reasons": dict(sorted(authority_reason_counts.items())),
+        },
+        "nylon_external_controls": {
+            "structure_evaluable": len(nylon_external_controls),
+        },
+        "source_input_rejections_or_duplicates": len(rejected),
+        "source_input_exclusion_reasons": dict(sorted(rejection_counts.items())),
         "deduplication_key": "material_family + sequence_md5",
         "source_priority": {
             "pet_primary": 0,
