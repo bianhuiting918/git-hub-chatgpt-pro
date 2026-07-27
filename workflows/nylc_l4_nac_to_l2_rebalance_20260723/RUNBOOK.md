@@ -1199,3 +1199,38 @@ replica that actually reaches the attack gate without hard numerical findings.
 Even a passing constrained seed is not a TS, committor, PMF, barrier or
 mechanism result, and Step2 remains blocked pending a defensible Step1 basin.
 
+
+
+## Minimal A1 Step1 q_attack endpoint extension (2026-07-27)
+
+The corrected recovery array `62016429` technically passed for force constants
+50, 100 and 200 kcal mol-1 A-2, but none reached the predeclared constrained
+attack-bracket seed gate. The k=200 endpoint was closest: OG1--C12 1.922290 A,
+O2--C12--OG1 99.611972 degrees, C12--O2 1.261848 A and C12--N3 1.400619 A.
+
+Job `62021985` therefore added exactly one pinned 1.45 A target window from
+the hash-verified k=200 `q05_1p65A` restart. It used the unchanged unified
+Step1 QM contract: 146 explicit QM atoms, charge 0, 510 electrons including six
+link H, Tyr146/Lys189/Asn219/Thr267/Asp306/Asp308 plus complete PA66-L2, and no
+QM water. The job completed `0:0` in 6 min 46 s on eight CPU ranks.
+
+The independent endpoint audit reports:
+
+- status: `PASS_TECHNICAL_A1_UNIFIED_STEP1_QATTACK_EXTENSION`;
+- constrained seed gate: `PASS_CONSTRAINED_ATTACK_BRACKET_SEED`;
+- observed OG1--C12: 1.758183 A;
+- O2--C12--OG1: 102.225750 degrees;
+- C12--O2: 1.271039 A;
+- C12--N3: 1.432946 A;
+- zero SCC, vlimit, bond-overflow, NaN, FATAL, SANDER BOMB, segmentation or
+  forrtl findings.
+
+The result is a restrained Step1 attack-bracket seed only. It is not a
+transition state, committor result, PMF, activation barrier or mechanism proof.
+Do not start Step2 directly from scheduler completion. The next Step1 work must
+test whether a locally optimized reaction coordinate retains a chemically
+plausible attack basin and must define proton-transfer and bond-formation
+coordinates before umbrella/PMF production.
+
+Compact authority:
+`audit/nylc_a1_qattack_extension_20260727.json`.
