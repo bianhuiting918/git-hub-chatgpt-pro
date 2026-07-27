@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN_A1_NAC_AUDIT_UNIVERSE",
+  "microstate": "A1_Thr267_Ogamma_minus_NalphaH3_plus",
+  "selection_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/selection_job_61813011/ensemble_selection.json",
+  "gate_residues": [
+    261,
+    262,
+    263,
+    264,
+    265,
+    266
+  ],
+  "gate_includes_thr267": false,
+  "nac": {
+    "distance_definition": "PA66-L2 reactive carbonyl C to Thr267 OG1",
+    "angle_definition": "PA66-L2 carbonyl O-C-Thr267 OG1",
+    "distance_max_nm": 0.35,
+    "angle_min_deg": 95,
+    "angle_max_deg": 115,
+    "joint_required": true
+  },
+  "analysis_window_ps": [
+    0,
+    1000
+  ],
+  "replicas": [
+    {
+      "slot": 0,
+      "candidate_id": "nac_evt18_time1206ps",
+      "candidate_source_index": 6,
+      "velocity_seed": 26711,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt18_time1206ps/seed26711/attempt_61970146_0_61970147/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt18_time1206ps/seed26711/attempt_61970146_0_61970147/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt18_time1206ps/build_job_61813799_6/build/source_cycle.ndx"
+    },
+    {
+      "slot": 1,
+      "candidate_id": "nac_evt18_time1206ps",
+      "candidate_source_index": 6,
+      "velocity_seed": 26723,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt18_time1206ps/seed26723/attempt_61970146_1_61970148/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt18_time1206ps/seed26723/attempt_61970146_1_61970148/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt18_time1206ps/build_job_61813799_6/build/source_cycle.ndx"
+    },
+    {
+      "slot": 2,
+      "candidate_id": "nac_evt18_time1206ps",
+      "candidate_source_index": 6,
+      "velocity_seed": 26737,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt18_time1206ps/seed26737/attempt_61970146_2_61970149/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt18_time1206ps/seed26737/attempt_61970146_2_61970149/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt18_time1206ps/build_job_61813799_6/build/source_cycle.ndx"
+    },
+    {
+      "slot": 3,
+      "candidate_id": "nac_evt25_time1462ps",
+      "candidate_source_index": 11,
+      "velocity_seed": 26711,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26711/attempt_61970146_3_61970150/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26711/attempt_61970146_3_61970150/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt25_time1462ps/build_job_61813799_11/build/source_cycle.ndx"
+    },
+    {
+      "slot": 4,
+      "candidate_id": "nac_evt25_time1462ps",
+      "candidate_source_index": 11,
+      "velocity_seed": 26723,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26723/attempt_61970146_4_61970151/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26723/attempt_61970146_4_61970151/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt25_time1462ps/build_job_61813799_11/build/source_cycle.ndx"
+    },
+    {
+      "slot": 5,
+      "candidate_id": "nac_evt25_time1462ps",
+      "candidate_source_index": 11,
+      "velocity_seed": 26737,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26737/attempt_61970146_5_61970146/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26737/attempt_61970146_5_61970146/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt25_time1462ps/build_job_61813799_11/build/source_cycle.ndx"
+    },
+    {
+      "slot": 6,
+      "candidate_id": "nac_evt08_time1086ps",
+      "candidate_source_index": 5,
+      "velocity_seed": 26711,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt08_time1086ps/seed26711/attempt_61970317_6_61970318/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt08_time1086ps/seed26711/attempt_61970317_6_61970318/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt08_time1086ps/build_job_61813799_5/build/source_cycle.ndx"
+    },
+    {
+      "slot": 7,
+      "candidate_id": "nac_evt08_time1086ps",
+      "candidate_source_index": 5,
+      "velocity_seed": 26723,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt08_time1086ps/seed26723/attempt_61970317_7_61970319/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt08_time1086ps/seed26723/attempt_61970317_7_61970319/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt08_time1086ps/build_job_61813799_5/build/source_cycle.ndx"
+    },
+    {
+      "slot": 8,
+      "candidate_id": "nac_evt08_time1086ps",
+      "candidate_source_index": 5,
+      "velocity_seed": 26737,
+      "fully_unrestrained": true,
+      "completion_manifest": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt08_time1086ps/seed26737/attempt_61970317_8_61970317/EQUILIBRATION_COMPLETE.json",
+      "free_run_root": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt08_time1086ps/seed26737/attempt_61970317_8_61970317/npt300free",
+      "source_cycle_ndx": "/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/ensemble/candidates/nac_evt08_time1086ps/build_job_61813799_5/build/source_cycle.ndx"
+    }
+  ],
+  "scientific_scope": "classical-MM A1 screening; not a QM/MM barrier or proton-transfer pathway"
+}
