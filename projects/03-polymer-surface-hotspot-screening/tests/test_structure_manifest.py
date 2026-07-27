@@ -241,5 +241,57 @@ class StructureManifestCliTests(unittest.TestCase):
             self.assertIn("NOT_EVALUATED_CHECKSUM_MISMATCH", reasons)
 
 
+    def test_exact_dell_manifest_overrides_older_nylon_structure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            old_pdb = root / "old.pdb"
+            exact_pdb = root / "exact.pdb"
+            old_pdb.write_text("ATOM OLD\n", encoding="utf-8")
+            exact_pdb.write_text("ATOM EXACT\n", encoding="utf-8")
+            empty = root / "empty.tsv"
+            write_tsv(empty, [])
+            primary = root / "primary.tsv"
+            exact = root / "exact.tsv"
+            authority = root / "authority.tsv"
+            write_tsv(primary, [{
+                "family": "Nylonase", "candidate_id": "NYL_OLD", "sequence_md5": "same_md5",
+                "selected_chain": "A", "receptor_path": str(old_pdb),
+                "receptor_sha256": sha256(old_pdb), "input_status": "READY_FOR_STRUCTURE_EVALUATION",
+                "structure_provenance": "PREDICTED_ESMFOLD",
+            }])
+            write_tsv(exact, [{
+                "family": "Nylonase", "candidate_id": "NYL_EXACT", "sequence_md5": "same_md5",
+                "selected_chain": "A", "receptor_path": str(exact_pdb),
+                "receptor_sha256": sha256(exact_pdb), "input_status": "READY_FOR_STRUCTURE_EVALUATION",
+                "structure_provenance": "PREDICTED_ALPHAFOLD",
+            }])
+            write_authority_tsv(authority, [{
+                "authority_source": "dell", "authority_row_index": "1", "family": "Nylonase",
+                "candidate_id": "NYL_EXACT", "sequence_md5": "same_md5",
+                "status": "READY_AFTER_DELL_SYNC", "reason": "",
+            }])
+            out = root / "out"
+            run = subprocess.run([
+                sys.executable, str(SCRIPT),
+                "--pet-manifest", str(empty),
+                "--nylon-authority-manifest", str(authority),
+                "--nylon-exact-manifest", str(exact),
+                "--nylon-manifest", str(primary),
+                "--nylon-recovered-manifest", str(empty),
+                "--nylon-extra-manifest", str(empty),
+                "--output-dir", str(out),
+            ], text=True, capture_output=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            with (out / "nylon_structures.tsv").open(encoding="utf-8") as handle:
+                rows = list(csv.DictReader(handle, delimiter="\t"))
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["candidate_id"], "NYL_EXACT")
+            self.assertEqual(rows[0]["manifest_role"], "nylon_exact_dell")
+            self.assertEqual(rows[0]["source_priority"], "-1")
+            summary = json.loads((out / "structure_manifest_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["schema_version"], "structure_manifest_v3")
+            self.assertEqual(summary["source_priority"]["nylon_exact_dell"], -1)
+
+
 if __name__ == "__main__":
     unittest.main()
