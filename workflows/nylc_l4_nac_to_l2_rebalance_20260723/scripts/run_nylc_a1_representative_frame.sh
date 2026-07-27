@@ -3,10 +3,10 @@ set -euo pipefail
 
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 FLOW="$TASK_ROOT/repo/workflows/nylc_l4_nac_to_l2_rebalance_20260723"
-CODE_ROOT="\${A1_REP_CODE_ROOT:-$FLOW}"
+CODE_ROOT="${A1_REP_CODE_ROOT:-$FLOW}"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 GMX=/public/software/apps/gromacs/2022.2/hpcx-gcc7.3.1/bin/gmx_mpi
-GITHUB_COMMIT="\${A1_GITHUB_COMMIT:-unknown}"
+GITHUB_COMMIT="${A1_GITHUB_COMMIT:-unknown}"
 
 SOURCE_ROOT="$TASK_ROOT/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26723/attempt_61970146_4_61970151/npt300free"
 SOURCE_TPR="$SOURCE_ROOT/run.tpr"
@@ -16,7 +16,11 @@ SOURCE_NDX="$TASK_ROOT/ensemble/candidates/nac_evt25_time1462ps/build_job_618137
 SOURCE_MDP="$CODE_ROOT/mdp/em_cg_flexible_m1.mdp"
 EXPECTED_TPR_SHA256=c60078a92c2ace51facde4ef64e453f690177fc88b4d6363427f935944fa2e43
 EXPECTED_XTC_SHA256=1a54f1b5b9f139b746c22d9e0f7e9a4a94eb8154bf2b881888986eedca933d89
-ATTEMPT="\${A1_REP_ATTEMPT:-\${SLURM_JOB_ID:-manual_$(date -u '+%Y%m%dT%H%M%SZ')}}"
+EXPECTED_TOPOL_SHA256=af98733e218a8f83d0a5c46120d9d230a16c222f76d230654d44b542288cc205
+EXPECTED_CHAIN_H_ITP_SHA256=8fd4398af1356b515720c1da3126d08b7795b24b3c112d98ef3235afa57c8179
+EXPECTED_L2_ITP_SHA256=b0e753c60fd4b71c282d21cc6106a15e73d91d12a20d80e92dd01516162eb301
+EXPECTED_SYSTEM_A1_GRO_SHA256=c47b1eccff62639f47763c333f4824689505fcdb1d267397f9c0ef13e043e5f2
+ATTEMPT="${A1_REP_ATTEMPT:-${SLURM_JOB_ID:-manual_$(date -u '+%Y%m%dT%H%M%SZ')}}"
 OUT="$TASK_ROOT/a1_activated_nac_20260726/representative_frame/attempt_$ATTEMPT"
 
 [[ ! -e "$OUT" ]] || {
@@ -36,15 +40,19 @@ append_history() {
     now="$(date '+%Y-%m-%dT%H:%M:%S%z')"
     (
         flock -x 9
-        printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
-            "$now" "$EVENT" "$COMMAND" "$STATE" "$GITHUB_COMMIT" "$DETAIL" \
-            >>"$TASK_ROOT/run_history.tsv"
-        "$PY" - "$now" "$EVENT" "$COMMAND" "$STATE" "$GITHUB_COMMIT" \
-            "$DETAIL" "$OUT" >>"$TASK_ROOT/run_history.jsonl" <<'PY'
+        "$PY" - \
+            "$TASK_ROOT/run_history.tsv" \
+            "$TASK_ROOT/run_history.jsonl" \
+            "$now" "$EVENT" "$COMMAND" "$STATE" "$GITHUB_COMMIT" \
+            "$DETAIL" "$OUT" <<'PY'
 import json
+import os
 import sys
-now, event, command, state, commit, detail, output = sys.argv[1:]
-print(json.dumps({
+tsv_path, jsonl_path, now, event, command, state, commit, detail, output = (
+    sys.argv[1:]
+)
+tsv_row = "\t".join((now, event, command, state, commit, detail)) + "\n"
+jsonl_row = json.dumps({
     "time": now,
     "event": event,
     "command": command,
@@ -52,14 +60,56 @@ print(json.dumps({
     "git_commit": commit,
     "detail": detail,
     "output": output,
-}, sort_keys=True))
+}, sort_keys=True) + "\n"
+with open(tsv_path, "a+", encoding="utf-8") as tsv, open(
+    jsonl_path, "a+", encoding="utf-8"
+) as jsonl:
+    tsv.seek(0, os.SEEK_END)
+    jsonl.seek(0, os.SEEK_END)
+    tsv_offset = tsv.tell()
+    jsonl_offset = jsonl.tell()
+    try:
+        tsv.write(tsv_row)
+        tsv.flush()
+        os.fsync(tsv.fileno())
+        jsonl.write(jsonl_row)
+        jsonl.flush()
+        os.fsync(jsonl.fileno())
+    except BaseException:
+        tsv.seek(tsv_offset)
+        tsv.truncate()
+        tsv.flush()
+        os.fsync(tsv.fileno())
+        jsonl.seek(jsonl_offset)
+        jsonl.truncate()
+        jsonl.flush()
+        os.fsync(jsonl.fileno())
+        raise
 PY
     ) 9>"$TASK_ROOT/.run_history.lock"
+}
+
+PROMOTED=0
+demote_promoted_outputs() {
+    local path name
+    for path in \
+        "$OUT/representative_354ps.gro" \
+        "$OUT/representative_354ps.pdb" \
+        "$OUT/PASS.json"; do
+        if [[ -e "$path" ]]; then
+            name="$(basename "$path")"
+            mv "$path" "$OUT/FAILED_NOT_PROMOTED_$name"
+        fi
+    done
+    PROMOTED=0
 }
 
 finish() {
     local code=$?
     trap - EXIT
+    if ((PROMOTED)); then
+        demote_promoted_outputs
+    fi
     STATE=NOT_EVALUATED
     DETAIL="source=evt25;seed=26723;stage=$CURRENT;exit_code=$code;scientific_status=NOT_EVALUATED;output=$OUT"
     "$PY" - "$OUT/NOT_EVALUATED.json" "$CURRENT" "$code" \
@@ -91,7 +141,7 @@ pathlib.Path(output).write_text(
     json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
 )
 PY
-    append_history
+    append_history || printf 'failed to append terminal history\n' >&2
     exit "$code"
 }
 trap finish EXIT
@@ -103,7 +153,10 @@ for path in \
     "$SOURCE_XTC" \
     "$SOURCE_NDX" \
     "$SOURCE_MDP" \
-    "$TOPOLOGY_ROOT/topol.top"; do
+    "$TOPOLOGY_ROOT/topol.top" \
+    "$TOPOLOGY_ROOT/topol_Protein_chain_H.itp" \
+    "$TOPOLOGY_ROOT/PA66_L2_GMX.itp" \
+    "$TOPOLOGY_ROOT/system_A1.gro"; do
     [[ -s "$path" ]] || {
         printf 'missing required input %s\n' "$path" >&2
         exit 2
@@ -112,7 +165,7 @@ done
 mapfile -d '' ITP_FILES < <(
     find "$TOPOLOGY_ROOT" -maxdepth 1 -type f -name '*.itp' -print0 | sort -z
 )
-((\${#ITP_FILES[@]} > 0)) || {
+((${#ITP_FILES[@]} > 0)) || {
     printf 'no topology ITP files under %s\n' "$TOPOLOGY_ROOT" >&2
     exit 2
 }
@@ -120,17 +173,21 @@ mapfile -d '' ITP_FILES < <(
 CURRENT=source_hashes
 printf '%s  %s\n' "$EXPECTED_TPR_SHA256" "$SOURCE_TPR" | sha256sum -c -
 printf '%s  %s\n' "$EXPECTED_XTC_SHA256" "$SOURCE_XTC" | sha256sum -c -
+printf '%s  %s\n' "$EXPECTED_TOPOL_SHA256" "$TOPOLOGY_ROOT/topol.top" | sha256sum -c -
+printf '%s  %s\n' "$EXPECTED_CHAIN_H_ITP_SHA256" "$TOPOLOGY_ROOT/topol_Protein_chain_H.itp" | sha256sum -c -
+printf '%s  %s\n' "$EXPECTED_L2_ITP_SHA256" "$TOPOLOGY_ROOT/PA66_L2_GMX.itp" | sha256sum -c -
+printf '%s  %s\n' "$EXPECTED_SYSTEM_A1_GRO_SHA256" "$TOPOLOGY_ROOT/system_A1.gro" | sha256sum -c -
 sha256sum \
     "$SOURCE_TPR" \
     "$SOURCE_XTC" \
     "$SOURCE_NDX" \
     "$SOURCE_MDP" \
     "$TOPOLOGY_ROOT/topol.top" \
-    "\${ITP_FILES[@]}" >"$OUT/input_sha256.tsv"
+    "${ITP_FILES[@]}" >"$OUT/input_sha256.tsv"
 
 module purge
 module load gromacs/2022.2-hpcx-gcc-7.3.1
-export GMX_MAXBACKUP=-1 OMP_NUM_THREADS="\${SLURM_CPUS_PER_TASK:-4}"
+export GMX_MAXBACKUP=-1 OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-4}"
 
 CURRENT=extract_system_354ps
 printf 'System\n' | "$GMX" trjconv \
@@ -255,6 +312,7 @@ if not passed:
 PY
 
 CURRENT=promote_artifacts
+PROMOTED=1
 mv "$OUT/source.tmp.gro" "$OUT/representative_354ps.gro"
 "$GMX" editconf \
     -f "$OUT/representative_354ps.gro" \
@@ -272,7 +330,7 @@ CURRENT=final_hashes
         "$SOURCE_NDX" \
         "$SOURCE_MDP" \
         "$TOPOLOGY_ROOT/topol.top" \
-        "\${ITP_FILES[@]}"
+        "${ITP_FILES[@]}"
     sha256sum \
         "$OUT/A1_REPRESENTATIVE_FRAME_AUDIT.json" \
         "$OUT/preflight.unrestrained.mdp" \
@@ -329,6 +387,7 @@ pathlib.Path(output).write_text(
 PY
 
 STATE=PASS_TECHNICAL
+CURRENT=terminal_history
 DETAIL="source=evt25;seed=26723;time_ps=354;scientific_status=PASS_A1_REPRESENTATIVE_NAC_FRAME;output=$OUT"
-trap - EXIT
 append_history
+trap - EXIT
