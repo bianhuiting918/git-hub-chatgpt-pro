@@ -106,6 +106,7 @@ class A1ExpandedDftb3ContractTests(unittest.TestCase):
             "--coordinate",
             "sander.MPI",
             "mpirun",
+            "--bind-to none",
             "SLURM_NTASKS",
             "-inf",
             "01_qmmm_one_step.mdinfo",
