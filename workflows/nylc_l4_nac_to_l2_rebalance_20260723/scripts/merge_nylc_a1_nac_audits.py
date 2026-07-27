@@ -112,16 +112,24 @@ def main()->int:
     candidates=candidate_summaries(records)
     selected=select_replica(records,candidates)
     eligible_replica_count=sum(r.get("scientific_status")=="PASS_REPLICA_NAC_PRESENT" for r in records)
+    technical_pass_count=sum(r.get("technical_status")=="PASS" for r in records)
+    if selected:
+        scientific_status="PASS_A1_NAC_CANDIDATE_AVAILABLE"
+    elif technical_pass_count==0:
+        scientific_status="NOT_EVALUATED_NO_TECHNICAL_AUDITS"
+    else:
+        scientific_status="FAIL_NO_ELIGIBLE_A1_NAC"
     summary={
         "schema_version":1,
         "status":"PASS_TECHNICAL_A1_NAC_MERGE" if not missing_slots else "PASS_WITH_NOT_EVALUATED_MISSING_AUDIT",
-        "scientific_status":"PASS_A1_NAC_CANDIDATE_AVAILABLE" if selected else "FAIL_NO_ELIGIBLE_A1_NAC",
+        "scientific_status":scientific_status,
         "audit_array_job_id":str(args.audit_array_job_id),
         "expected_slots":list(range(9)),
         "missing_slots":missing_slots,
         "replica_denominator":9,
         "candidate_denominator":3,
         "eligible_replica_count":eligible_replica_count,
+        "technical_pass_count":technical_pass_count,
         "selection_order":["candidate eligible seed count descending","replica nac_occupancy descending","longest continuous NAC descending","potential_energy_kj_mol mean ascending"],
         "selected_replica":selected,
         "candidate_summaries":candidates,
