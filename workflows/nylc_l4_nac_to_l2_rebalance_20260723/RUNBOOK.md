@@ -1002,3 +1002,58 @@ Staged equilibration:
   temperature/pressure, and LINCS/SETTLE/NaN/FATAL must be audited only in the
   fully unrestrained 1 ns window.  Longer extensions are selected only after
   this common screening window.
+
+## A1 nine-replica fully unrestrained NAC audit (2026-07-27)
+
+The common A1 screening universe is three source conformations
+(`nac_evt18_time1206ps`, `nac_evt25_time1462ps`, and
+`nac_evt08_time1086ps`) crossed with velocity seeds 26711, 26723, and 26737:
+nine independent 1 ns fully unrestrained NPT replicas, sampled every 2 ps
+(501 frames per replica). The A1 state is Thr267 O-gamma-minus / N-alpha-H3+.
+This audit intentionally excludes the earlier M1 proton-path logic.
+
+Corrected audit array `61976600` completed 9/9 tasks with exit code 0:0.
+Dependent merge/rank job `61976667` completed 0:0. All nine replicas passed
+the technical, binding, thermodynamic, zero-restraint, and
+LINCS/SETTLE/NaN/FATAL gates. The preserved first audit attempt `61975718`
+was a technical deployment failure because the runner pre-created a directory
+owned by the primitive generator; it contains no scientific NAC result.
+Its merge `61976215` is superseded. The corrected runner and merge
+classification are regression-tested.
+
+Joint NAC requires reactive PA66-L2 carbonyl-C to Thr267-OG1 distance <=0.35
+nm and carbonyl O-C-OG1 angle 95--115 degrees. Gate opening uses residues
+261--266 and excludes Thr267.
+
+| candidate / seed | NAC frames / 501 | occupancy | longest run | result |
+| --- | ---: | ---: | ---: | --- |
+| evt18 / 26711 | 0 | 0.0000 | 0 ps | FAIL_REPLICA_NO_NAC |
+| evt18 / 26723 | 6 | 0.0120 | 2 ps | PASS_REPLICA_NAC_PRESENT |
+| evt18 / 26737 | 0 | 0.0000 | 0 ps | FAIL_REPLICA_NO_NAC |
+| evt25 / 26711 | 0 | 0.0000 | 0 ps | FAIL_REPLICA_NO_NAC |
+| evt25 / 26723 | 165 | 0.3293 | 8 ps | PASS_REPLICA_NAC_PRESENT |
+| evt25 / 26737 | 61 | 0.1218 | 12 ps | PASS_REPLICA_NAC_PRESENT |
+| evt08 / 26711 | 0 | 0.0000 | 0 ps | FAIL_REPLICA_NO_NAC |
+| evt08 / 26723 | 7 | 0.0140 | 2 ps | PASS_REPLICA_NAC_PRESENT |
+| evt08 / 26737 | 1 | 0.0020 | 0 ps | PASS_REPLICA_NAC_PRESENT |
+
+The overall status is `PASS_A1_NAC_CANDIDATE_AVAILABLE`: five of nine
+replicas contain at least one NAC frame. The reproducible source is evt25,
+which is NAC-positive in two of three independent seeds and has far higher
+occupancy and residence than evt18 or evt08. The selected replica is evt25 /
+seed26723 (32.93% occupancy); evt25 / seed26737 provides an independent
+replicate (12.18%, 12 ps longest run).
+
+Within the selected replica's longest continuous event (350--358 ps), the
+354 ps frame has the lowest instantaneous MM potential: distance 0.332755 nm,
+angle 109.282 degrees, gate opening 3.136489 nm, and potential energy
+-1831999.375 kJ/mol. It is only a nominated representative until its
+coordinates are extracted and independently re-audited. Whole-system MM
+potential is a secondary within-system ranking aid, not a QM/MM barrier or a
+proof of the proton-transfer path.
+
+Compact authority:
+`audit/nylc_a1_nac_audit_result_20260727.json`.
+Remote raw audit:
+`$TASK_ROOT/a1_activated_nac_20260726/nac_audit_merge/job_61976667/A1_NAC_AUDIT_SUMMARY.json`.
+
