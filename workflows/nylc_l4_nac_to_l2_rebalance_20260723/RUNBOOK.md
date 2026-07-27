@@ -1306,3 +1306,36 @@ overall mechanism.
 
 Compact authority:
 `audit/nylc_a1_step1_coupled_scout_20260728.json`.
+
+
+## A1 Step1 PT2 coordinate identity and geometry audit (2026-07-28)
+
+The direct N-alpha-to-leaving-N PT2 proposal was audited before applying any
+new restraint. Test-first development produced the expected missing-auditor
+failure, then the implementation passed 4/4 contract tests and Python
+compilation at commit
+`c2cd599c00831de92afe2ac9cd244e47c178d142`.
+
+The hash-pinned job-`62021985` seed has the correct A1 bond graph and unified
+QM membership: Thr267 N-alpha 8949 is bonded to transferred HG1 8961,
+Thr267 OG1 8960 is not bonded to HG1, L2 C12 10287 is bonded to leaving N3
+10289, and all five atoms belong to the 146-atom, charge-zero, 510-electron,
+six-link, no-QM-water Step1 region.
+
+However, this seed is not geometrically preorganized for direct HG1 transfer to
+N3. N-alpha--N3 is 3.376573 A, HG1--N3 is 3.652984 A and the
+N-alpha--HG1--N3 angle is only 66.461356 degrees. The project geometry screen
+requires donor--acceptor <=3.5 A, H--acceptor <=2.5 A and donor--H--acceptor
+angle >=135 degrees. Its classification is therefore
+`NOT_EVALUATED_A1_PT2_DIRECT_RELAY_NOT_PREORGANIZED`.
+
+Do not strongly pull HG1 directly to N3 from this seed. Before designing a
+direct PT2/acylation scout, scan the preserved nine-replica fully unrestrained
+A1 NAC ensemble for independently sampled frames that satisfy both NAC and PT2
+preorganization. If no such frame exists, retain direct PT2 from the current
+A1 ensemble as not supported geometrically and test a relay or alternative
+microstate rather than forcing an implausible path. Geometry alone is not
+proton transfer, a TS, PMF, barrier or mechanism proof.
+
+Compact authority:
+`audit/nylc_a1_step1_pt2_coordinate_20260728.json`.
