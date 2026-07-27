@@ -948,3 +948,57 @@ documentation, tests,
 compact JSON/TSV audits and run history belong in GitHub. Trajectories, large
 topologies, checkpoints, medoid coordinate systems, credentials and secrets
 remain outside GitHub.
+
+
+## A1 full-system EM and staged equilibration checkpoint (2026-07-27)
+
+The A1 microstate in this workflow is Thr267 O-gamma deprotonated with the
+transferred proton on the Thr267 N-alpha (N-alpha-H3+).  This is a classical-MM
+screening state, not a statement about the microscopic proton-transfer path.
+
+Technical gates completed before dynamics:
+
+- local A1 patch: job `61902961`, `PASS_A1_SCREENING_PATCH`;
+- three full-system preflights: array `61966928`, all
+  `PASS_A1_FULL_SYSTEM_PREFLIGHT`;
+- the full system keeps the audited PA66-L2 topology, changes only transferred
+  HG1 coordinate 8961, and preserves N-alpha-H3 / O-gamma-minus valence.
+
+EM history and recovery:
+
+- array `61967618` preserved three technical failures.  The free CG stage did
+  not meet the force gate for evt18/evt25; evt08 was interrupted by a mutable
+  runner-file deployment error.  These are not scientific NAC failures.
+- recovery array `61968026` used free steepest descent.  evt18 and evt25 both
+  converged below 500 kJ mol-1 nm-1, but the old auditor falsely matched the
+  substring `nan` inside `lincs-warnangle`.
+- regression commit `dee10cb87143ca01d013ef998f497f2f90ae34ee` now matches
+  only an independent NaN token.  Per-task immutable code snapshots are
+  required by commits `67d2b50bb1e8f65e3bdfedc9fa8c62db2658b6cd` and
+  `3b56de5b3dfafabe5d1d956ca60c275c302a2b34`.
+- re-audit jobs `61969849` (evt18) and `61969850` (evt25) completed with
+  `PASS_A1_EM`.  evt18: Fmax 477.37888 and minimum nonbonded distance
+  0.188851794 nm.  evt25: Fmax 408.70236 and minimum nonbonded distance
+  0.222283603 nm.  This is a technical EM gate only.
+- re-audit attempt `61969676` exited before audit because its frozen deployment
+  omitted `build_nylc_a1_full_system.py`; the failure is preserved and was
+  corrected by using the complete canonical code root.
+- evt08 fresh EM is job `61969851`; do not advance it unless its independent
+  `A1_EM_AUDIT.json` reports `PASS_A1_EM`.
+
+Staged equilibration:
+
+- canonical runner: `scripts/run_nylc_a1_equilibration.sh`;
+- Slurm launcher: `slurm/run_nylc_a1_equilibration.sbatch`;
+- tests: `tests/test_nylc_a1_equilibration_contract.py` and
+  `tests/test_nylc_a1_em_contract.py` (10 tests passed before submission);
+- array `61970146`, tasks 0-5, covers evt18 and evt25 with velocity seeds
+  26711, 26723, and 26737.  The order is restrained 50 K, restrained 150 K,
+  weakly restrained 300 K NVT, weakly restrained 300 K NPT, L2 10-unit release,
+  and a final 1 ns NPT TPR that must contain no position/distance restraints or
+  non-empty `define`.
+- completion of a Slurm task or `PASS_TECHNICAL_A1_EQUILIBRATION` is not a
+  scientific pass.  NAC occupancy, catalytic distance/angle, gate opening,
+  temperature/pressure, and LINCS/SETTLE/NaN/FATAL must be audited only in the
+  fully unrestrained 1 ns window.  Longer extensions are selected only after
+  this common screening window.
