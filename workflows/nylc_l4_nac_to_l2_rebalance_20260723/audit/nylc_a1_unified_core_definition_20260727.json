@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "SUBMITTED_A1_UNIFIED_CORE_DFTB3_NUMERICAL_PREFLIGHT",
+  "status": "PASS_A1_UNIFIED_CORE_DFTB3_NUMERICAL_PREFLIGHT",
   "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER",
   "source": {
     "representative_job": 61990814,
@@ -127,16 +127,51 @@
   "step2_water_policy": "Keep the identical six protein residues. Add a selected neutral reacting water before the first Step2 window and retain the same water identity through every Step2 TS/PMF window.",
   "numerical_preflight": {
     "slurm_job_id": 62011285,
-    "scheduler_snapshot": "PENDING_ASSOC_GRP_JOBS_LIMIT",
-    "requested_resources": {
-      "partition": "xahcnormal",
-      "nodes": 1,
-      "mpi_ranks": 8,
-      "cpus_per_rank": 1,
-      "mem_per_cpu_mb": 2500,
-      "time_limit": "02:00:00"
-    },
+    "slurm_state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:03:10",
+    "alloc_cpus": 8,
+    "total_cpu": "11:22.529",
+    "max_rss_kb": 4867740,
     "github_commit": "fe38527eccaea9c84d004652dcd222c4c38b9586",
-    "interpretation": "Technical numerical preflight only. Scheduler or numerical completion is not a TS, PMF, barrier, or mechanism result."
+    "hard_error_gate": {
+      "scc_warnings": 0,
+      "vlimit_warnings": 0,
+      "bond_overflow": 0,
+      "nan": 0,
+      "fatal": 0,
+      "sander_bomb": 0,
+      "segmentation": 0,
+      "forrtl": 0
+    },
+    "interpretation": "Technical DFTB3/3OB-3-1 numerical PASS only; not a TS, PMF, barrier, or mechanism result."
+  },
+  "step1_qattack": {
+    "slurm_job_id": 62012919,
+    "status_at_record": "RUNNING",
+    "github_commit": "96af07f9e3295010ebfab94b578349347df209c6",
+    "windows_target_A": [
+      3.27,
+      3.05,
+      2.85,
+      2.65,
+      2.45,
+      2.25,
+      2.05,
+      1.85,
+      1.65
+    ],
+    "first_window_geometry": {
+      "og1_c12_A": 3.2928886510832367,
+      "o2_c12_og1_deg": 112.39349201720036,
+      "c12_o2_A": 1.2554631439936867,
+      "c12_n3_A": 1.3683283610529153,
+      "nalpha_h_A": [
+        1.032204661248416,
+        1.0242657685262333,
+        1.0333436631607584
+      ]
+    },
+    "interpretation": "Constrained attack-only scouting; not a TS, committor, PMF, barrier, or mechanism result."
   }
 }
