@@ -44,15 +44,23 @@ def valid_mpnn(rows):
 
 def valid_saprot(rows):
     _require(rows,["family","canonical_sequence_md5","scoring_sequence_md5",
-                   "scoring_sequence_scope","status_FULL_PROTEIN",
-                   "mean_log_likelihood_FULL_PROTEIN"],"SaProt")
+                   "scoring_sequence_scope"],"SaProt")
     x=rows.copy()
-    mask=(x.family.eq("Nylonase") & x.status_FULL_PROTEIN.eq("PASS")
-          & x.scoring_sequence_scope.eq("CANONICAL_EXACT")
-          & x.canonical_sequence_md5.eq(x.scoring_sequence_md5))
-    x=x.loc[mask,["canonical_sequence_md5","mean_log_likelihood_FULL_PROTEIN"]].rename(
-        columns={"canonical_sequence_md5":"sequence_md5",
-                 "mean_log_likelihood_FULL_PROTEIN":"saprot_full_mean"})
+    exact=(x.family.eq("Nylonase")
+           & x.scoring_sequence_scope.eq("CANONICAL_EXACT")
+           & x.canonical_sequence_md5.eq(x.scoring_sequence_md5))
+    if "mean_log_likelihood_FULL_PROTEIN" in x.columns:
+        _require(x,["status_FULL_PROTEIN"],"SaProt denominator")
+        mask=exact & x.status_FULL_PROTEIN.eq("PASS")
+        score_col="mean_log_likelihood_FULL_PROTEIN"
+    elif "saprot_mean_log_likelihood" in x.columns:
+        _require(x,["saprot_result_path"],"SaProt paired manifest")
+        mask=exact & x.saprot_result_path.fillna("").ne("")
+        score_col="saprot_mean_log_likelihood"
+    else:
+        raise ValueError("SaProt missing full-protein mean log-likelihood field")
+    x=x.loc[mask,["canonical_sequence_md5",score_col]].rename(
+        columns={"canonical_sequence_md5":"sequence_md5",score_col:"saprot_full_mean"})
     x=_numeric(x,["saprot_full_mean"])
     x=x[np.isfinite(x.saprot_full_mean)]
     _unique(x,"sequence_md5","valid SaProt")
