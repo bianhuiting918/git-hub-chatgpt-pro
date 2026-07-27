@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "status": "SUBMITTED_A1_UNIFIED_CORE_DFTB3_NUMERICAL_PREFLIGHT",
+  "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER",
+  "source": {
+    "representative_job": 61990814,
+    "representative_gro_sha256": "7b095b7d36a25327558b4bbab20a98a43edaab51d0cacaf7a888ff886bafe679",
+    "small_qm_control_job": 62009113,
+    "small_qm_control_status": "PASS_A1_EXPANDED_DFTB3_NUMERICAL_PREFLIGHT"
+  },
+  "unified_protein_core": {
+    "protein_residues": [
+      {
+        "canonical_resid": 146,
+        "global_resid": 501,
+        "resname": "TYR",
+        "scope": "sidechain",
+        "atom_range_index1": [
+          7160,
+          7174
+        ],
+        "boundary_qm_mm_index1": [
+          7160,
+          7158
+        ],
+        "formal_residue_charge": 0
+      },
+      {
+        "canonical_resid": 189,
+        "global_resid": 544,
+        "resname": "LYS",
+        "scope": "sidechain",
+        "atom_range_index1": [
+          7756,
+          7771
+        ],
+        "boundary_qm_mm_index1": [
+          7756,
+          7754
+        ],
+        "formal_residue_charge": 1
+      },
+      {
+        "canonical_resid": 219,
+        "global_resid": 574,
+        "resname": "ASN",
+        "scope": "sidechain",
+        "atom_range_index1": [
+          8235,
+          8242
+        ],
+        "boundary_qm_mm_index1": [
+          8235,
+          8233
+        ],
+        "formal_residue_charge": 0
+      },
+      {
+        "canonical_resid": 267,
+        "global_resid": 622,
+        "resname": "THR",
+        "scope": "complete_processed_A1_NalphaH3_Ogamma_minus",
+        "atom_range_index1": [
+          8949,
+          8963
+        ],
+        "boundary_qm_mm_index1": [
+          8962,
+          8964
+        ],
+        "formal_residue_charge": 0
+      },
+      {
+        "canonical_resid": 306,
+        "global_resid": 661,
+        "resname": "ASH",
+        "scope": "sidechain",
+        "atom_range_index1": [
+          9567,
+          9573
+        ],
+        "boundary_qm_mm_index1": [
+          9567,
+          9565
+        ],
+        "formal_residue_charge": 0
+      },
+      {
+        "canonical_resid": 308,
+        "global_resid": 663,
+        "resname": "ASP",
+        "scope": "sidechain",
+        "atom_range_index1": [
+          9587,
+          9592
+        ],
+        "boundary_qm_mm_index1": [
+          9587,
+          9585
+        ],
+        "formal_residue_charge": -1
+      }
+    ],
+    "ligand": {
+      "resname": "L2",
+      "scope": "complete",
+      "atom_range_index1": [
+        10273,
+        10351
+      ],
+      "atom_count": 79,
+      "formal_charge": 0,
+      "reactive_atoms": {
+        "thr267_og1": 8960,
+        "c12": 10287,
+        "o2": 10288,
+        "n3": 10289
+      }
+    },
+    "explicit_qm_atom_count": 146,
+    "link_h_count": 6,
+    "qmcharge": 0,
+    "spin": 1,
+    "electron_count_including_link_h": 510,
+    "qm_water_count_step1": 0
+  },
+  "step2_water_policy": "Keep the identical six protein residues. Add a selected neutral reacting water before the first Step2 window and retain the same water identity through every Step2 TS/PMF window.",
+  "numerical_preflight": {
+    "slurm_job_id": 62011285,
+    "scheduler_snapshot": "PENDING_ASSOC_GRP_JOBS_LIMIT",
+    "requested_resources": {
+      "partition": "xahcnormal",
+      "nodes": 1,
+      "mpi_ranks": 8,
+      "cpus_per_rank": 1,
+      "mem_per_cpu_mb": 2500,
+      "time_limit": "02:00:00"
+    },
+    "github_commit": "fe38527eccaea9c84d004652dcd222c4c38b9586",
+    "interpretation": "Technical numerical preflight only. Scheduler or numerical completion is not a TS, PMF, barrier, or mechanism result."
+  }
+}
