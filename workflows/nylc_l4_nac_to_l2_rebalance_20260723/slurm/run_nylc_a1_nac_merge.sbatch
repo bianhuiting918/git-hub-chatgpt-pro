@@ -17,8 +17,10 @@ AUDIT_ARRAY_JOB_ID="${AUDIT_ARRAY_JOB_ID:?submit with afterany dependency and AU
 GITHUB_COMMIT="${A1_GITHUB_COMMIT:-unknown}"
 JOB_ID="${SLURM_JOB_ID:?SLURM_JOB_ID required}"
 SNAP="$TASK_ROOT/a1_activated_nac_20260726/code_snapshots/nac_merge_$JOB_ID"
-OUT="$TASK_ROOT/a1_activated_nac_20260726/nac_audit_merge/job_$JOB_ID"
+MERGE_ROOT="$TASK_ROOT/a1_activated_nac_20260726/nac_audit_merge"
+OUT="$MERGE_ROOT/job_$JOB_ID"
 [[ ! -e "$OUT" ]] || { printf 'refusing to overwrite %s\n' "$OUT" >&2; exit 2; }
+mkdir -p "$MERGE_ROOT"
 mkdir -p "$SNAP/scripts" "$SNAP/manifests"
 cp "$FLOW/scripts/merge_nylc_a1_nac_audits.py" "$SNAP/scripts/"
 cp "$FLOW/manifests/nylc_a1_nac_audit_universe.json" "$SNAP/manifests/"
