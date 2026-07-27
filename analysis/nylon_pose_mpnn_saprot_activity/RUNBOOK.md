@@ -22,3 +22,8 @@ sbatch analysis/nylon_pose_mpnn_saprot_activity/slurm.sbatch
 ## Outputs and recovery
 
 `authority_joined.tsv` is the enzyme-level exact-MD5 authority table. `not_evaluated.tsv` preserves technical reasons. Per-endpoint denominators, correlations, bootstrap CIs, standardized models, predictor-collinearity audit, sensitivity correlations and figures are written at the root. `input_sha256.tsv`, `logs/run_history.tsv`, `audit.json`, and `PASS.json` provide provenance. Re-run is idempotent: an existing root `PASS.json` causes a recorded skip. A failed run may be resumed only after inspecting Slurm logs; do not delete or overwrite the directory.
+
+
+## Live SaProt authority correction (2026-07-27)
+
+The older `saprot_nylonase_4556_denominator_20260725_v1` is retained only as a stale denominator audit: its Nyl01–Nyl95 rows are pre-transfer `NOT_EVALUATED_DELL_ASSET_NOT_SYNCED`. Production instead reads the newer independently PASS-gated paired manifest `manifests/proteinmpnn_compatibility_pet8329_nylon4167_20260727_v2_scopefix/run_manifest_all_12496_scopefixed.tsv`. For Nyl01–Nyl95 it points to `saprot_nylonase_dell_20260727_v2` result JSONs and supplies the exact-canonical FULL_PROTEIN mean log-likelihood; native active-site-mask failures do not invalidate the independent FULL_PROTEIN PASS scope.
