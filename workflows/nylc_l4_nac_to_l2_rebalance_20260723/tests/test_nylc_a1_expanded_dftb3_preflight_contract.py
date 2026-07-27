@@ -105,7 +105,8 @@ class A1ExpandedDftb3ContractTests(unittest.TestCase):
             "-ur compact",
             "--coordinate",
             "sander.MPI",
-            "srun",
+            "mpirun",
+            "SLURM_NTASKS",
             "-inf",
             "01_qmmm_one_step.mdinfo",
             "02_qmmm_20_step.mdinfo",
@@ -115,7 +116,7 @@ class A1ExpandedDftb3ContractTests(unittest.TestCase):
             "PASS.json",
         ):
             self.assertIn(token, text)
-        for forbidden in ("gmx mdrun", "lowest_potential", "pmemd.cuda"):
+        for forbidden in ("gmx mdrun", "lowest_potential", "pmemd.cuda", "srun -n"):
             self.assertNotIn(forbidden, text)
 
     def test_slurm_uses_eight_cpu_ranks_without_dcu_request(self):
