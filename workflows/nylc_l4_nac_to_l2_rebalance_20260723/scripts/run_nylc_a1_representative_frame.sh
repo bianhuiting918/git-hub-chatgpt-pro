@@ -162,8 +162,12 @@ for path in \
         exit 2
     }
 done
-mapfile -d '' ITP_FILES < <(
-    find "$TOPOLOGY_ROOT" -maxdepth 1 -type f -name '*.itp' -print0 | sort -z
+ITP_FILES=()
+while IFS= read -r path; do
+    ITP_FILES+=("$path")
+done < <(
+    find "$TOPOLOGY_ROOT" -maxdepth 1 -type f -name '*.itp' -print |
+        LC_ALL=C sort
 )
 ((${#ITP_FILES[@]} > 0)) || {
     printf 'no topology ITP files under %s\n' "$TOPOLOGY_ROOT" >&2
