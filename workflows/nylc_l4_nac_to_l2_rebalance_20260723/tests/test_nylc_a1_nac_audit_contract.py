@@ -94,7 +94,8 @@ class A1NACAuditContract(unittest.TestCase):
     def test_merge_job_is_afterany_and_records_history(self):
         text=MERGE_SBATCH.read_text()
         for token in ["AUDIT_ARRAY_JOB_ID","afterany","run_history.tsv",
-                      "run_history.jsonl","merge_nylc_a1_nac_audits.py"]:
+                      "run_history.jsonl","merge_nylc_a1_nac_audits.py",
+                      "MERGE_ROOT","mkdir -p \"$MERGE_ROOT\""]:
             self.assertIn(token,text)
 
 if __name__=="__main__":
