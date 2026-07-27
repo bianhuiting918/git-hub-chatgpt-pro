@@ -53,6 +53,9 @@ class FakeGroup(list):
     def resids(self):
         return np.asarray([atom.resid for atom in self], dtype=int)
 
+    def center_of_mass(self):
+        return np.mean(self.positions, axis=0)
+
 
 class A1RepresentativeFrameContractTests(unittest.TestCase):
     def test_frozen_source_and_frame_constants_are_exact(self):
@@ -60,6 +63,9 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertEqual(module.SELECTED_TIME_PS, 354.000)
         self.assertEqual(module.TIME_TOLERANCE_PS, 0.001)
         self.assertEqual(module.COORDINATE_TOLERANCE_NM, 0.0015)
+        self.assertEqual(module.NAC_DISTANCE_MAX_NM, 0.35)
+        self.assertEqual(module.NAC_ANGLE_MIN_DEG, 95.0)
+        self.assertEqual(module.NAC_ANGLE_MAX_DEG, 115.0)
         self.assertEqual(module.EXPECTED_ATOM_COUNT, 133589)
         self.assertEqual(module.EXPECTED_L2_ATOM_COUNT, 79)
         self.assertEqual(module.EXPECTED_L2_HEAVY_COUNT, 33)
@@ -138,10 +144,16 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
                 source, np.asarray(((9.90, 5.0, 5.0),)), box
             )
 
-    def test_reactive_atom_identity_is_fail_closed(self):
+    def test_reactive_atom_identities_are_fail_closed(self):
         module = load_module()
-        atom = FakeAtom(8959, "OG1", "THR", 267)
-        module._require_identity(atom, 8960, "THR", "OG1", 267)
+        identities = (
+            (FakeAtom(8959, "OG1", "THR", 267), 8960, "THR", "OG1", 267),
+            (FakeAtom(10286, "C12", "L2", 1), 10287, "L2", "C12", None),
+            (FakeAtom(10287, "O2", "L2", 1), 10288, "L2", "O2", None),
+            (FakeAtom(10288, "N3", "L2", 1), 10289, "L2", "N3", None),
+        )
+        for atom, index1, resname, name, resid in identities:
+            module._require_identity(atom, index1, resname, name, resid)
         with self.assertRaisesRegex(module.AuditError, "expected THR267:OG1"):
             module._require_identity(
                 FakeAtom(8959, "HG1", "THR", 267), 8960, "THR", "OG1", 267
@@ -180,9 +192,11 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         passing = module._joint_nac(
             oxygen_A=np.asarray((-1.0, 0.0, 0.0)),
             carbon_A=np.asarray((0.0, 0.0, 0.0)),
-            og1_A=np.asarray((0.0, 3.0, 0.0)),
+            og1_A=np.asarray((0.7764571353, 2.8977774789, 0.0)),
             box=box,
         )
+        self.assertAlmostEqual(passing["c_og1_distance_nm"], 0.3)
+        self.assertAlmostEqual(passing["o_c_og1_angle_deg"], 105.0)
         self.assertTrue(passing["joint_pass"])
 
     def test_gate_is_exactly_261_to_266_and_excludes_thr267(self):
@@ -194,6 +208,29 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         gate.append(FakeAtom(99, "CA", "THR", 267))
         with self.assertRaisesRegex(module.AuditError, "Gate residues"):
             module._validate_gate_membership(gate)
+
+    def test_gate_record_uses_core_and_gate_and_excludes_thr267(self):
+        module = load_module()
+        core = FakeGroup([FakeAtom(0, "CA", "ALA", 100, (0.0, 0.0, 0.0))])
+        gate = FakeGroup(
+            [
+                FakeAtom(i + 1, "CA", "THR", resid, (1.0, 0.0, 0.0))
+                for i, resid in enumerate(range(261, 267))
+            ]
+        )
+        primitive = mock.Mock(return_value=0.25)
+        record = module._gate_opening_record(
+            core,
+            gate,
+            np.asarray((10.0, 10.0, 10.0, 90.0, 90.0, 90.0)),
+            gate_opening=primitive,
+        )
+        self.assertEqual(record["core_atom_count"], 1)
+        self.assertEqual(record["gate_atom_count"], 6)
+        self.assertEqual(record["gate_resids"], [261, 262, 263, 264, 265, 266])
+        self.assertTrue(record["thr267_excluded"])
+        self.assertAlmostEqual(record["opening_nm"], 0.25)
+        np.testing.assert_allclose(primitive.call_args.args[0], (0.1, 0.0, 0.0))
 
     def test_l2_and_full_system_counts_are_exact(self):
         module = load_module()
@@ -250,6 +287,10 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         }
         self.assertEqual(
             module._scientific_status(gates), "PASS_A1_REPRESENTATIVE_NAC_FRAME"
+        )
+        self.assertEqual(
+            module.SCIENTIFIC_SCOPE,
+            "classical_fixed_topology_preorganization_not_proton_transfer",
         )
         for key in gates:
             failed = dict(gates)
