@@ -25,6 +25,7 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
             "PASS_A1_REPRESENTATIVE_FRAME_EXTRACTION",
             "PASS_A1_REPRESENTATIVE_NAC_FRAME",
             "7b095b7d36a25327558b4bbab20a98a43edaab51d0cacaf7a888ff886bafe679",
+            "8a61a57be0537a5fb0aac8f2379452fdb6980468cb06659c0953224d3a0aefa3",
             "af98733e218a8f83d0a5c46120d9d230a16c222f76d230654d44b542288cc205",
             "8fd4398af1356b515720c1da3126d08b7795b24b3c112d98ef3235afa57c8179",
             "b0e753c60fd4b71c282d21cc6106a15e73d91d12a20d80e92dd01516162eb301",
@@ -39,6 +40,10 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
         for token in (
             "PROTEIN_ATOMS = 10272",
             "THR267_OG1 = 8960",
+            "EXPECTED_ACTIVE_GLOBAL_RESID = 622",
+            "EXPECTED_ACTIVE_ORIGINAL_RESID = 267",
+            "source_global_resid",
+            "extracted_original_resid",
             "L2_FIRST = 10273",
             "L2_LAST = 10351",
             "L2_REACTIVE_C = 10287",
