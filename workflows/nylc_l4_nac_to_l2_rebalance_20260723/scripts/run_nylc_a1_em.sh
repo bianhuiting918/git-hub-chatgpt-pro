@@ -57,7 +57,7 @@ nstenergy = 100
 nstlog = 100
 EOF
 cat >"$OUT/em_free/em.mdp" <<'EOF'
-integrator = cg
+integrator = steep
 emtol = 500
 emstep = 0.0001
 nsteps = 50000
