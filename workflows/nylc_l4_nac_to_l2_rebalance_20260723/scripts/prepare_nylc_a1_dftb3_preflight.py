@@ -35,6 +35,7 @@ SPIN = 1
 DFTB_TELEC_K = 200.0
 EXPECTED_QM_ATOMS = 94
 EXPECTED_ELECTRONS_WITH_LINKS = 314
+MAX_ALLOWED_BOND_LENGTH_A = 2.0
 ATOMIC_NUMBERS = {"H": 1, "C": 6, "N": 7, "O": 8}
 
 
@@ -121,6 +122,22 @@ def derive_qm_contract(structure):
         raise ValueError(f"A1 Thr267 patch net charge is not 0: {active_charge}")
     if abs(ligand_charge) > 1.0e-4:
         raise ValueError(f"L2 net charge is not 0: {ligand_charge}")
+    bond_lengths = []
+    for bond in structure.bonds:
+        left, right = bond.atom1, bond.atom2
+        distance = sum(
+            (float(left.xx[axis]) - float(right.xx[axis])) ** 2
+            for axis in range(3)
+        ) ** 0.5
+        bond_lengths.append(distance)
+    max_bond_length_A = max(bond_lengths)
+    bond_count_gt_3A = sum(distance > 3.0 for distance in bond_lengths)
+    if max_bond_length_A > MAX_ALLOWED_BOND_LENGTH_A or bond_count_gt_3A:
+        raise ValueError(
+            "PBC-split or otherwise invalid bonded geometry: "
+            f"max_bond_length_A={max_bond_length_A}; "
+            f"bond_count_gt_3A={bond_count_gt_3A}"
+        )
     qm_atoms = list(active.atoms) + ligand
     if len(qm_atoms) != EXPECTED_QM_ATOMS or len({atom.idx for atom in qm_atoms}) != EXPECTED_QM_ATOMS:
         raise ValueError(f"QM atom count {len(qm_atoms)} != {EXPECTED_QM_ATOMS}")
@@ -153,14 +170,20 @@ def derive_qm_contract(structure):
         "ligand_topology_charge": ligand_charge,
         "n_bonded_hydrogens": n_hydrogens,
         "og1_bonded_atoms": og1_bonded,
+        "max_bond_length_A": max_bond_length_A,
+        "bond_count_gt_3A": bond_count_gt_3A,
     }
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=pathlib.Path, required=True)
+    parser.add_argument("--coordinate", type=pathlib.Path, required=True)
     args = parser.parse_args()
     output = args.output.resolve()
+    coordinate = args.coordinate.resolve()
+    if not coordinate.is_file():
+        raise ValueError(f"whole-system coordinate is missing: {coordinate}")
     output.mkdir(parents=True, exist_ok=False)
     pass_path = REPRESENTATIVE_ROOT / "PASS.json"
     representative_audit_path = REPRESENTATIVE_ROOT / "A1_REPRESENTATIVE_FRAME_AUDIT.json"
@@ -195,7 +218,10 @@ def main():
     previous = pathlib.Path.cwd()
     os.chdir(TOPOLOGY_ROOT)
     try:
-        structure = pmd.load_file(str(TOPOLOGY_ROOT / "topol.top"), xyz=str(gro))
+        structure = pmd.load_file(
+            str(TOPOLOGY_ROOT / "topol.top"),
+            xyz=str(coordinate),
+        )
     finally:
         os.chdir(previous)
     contract = derive_qm_contract(structure)
@@ -217,6 +243,8 @@ def main():
         "source_status": authority["status"],
         "source_scientific_status": authority["scientific_status"],
         "source_gro_sha256": EXPECTED_GRO_SHA256,
+        "coordinate_sha256": sha256(coordinate),
+        "coordinate_preprocessing": "gmx trjconv -pbc mol -ur compact",
         "representative_audit_sha256": EXPECTED_REPRESENTATIVE_AUDIT_SHA256,
         "active_global_resid": EXPECTED_ACTIVE_GLOBAL_RESID,
         "active_original_resid": EXPECTED_ACTIVE_ORIGINAL_RESID,
@@ -234,6 +262,8 @@ def main():
         "ligand_topology_charge": contract["ligand_topology_charge"],
         "n_bonded_hydrogens": contract["n_bonded_hydrogens"],
         "og1_bonded_atoms": contract["og1_bonded_atoms"],
+        "max_bond_length_A": contract["max_bond_length_A"],
+        "bond_count_gt_3A": contract["bond_count_gt_3A"],
         "qmmask": qmmask,
         "qm_region_scope": "minimal Thr267 plus complete L2 numerical preflight",
         "production_qm_region_gate": (
