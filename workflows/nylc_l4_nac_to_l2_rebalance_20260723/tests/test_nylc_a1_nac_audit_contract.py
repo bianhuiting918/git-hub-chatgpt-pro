@@ -8,6 +8,8 @@ MANIFEST=HERE/"manifests"/"nylc_a1_nac_audit_universe.json"
 RUNNER=HERE/"scripts"/"run_nylc_a1_nac_audit.sh"
 AUDITOR=HERE/"scripts"/"audit_nylc_a1_nac_replica.py"
 SBATCH=HERE/"slurm"/"run_nylc_a1_nac_audit.sbatch"
+MERGER=HERE/"scripts"/"merge_nylc_a1_nac_audits.py"
+MERGE_SBATCH=HERE/"slurm"/"run_nylc_a1_nac_merge.sbatch"
 
 class A1NACAuditContract(unittest.TestCase):
     def test_manifest_has_exact_nine_slot_universe(self):
@@ -72,6 +74,27 @@ class A1NACAuditContract(unittest.TestCase):
         for token in ["#SBATCH --array=0-8%9","#SBATCH -p xahcnormal",
                       "code_snapshots","SNAPSHOT_SHA256.tsv",
                       "A1_NAC_CODE_ROOT","SLURM_ARRAY_TASK_ID"]:
+            self.assertIn(token,text)
+
+
+    def test_merge_runtime_files_exist(self):
+        self.assertTrue(MERGER.is_file())
+        self.assertTrue(MERGE_SBATCH.is_file())
+
+    @unittest.skipUnless(MERGER.is_file(),"merger missing")
+    def test_merger_keeps_denominator_and_ranks_only_eligible_frames(self):
+        text=MERGER.read_text()
+        for token in ["expected_slots","missing_slots","NOT_EVALUATED_MISSING_AUDIT",
+                      "replica_denominator","candidate_denominator",
+                      "eligible_replica_count","nac_occupancy",
+                      "potential_energy_kj_mol","selected_replica"]:
+            self.assertIn(token,text)
+
+    @unittest.skipUnless(MERGE_SBATCH.is_file(),"merge sbatch missing")
+    def test_merge_job_is_afterany_and_records_history(self):
+        text=MERGE_SBATCH.read_text()
+        for token in ["AUDIT_ARRAY_JOB_ID","afterany","run_history.tsv",
+                      "run_history.jsonl","merge_nylc_a1_nac_audits.py"]:
             self.assertIn(token,text)
 
 if __name__=="__main__":
