@@ -12,9 +12,20 @@ set -euo pipefail
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 : "${A1_EXPANDED_GITHUB_COMMIT:?set immutable GitHub commit}"
 : "${A1_EXPANDED_DFTB3_CODE_SOURCE:?set deployed immutable code root}"
+printf 'expanded_preflight commit=%s code_source=%s\n' "$A1_EXPANDED_GITHUB_COMMIT" "$A1_EXPANDED_DFTB3_CODE_SOURCE"
+if [[ ! -d "$A1_EXPANDED_DFTB3_CODE_SOURCE" ]]; then
+    printf 'code source is not visible on compute node: %s\n' "$A1_EXPANDED_DFTB3_CODE_SOURCE" >&2
+    exit 3
+fi
 CODE_SOURCE="$(realpath "$A1_EXPANDED_DFTB3_CODE_SOURCE")"
-[[ -s "$CODE_SOURCE/GITHUB_COMMIT" && -s "$CODE_SOURCE/SNAPSHOT_SHA256.tsv" ]]
-[[ "$(tr -d '[:space:]' <"$CODE_SOURCE/GITHUB_COMMIT")" == "$A1_EXPANDED_GITHUB_COMMIT" ]]
+if [[ ! -s "$CODE_SOURCE/GITHUB_COMMIT" || ! -s "$CODE_SOURCE/SNAPSHOT_SHA256.tsv" ]]; then
+    printf 'snapshot metadata is missing under %s\n' "$CODE_SOURCE" >&2
+    exit 3
+fi
+if [[ "$(tr -d '[:space:]' <"$CODE_SOURCE/GITHUB_COMMIT")" != "$A1_EXPANDED_GITHUB_COMMIT" ]]; then
+    printf 'snapshot commit mismatch under %s\n' "$CODE_SOURCE" >&2
+    exit 3
+fi
 (
     cd "$CODE_SOURCE"
     sha256sum -c SNAPSHOT_SHA256.tsv
