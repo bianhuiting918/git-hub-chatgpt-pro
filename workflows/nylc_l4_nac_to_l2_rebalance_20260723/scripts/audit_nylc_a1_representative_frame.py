@@ -34,6 +34,12 @@ REACTIVE_INDEX1 = {
     "l2_o": 10288,
     "l2_n": 10289,
 }
+THR267_SOURCE_GLOBAL_RESID = 622
+THR267_EXTRACTED_ORIGINAL_RESID = 267
+THR267_CHAIN_H_LOCAL_ATOM_INDEX1 = 12
+CHAIN_H_ATOM_OFFSET = REACTIVE_INDEX1["thr267_og1"] - THR267_CHAIN_H_LOCAL_ATOM_INDEX1
+SOURCE_GATE_GLOBAL_RESIDS = list(range(616, 622))
+EXTRACTED_GATE_ORIGINAL_RESIDS = list(range(261, 267))
 SCIENTIFIC_SCOPE = "classical_fixed_topology_preorganization_not_proton_transfer"
 
 
@@ -194,70 +200,87 @@ def _validate_box_identity(source_box, extracted_box) -> dict[str, list[float]]:
     }
 
 
-def _topology_resnum(atom) -> int:
-    if not hasattr(atom, "resnum"):
+def _required_resid(atom, namespace: str) -> int:
+    if not hasattr(atom, "resid"):
         raise AuditError(
-            "atom topology resnum is unavailable",
+            f"{namespace} resid is unavailable",
             stage="atom_mapping",
             gate="atom_mapping",
         )
-    try:
-        return int(atom.resnum)
-    except (TypeError, ValueError) as exc:
-        raise AuditError(
-            f"atom topology resnum is invalid: {atom.resnum!r}",
-            stage="atom_mapping",
-            gate="atom_mapping",
-        ) from exc
-
-
-def _global_resid(atom) -> int | None:
-    if not hasattr(atom, "resid"):
-        return None
     try:
         return int(atom.resid)
     except (TypeError, ValueError) as exc:
         raise AuditError(
-            f"atom global resid is invalid: {atom.resid!r}",
+            f"{namespace} resid is invalid: {atom.resid!r}",
             stage="atom_mapping",
             gate="atom_mapping",
         ) from exc
 
 
-def _require_identity(
-    atom,
+def _require_dual_identity(
+    source_atom,
+    extracted_atom,
     index1: int,
     resname: str,
     name: str,
-    resnum: int | None = None,
+    *,
+    source_global_resid: int | None,
+    extracted_original_resid: int | None,
 ) -> dict[str, object]:
-    observed_index1 = int(atom.index) + 1
-    observed_resname = str(atom.resname)
-    observed_name = str(atom.name)
-    observed_resnum = _topology_resnum(atom)
-    observed_global_resid = _global_resid(atom)
-    expected_label = f"{resname}{resnum if resnum is not None else ''}:{name}"
+    source_index1 = int(source_atom.index) + 1
+    extracted_index1 = int(extracted_atom.index) + 1
+    source_name = str(source_atom.name)
+    extracted_name = str(extracted_atom.name)
+    source_resname = str(source_atom.resname)
+    extracted_resname = str(extracted_atom.resname)
+    observed_source_global = _required_resid(source_atom, "source global")
+    observed_extracted_original = _required_resid(
+        extracted_atom, "extracted original"
+    )
     if (
-        observed_index1 != int(index1)
-        or observed_resname != resname
-        or observed_name != name
-        or (resnum is not None and observed_resnum != int(resnum))
+        source_index1 != int(index1)
+        or extracted_index1 != int(index1)
+        or source_name != name
+        or extracted_name != name
+        or source_resname != resname
+        or extracted_resname != resname
     ):
         raise AuditError(
-            f"atom index1={observed_index1} is "
-            f"{observed_resname} topology resnum {observed_resnum}:"
-            f"{observed_name} (global resid {observed_global_resid}); "
-            f"expected {expected_label} at index1={index1}",
+            f"dual atom identity mismatch at index1={index1}: source "
+            f"{source_resname}:{source_name} index1={source_index1}, extracted "
+            f"{extracted_resname}:{extracted_name} index1={extracted_index1}, "
+            f"expected {resname}:{name}",
+            stage="atom_mapping",
+            gate="atom_mapping",
+        )
+    if (
+        source_global_resid is not None
+        and observed_source_global != int(source_global_resid)
+    ):
+        raise AuditError(
+            f"source global resid {observed_source_global} for {resname}:{name} "
+            f"!= required {source_global_resid}",
+            stage="atom_mapping",
+            gate="atom_mapping",
+        )
+    if (
+        extracted_original_resid is not None
+        and observed_extracted_original != int(extracted_original_resid)
+    ):
+        raise AuditError(
+            f"extracted original resid {observed_extracted_original} for "
+            f"{resname}:{name} != required {extracted_original_resid}",
             stage="atom_mapping",
             gate="atom_mapping",
         )
     return {
-        "index1": observed_index1,
-        "segid": str(getattr(atom, "segid", "")),
-        "resnum": observed_resnum,
-        "global_resid": observed_global_resid,
-        "resname": observed_resname,
-        "name": observed_name,
+        "index1": int(index1),
+        "name": name,
+        "resname": resname,
+        "source_global_resid": observed_source_global,
+        "extracted_original_resid": observed_extracted_original,
+        "source_segid": str(getattr(source_atom, "segid", "")),
+        "extracted_segid": str(getattr(extracted_atom, "segid", "")),
     }
 
 
@@ -313,46 +336,54 @@ def _joint_nac(oxygen_A, carbon_A, og1_A, box) -> dict[str, object]:
     }
 
 
-def _residue_number_pairs(group) -> list[tuple[int, int | None]]:
-    pairs: list[tuple[int, int | None]] = []
-    resnum_to_global: dict[int, int | None] = {}
-    global_to_resnum: dict[int, int] = {}
-    for atom in group:
-        resnum = _topology_resnum(atom)
-        global_resid = _global_resid(atom)
-        prior_global = resnum_to_global.setdefault(resnum, global_resid)
-        if prior_global != global_resid:
-            raise AuditError(
-                f"topology resnum {resnum} maps to inconsistent global resids "
-                f"{prior_global} and {global_resid}",
-                stage="gate_definition",
-                gate="gate_definition",
-            )
-        if global_resid is not None:
-            prior_resnum = global_to_resnum.setdefault(global_resid, resnum)
-            if prior_resnum != resnum:
-                raise AuditError(
-                    f"global resid {global_resid} maps to inconsistent topology "
-                    f"resnums {prior_resnum} and {resnum}",
-                    stage="gate_definition",
-                    gate="gate_definition",
-                )
-        pairs.append((resnum, global_resid))
-    return pairs
-
-
-def _validate_gate_membership(gate) -> list[int]:
-    pairs = _residue_number_pairs(gate)
-    resnums = sorted({resnum for resnum, _ in pairs})
-    expected = list(range(261, 267))
-    if resnums != expected or 267 in resnums:
+def _validate_dual_gate_membership(source_gate, extracted_gate) -> dict[str, object]:
+    if len(source_gate) == 0 or len(extracted_gate) == 0:
         raise AuditError(
-            f"Gate topology resnums are {resnums}, expected 261-266 with "
-            "Thr267 excluded",
+            "dual Gate membership requires nonempty source and extracted groups",
             stage="gate_definition",
             gate="gate_definition",
         )
-    return resnums
+    source_indices = [int(atom.index) + 1 for atom in source_gate]
+    extracted_indices = [int(atom.index) + 1 for atom in extracted_gate]
+    if source_indices != extracted_indices:
+        raise AuditError(
+            "dual Gate membership uses different source/extracted atom indices",
+            stage="gate_definition",
+            gate="gate_definition",
+        )
+    for source_atom, extracted_atom in zip(source_gate, extracted_gate):
+        if (
+            str(source_atom.name) != str(extracted_atom.name)
+            or str(source_atom.resname) != str(extracted_atom.resname)
+        ):
+            raise AuditError(
+                "dual Gate membership has inconsistent atom names or residue names",
+                stage="gate_definition",
+                gate="gate_definition",
+            )
+    source_global_resids = sorted(
+        {_required_resid(atom, "source global") for atom in source_gate}
+    )
+    extracted_original_resids = sorted(
+        {_required_resid(atom, "extracted original") for atom in extracted_gate}
+    )
+    if (
+        source_global_resids != SOURCE_GATE_GLOBAL_RESIDS
+        or extracted_original_resids != EXTRACTED_GATE_ORIGINAL_RESIDS
+        or THR267_SOURCE_GLOBAL_RESID in source_global_resids
+        or THR267_EXTRACTED_ORIGINAL_RESID in extracted_original_resids
+    ):
+        raise AuditError(
+            "dual Gate membership must be source global 616-621 and extracted "
+            "original 261-266, excluding global622/original267",
+            stage="gate_definition",
+            gate="gate_definition",
+        )
+    return {
+        "source_global_resids": source_global_resids,
+        "extracted_original_resids": extracted_original_resids,
+        "thr267_and_global622_excluded": True,
+    }
 
 
 def _gate_opening_record(
@@ -360,15 +391,12 @@ def _gate_opening_record(
     gate,
     box,
     *,
+    source_gate,
     gate_opening: Callable[[np.ndarray], float],
 ) -> dict[str, object]:
     if len(core) == 0 or len(gate) == 0:
         raise AuditError("Core and Gate groups must both contain atoms")
-    gate_resnums = _validate_gate_membership(gate)
-    gate_pairs = _residue_number_pairs(gate)
-    gate_global_resids = sorted(
-        {global_resid for _, global_resid in gate_pairs if global_resid is not None}
-    )
+    numbering = _validate_dual_gate_membership(source_gate, gate)
     vector_A = _minimum_image_A(
         np.asarray(gate.center_of_mass(), dtype=float)
         - np.asarray(core.center_of_mass(), dtype=float),
@@ -380,9 +408,7 @@ def _gate_opening_record(
     return {
         "core_atom_count": len(core),
         "gate_atom_count": len(gate),
-        "gate_resnums": gate_resnums,
-        "gate_global_resids": gate_global_resids,
-        "thr267_excluded": True,
+        **numbering,
         "opening_nm": opening_nm,
     }
 
@@ -412,8 +438,8 @@ def _atom_record(atom) -> dict[str, object]:
     return {
         "index1": int(atom.index) + 1,
         "segid": str(getattr(atom, "segid", "")),
-        "resnum": _topology_resnum(atom),
-        "global_resid": _global_resid(atom),
+        "original_resid": _required_resid(atom, "extracted original"),
+        "residue_namespace": "extracted_gro_original",
         "resname": str(atom.resname),
         "name": str(atom.name),
     }
@@ -563,7 +589,7 @@ def audit_frame(
     source_positions_A = source.atoms.positions.copy()
     source_box = _validated_box(source.trajectory.ts.dimensions).copy()
 
-    extracted = mda.Universe(str(tpr_path), str(gro_path))
+    extracted = mda.Universe(str(gro_path))
     extracted_positions_A = extracted.atoms.positions.copy()
     extracted_box = _validated_box(extracted.trajectory.ts.dimensions).copy()
 
@@ -581,23 +607,45 @@ def audit_frame(
     )
 
     expected_identities = {
-        "thr267_og1": ("THR", "OG1", 267),
-        "l2_c": ("L2", "C12", None),
-        "l2_o": ("L2", "O2", None),
-        "l2_n": ("L2", "N3", None),
+        "thr267_og1": (
+            "THR",
+            "OG1",
+            THR267_SOURCE_GLOBAL_RESID,
+            THR267_EXTRACTED_ORIGINAL_RESID,
+        ),
+        "l2_c": ("L2", "C12", None, None),
+        "l2_o": ("L2", "O2", None, None),
+        "l2_n": ("L2", "N3", None, None),
     }
     atom_mapping: dict[str, dict[str, object]] = {}
     for key, index1 in REACTIVE_INDEX1.items():
-        resname, name, resid = expected_identities[key]
-        source_atom = source.atoms[index1 - 1]
-        extracted_atom = extracted.atoms[index1 - 1]
-        source_record = _require_identity(source_atom, index1, resname, name, resid)
-        extracted_record = _require_identity(
-            extracted_atom, index1, resname, name, resid
+        resname, name, source_global_resid, extracted_original_resid = (
+            expected_identities[key]
         )
-        if source_record != extracted_record:
-            raise AuditError(f"source/extracted identity differs for {key}")
-        atom_mapping[key] = source_record
+        atom_mapping[key] = _require_dual_identity(
+            source.atoms[index1 - 1],
+            extracted.atoms[index1 - 1],
+            index1,
+            resname,
+            name,
+            source_global_resid=source_global_resid,
+            extracted_original_resid=extracted_original_resid,
+        )
+    l2_keys = ("l2_c", "l2_o", "l2_n")
+    if len({atom_mapping[key]["source_global_resid"] for key in l2_keys}) != 1:
+        raise AuditError(
+            "source L2 reactive atoms do not share one required global resid",
+            stage="atom_mapping",
+            gate="atom_mapping",
+        )
+    if len(
+        {atom_mapping[key]["extracted_original_resid"] for key in l2_keys}
+    ) != 1:
+        raise AuditError(
+            "extracted L2 reactive atoms do not share one required original resid",
+            stage="atom_mapping",
+            gate="atom_mapping",
+        )
 
     thr267 = source.atoms[REACTIVE_INDEX1["thr267_og1"] - 1].residue
     nalpha = thr267.atoms.select_atoms("name N")
@@ -629,12 +677,18 @@ def audit_frame(
         )
 
     ndx_groups = _parse_ndx(ndx_path)
-    core = _group_from_index1(extracted, ndx_groups["Core"], "Core")
-    gate = _group_from_index1(extracted, ndx_groups["Gate"], "Gate")
+    source_gate = _group_from_index1(source, ndx_groups["Gate"], "source Gate")
+    extracted_core = _group_from_index1(
+        extracted, ndx_groups["Core"], "extracted Core"
+    )
+    extracted_gate = _group_from_index1(
+        extracted, ndx_groups["Gate"], "extracted Gate"
+    )
     gate_record = _gate_opening_record(
-        core,
-        gate,
+        extracted_core,
+        extracted_gate,
         extracted_box,
+        source_gate=source_gate,
         gate_opening=_load_existing_gate_opening(),
     )
 
@@ -655,7 +709,9 @@ def audit_frame(
         "atom_mapping": True,
         "a1_bonds": True,
         "joint_nac": bool(nac["joint_pass"]),
-        "gate_definition": bool(gate_record["thr267_excluded"]),
+        "gate_definition": bool(
+            gate_record["thr267_and_global622_excluded"]
+        ),
         "counts_and_box": True,
         "minimum_contacts": contacts_pass,
     }
@@ -680,6 +736,13 @@ def audit_frame(
         "box": box_record,
         "counts": counts,
         "atom_mapping": atom_mapping,
+        "mapping_evidence": {
+            "thr267_chain_h_local_atom_index1": THR267_CHAIN_H_LOCAL_ATOM_INDEX1,
+            "chain_h_atom_offset": CHAIN_H_ATOM_OFFSET,
+            "global_index1": REACTIVE_INDEX1["thr267_og1"],
+            "source_global_resid": THR267_SOURCE_GLOBAL_RESID,
+            "extracted_original_resid": THR267_EXTRACTED_ORIGINAL_RESID,
+        },
         "a1_bonds": a1_bonds,
         "joint_nac": nac,
         "gate": gate_record,
