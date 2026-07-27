@@ -571,5 +571,16 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertIn("demote_promoted_outputs", runner)
 
 
+    def test_itp_discovery_is_deterministic_and_bash_4_2_compatible(self):
+        runner = (
+            HERE / "scripts" / "run_nylc_a1_representative_frame.sh"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("mapfile -d", runner)
+        self.assertIn("ITP_FILES=()", runner)
+        self.assertIn("while IFS= read -r path; do", runner)
+        self.assertIn('ITP_FILES+=("$path")', runner)
+        self.assertIn("LC_ALL=C sort", runner)
+
+
 if __name__ == "__main__":
     unittest.main()
