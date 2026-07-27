@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
+import importlib.util
 import pathlib
+import sys
+import types
 import unittest
+from unittest import mock
 
 HERE = pathlib.Path(__file__).resolve().parents[1]
 PREPARE = HERE / "scripts" / "prepare_nylc_a1_dftb3_preflight.py"
@@ -119,6 +123,37 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
         combined = PREPARE.read_text(encoding="utf-8") + AUDIT.read_text(encoding="utf-8")
         for token in ("numerical preflight", "not a TS", "PMF", "barrier", "Asp306", "Asp308"):
             self.assertIn(token, combined)
+
+
+    def test_qmmm_input_interpolates_complete_numeric_contract(self):
+        fake_parmed = types.ModuleType("parmed")
+        with mock.patch.dict(sys.modules, {"parmed": fake_parmed}):
+            spec = importlib.util.spec_from_file_location("a1_dftb3_prepare", PREPARE)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+        one = module.qmmm_input("one", maxcyc=1, qmmask="@1,2,3")
+        twenty = module.qmmm_input("twenty", maxcyc=20, qmmask="@1,2,3")
+        self.assertIn("maxcyc=1", one)
+        self.assertIn("maxcyc=20", twenty)
+        for rendered in (one, twenty):
+            self.assertIn("qmmask='@1,2,3'", rendered)
+            self.assertIn("qmcharge=0", rendered)
+            self.assertIn("spin=1", rendered)
+            self.assertNotIn("{", rendered)
+            self.assertNotIn("}", rendered)
+
+    def test_runner_transactionally_records_terminal_history_and_demotes_pass(self):
+        text = RUNNER.read_text(encoding="utf-8")
+        for token in (
+            "PROMOTED=0",
+            "demote_promoted_outputs",
+            "FAILED_NOT_PROMOTED_",
+            "os.fsync",
+            "truncate",
+            "if ((PROMOTED))",
+        ):
+            self.assertIn(token, text)
+        self.assertLess(text.rindex("append_history"), text.rindex("trap - EXIT"))
 
 
 if __name__ == "__main__":
