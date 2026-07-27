@@ -76,6 +76,7 @@ def assemble_authority(activity, pose, pose_strata, mpnn, saprot, pose_not_evalu
     _unique(p,"sequence_md5","pose")
     p=p.rename(columns={"strict_nac_rate":"pose_strict_nac",
                         "retention_rate_loose_gate":"pose_loose_gate"})
+    p=p[["sequence_md5","pose_strict_nac","pose_loose_gate"]]
     p=_numeric(p,["pose_strict_nac","pose_loose_gate"])
     s=pose_strata.copy()
     s["sequence_md5"]=s.sequence_md5.astype(str).str.lower()
