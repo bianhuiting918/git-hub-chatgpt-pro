@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "status": "PASS_A1_PT2_ATOM_AND_QM_CONTRACT",
+  "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER_MECHANISM",
+  "direct_relay_gate": "NOT_EVALUATED_A1_PT2_DIRECT_RELAY_NOT_PREORGANIZED",
+  "source": {
+    "job": "62021985",
+    "restart": "q06_1p45A/window.rst7",
+    "restart_sha256": "548dca57cb623e69d5fefaa8e270267a5bd599bd5995113219cdf349c346e56c",
+    "prmtop_sha256": "a61d15bf0bf78675be93275d45f274e808ed6ae450fc1ca21a8e14aee8c12ca0",
+    "result_sha256": "9e4c7b82be3a6bb2cbb558aa7090cd0915e27cd8bc05c23679ee1a2cb4bddf9f",
+    "code_commit": "c2cd599c00831de92afe2ac9cd244e47c178d142"
+  },
+  "atom_contract": {
+    "nalpha": {
+      "index1": 8949,
+      "name": "N",
+      "residue": "THR",
+      "global_residue": 622
+    },
+    "og1": {
+      "index1": 8960,
+      "name": "OG1",
+      "residue": "THR",
+      "global_residue": 622
+    },
+    "transferred_hg1": {
+      "index1": 8961,
+      "name": "HG1",
+      "residue": "THR",
+      "global_residue": 622
+    },
+    "carbonyl_c12": {
+      "index1": 10287,
+      "name": "C12",
+      "residue": "L2",
+      "global_residue": 711
+    },
+    "leaving_n3": {
+      "index1": 10289,
+      "name": "N3",
+      "residue": "L2",
+      "global_residue": 711
+    },
+    "nalpha_hg1_bond_present": true,
+    "og1_hg1_bond_absent": true,
+    "c12_n3_bond_present": true
+  },
+  "qm_contract": {
+    "explicit_qm_atoms": 146,
+    "qmcharge": 0,
+    "electrons_including_link_h": 510,
+    "link_h": 6,
+    "step1_qm_water_count": 0,
+    "all_reaction_atoms_in_qm": true
+  },
+  "geometry_A_deg": {
+    "nalpha_n3_A": 3.3765734910357974,
+    "hg1_n3_A": 3.652984271139519,
+    "nalpha_hg1_A": 1.028424469633653,
+    "nalpha_hg1_n3_deg": 66.46135552608986,
+    "og1_c12_A": 1.7581830008291393,
+    "c12_n3_A": 1.4329460688816056
+  },
+  "preorganization_definition": {
+    "nalpha_n3_A_max": 3.5,
+    "hg1_n3_A_max": 2.5,
+    "nalpha_hg1_n3_deg_min": 135,
+    "scope": "geometric preorganization only"
+  },
+  "decision": "Do not strongly pull HG1 directly to N3 from this seed. Search the existing nine-replica A1 fully unrestrained NAC ensemble for independently sampled PT2-preorganized NAC frames before designing a direct PT2/acylation scout."
+}
