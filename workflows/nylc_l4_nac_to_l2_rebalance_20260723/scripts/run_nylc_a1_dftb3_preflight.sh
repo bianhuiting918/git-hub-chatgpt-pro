@@ -4,6 +4,7 @@ set -euo pipefail
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
 CODE_ROOT="${A1_DFTB3_CODE_ROOT:?set immutable code snapshot}"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
+export GMXDATA=/public/software/apps/Gromacs-DCU2/2022.1/mpi/share/gromacs
 AMBER_RUNTIME="$TASK_ROOT/../nylc_gyaq_pa66_l2_nac_qmmm_20260723/amber_runtime"
 REP="$TASK_ROOT/a1_activated_nac_20260726/representative_frame/attempt_61990814"
 ATTEMPT="${A1_DFTB3_ATTEMPT:-${SLURM_JOB_ID:-manual_$(date -u '+%Y%m%dT%H%M%SZ')}}"
