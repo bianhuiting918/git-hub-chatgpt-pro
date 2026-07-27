@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-07-27",
+  "audit_array_job_id": "61976600",
+  "merge_job_id": "61976667",
+  "microstate": "A1_Thr267_Ogamma_minus_NalphaH3_plus",
+  "scientific_scope": "classical-MM A1 NAC stability screen only; no proton-path or QM/MM barrier inference",
+  "fully_unrestrained_window_ns_per_replica": 1,
+  "replica_denominator": 9,
+  "technical_pass_count": 9,
+  "eligible_replica_count": 5,
+  "nac_definition": {
+    "distance": "PA66-L2 reactive carbonyl C to Thr267 OG1 <= 0.35 nm",
+    "angle": "carbonyl O-C-OG1 95-115 degrees",
+    "joint_required": true,
+    "gate_group": "NylC residues 261-266; Thr267 excluded"
+  },
+  "candidate_summary": [
+    {
+      "candidate_id": "nac_evt25_time1462ps",
+      "nac_positive_seeds": 2,
+      "seed_denominator": 3,
+      "mean_positive_occupancy": 0.2255489022,
+      "max_longest_event_ps": 12
+    },
+    {
+      "candidate_id": "nac_evt08_time1086ps",
+      "nac_positive_seeds": 2,
+      "seed_denominator": 3,
+      "mean_positive_occupancy": 0.0079840319,
+      "max_longest_event_ps": 2
+    },
+    {
+      "candidate_id": "nac_evt18_time1206ps",
+      "nac_positive_seeds": 1,
+      "seed_denominator": 3,
+      "mean_positive_occupancy": 0.0119760479,
+      "max_longest_event_ps": 2
+    }
+  ],
+  "replicas": [
+    {
+      "slot": 0,
+      "candidate_id": "nac_evt18_time1206ps",
+      "seed": 26711,
+      "status": "FAIL_REPLICA_NO_NAC",
+      "nac_frames": 0,
+      "frames": 501,
+      "occupancy": 0,
+      "longest_ps": 0,
+      "potential_mean_kj_mol": -1829599.9476,
+      "gate_mean_nm": 2.8373024
+    },
+    {
+      "slot": 1,
+      "candidate_id": "nac_evt18_time1206ps",
+      "seed": 26723,
+      "status": "PASS_REPLICA_NAC_PRESENT",
+      "nac_frames": 6,
+      "frames": 501,
+      "occupancy": 0.0119760479,
+      "longest_ps": 2,
+      "potential_mean_kj_mol": -1829418.9688,
+      "gate_mean_nm": 3.1994373
+    },
+    {
+      "slot": 2,
+      "candidate_id": "nac_evt18_time1206ps",
+      "seed": 26737,
+      "status": "FAIL_REPLICA_NO_NAC",
+      "nac_frames": 0,
+      "frames": 501,
+      "occupancy": 0,
+      "longest_ps": 0,
+      "potential_mean_kj_mol": -1829503.8014,
+      "gate_mean_nm": 2.7545154
+    },
+    {
+      "slot": 3,
+      "candidate_id": "nac_evt25_time1462ps",
+      "seed": 26711,
+      "status": "FAIL_REPLICA_NO_NAC",
+      "nac_frames": 0,
+      "frames": 501,
+      "occupancy": 0,
+      "longest_ps": 0,
+      "potential_mean_kj_mol": -1829500.5514,
+      "gate_mean_nm": 3.0555541
+    },
+    {
+      "slot": 4,
+      "candidate_id": "nac_evt25_time1462ps",
+      "seed": 26723,
+      "status": "PASS_REPLICA_NAC_PRESENT",
+      "nac_frames": 165,
+      "frames": 501,
+      "occupancy": 0.3293413174,
+      "longest_ps": 8,
+      "potential_mean_kj_mol": -1829404.6322,
+      "gate_mean_nm": 3.0956283
+    },
+    {
+      "slot": 5,
+      "candidate_id": "nac_evt25_time1462ps",
+      "seed": 26737,
+      "status": "PASS_REPLICA_NAC_PRESENT",
+      "nac_frames": 61,
+      "frames": 501,
+      "occupancy": 0.121756487,
+      "longest_ps": 12,
+      "potential_mean_kj_mol": -1829339.3855,
+      "gate_mean_nm": 3.1498006
+    },
+    {
+      "slot": 6,
+      "candidate_id": "nac_evt08_time1086ps",
+      "seed": 26711,
+      "status": "FAIL_REPLICA_NO_NAC",
+      "nac_frames": 0,
+      "frames": 501,
+      "occupancy": 0,
+      "longest_ps": 0,
+      "potential_mean_kj_mol": -1829664.2834,
+      "gate_mean_nm": 2.9836723
+    },
+    {
+      "slot": 7,
+      "candidate_id": "nac_evt08_time1086ps",
+      "seed": 26723,
+      "status": "PASS_REPLICA_NAC_PRESENT",
+      "nac_frames": 7,
+      "frames": 501,
+      "occupancy": 0.0139720559,
+      "longest_ps": 2,
+      "potential_mean_kj_mol": -1829361.1652,
+      "gate_mean_nm": 2.9621197
+    },
+    {
+      "slot": 8,
+      "candidate_id": "nac_evt08_time1086ps",
+      "seed": 26737,
+      "status": "PASS_REPLICA_NAC_PRESENT",
+      "nac_frames": 1,
+      "frames": 501,
+      "occupancy": 0.001996008,
+      "longest_ps": 0,
+      "potential_mean_kj_mol": -1829354.7036,
+      "gate_mean_nm": 3.1092664
+    }
+  ],
+  "selected_replica": {
+    "slot": 4,
+    "candidate_id": "nac_evt25_time1462ps",
+    "seed": 26723,
+    "occupancy": 0.3293413174,
+    "longest_event_ps": 8,
+    "longest_event_window_ps": [
+      350,
+      358
+    ],
+    "bound_occupancy": 1,
+    "temperature_mean_K": 299.990687,
+    "pressure_mean_bar": 1.3999242,
+    "numerical_counts": {
+      "fatal": 0,
+      "lincs": 0,
+      "settle": 0,
+      "nan": 0
+    }
+  },
+  "representative_frame_nomination": {
+    "source_replica_slot": 4,
+    "time_ps": 354,
+    "rationale": "lowest instantaneous MM potential within the selected replica longest continuous NAC event",
+    "distance_nm": 0.332754611,
+    "angle_deg": 109.2815401,
+    "gate_opening_nm": 3.136489427,
+    "potential_energy_kj_mol": -1831999.375,
+    "status": "NOMINATED_NOT_YET_EXTRACTED_OR_INDEPENDENTLY_COORDINATE_AUDITED"
+  },
+  "overall_scientific_status": "PASS_A1_NAC_CANDIDATE_AVAILABLE",
+  "interpretation": "evt25 is the reproducible A1 NAC basin candidate. Presence and occupancy support subsequent representative-frame extraction and QM/MM preflight; they do not establish a transition state, PMF, proton-transfer route, or activation barrier."
+}
