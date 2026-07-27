@@ -1234,3 +1234,41 @@ coordinates before umbrella/PMF production.
 
 Compact authority:
 `audit/nylc_a1_qattack_extension_20260727.json`.
+
+
+## A1 Step1 constrained-seed release test (2026-07-27)
+
+Job `62026754` tested whether the job-`62021985` constrained attack seed
+occupies a local QM/MM basin under the unchanged 146-atom DFTB3/3OB-3-1
+Hamiltonian. The first 500-step stage removed the reactive distance and angle
+restraints while retaining only a 1 kcal mol-1 A-2 position restraint on
+non-QM solute heavy atoms. The second 500-step stage continued after removing
+all position restraints. The QM charge remained zero, the electron/link
+contract remained 510/six, and Step1 contained no QM water.
+
+The job completed `0:0` in 38 min 06 s and technically passed with zero SCC,
+vlimit, bond-overflow, NaN, FATAL, SANDER BOMB, segmentation or forrtl
+findings. Its scientific release classification is
+`FAIL_RELEASE_RETURNED_TOWARD_REACTANT`.
+
+Geometry changed as follows:
+
+| state | OG1--C12 (A) | O2--C12--OG1 (deg) | C12--O2 (A) | C12--N3 (A) | carbonyl neighbor-angle sum (deg) | pyramidalization (deg) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| constrained seed | 1.758183 | 102.225750 | 1.271039 | 1.432946 | 353.185624 | 6.814376 |
+| local release | 3.974976 | 93.937504 | 1.263752 | 1.358525 | 359.961207 | 0.038793 |
+| full release | 4.158148 | 88.831087 | 1.261633 | 1.371106 | 359.894212 | 0.105788 |
+
+Thus the short contact was restraint-supported and the carbonyl returned to an
+essentially planar reactant-like geometry even before full environmental
+release. This rules out using the current one-dimensional OG1--C12 scan as a
+production PMF coordinate. It does not reject the A1 protonation microstate or
+the overall catalytic mechanism.
+
+The next safe Step1 scout is a small coupled attack/carbonyl-rehybridization
+scan that varies OG1--C12 together with C12--O2 and audits spontaneous
+pyramidalization and C12--N3 response. Production PMF remains blocked until a
+released local basin or a defensible coupled reaction path is demonstrated.
+
+Compact authority:
+`audit/nylc_a1_step1_release_test_20260727.json`.
