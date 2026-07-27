@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import importlib.util
+import json
 import pathlib
+import tempfile
 import unittest
 from types import SimpleNamespace
 from unittest import mock
@@ -66,6 +68,7 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertEqual(module.NAC_DISTANCE_MAX_NM, 0.35)
         self.assertEqual(module.NAC_ANGLE_MIN_DEG, 95.0)
         self.assertEqual(module.NAC_ANGLE_MAX_DEG, 115.0)
+        self.assertEqual(module.SEVERE_CLASH_CUTOFF_NM, 0.18)
         self.assertEqual(module.EXPECTED_ATOM_COUNT, 133589)
         self.assertEqual(module.EXPECTED_L2_ATOM_COUNT, 79)
         self.assertEqual(module.EXPECTED_L2_HEAVY_COUNT, 33)
@@ -130,6 +133,21 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
             )
         with self.assertRaisesRegex(module.AuditError, "exactly one"):
             module._select_unique_time([SimpleNamespace(time=353.0)], 354.000)
+
+    def test_requested_time_is_frozen_before_source_access(self):
+        module = load_module()
+        self.assertEqual(module._require_frozen_time(354.0004), 354.000)
+        with mock.patch.object(module, "_validate_source_hashes") as validate_hashes:
+            with self.assertRaisesRegex(module.AuditError, "frozen selected time"):
+                module.audit_frame(
+                    "run.tpr",
+                    "run.xtc",
+                    "frame.gro",
+                    "groups.ndx",
+                    355.0,
+                    dict(module.EXPECTED_SOURCE_HASHES),
+                )
+        validate_hashes.assert_not_called()
 
     def test_coordinate_identity_uses_minimum_image_and_nm_tolerance(self):
         module = load_module()
@@ -265,12 +283,74 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
             np.asarray((10.0, 10.0, 10.0, 90.0, 90.0, 90.0)),
         )
         self.assertAlmostEqual(record["distance_nm"], 0.02)
+        self.assertEqual(record["severe_clash_cutoff_nm"], 0.18)
+        self.assertFalse(record["contact_pass"])
         self.assertEqual(record["ligand"]["index1"], 10287)
         self.assertEqual(record["ligand"]["name"], "C12")
         self.assertEqual(record["partner"]["index1"], 22)
         self.assertEqual(record["partner"]["resname"], "LYS")
         self.assertEqual(record["partner"]["resid"], 15)
         self.assertEqual(record["partner"]["name"], "NZ")
+
+    def test_both_contact_classes_must_clear_the_same_severe_clash_cutoff(self):
+        module = load_module()
+        safe = {
+            "distance_nm": 0.18,
+            "severe_clash_cutoff_nm": module.SEVERE_CLASH_CUTOFF_NM,
+            "contact_pass": True,
+        }
+        self.assertTrue(
+            module._validate_minimum_contacts(
+                {
+                    "ligand_protein_heavy": dict(safe),
+                    "ligand_water_heavy": dict(safe),
+                }
+            )
+        )
+        clashing = dict(safe)
+        clashing["distance_nm"] = 0.179
+        clashing["contact_pass"] = False
+        with self.assertRaisesRegex(module.AuditError, "severe-clash cutoff"):
+            module._validate_minimum_contacts(
+                {
+                    "ligand_protein_heavy": dict(safe),
+                    "ligand_water_heavy": clashing,
+                }
+            )
+
+    def test_cli_writes_failure_json_for_audit_error(self):
+        module = load_module()
+        with tempfile.TemporaryDirectory() as temporary:
+            output = pathlib.Path(temporary) / "audit.json"
+            failure = module.AuditError(
+                "water contact below severe-clash cutoff",
+                stage="minimum_contacts",
+                gate="minimum_contacts",
+            )
+            with mock.patch.object(module, "audit_frame", side_effect=failure):
+                return_code = module.main(
+                    [
+                        "--tpr",
+                        "run.tpr",
+                        "--xtc",
+                        "run.xtc",
+                        "--gro",
+                        "frame.gro",
+                        "--ndx",
+                        "groups.ndx",
+                        "--output",
+                        str(output),
+                    ]
+                )
+            self.assertNotEqual(return_code, 0)
+            payload = json.loads(output.read_text(encoding="utf-8"))
+            self.assertEqual(
+                payload["scientific_status"],
+                "FAIL_A1_REPRESENTATIVE_NAC_FRAME",
+            )
+            self.assertEqual(payload["failed_stage"], "minimum_contacts")
+            self.assertEqual(payload["failed_gate"], "minimum_contacts")
+            self.assertIn("water contact", payload["error"])
 
     def test_pass_status_is_emitted_only_when_every_gate_is_true(self):
         module = load_module()
