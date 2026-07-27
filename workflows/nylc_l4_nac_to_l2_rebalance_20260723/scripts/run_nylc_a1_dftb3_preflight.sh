@@ -75,9 +75,6 @@ test -s "$OUT/prepared/qmmm_preflight_audit.json"
 # Amber18 runtime and the 3ob-3-1 Slater-Koster set are mandatory.
 module purge >/dev/null 2>&1 || true
 module load amber/2018-hpcx-gcc-7.3.1
-set +u
-source "$AMBER_RUNTIME/amber.sh"
-set -u
 export AMBERHOME="$AMBER_RUNTIME"
 test -s "$AMBERHOME/dat/slko/3ob-3-1/C-C.skf"
 CURRENT=one_step
