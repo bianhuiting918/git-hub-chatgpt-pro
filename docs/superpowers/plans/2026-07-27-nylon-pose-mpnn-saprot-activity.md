@@ -313,3 +313,8 @@ Expected: zero failures and hashes matching the remote handoff.
 - [ ] **Step 4: Commit**
 
 Commit message: `docs: publish audited nylon correlation results`.
+
+
+## Live SaProt authority correction (2026-07-27)
+
+The older `saprot_nylonase_4556_denominator_20260725_v1` is retained only as a stale denominator audit: its Nyl01–Nyl95 rows are pre-transfer `NOT_EVALUATED_DELL_ASSET_NOT_SYNCED`. Production instead reads the newer independently PASS-gated paired manifest `manifests/proteinmpnn_compatibility_pet8329_nylon4167_20260727_v2_scopefix/run_manifest_all_12496_scopefixed.tsv`. For Nyl01–Nyl95 it points to `saprot_nylonase_dell_20260727_v2` result JSONs and supplies the exact-canonical FULL_PROTEIN mean log-likelihood; native active-site-mask failures do not invalidate the independent FULL_PROTEIN PASS scope.
