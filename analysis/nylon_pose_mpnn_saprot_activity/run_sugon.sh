@@ -2,7 +2,7 @@
 set -euo pipefail
 ROOT=/work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/outputs/nylon_pose_mpnn_saprot_activity_20260727_v1
 PY=/work/home/acshdt1dks/anaconda3/envs/pytorch/bin/python
-export PYTHONPATH="$ROOT/deps:/work/home/acshdt1dks/anaconda3/envs/matplotlib/lib/python3.9/site-packages:$ROOT/code:${PYTHONPATH:-}"
+export PYTHONPATH="$ROOT/deps:/work/home/acshdt1dks/anaconda3/envs/matplotlib/lib/python3.9/site-packages:$ROOT/code:${PYTHONPATH:-}"\nexport PATH="$ROOT/deps/mmseqs/bin:$PATH"
 mkdir -p "$ROOT/logs" "$ROOT/figures" "$ROOT/clusters"
 if [[ -f "$ROOT/PASS.json" ]]; then
   printf '%s\t%s\t%s\t%s\n' "$(date -Is)" "${SLURM_JOB_ID:-manual}" "SKIP_EXISTING_PASS" "$ROOT/PASS.json" >> "$ROOT/logs/run_history.tsv"
