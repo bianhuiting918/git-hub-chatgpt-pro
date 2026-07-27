@@ -983,8 +983,8 @@ EM history and recovery:
 - re-audit attempt `61969676` exited before audit because its frozen deployment
   omitted `build_nylc_a1_full_system.py`; the failure is preserved and was
   corrected by using the complete canonical code root.
-- evt08 fresh EM is job `61969851`; do not advance it unless its independent
-  `A1_EM_AUDIT.json` reports `PASS_A1_EM`.
+- evt08 fresh EM job `61969851` completed with `PASS_A1_EM`; its three
+  equilibration velocity seeds are array `61970317`, tasks 6-8.
 
 Staged equilibration:
 
