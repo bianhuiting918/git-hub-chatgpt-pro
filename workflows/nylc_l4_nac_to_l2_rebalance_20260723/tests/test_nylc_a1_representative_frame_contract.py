@@ -33,11 +33,13 @@ class FakeAtom:
         position=(0.0, 0.0, 0.0),
         segid="H",
         bonded_names=(),
+        resnum=None,
     ):
         self.index = index
         self.name = name
         self.resname = resname
         self.resid = resid
+        self.resnum = resid if resnum is None else resnum
         self.position = np.asarray(position, dtype=float)
         self.segid = segid
         self.bonded_atoms = SimpleNamespace(names=np.asarray(bonded_names, dtype=object))
@@ -55,6 +57,10 @@ class FakeGroup(list):
     @property
     def resids(self):
         return np.asarray([atom.resid for atom in self], dtype=int)
+
+    @property
+    def resnums(self):
+        return np.asarray([atom.resnum for atom in self], dtype=int)
 
     def center_of_mass(self):
         return np.mean(self.positions, axis=0)
@@ -163,19 +169,63 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
                 source, np.asarray(((9.90, 5.0, 5.0),)), box
             )
 
-    def test_reactive_atom_identities_are_fail_closed(self):
+    def test_reactive_atom_identities_use_topology_resnum_not_global_resid(self):
         module = load_module()
         identities = (
-            (FakeAtom(8959, "OG1", "THR", 267), 8960, "THR", "OG1", 267),
-            (FakeAtom(10286, "C12", "L2", 1), 10287, "L2", "C12", None),
-            (FakeAtom(10287, "O2", "L2", 1), 10288, "L2", "O2", None),
-            (FakeAtom(10288, "N3", "L2", 1), 10289, "L2", "N3", None),
+            (
+                FakeAtom(8959, "OG1", "THR", 622, resnum=267),
+                8960,
+                "THR",
+                "OG1",
+                267,
+            ),
+            (
+                FakeAtom(10286, "C12", "L2", 663, resnum=1),
+                10287,
+                "L2",
+                "C12",
+                None,
+            ),
+            (
+                FakeAtom(10287, "O2", "L2", 663, resnum=1),
+                10288,
+                "L2",
+                "O2",
+                None,
+            ),
+            (
+                FakeAtom(10288, "N3", "L2", 663, resnum=1),
+                10289,
+                "L2",
+                "N3",
+                None,
+            ),
         )
-        for atom, index1, resname, name, resid in identities:
-            module._require_identity(atom, index1, resname, name, resid)
+        for atom, index1, resname, name, resnum in identities:
+            record = module._require_identity(atom, index1, resname, name, resnum)
+            self.assertEqual(record["resnum"], atom.resnum)
+            self.assertEqual(record["global_resid"], atom.resid)
         with self.assertRaisesRegex(module.AuditError, "expected THR267:OG1"):
             module._require_identity(
-                FakeAtom(8959, "HG1", "THR", 267), 8960, "THR", "OG1", 267
+                FakeAtom(8959, "HG1", "THR", 622, resnum=267),
+                8960,
+                "THR",
+                "OG1",
+                267,
+            )
+        with self.assertRaisesRegex(module.AuditError, "topology resnum"):
+            module._require_identity(
+                FakeAtom(8959, "OG1", "THR", 622, resnum=268),
+                8960,
+                "THR",
+                "OG1",
+                267,
+            )
+        missing_resnum = FakeAtom(8959, "OG1", "THR", 622, resnum=267)
+        del missing_resnum.resnum
+        with self.assertRaisesRegex(module.AuditError, "topology resnum"):
+            module._require_identity(
+                missing_resnum, 8960, "THR", "OG1", 267
             )
 
     def test_a1_bonds_require_n_h1_h2_hg1_and_og1_only_cb(self):
@@ -218,23 +268,42 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertAlmostEqual(passing["o_c_og1_angle_deg"], 105.0)
         self.assertTrue(passing["joint_pass"])
 
-    def test_gate_is_exactly_261_to_266_and_excludes_thr267(self):
+    def test_gate_uses_topology_resnums_261_to_266_and_excludes_thr267(self):
         module = load_module()
-        gate = FakeGroup(
-            [FakeAtom(i, "CA", "THR", resid) for i, resid in enumerate(range(261, 267))]
-        )
-        self.assertEqual(module._validate_gate_membership(gate), [261, 262, 263, 264, 265, 266])
-        gate.append(FakeAtom(99, "CA", "THR", 267))
-        with self.assertRaisesRegex(module.AuditError, "Gate residues"):
-            module._validate_gate_membership(gate)
-
-    def test_gate_record_uses_core_and_gate_and_excludes_thr267(self):
-        module = load_module()
-        core = FakeGroup([FakeAtom(0, "CA", "ALA", 100, (0.0, 0.0, 0.0))])
         gate = FakeGroup(
             [
-                FakeAtom(i + 1, "CA", "THR", resid, (1.0, 0.0, 0.0))
-                for i, resid in enumerate(range(261, 267))
+                FakeAtom(i, "CA", "THR", 616 + i, resnum=261 + i)
+                for i in range(6)
+            ]
+        )
+        self.assertEqual(
+            module._validate_gate_membership(gate),
+            [261, 262, 263, 264, 265, 266],
+        )
+        gate.append(FakeAtom(99, "CA", "THR", 622, resnum=267))
+        with self.assertRaisesRegex(module.AuditError, "Gate topology resnums"):
+            module._validate_gate_membership(gate)
+        missing_resnum = FakeGroup(gate[:-1])
+        del missing_resnum[0].resnum
+        with self.assertRaisesRegex(module.AuditError, "topology resnum"):
+            module._validate_gate_membership(missing_resnum)
+
+    def test_gate_record_reports_original_and_global_residue_numbers(self):
+        module = load_module()
+        core = FakeGroup(
+            [FakeAtom(0, "CA", "ALA", 455, (0.0, 0.0, 0.0), resnum=100)]
+        )
+        gate = FakeGroup(
+            [
+                FakeAtom(
+                    i + 1,
+                    "CA",
+                    "THR",
+                    616 + i,
+                    (1.0, 0.0, 0.0),
+                    resnum=261 + i,
+                )
+                for i in range(6)
             ]
         )
         primitive = mock.Mock(return_value=0.25)
@@ -246,7 +315,12 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         )
         self.assertEqual(record["core_atom_count"], 1)
         self.assertEqual(record["gate_atom_count"], 6)
-        self.assertEqual(record["gate_resids"], [261, 262, 263, 264, 265, 266])
+        self.assertEqual(
+            record["gate_resnums"], [261, 262, 263, 264, 265, 266]
+        )
+        self.assertEqual(
+            record["gate_global_resids"], [616, 617, 618, 619, 620, 621]
+        )
         self.assertTrue(record["thr267_excluded"])
         self.assertAlmostEqual(record["opening_nm"], 0.25)
         np.testing.assert_allclose(primitive.call_args.args[0], (0.1, 0.0, 0.0))
@@ -268,14 +342,22 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         module = load_module()
         ligand = FakeGroup(
             [
-                FakeAtom(10286, "C12", "L2", 1, (0.1, 0.0, 0.0), "L"),
-                FakeAtom(10287, "O2", "L2", 1, (5.0, 5.0, 5.0), "L"),
+                FakeAtom(
+                    10286, "C12", "L2", 663, (0.1, 0.0, 0.0), "L", resnum=1
+                ),
+                FakeAtom(
+                    10287, "O2", "L2", 663, (5.0, 5.0, 5.0), "L", resnum=1
+                ),
             ]
         )
         partners = FakeGroup(
             [
-                FakeAtom(20, "CB", "ALA", 12, (4.0, 4.0, 4.0), "H"),
-                FakeAtom(21, "NZ", "LYS", 15, (9.9, 0.0, 0.0), "H"),
+                FakeAtom(
+                    20, "CB", "ALA", 367, (4.0, 4.0, 4.0), "H", resnum=12
+                ),
+                FakeAtom(
+                    21, "NZ", "LYS", 370, (9.9, 0.0, 0.0), "H", resnum=15
+                ),
             ]
         )
         record = module._minimum_contact(
@@ -290,7 +372,8 @@ class A1RepresentativeFrameContractTests(unittest.TestCase):
         self.assertEqual(record["ligand"]["name"], "C12")
         self.assertEqual(record["partner"]["index1"], 22)
         self.assertEqual(record["partner"]["resname"], "LYS")
-        self.assertEqual(record["partner"]["resid"], 15)
+        self.assertEqual(record["partner"]["resnum"], 15)
+        self.assertEqual(record["partner"]["global_resid"], 370)
         self.assertEqual(record["partner"]["name"], "NZ")
 
     def test_both_contact_classes_must_clear_the_same_severe_clash_cutoff(self):
