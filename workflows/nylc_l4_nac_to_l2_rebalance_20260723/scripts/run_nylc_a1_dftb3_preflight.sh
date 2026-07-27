@@ -91,9 +91,9 @@ module load amber/2018-hpcx-gcc-7.3.1
 export AMBERHOME="$AMBER_RUNTIME"
 test -s "$AMBERHOME/dat/slko/3ob-3-1/C-C.skf"
 CURRENT=one_step
-sander -O -i "$OUT/prepared/01_qmmm_one_step.in" -o "$OUT/prepared/01_qmmm_one_step.out" -p "$OUT/prepared/system.prmtop" -c "$OUT/prepared/representative_354ps.rst7" -r "$OUT/prepared/01_qmmm_one_step.rst7"
+sander -O -i "$OUT/prepared/01_qmmm_one_step.in" -o "$OUT/prepared/01_qmmm_one_step.out" -p "$OUT/prepared/system.prmtop" -c "$OUT/prepared/representative_354ps.rst7" -r "$OUT/prepared/01_qmmm_one_step.rst7" -inf "$OUT/prepared/01_qmmm_one_step.mdinfo"
 CURRENT=twenty_step
-sander -O -i "$OUT/prepared/02_qmmm_20_step.in" -o "$OUT/prepared/02_qmmm_20_step.out" -p "$OUT/prepared/system.prmtop" -c "$OUT/prepared/01_qmmm_one_step.rst7" -r "$OUT/prepared/02_qmmm_20_step.rst7"
+sander -O -i "$OUT/prepared/02_qmmm_20_step.in" -o "$OUT/prepared/02_qmmm_20_step.out" -p "$OUT/prepared/system.prmtop" -c "$OUT/prepared/01_qmmm_one_step.rst7" -r "$OUT/prepared/02_qmmm_20_step.rst7" -inf "$OUT/prepared/02_qmmm_20_step.mdinfo"
 CURRENT=numerical_audit
 set +e
 "$PY" "$CODE_ROOT/scripts/audit_nylc_a1_dftb3_smoke.py" --one-step "$OUT/prepared/01_qmmm_one_step.out" --segment "$OUT/prepared/02_qmmm_20_step.out" --audit "$OUT/prepared/qmmm_preflight_audit.json" --output "$OUT/A1_DFTB3_PREFLIGHT_RESULT.json"
