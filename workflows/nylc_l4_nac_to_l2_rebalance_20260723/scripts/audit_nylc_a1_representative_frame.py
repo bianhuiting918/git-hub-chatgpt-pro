@@ -194,33 +194,68 @@ def _validate_box_identity(source_box, extracted_box) -> dict[str, list[float]]:
     }
 
 
+def _topology_resnum(atom) -> int:
+    if not hasattr(atom, "resnum"):
+        raise AuditError(
+            "atom topology resnum is unavailable",
+            stage="atom_mapping",
+            gate="atom_mapping",
+        )
+    try:
+        return int(atom.resnum)
+    except (TypeError, ValueError) as exc:
+        raise AuditError(
+            f"atom topology resnum is invalid: {atom.resnum!r}",
+            stage="atom_mapping",
+            gate="atom_mapping",
+        ) from exc
+
+
+def _global_resid(atom) -> int | None:
+    if not hasattr(atom, "resid"):
+        return None
+    try:
+        return int(atom.resid)
+    except (TypeError, ValueError) as exc:
+        raise AuditError(
+            f"atom global resid is invalid: {atom.resid!r}",
+            stage="atom_mapping",
+            gate="atom_mapping",
+        ) from exc
+
+
 def _require_identity(
     atom,
     index1: int,
     resname: str,
     name: str,
-    resid: int | None = None,
+    resnum: int | None = None,
 ) -> dict[str, object]:
     observed_index1 = int(atom.index) + 1
     observed_resname = str(atom.resname)
     observed_name = str(atom.name)
-    observed_resid = int(atom.resid)
-    expected_label = f"{resname}{resid if resid is not None else ''}:{name}"
+    observed_resnum = _topology_resnum(atom)
+    observed_global_resid = _global_resid(atom)
+    expected_label = f"{resname}{resnum if resnum is not None else ''}:{name}"
     if (
         observed_index1 != int(index1)
         or observed_resname != resname
         or observed_name != name
-        or (resid is not None and observed_resid != int(resid))
+        or (resnum is not None and observed_resnum != int(resnum))
     ):
         raise AuditError(
             f"atom index1={observed_index1} is "
-            f"{observed_resname}{observed_resid}:{observed_name}; "
-            f"expected {expected_label} at index1={index1}"
+            f"{observed_resname} topology resnum {observed_resnum}:"
+            f"{observed_name} (global resid {observed_global_resid}); "
+            f"expected {expected_label} at index1={index1}",
+            stage="atom_mapping",
+            gate="atom_mapping",
         )
     return {
         "index1": observed_index1,
         "segid": str(getattr(atom, "segid", "")),
-        "resid": observed_resid,
+        "resnum": observed_resnum,
+        "global_resid": observed_global_resid,
         "resname": observed_resname,
         "name": observed_name,
     }
@@ -278,14 +313,46 @@ def _joint_nac(oxygen_A, carbon_A, og1_A, box) -> dict[str, object]:
     }
 
 
+def _residue_number_pairs(group) -> list[tuple[int, int | None]]:
+    pairs: list[tuple[int, int | None]] = []
+    resnum_to_global: dict[int, int | None] = {}
+    global_to_resnum: dict[int, int] = {}
+    for atom in group:
+        resnum = _topology_resnum(atom)
+        global_resid = _global_resid(atom)
+        prior_global = resnum_to_global.setdefault(resnum, global_resid)
+        if prior_global != global_resid:
+            raise AuditError(
+                f"topology resnum {resnum} maps to inconsistent global resids "
+                f"{prior_global} and {global_resid}",
+                stage="gate_definition",
+                gate="gate_definition",
+            )
+        if global_resid is not None:
+            prior_resnum = global_to_resnum.setdefault(global_resid, resnum)
+            if prior_resnum != resnum:
+                raise AuditError(
+                    f"global resid {global_resid} maps to inconsistent topology "
+                    f"resnums {prior_resnum} and {resnum}",
+                    stage="gate_definition",
+                    gate="gate_definition",
+                )
+        pairs.append((resnum, global_resid))
+    return pairs
+
+
 def _validate_gate_membership(gate) -> list[int]:
-    residues = sorted({int(value) for value in gate.resids})
+    pairs = _residue_number_pairs(gate)
+    resnums = sorted({resnum for resnum, _ in pairs})
     expected = list(range(261, 267))
-    if residues != expected or 267 in residues:
+    if resnums != expected or 267 in resnums:
         raise AuditError(
-            f"Gate residues are {residues}, expected 261-266 with Thr267 excluded"
+            f"Gate topology resnums are {resnums}, expected 261-266 with "
+            "Thr267 excluded",
+            stage="gate_definition",
+            gate="gate_definition",
         )
-    return residues
+    return resnums
 
 
 def _gate_opening_record(
@@ -297,7 +364,11 @@ def _gate_opening_record(
 ) -> dict[str, object]:
     if len(core) == 0 or len(gate) == 0:
         raise AuditError("Core and Gate groups must both contain atoms")
-    gate_resids = _validate_gate_membership(gate)
+    gate_resnums = _validate_gate_membership(gate)
+    gate_pairs = _residue_number_pairs(gate)
+    gate_global_resids = sorted(
+        {global_resid for _, global_resid in gate_pairs if global_resid is not None}
+    )
     vector_A = _minimum_image_A(
         np.asarray(gate.center_of_mass(), dtype=float)
         - np.asarray(core.center_of_mass(), dtype=float),
@@ -309,7 +380,8 @@ def _gate_opening_record(
     return {
         "core_atom_count": len(core),
         "gate_atom_count": len(gate),
-        "gate_resids": gate_resids,
+        "gate_resnums": gate_resnums,
+        "gate_global_resids": gate_global_resids,
         "thr267_excluded": True,
         "opening_nm": opening_nm,
     }
@@ -340,7 +412,8 @@ def _atom_record(atom) -> dict[str, object]:
     return {
         "index1": int(atom.index) + 1,
         "segid": str(getattr(atom, "segid", "")),
-        "resid": int(atom.resid),
+        "resnum": _topology_resnum(atom),
+        "global_resid": _global_resid(atom),
         "resname": str(atom.resname),
         "name": str(atom.name),
     }
