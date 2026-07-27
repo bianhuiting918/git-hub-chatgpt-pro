@@ -1057,3 +1057,39 @@ Compact authority:
 Remote raw audit:
 `$TASK_ROOT/a1_activated_nac_20260726/nac_audit_merge/job_61976667/A1_NAC_AUDIT_SUMMARY.json`.
 
+
+
+## Corrected A1 Amber18 DFTB3 numerical preflight (2026-07-27)
+
+Job `61999607` completed on SCNet `xahcnormal` with exit code `0:0`
+using four allocated CPU cores in 3 min 14 s. Before the GROMACS-to-Amber
+conversion, the frozen representative frame was made whole with
+`gmx trjconv -pbc mol -ur compact`. The resulting coordinate SHA256 is
+`a95e60617921d4b151f88c58fd3d377f9e52f61c6c4c84fc2908b68862036ca0`.
+The topology-derived maximum covalent bond length is 1.914915 A and zero
+bonds exceed 3 A.
+
+Both the one-step and 20-step Amber18 DFTB3/3OB-3-1 stages used 94 QM atoms,
+charge 0, singlet spin and one link atom. Both reached `FINAL RESULTS` and
+`Run done` with zero SCC, vlimit, NaN, FATAL, SANDER BOMB, segmentation,
+forrtl or bonded-energy-overflow findings. The 20-step endpoint has energy
+approximately -489380 kcal/mol, RMS 4.6124 and GMAX 191.97. This is
+`PASS_A1_DFTB3_NUMERICAL_PREFLIGHT`, not a TS, reaction coordinate, PMF,
+barrier or mechanism result.
+
+Job `61997314` is superseded as
+`SUPERSEDED_FALSE_PASS_PBC_SPLIT_COORDINATES`: its initial Amber coordinates
+contained 845 bonds longer than 3 A (maximum 123.61 A) and its bond energy
+overflowed. Jobs `61998674` and `61998974` are preserved technical failures
+from, respectively, a ParmEd scalar-coordinate implementation error and a
+shared default `mdinfo` collision. The corrected runner uses explicit
+job-local `mdinfo` paths and rejects non-whole bonded geometry before sander.
+
+Compact authority:
+`audit/nylc_a1_dftb3_preflight_20260727.json`.
+
+Production Step1 remains gated on a QM region expanded at least through Asp306
+and Asp308, with sensitivity checks for Tyr146, Lys189, Asn219 and relevant
+water. Small serial preflights remain at four CPU cores. Additional CPU is used
+primarily by parallel independent scan or umbrella windows; Amber18 DFTB3 does
+not request DCU without a separately validated accelerator backend.
