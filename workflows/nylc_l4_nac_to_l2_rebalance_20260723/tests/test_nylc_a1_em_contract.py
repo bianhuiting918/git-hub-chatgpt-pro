@@ -19,6 +19,7 @@ class A1EMContract(unittest.TestCase):
                       "em_free","-maxwarn 0","run_history.tsv","run_history.jsonl",
                       "audit_nylc_a1_em.py"]:
             self.assertIn(token,text)
+        self.assertGreaterEqual(text.count("integrator = steep"),2)
 
     @unittest.skipUnless(AUDITOR.is_file(),"auditor missing")
     def test_em_auditor_requires_convergence_and_no_overlap(self):
