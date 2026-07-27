@@ -1272,3 +1272,37 @@ released local basin or a defensible coupled reaction path is demonstrated.
 
 Compact authority:
 `audit/nylc_a1_step1_release_test_20260727.json`.
+
+
+## A1 Step1 coupled attack/carbonyl scout outcome (2026-07-28)
+
+Array job `62033771` tested three restrained carbonyl targets (C12--O2
+1.30, 1.35 and 1.40 A) from the hash-pinned job-`62021985` attack seed.
+Every task retained the same Step1 Hamiltonian: 146 explicit QM atoms, charge
+0, 510 electrons including six link H, the six fixed protein residues plus
+complete PA66-L2, DFTB3/3OB-3-1, and no QM water. The common OG1--C12 target
+was 1.45 A. Each coupled minimization was followed by a local release with all
+reactive restraints removed and only a 1 kcal mol-1 A-2 restraint on non-QM
+solute heavy atoms retained.
+
+All three tasks completed `0:0`, passed artifact SHA256 verification and had
+zero SCC, vlimit, bond-overflow, NaN, FATAL, SANDER BOMB, segmentation or
+forrtl findings. They all failed the released attack-basin candidate gate:
+
+| C12--O2 target (A) | coupled OG1--C12 (A) | coupled pyramidalization (deg) | released OG1--C12 (A) | released angle (deg) | released C12--O2 / C12--N3 (A) | released pyramidalization (deg) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1.30 | 1.725234 | 8.020909 | 3.799678 | 93.211281 | 1.254935 / 1.373922 | 0.036945 |
+| 1.35 | 1.775492 | 8.217392 | 3.792856 | 92.720677 | 1.260521 / 1.365909 | 0.037263 |
+| 1.40 | 1.704370 | 8.713287 | 3.628420 | 95.735461 | 1.269004 / 1.363033 | 0.002813 |
+
+The common classification is
+`FAIL_COUPLED_SCOUT_NO_RELEASED_ATTACK_BASIN_CANDIDATE`. The coupled
+restraints produced short attack contacts but only modest carbonyl
+pyramidalization; after removing reactive restraints, every structure returned
+to a planar reactant-like carbonyl and lost the attack contact. Therefore no
+PMF is started from this seed or these coordinates. This is a negative
+reaction-coordinate/seed result, not rejection of the A1 microstate or the
+overall mechanism.
+
+Compact authority:
+`audit/nylc_a1_step1_coupled_scout_20260728.json`.
