@@ -20,6 +20,7 @@ class Source(NamedTuple):
     url: str
     filename: str
     compressed: bool = False
+    allow_legacy_assembly_placeholder: bool = False
 
 
 FROZEN_SOURCES = {
@@ -37,6 +38,7 @@ FROZEN_SOURCES = {
         "3AXG",
         "https://files.rcsb.org/download/3AXG.pdb1.gz",
         "3AXG_BIOASSEMBLY1.pdb",
+        True,
         True,
     ),
 }
@@ -58,14 +60,29 @@ def decode_download(data: bytes, compressed: bool) -> bytes:
     return gzip.decompress(data) if compressed else data
 
 
-def validate_pdb_bytes(data: bytes, expected_pdb_id: str) -> dict:
+def validate_pdb_bytes(
+    data: bytes,
+    expected_pdb_id: str,
+    allow_legacy_assembly_placeholder: bool = False,
+) -> dict:
     try:
         text = data.decode("ascii")
     except UnicodeDecodeError as error:
         raise ValueError("PDB payload is not ASCII text") from error
+
     prefix = text[:20000].upper()
-    if expected_pdb_id.upper() not in prefix:
-        raise ValueError(f"expected PDB id {expected_pdb_id} not found")
+    if expected_pdb_id.upper() in prefix:
+        identity_validation = "expected_pdb_id_in_prefix"
+    else:
+        header = next(
+            (line for line in text.splitlines() if line.startswith("HEADER")),
+            "",
+        )
+        legacy_placeholder = header.rstrip().upper().endswith("XXXX")
+        if not (allow_legacy_assembly_placeholder and legacy_placeholder):
+            raise ValueError(f"expected PDB id {expected_pdb_id} not found")
+        identity_validation = "rcsb_legacy_bioassembly_header_xxxx"
+
     n_coordinates = sum(
         line.startswith(("ATOM  ", "HETATM")) for line in text.splitlines()
     )
@@ -73,7 +90,10 @@ def validate_pdb_bytes(data: bytes, expected_pdb_id: str) -> dict:
         raise ValueError("PDB payload has no coordinate records")
     if not text.rstrip().endswith("END"):
         raise ValueError("PDB payload lacks terminal END record")
-    return {"n_coordinate_records": int(n_coordinates)}
+    return {
+        "n_coordinate_records": int(n_coordinates),
+        "identity_validation": identity_validation,
+    }
 
 
 def prepare_output_directory(path: Path) -> None:
@@ -133,7 +153,11 @@ def main() -> int:
         for source_id, source in FROZEN_SOURCES.items():
             wire = fetch(source.url, args.timeout_seconds)
             decoded = decode_download(wire, source.compressed)
-            validation = validate_pdb_bytes(decoded, source.pdb_id)
+            validation = validate_pdb_bytes(
+                decoded,
+                source.pdb_id,
+                source.allow_legacy_assembly_placeholder,
+            )
             destination = args.output_dir / source.filename
             destination.write_bytes(decoded)
             rows.append(
@@ -146,6 +170,7 @@ def main() -> int:
                     "decoded_bytes": len(decoded),
                     "sha256": sha256_bytes(decoded),
                     "n_coordinate_records": validation["n_coordinate_records"],
+                    "identity_validation": validation["identity_validation"],
                 }
             )
         provenance = args.output_dir / "provenance.tsv"
