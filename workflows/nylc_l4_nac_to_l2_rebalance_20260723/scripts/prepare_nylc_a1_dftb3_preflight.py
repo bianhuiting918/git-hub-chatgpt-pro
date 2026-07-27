@@ -76,6 +76,13 @@ def qmmm_input(title, maxcyc, qmmask):
 """
 
 
+def bond_length_A(left, right):
+    return sum(
+        (float(getattr(left, axis)) - float(getattr(right, axis))) ** 2
+        for axis in ("xx", "xy", "xz")
+    ) ** 0.5
+
+
 def atom_by_name(residue, name):
     matches = [atom for atom in residue.atoms if atom.name == name]
     if len(matches) != 1:
@@ -125,10 +132,7 @@ def derive_qm_contract(structure):
     bond_lengths = []
     for bond in structure.bonds:
         left, right = bond.atom1, bond.atom2
-        distance = sum(
-            (float(left.xx[axis]) - float(right.xx[axis])) ** 2
-            for axis in range(3)
-        ) ** 0.5
+        distance = bond_length_A(left, right)
         bond_lengths.append(distance)
     max_bond_length_A = max(bond_lengths)
     bond_count_gt_3A = sum(distance > 3.0 for distance in bond_lengths)
