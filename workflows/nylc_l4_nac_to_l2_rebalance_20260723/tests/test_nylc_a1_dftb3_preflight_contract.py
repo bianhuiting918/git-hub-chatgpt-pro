@@ -88,7 +88,8 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
         text = RUNNER.read_text(encoding="utf-8")
         for token in (
             "Amber18",
-            "amber.sh",
+            "module load amber/2018-hpcx-gcc-7.3.1",
+            'export AMBERHOME="$AMBER_RUNTIME"',
             "3ob-3-1",
             "sander",
             "01_qmmm_one_step.in",
@@ -101,7 +102,7 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
             "code snapshot",
         ):
             self.assertIn(token, text)
-        for forbidden in ("gmx mdrun", "trjconv", "lowest_potential"):
+        for forbidden in ("gmx mdrun", "trjconv", "lowest_potential", 'source "$AMBER_RUNTIME/amber.sh"'):
             self.assertNotIn(forbidden, text)
 
     def test_slurm_is_cpu_only_bounded_and_immutable(self):
