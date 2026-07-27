@@ -58,6 +58,9 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
             "OG1 bonded atoms",
             "active_residue_topology_charge",
             "ligand_topology_charge",
+            "max_bond_length_A",
+            "bond_count_gt_3A",
+            "MAX_ALLOWED_BOND_LENGTH_A = 2.0",
         ):
             self.assertIn(token, text)
 
@@ -86,6 +89,9 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
             "FATAL",
             "PASS_A1_DFTB3_NUMERICAL_PREFLIGHT",
             "FAIL_A1_DFTB3_NUMERICAL_PREFLIGHT",
+            "max_bond_length_A",
+            "bond_count_gt_3A",
+            "bond_overflow",
         ):
             self.assertIn(token, text)
 
@@ -109,8 +115,21 @@ class A1Dftb3PreflightContractTests(unittest.TestCase):
         ):
             self.assertIn(token, text)
         self.assertLess(text.index("export GMXDATA"), text.index("CURRENT=preparation"))
-        for forbidden in ("gmx mdrun", "trjconv", "lowest_potential", 'source "$AMBER_RUNTIME/amber.sh"'):
+        for forbidden in ("gmx mdrun", "lowest_potential", 'source "$AMBER_RUNTIME/amber.sh"'):
             self.assertNotIn(forbidden, text)
+
+    def test_runner_makes_molecules_whole_before_parmed_conversion(self):
+        text = RUNNER.read_text(encoding="utf-8")
+        for token in (
+            "gmx_mpi trjconv",
+            "-pbc mol",
+            "-ur compact",
+            "representative_whole.gro",
+            "--coordinate",
+            "CURRENT=pbc_whole",
+        ):
+            self.assertIn(token, text)
+        self.assertLess(text.index("CURRENT=pbc_whole"), text.index("CURRENT=preparation"))
 
     def test_slurm_is_cpu_only_bounded_and_immutable(self):
         text = SLURM.read_text(encoding="utf-8")
