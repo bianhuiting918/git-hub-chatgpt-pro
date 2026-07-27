@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "status": "PASS_TECHNICAL_A1_STEP1_COUPLED_SCOUT_MATRIX",
+  "scientific_status": "FAIL_COUPLED_SCOUT_NO_RELEASED_ATTACK_BASIN_CANDIDATE",
+  "interpretation": "All three coupled attack/carbonyl minimizations completed without numerical hard errors, but every reactive-restraint-free local release returned toward the planar reactant. This blocks starting a one-dimensional or coupled PMF from these seeds. It is not evidence against the A1 microstate or the overall mechanism.",
+  "job": {
+    "array_job_id": "62033771",
+    "accounting_states": [
+      "COMPLETED 0:0",
+      "COMPLETED 0:0",
+      "COMPLETED 0:0"
+    ],
+    "stderr_nonempty_tasks": []
+  },
+  "provenance": {
+    "code_commit": "7457f1020afda3ff9b7ed2adf6994a14b448fd24",
+    "source_job": "62021985",
+    "source_seed_status": "PASS_CONSTRAINED_ATTACK_BRACKET_SEED",
+    "source_seed_pass_sha256": "3083663f502f522974f7eac56e1b3a4c7015933c7d949562364d359006c25224",
+    "source_restart_sha256": "548dca57cb623e69d5fefaa8e270267a5bd599bd5995113219cdf349c346e56c",
+    "prmtop_sha256": "a61d15bf0bf78675be93275d45f274e808ed6ae450fc1ca21a8e14aee8c12ca0"
+  },
+  "qm_contract": {
+    "explicit_qm_atoms": 146,
+    "qmcharge": 0,
+    "electrons_including_link_h": 510,
+    "link_h": 6,
+    "step1_qm_water_count": 0,
+    "hamiltonian": "DFTB3/3OB-3-1"
+  },
+  "protocol": {
+    "attack_target_A": 1.45,
+    "carbonyl_targets_A": [
+      1.3,
+      1.35,
+      1.4
+    ],
+    "stages": [
+      "coupled",
+      "local_release"
+    ],
+    "local_release_reactive_restraints": false,
+    "local_release_non_qm_solute_heavy_position_restraint_kcal_mol_A2": 1
+  },
+  "project_exploratory_gate": {
+    "contact": "OG1-C12 <= 1.90 A and O2-C12-OG1 95-115 deg",
+    "carbonyl": "C12-O2 >= 1.30 A; C12-N3 >= 1.40 A; pyramidalization >= 10 deg",
+    "provenance": "project exploratory scout gate; not a literature TI definition"
+  },
+  "candidates": [
+    {
+      "carbonyl_target_A": 1.3,
+      "pass_sha256": "9e72d9f54476d88945b4c5004b42897693513ec227b99b4502e2a444592cf484",
+      "technical_status": "PASS_TECHNICAL_A1_STEP1_COUPLED_SCOUT",
+      "coupled": {
+        "og1_c12_A": 1.7252340868754246,
+        "angle_deg": 101.57831832967922,
+        "c12_o2_A": 1.3101246952529884,
+        "c12_n3_A": 1.4409455217261558,
+        "pyramidalization_deg": 8.020909086188965
+      },
+      "local_release": {
+        "og1_c12_A": 3.7996778369230886,
+        "angle_deg": 93.21128006758916,
+        "c12_o2_A": 1.254935347352262,
+        "c12_n3_A": 1.3739218780084315,
+        "pyramidalization_deg": 0.03694543956362395
+      },
+      "release_contact_gate": "FAIL_RELEASE_RETURNED_TOWARD_REACTANT",
+      "exploratory_geometry_gate": "FAIL_PROJECT_EXPLORATORY_TETRAHEDRAL_GEOMETRY",
+      "candidate_gate": "FAIL_COUPLED_SCOUT_NO_RELEASED_ATTACK_BASIN_CANDIDATE",
+      "numerical_errors": {
+        "scc": 0,
+        "nan": 0,
+        "fatal": 0,
+        "vlimit": 0,
+        "bond_overflow": 0
+      }
+    },
+    {
+      "carbonyl_target_A": 1.35,
+      "pass_sha256": "5e82ddd7f237c30503e406883c00cc55543c1bb79209e4df44b168a13c6c03d0",
+      "technical_status": "PASS_TECHNICAL_A1_STEP1_COUPLED_SCOUT",
+      "coupled": {
+        "og1_c12_A": 1.7754920544440143,
+        "angle_deg": 104.263897024471,
+        "c12_o2_A": 1.1927044674508678,
+        "c12_n3_A": 1.4780130417888686,
+        "pyramidalization_deg": 8.217391624218862
+      },
+      "local_release": {
+        "og1_c12_A": 3.7928563477022768,
+        "angle_deg": 92.72067659662302,
+        "c12_o2_A": 1.2605212000186623,
+        "c12_n3_A": 1.365908930393958,
+        "pyramidalization_deg": 0.03726258041797337
+      },
+      "release_contact_gate": "FAIL_RELEASE_RETURNED_TOWARD_REACTANT",
+      "exploratory_geometry_gate": "FAIL_PROJECT_EXPLORATORY_TETRAHEDRAL_GEOMETRY",
+      "candidate_gate": "FAIL_COUPLED_SCOUT_NO_RELEASED_ATTACK_BASIN_CANDIDATE",
+      "numerical_errors": {
+        "scc": 0,
+        "nan": 0,
+        "fatal": 0,
+        "vlimit": 0,
+        "bond_overflow": 0
+      }
+    },
+    {
+      "carbonyl_target_A": 1.4,
+      "pass_sha256": "0d5a7a1b6d0caa41e7474eccb2bf45f902114a3c7c5f3ece51857c044081b12b",
+      "technical_status": "PASS_TECHNICAL_A1_STEP1_COUPLED_SCOUT",
+      "coupled": {
+        "og1_c12_A": 1.7043702190445444,
+        "angle_deg": 101.13529406247687,
+        "c12_o2_A": 1.3333849051794828,
+        "c12_n3_A": 1.4327364600996142,
+        "pyramidalization_deg": 8.713286641590344
+      },
+      "local_release": {
+        "og1_c12_A": 3.628420391066842,
+        "angle_deg": 95.73546073340155,
+        "c12_o2_A": 1.2690044711106363,
+        "c12_n3_A": 1.363033364873897,
+        "pyramidalization_deg": 0.002812701076891244
+      },
+      "release_contact_gate": "FAIL_RELEASE_RETURNED_TOWARD_REACTANT",
+      "exploratory_geometry_gate": "FAIL_PROJECT_EXPLORATORY_TETRAHEDRAL_GEOMETRY",
+      "candidate_gate": "FAIL_COUPLED_SCOUT_NO_RELEASED_ATTACK_BASIN_CANDIDATE",
+      "numerical_errors": {
+        "scc": 0,
+        "nan": 0,
+        "fatal": 0,
+        "vlimit": 0,
+        "bond_overflow": 0
+      }
+    }
+  ],
+  "decision": {
+    "start_pmf": false,
+    "next_step": "Do not extend the same constrained seed. Revisit the Step1 reaction coordinate/state definition before any PMF; preserve all three failed candidates."
+  }
+}
