@@ -148,8 +148,16 @@
   },
   "step1_qattack": {
     "slurm_job_id": 62012919,
-    "status_at_record": "RUNNING",
+    "slurm_state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:30:52",
+    "alloc_cpus": 8,
+    "max_rss_kb": 4938612,
     "github_commit": "96af07f9e3295010ebfab94b578349347df209c6",
+    "status": "PASS_TECHNICAL_A1_UNIFIED_STEP1_QATTACK_SCAN",
+    "attack_bracket_seed_gate": "NOT_EVALUATED_ATTACK_BRACKET_NOT_REACHED",
+    "scientific_status": "NOT_EVALUATED_TS_PMF_BARRIER",
+    "coordinate": "Thr267 OG1 - L2 C12 distance",
     "windows_target_A": [
       3.27,
       3.05,
@@ -161,17 +169,44 @@
       1.85,
       1.65
     ],
-    "first_window_geometry": {
-      "og1_c12_A": 3.2928886510832367,
-      "o2_c12_og1_deg": 112.39349201720036,
-      "c12_o2_A": 1.2554631439936867,
-      "c12_n3_A": 1.3683283610529153,
+    "windows_actual_og1_c12_A": [
+      3.2928886510832367,
+      3.163799134207457,
+      2.9989704338151384,
+      2.8468361035390255,
+      2.6953703515170773,
+      2.622596797404048,
+      2.568482754569535,
+      2.5306864764435266,
+      2.5078335943020953
+    ],
+    "final_window_geometry": {
+      "target_og1_c12_A": 1.65,
+      "actual_og1_c12_A": 2.5078335943020953,
+      "o2_c12_og1_deg": 96.68039892494535,
+      "c12_o2_A": 1.2481053784308624,
+      "c12_n3_A": 1.381408556975661,
       "nalpha_h_A": [
-        1.032204661248416,
-        1.0242657685262333,
-        1.0333436631607584
+        1.0343468417121235,
+        1.026197056484545,
+        1.0296604233969417
       ]
     },
-    "interpretation": "Constrained attack-only scouting; not a TS, committor, PMF, barrier, or mechanism result."
+    "hard_error_gate": {
+      "scc_warnings": 0,
+      "vlimit_warnings": 0,
+      "bond_overflow": 0,
+      "nan": 0,
+      "fatal": 0,
+      "sander_bomb": 0,
+      "segmentation": 0,
+      "forrtl": 0
+    },
+    "diagnosed_limit": {
+      "finding": "The final windows did not reach their distance targets; the endpoint remained at 2.508 A and retained carbonyl/amide bond lengths.",
+      "root_cause": "The original restraint set r4=target+0.25 A. Once the actual distance exceeded r4, Amber's NMR distance restraint operated in its linear outer tail, capping the restoring slope; 75 steepest-descent steps were insufficient to reach the short-distance targets.",
+      "disposition": "Preserve this scan as a technically clean negative bracket result. Do not label it TS/PMF/barrier and do not start Step2. A corrected single-variable scouting design requires explicit approval before implementation."
+    },
+    "interpretation": "Constrained attack-only scouting completed cleanly but did not reach an attack/tetrahedral bracket. Raw minimized energies across windows are not a PMF or activation barrier."
   }
 }
