@@ -14,6 +14,9 @@ FULL=HERE/"audit_nylc_a1_full_system.py"
 class EMAuditError(RuntimeError):
     pass
 
+def log_has_nonfinite_token(log_text):
+    return re.search(r"(?i)(?<![A-Za-z0-9_])nan(?![A-Za-z0-9_])",log_text) is not None
+
 def load_full():
     spec=importlib.util.spec_from_file_location("a1_full_audit",FULL)
     module=importlib.util.module_from_spec(spec)
@@ -33,9 +36,11 @@ def audit(gro_text,chain_itp_text,build_audit,log_text):
     if not math.isfinite(potential):
         raise EMAuditError("free EM potential is not finite")
     upper=log_text.upper()
-    for marker in ["FATAL ERROR","NAN","SEGMENTATION FAULT"]:
+    for marker in ["FATAL ERROR","SEGMENTATION FAULT"]:
         if marker in upper:
             raise EMAuditError(f"free EM log contains {marker}")
+    if log_has_nonfinite_token(log_text):
+        raise EMAuditError("free EM log contains numeric NaN")
     base=load_full().audit(gro_text,chain_itp_text,build_audit,potential,True)
     return {
         "schema_version":1,
