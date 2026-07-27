@@ -123,4 +123,4 @@ def test_slurm_contract_requests_four_cpus():
     ).read_text(encoding="utf-8")
     assert "#SBATCH --cpus-per-task=4" in text
     assert "--workers \"$SLURM_CPUS_PER_TASK\"" in text
-    assert 'EXISTING_PASS_ROOT=\${EXISTING_PASS_ROOT:?EXISTING_PASS_ROOT is required}' in text
+    assert 'EXISTING_PASS_ROOT=${EXISTING_PASS_ROOT:?EXISTING_PASS_ROOT is required}' in text
