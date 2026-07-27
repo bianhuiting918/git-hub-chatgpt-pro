@@ -27,7 +27,103 @@ def write_tsv(path: Path, rows):
         writer.writerows(rows)
 
 
+def write_authority_tsv(path: Path, rows):
+    fields = [
+        "authority_source", "authority_row_index", "family", "candidate_id",
+        "sequence_md5", "status", "reason",
+    ]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields, delimiter="\t")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 class StructureManifestCliTests(unittest.TestCase):
+    def test_separates_nylon_authority_candidates_from_external_controls(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pet_pdb = root / "pet.pdb"
+            nyl_pdb = root / "nyl.pdb"
+            recovered_pdb = root / "recovered.pdb"
+            control_pdb = root / "control.pdb"
+            for path, text in (
+                (pet_pdb, "ATOM PET\n"),
+                (nyl_pdb, "ATOM NYL\n"),
+                (recovered_pdb, "ATOM RECOVERED\n"),
+                (control_pdb, "ATOM CONTROL\n"),
+            ):
+                path.write_text(text, encoding="utf-8")
+
+            pet = root / "pet.tsv"
+            nylon = root / "nylon.tsv"
+            recovered = root / "recovered.tsv"
+            extra = root / "extra.tsv"
+            authority = root / "authority.tsv"
+            write_tsv(pet, [{
+                "family": "PETase", "candidate_id": "PET_OK", "sequence_md5": "pet_md5",
+                "selected_chain": "A", "receptor_path": str(pet_pdb),
+                "receptor_sha256": sha256(pet_pdb), "input_status": "READY_FOR_STRUCTURE_EVALUATION",
+                "structure_provenance": "PREDICTED_ALPHAFOLD",
+            }])
+            write_tsv(nylon, [{
+                "family": "Nylonase", "candidate_id": "AUTH_READY", "sequence_md5": "auth_ready",
+                "selected_chain": "A", "receptor_path": str(nyl_pdb),
+                "receptor_sha256": sha256(nyl_pdb), "input_status": "READY_FOR_STRUCTURE_EVALUATION",
+                "structure_provenance": "PREDICTED_ESMFOLD",
+            }])
+            write_tsv(recovered, [{
+                "family": "Nylonase", "candidate_id": "AUTH_RECOVERED", "sequence_md5": "auth_recovered",
+                "selected_chain": "A", "receptor_path": str(recovered_pdb),
+                "receptor_sha256": sha256(recovered_pdb), "input_status": "READY_FOR_STRUCTURE_EVALUATION",
+                "structure_provenance": "EXPERIMENTAL_PDB",
+            }])
+            write_tsv(extra, [{
+                "family": "Nylonase", "candidate_id": "EXTERNAL_CONTROL", "sequence_md5": "external",
+                "selected_chain": "A", "receptor_path": str(control_pdb),
+                "receptor_sha256": sha256(control_pdb), "input_status": "READY_FOR_STRUCTURE_EVALUATION",
+                "structure_provenance": "EXPERIMENTAL_PDB",
+            }])
+            write_authority_tsv(authority, [
+                {"authority_source": "prepared", "authority_row_index": "1", "family": "Nylonase",
+                 "candidate_id": "AUTH_READY", "sequence_md5": "auth_ready",
+                 "status": "READY_FOR_STRUCTURE_EVALUATION", "reason": ""},
+                {"authority_source": "not_evaluated", "authority_row_index": "2", "family": "Nylonase",
+                 "candidate_id": "AUTH_RECOVERED", "sequence_md5": "auth_recovered",
+                 "status": "NOT_EVALUATED_NO_EXACT_STRUCTURE", "reason": "old state before recovery"},
+                {"authority_source": "dell", "authority_row_index": "3", "family": "Nylonase",
+                 "candidate_id": "AUTH_NOT_ON_SUGON", "sequence_md5": "auth_missing",
+                 "status": "READY_AFTER_DELL_SYNC", "reason": "not on Sugon"},
+            ])
+
+            out = root / "out"
+            run = subprocess.run([
+                sys.executable, str(SCRIPT),
+                "--pet-manifest", str(pet),
+                "--nylon-authority-manifest", str(authority),
+                "--nylon-manifest", str(nylon),
+                "--nylon-recovered-manifest", str(recovered),
+                "--nylon-extra-manifest", str(extra),
+                "--output-dir", str(out),
+            ], text=True, capture_output=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
+
+            with (out / "nylon_structures.tsv").open(encoding="utf-8") as handle:
+                candidates = list(csv.DictReader(handle, delimiter="\t"))
+            with (out / "nylon_external_controls.tsv").open(encoding="utf-8") as handle:
+                controls = list(csv.DictReader(handle, delimiter="\t"))
+            with (out / "nylon_authority_not_evaluated.tsv").open(encoding="utf-8") as handle:
+                missing = list(csv.DictReader(handle, delimiter="\t"))
+            summary = json.loads((out / "structure_manifest_summary.json").read_text(encoding="utf-8"))
+
+            self.assertEqual({r["candidate_id"] for r in candidates}, {"AUTH_READY", "AUTH_RECOVERED"})
+            self.assertEqual([r["candidate_id"] for r in controls], ["EXTERNAL_CONTROL"])
+            self.assertEqual([r["candidate_id"] for r in missing], ["AUTH_NOT_ON_SUGON"])
+            self.assertEqual(missing[0]["exclusion_reason"], "NOT_EVALUATED_STRUCTURE_NOT_ON_SUGON")
+            self.assertEqual(summary["nylon_authority"]["denominator"], 3)
+            self.assertEqual(summary["nylon_authority"]["structure_evaluable"], 2)
+            self.assertEqual(summary["nylon_authority"]["not_evaluated"], 1)
+            self.assertEqual(summary["nylon_external_controls"]["structure_evaluable"], 1)
+
     def test_freezes_only_readable_checksum_valid_structures_and_keeps_families_separate(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -42,6 +138,7 @@ class StructureManifestCliTests(unittest.TestCase):
             nylon = root / "nylon.tsv"
             recovered = root / "recovered.tsv"
             extra = root / "extra.tsv"
+            authority = root / "authority.tsv"
             write_tsv(pet, [
                 {"family": "PETase", "candidate_id": "PET_OK", "sequence_md5": "pet_md5",
                  "selected_chain": "A", "receptor_path": str(pet_pdb),
@@ -70,11 +167,17 @@ class StructureManifestCliTests(unittest.TestCase):
                  "receptor_sha256": sha256(extra_pdb), "input_status": "READY_FOR_STRUCTURE_EVALUATION",
                  "structure_provenance": "EXPERIMENTAL_PDB"},
             ])
+            write_authority_tsv(authority, [
+                {"authority_source": "prepared", "authority_row_index": "1", "family": "Nylonase",
+                 "candidate_id": "NYL_OK", "sequence_md5": "nyl_md5",
+                 "status": "READY_FOR_STRUCTURE_EVALUATION", "reason": ""},
+            ])
 
             out = root / "out"
             run = subprocess.run([
                 sys.executable, str(SCRIPT),
                 "--pet-manifest", str(pet),
+                "--nylon-authority-manifest", str(authority),
                 "--nylon-manifest", str(nylon),
                 "--nylon-recovered-manifest", str(recovered),
                 "--nylon-extra-manifest", str(extra),
@@ -86,19 +189,23 @@ class StructureManifestCliTests(unittest.TestCase):
                 pet_rows = list(csv.DictReader(handle, delimiter="\t"))
             with (out / "nylon_structures.tsv").open(encoding="utf-8") as handle:
                 nylon_rows = list(csv.DictReader(handle, delimiter="\t"))
+            with (out / "nylon_external_controls.tsv").open(encoding="utf-8") as handle:
+                control_rows = list(csv.DictReader(handle, delimiter="\t"))
             with (out / "not_evaluated.tsv").open(encoding="utf-8") as handle:
                 rejected = list(csv.DictReader(handle, delimiter="\t"))
             summary = json.loads((out / "structure_manifest_summary.json").read_text(encoding="utf-8"))
 
             self.assertEqual([r["candidate_id"] for r in pet_rows], ["PET_OK"])
-            self.assertEqual({r["candidate_id"] for r in nylon_rows}, {"NYL_OK", "NYL_EXTRA"})
+            self.assertEqual([r["candidate_id"] for r in nylon_rows], ["NYL_OK"])
+            self.assertEqual([r["candidate_id"] for r in control_rows], ["NYL_EXTRA"])
             self.assertTrue(all(r["material_family"] == "PET" for r in pet_rows))
-            self.assertTrue(all(r["material_family"] == "NYLON" for r in nylon_rows))
+            self.assertTrue(all(r["material_family"] == "NYLON" for r in nylon_rows + control_rows))
             reasons = {r["exclusion_reason"] for r in rejected}
             self.assertIn("NOT_EVALUATED_MISSING_STRUCTURE", reasons)
             self.assertIn("DUPLICATE_LOWER_PRIORITY", reasons)
             self.assertEqual(summary["included"]["PET"], 1)
-            self.assertEqual(summary["included"]["NYLON"], 2)
+            self.assertEqual(summary["nylon_authority"]["structure_evaluable"], 1)
+            self.assertEqual(summary["nylon_external_controls"]["structure_evaluable"], 1)
 
     def test_checksum_mismatch_is_not_included(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -107,6 +214,7 @@ class StructureManifestCliTests(unittest.TestCase):
             pdb.write_text("ATOM\n", encoding="utf-8")
             pet = root / "pet.tsv"
             empty = root / "empty.tsv"
+            authority = root / "authority.tsv"
             write_tsv(pet, [{
                 "family": "PETase", "candidate_id": "BAD", "sequence_md5": "bad_md5",
                 "selected_chain": "A", "receptor_path": str(pdb),
@@ -114,10 +222,12 @@ class StructureManifestCliTests(unittest.TestCase):
                 "structure_provenance": "PREDICTED_ALPHAFOLD",
             }])
             write_tsv(empty, [])
+            write_authority_tsv(authority, [])
             out = root / "out"
             run = subprocess.run([
                 sys.executable, str(SCRIPT),
                 "--pet-manifest", str(pet),
+                "--nylon-authority-manifest", str(authority),
                 "--nylon-manifest", str(empty),
                 "--nylon-recovered-manifest", str(empty),
                 "--nylon-extra-manifest", str(empty),
