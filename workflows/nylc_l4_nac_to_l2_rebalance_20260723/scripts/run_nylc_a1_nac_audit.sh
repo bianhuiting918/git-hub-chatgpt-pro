@@ -90,6 +90,7 @@ open(sys.argv[3],"w").write(json.dumps(p,indent=2,sort_keys=True)+"\n")
 PY
 ln -s "$FREE/run.log" "$OUT/primitives/run.log"
 CURRENT=energy_extraction
+# gmx energy extracts Potential, Temperature, Pressure, and Volume from the same free-window EDR.
 printf 'Potential\n0\n' | "$GMX" energy -f "$FREE/run.edr" -o "$OUT/primitives/potential_energy.xvg" >"$OUT/potential.stdout" 2>"$OUT/potential.stderr"
 printf 'Temperature\nPressure\nVolume\n0\n' | "$GMX" energy -f "$FREE/run.edr" -o "$OUT/primitives/thermo.xvg" >"$OUT/thermo.stdout" 2>"$OUT/thermo.stderr"
 CURRENT=replica_audit
