@@ -1093,3 +1093,34 @@ and Asp308, with sensitivity checks for Tyr146, Lys189, Asn219 and relevant
 water. Small serial preflights remain at four CPU cores. Additional CPU is used
 primarily by parallel independent scan or umbrella windows; Amber18 DFTB3 does
 not request DCU without a separately validated accelerator backend.
+
+## Unified Step1/Step2 protein QM core (2026-07-27)
+
+The user-approved production protein residue set is fixed across Step1 and
+Step2: Tyr146, Lys189, Asn219, Thr267, Asp306 and Asp308. The A1 microstate is
+Thr267 N-alpha-H3+/O-gamma-minus, Asp306=ASH and Asp308=ASP-. PA66-L2 remains
+complete. Step1 has no QM water. Step2 keeps the identical six protein residues
+and adds a selected neutral reacting water before its first window; that water
+identity must remain fixed through all Step2 TS/PMF windows.
+
+The frozen topology mapping gives a 146-explicit-atom Step1 QM region with six
+link H, formal QM charge 0, singlet spin and 510 electrons including links.
+The boundaries are Tyr146 CB-CA 7160-7158, Lys189 CB-CA 7756-7754, Asn219
+CB-CA 8235-8233, Thr267 C-next-N 8962-8964, Asp306 CB-CA 9567-9565 and
+Asp308 CB-CA 9587-9585. The complete L2 range is 10273-10351; reactive atoms
+are Thr267 OG1 8960 and L2 C12/O2/N3 10287-10289.
+
+Job `62009113` is the completed 107-atom small-region control. It passed
+one-step and 20-step Amber18 DFTB3/3OB-3-1 numerical entry on eight MPI ranks,
+with zero SCC, vlimit, bond-overflow, NaN, FATAL and SANDER BOMB hits. It is not
+the production Step1 region and is not a TS, PMF, barrier or mechanism result.
+
+Unified-core preflight job `62011285` was submitted from immutable GitHub
+commit `fe38527eccaea9c84d004652dcd222c4c38b9586` after eight contract tests,
+Python compilation, Bash syntax checks and snapshot-hash verification passed.
+Its initial scheduler state is `PENDING (AssocGrpJobsLimit)`; do not duplicate
+or cancel unrelated jobs. A numerical PASS authorizes Step1 reaction-coordinate
+scouting only. TS, committor and PMF remain separately gated.
+
+Compact definition:
+`audit/nylc_a1_unified_core_definition_20260727.json`.
