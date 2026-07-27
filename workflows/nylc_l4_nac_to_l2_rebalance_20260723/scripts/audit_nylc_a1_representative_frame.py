@@ -20,6 +20,7 @@ COORDINATE_TOLERANCE_NM = 0.0015
 NAC_DISTANCE_MAX_NM = 0.35
 NAC_ANGLE_MIN_DEG = 95.0
 NAC_ANGLE_MAX_DEG = 115.0
+SEVERE_CLASH_CUTOFF_NM = 0.18
 EXPECTED_ATOM_COUNT = 133589
 EXPECTED_L2_ATOM_COUNT = 79
 EXPECTED_L2_HEAVY_COUNT = 33
@@ -38,6 +39,32 @@ SCIENTIFIC_SCOPE = "classical_fixed_topology_preorganization_not_proton_transfer
 
 class AuditError(RuntimeError):
     """A frozen representative-frame contract was not satisfied."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        stage: str = "audit",
+        gate: str = "audit",
+    ):
+        super().__init__(message)
+        self.stage = str(stage)
+        self.gate = str(gate)
+
+
+def _require_frozen_time(time_ps: float) -> float:
+    requested = float(time_ps)
+    if (
+        not math.isfinite(requested)
+        or abs(requested - SELECTED_TIME_PS) > TIME_TOLERANCE_PS
+    ):
+        raise AuditError(
+            f"requested time {requested!r} ps differs from frozen selected time "
+            f"{SELECTED_TIME_PS:.3f} ps by more than {TIME_TOLERANCE_PS:.3f} ps",
+            stage="source_time",
+            gate="source_time_unique",
+        )
+    return SELECTED_TIME_PS
 
 
 def _sha256(path: pathlib.Path) -> str:
@@ -331,13 +358,43 @@ def _minimum_contact(ligand, partners, box) -> dict[str, object]:
     flat_index = int(np.argmin(distances_A))
     ligand_index, partner_index = np.unravel_index(flat_index, distances_A.shape)
     distance_nm = float(distances_A[ligand_index, partner_index] / 10.0)
-    if distance_nm <= 0.0:
-        raise AuditError("minimum heavy-atom contact distance must be positive")
     return {
         "distance_nm": distance_nm,
+        "severe_clash_cutoff_nm": SEVERE_CLASH_CUTOFF_NM,
+        "contact_pass": bool(distance_nm >= SEVERE_CLASH_CUTOFF_NM),
         "ligand": _atom_record(ligand[ligand_index]),
         "partner": _atom_record(partners[partner_index]),
     }
+
+
+def _validate_minimum_contacts(
+    contacts: Mapping[str, Mapping[str, object]],
+) -> bool:
+    required = ("ligand_protein_heavy", "ligand_water_heavy")
+    for label in required:
+        if label not in contacts:
+            raise AuditError(
+                f"minimum-contact result lacks {label}",
+                stage="minimum_contacts",
+                gate="minimum_contacts",
+            )
+        record = contacts[label]
+        distance_nm = float(record.get("distance_nm", float("nan")))
+        cutoff_nm = float(record.get("severe_clash_cutoff_nm", float("nan")))
+        passed = bool(record.get("contact_pass", False))
+        if (
+            not math.isfinite(distance_nm)
+            or cutoff_nm != SEVERE_CLASH_CUTOFF_NM
+            or not passed
+            or distance_nm < SEVERE_CLASH_CUTOFF_NM
+        ):
+            raise AuditError(
+                f"{label} minimum {distance_nm:.9g} nm fails the frozen "
+                f"{SEVERE_CLASH_CUTOFF_NM:.9g} nm severe-clash cutoff",
+                stage="minimum_contacts",
+                gate="minimum_contacts",
+            )
+    return True
 
 
 def _parse_ndx(path: pathlib.Path) -> dict[str, list[int]]:
@@ -407,6 +464,7 @@ def audit_frame(
     time_ps: float,
     source_hashes: Mapping[str, str],
 ) -> dict[str, object]:
+    frozen_time_ps = _require_frozen_time(time_ps)
     tpr_path = pathlib.Path(tpr)
     xtc_path = pathlib.Path(xtc)
     gro_path = pathlib.Path(gro)
@@ -426,7 +484,7 @@ def audit_frame(
         SimpleNamespace(frame=int(ts.frame), time=float(ts.time))
         for ts in source.trajectory
     ]
-    selected = _select_unique_time(frame_records, float(time_ps))
+    selected = _select_unique_time(frame_records, frozen_time_ps)
     source.trajectory[int(selected.frame)]
     selected_time = float(source.trajectory.ts.time)
     source_positions_A = source.atoms.positions.copy()
@@ -515,6 +573,7 @@ def audit_frame(
             ligand_heavy, water_oxygen, extracted_box
         ),
     }
+    contacts_pass = _validate_minimum_contacts(minimum_contacts)
 
     gates = {
         "source_hashes": True,
@@ -525,7 +584,7 @@ def audit_frame(
         "joint_nac": bool(nac["joint_pass"]),
         "gate_definition": bool(gate_record["thr267_excluded"]),
         "counts_and_box": True,
-        "minimum_contacts": True,
+        "minimum_contacts": contacts_pass,
     }
     result = {
         "schema_version": 1,
@@ -536,6 +595,7 @@ def audit_frame(
             "xtc": str(xtc_path),
             "sha256": observed_hashes,
             "requested_time_ps": float(time_ps),
+            "frozen_selected_time_ps": frozen_time_ps,
             "selected_time_ps": selected_time,
             "time_tolerance_ps": TIME_TOLERANCE_PS,
         },
@@ -558,7 +618,18 @@ def audit_frame(
     return result
 
 
-def main() -> int:
+def _failure_result(error: AuditError) -> dict[str, object]:
+    return {
+        "schema_version": 1,
+        "scientific_status": "FAIL_A1_REPRESENTATIVE_NAC_FRAME",
+        "scientific_scope": SCIENTIFIC_SCOPE,
+        "failed_stage": error.stage,
+        "failed_gate": error.gate,
+        "error": str(error),
+    }
+
+
+def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tpr", type=pathlib.Path, required=True)
     parser.add_argument("--xtc", type=pathlib.Path, required=True)
@@ -572,21 +643,26 @@ def main() -> int:
         "--xtc-sha256", default=EXPECTED_SOURCE_HASHES["xtc"]
     )
     parser.add_argument("--output", type=pathlib.Path)
-    args = parser.parse_args()
-    result = audit_frame(
-        args.tpr,
-        args.xtc,
-        args.gro,
-        args.ndx,
-        args.time_ps,
-        {"tpr": args.tpr_sha256, "xtc": args.xtc_sha256},
-    )
+    args = parser.parse_args(argv)
+    return_code = 0
+    try:
+        result = audit_frame(
+            args.tpr,
+            args.xtc,
+            args.gro,
+            args.ndx,
+            args.time_ps,
+            {"tpr": args.tpr_sha256, "xtc": args.xtc_sha256},
+        )
+    except AuditError as error:
+        result = _failure_result(error)
+        return_code = 1
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.output is None:
         print(rendered, end="")
     else:
         args.output.write_text(rendered, encoding="utf-8")
-    return 0
+    return return_code
 
 
 if __name__ == "__main__":
