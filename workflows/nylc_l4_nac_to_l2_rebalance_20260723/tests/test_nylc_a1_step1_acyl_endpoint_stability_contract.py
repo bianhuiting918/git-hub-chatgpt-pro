@@ -222,6 +222,7 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
                 module.require_fresh_candidate_dir(candidate)
 
     def test_runner_and_slurm_enforce_operational_safety_and_snapshot_coverage(self):
+        module = load_module()
         if not RUNNER.is_file() or not SLURM.is_file():
             self.skipTest("production runner or Slurm wrapper absent at TDD RED")
         runner = RUNNER.read_text(encoding="utf-8")
