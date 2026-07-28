@@ -1404,3 +1404,12 @@ A later release removes every attack/PT2/CN reactive restraint and retains only
 the weak non-QM-solute environment restraint. PMF remains blocked unless both
 independent seeds produce the same class of persistent, reactive-restraint-free
 local basin. This scout is not a TS, committor, PMF, barrier or mechanism proof.
+
+### Dual-seed q_attack x q_PT2 x q_CN scout outcome (job 62118635; 2026-07-28)
+
+- The 16-window array was submitted from compute commit `ea0f631beac6db1fdc4d34a90073ca5fd2ccf5ed`; its throttle was raised in place from 4 to 16 without cancellation or resubmission.
+- The original array exit code 1 was a post-compute audit false negative: the guide restart was intentionally scratch-only. Regression commit `ad61b05ca5f0028b4f36920617d8fc9f4e348398` was RED on the old behavior and GREEN 6/6 after the fix. QM stages were not rerun.
+- Fixed-logic posthoc audit: 16/16 technical completion; seed26723 8/8 technical and 0/8 candidate; seed26737 8/8 technical and 0/8 candidate.
+- Both seeds had 8/8 attack-angle gates but 0/8 target-response gates. RMS-gradient gates passed 3/8 and 4/8, respectively. The bounded restraints did not produce a release-eligible q_attack/PT2/CN window.
+- Gate: `NO_A1_PT2_CN_SCOUT_WINDOW_CANDIDATE`. Apply no forced fill, launch no reactive-restraint-free release, and do not start PMF.
+- Technical completion and restrained geometry do not establish proton transfer, a transition state, PMF, a barrier, or a mechanism.
