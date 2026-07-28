@@ -113,5 +113,28 @@ class AttackInheritedContract(unittest.TestCase):
             self.assertIn(token, text)
 
 
+    def test_runtime_provenance_and_false_pass_regressions(self):
+        if not PREPARE.is_file() or not RUNNER.is_file():
+            self.skipTest("production files absent")
+        prepare = PREPARE.read_text(encoding="utf-8")
+        runner = RUNNER.read_text(encoding="utf-8")
+        self.assertIn(
+            'cp "$WINDOW_OUT/restraints.RST" "$WINDOW_SCRATCH/restraints.RST"',
+            runner,
+        )
+        for token in (
+            "inherited_restart_sha256",
+            "output_restart_sha256",
+            "inheritance_sha256_verified",
+            "baseline_source",
+            "window_00_3p0_endpoint",
+            "guard_stop_endpoint.rst7",
+            "CHAIN_TECHNICAL",
+            'if [[ "$CHAIN_TECHNICAL" != 1 ]]',
+        ):
+            self.assertIn(token, prepare + runner)
+        self.assertIn("exit 1", runner)
+
+
 if __name__ == "__main__":
     unittest.main()
