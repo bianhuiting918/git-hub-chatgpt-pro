@@ -21,6 +21,7 @@ STATE=STARTED
 CURRENT=initialization
 DETAIL="array_index=$INDEX;scope=acyl_endpoint_stability_not_barrier_or_mechanism;output=$OUT"
 OWNED=0
+SEED_FINALIZED=0
 
 append_history() {
     local now
@@ -53,12 +54,34 @@ write_hashes() {
     ) >"$OUT/SHA256.tsv"
 }
 
+seed_result_complete() {
+    test -s "$OUT/ENDPOINT_MANIFEST.json"
+    test -s "$OUT/RESULT.json"
+    test -s "$OUT/SHA256.tsv"
+    local sentinels=0
+    if [[ -s "$OUT/PASS.json" ]]; then sentinels=$((sentinels + 1)); fi
+    if [[ -s "$OUT/NOT_EVALUATED.json" ]]; then sentinels=$((sentinels + 1)); fi
+    (( sentinels == 1 ))
+}
+
+merge_if_ready_locked() {
+    (
+        flock -x 9
+        "$PY" "$DRIVER" --mode merge-if-ready --output-root "$OUTPUT_ROOT" --array-job "$ARRAY_JOB"
+    ) 9<"$OUTPUT_ROOT"
+}
+
 finish() {
     local code=$?
     trap - EXIT
-    if (( OWNED )); then
-        "$PY" "$DRIVER" --mode finalize-seed --output "$OUT" --technical-failure || true
-        write_hashes || true
+    if (( OWNED && ! SEED_FINALIZED )); then
+        CURRENT=failure_finalize_seed
+        if "$PY" "$DRIVER" --mode finalize-seed --output "$OUT" --technical-failure; then
+            if write_hashes && seed_result_complete; then
+                SEED_FINALIZED=1
+                merge_if_ready_locked || true
+            fi
+        fi
     fi
     STATE=NOT_EVALUATED
     DETAIL="array_index=$INDEX;stage=$CURRENT;exit_code=$code;status=NOT_EVALUATED_A1_ACYL_ENDPOINT_STABILITY;output=$OUT"
@@ -136,15 +159,11 @@ done
 CURRENT=finalize_seed
 "$PY" "$DRIVER" --mode finalize-seed --output "$OUT"
 write_hashes
-test -s "$OUT/ENDPOINT_MANIFEST.json"
-test -s "$OUT/RESULT.json"
-test -s "$OUT/SHA256.tsv"
+seed_result_complete
+SEED_FINALIZED=1
 
 CURRENT=merge_if_ready
-(
-    flock -x 9
-    "$PY" "$DRIVER" --mode merge-if-ready --output-root "$OUTPUT_ROOT" --array-job "$ARRAY_JOB"
-) 9<"$OUTPUT_ROOT"
+merge_if_ready_locked
 
 STATE=PASS_TECHNICAL
 CURRENT=terminal_history

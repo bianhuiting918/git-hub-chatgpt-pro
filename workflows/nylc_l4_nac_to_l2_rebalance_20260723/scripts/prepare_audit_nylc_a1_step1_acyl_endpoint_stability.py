@@ -11,6 +11,7 @@ import math
 import os
 import pathlib
 import re
+import warnings
 from typing import Any, Iterable, Mapping, Sequence
 
 BASE_PATH = pathlib.Path(__file__).with_name("prepare_audit_nylc_a1_step1_pt2_cn_scout.py")
@@ -40,6 +41,7 @@ LOCAL_RELEASE_STEPS = 800
 FULL_RELEASE_STEPS = 800
 RELEASE_MD_STEPS = 500
 RELEASE_DT_PS = 0.0005
+RELEASE_NTWX = 10
 PRODUCT_GATE = {
     "attack_A": (1.40, 1.65),
     "hg1_n3_A": (0.95, 1.20),
@@ -59,6 +61,7 @@ SEED_CLASSIFICATIONS = (
     "ZWITTERIONIC_CLEAVAGE",
     "MISROUTED_PROTON",
     "RESTRAINT_DEPENDENT_PRODUCT",
+    "UNCLASSIFIED_RELEASE_ENDPOINT",
     "NOT_EVALUATED_TECHNICAL_FAILURE",
 )
 AUTO_START_PATH_SAMPLING = False
@@ -173,7 +176,7 @@ def release_md_spec(seed: str, full_release: Mapping[str, Any]) -> dict[str, Any
         "stage": "release_md", "input_restart_sha256": restart_sha,
         "ig": 26723 if seed == "seed26723" else 26737,
         "nstlim": RELEASE_MD_STEPS, "dt": RELEASE_DT_PS, "temp0": 300.0,
-        "ntwx": 10, "ntt": 3, "gamma_ln": 2.0, "ntc": 1, "ntf": 1, "ntpr": 10,
+        "ntwx": RELEASE_NTWX, "ntt": 3, "gamma_ln": 2.0, "ntc": 1, "ntf": 1, "ntpr": 10,
         "ntr": 0, "nmropt": 0, "disang": None, "reactive_restraints": (),
     }
 
@@ -200,29 +203,40 @@ def _angle(coordinates: Mapping[int, Any], first: int, center: int, third: int) 
     return math.degrees(math.acos(max(-1.0, min(1.0, cosine))))
 
 
-def measure_product_geometry(coordinates: Mapping[int, Any]) -> dict[str, float]:
-    o2 = _xyz(coordinates[REACTIVE_ATOMS["o2"]])
-    og1 = _xyz(coordinates[REACTIVE_ATOMS["og1"]])
-    c11 = _xyz(coordinates[REACTIVE_ATOMS["c11"]])
-    c12 = _xyz(coordinates[REACTIVE_ATOMS["c12"]])
-    u = tuple(x - y for x, y in zip(og1, o2))
-    v = tuple(x - y for x, y in zip(c11, o2))
+def _point_plane_distance(
+    coordinates: Mapping[int, Any], point: int, first: int, second: int, third: int
+) -> float:
+    origin = _xyz(coordinates[first])
+    left = _xyz(coordinates[second])
+    right = _xyz(coordinates[third])
+    target = _xyz(coordinates[point])
+    u = tuple(x - y for x, y in zip(left, origin))
+    v = tuple(x - y for x, y in zip(right, origin))
     normal = (
         u[1] * v[2] - u[2] * v[1],
         u[2] * v[0] - u[0] * v[2],
         u[0] * v[1] - u[1] * v[0],
     )
-    norm = math.sqrt(sum(x * x for x in normal))
+    norm = math.sqrt(sum(value * value for value in normal))
     if norm == 0.0:
-        raise ValueError("O2/OG1/C11 reference plane is degenerate")
-    displacement = tuple(x - y for x, y in zip(c12, o2))
-    oop = abs(sum(x * y for x, y in zip(displacement, normal))) / norm
+        raise ValueError("reference plane is degenerate")
+    displacement = tuple(x - y for x, y in zip(target, origin))
+    return abs(sum(x * y for x, y in zip(displacement, normal))) / norm
+
+
+def measure_product_geometry(coordinates: Mapping[int, Any]) -> dict[str, float]:
+    r = REACTIVE_ATOMS
     angle_sum = (
-        _angle(coordinates, REACTIVE_ATOMS["o2"], REACTIVE_ATOMS["c12"], REACTIVE_ATOMS["og1"])
-        + _angle(coordinates, REACTIVE_ATOMS["og1"], REACTIVE_ATOMS["c12"], REACTIVE_ATOMS["c11"])
-        + _angle(coordinates, REACTIVE_ATOMS["c11"], REACTIVE_ATOMS["c12"], REACTIVE_ATOMS["o2"])
+        _angle(coordinates, r["o2"], r["c12"], r["og1"])
+        + _angle(coordinates, r["og1"], r["c12"], r["c11"])
+        + _angle(coordinates, r["c11"], r["c12"], r["o2"])
     )
-    return {"product_out_of_plane_A": oop, "product_angle_sum_deg": angle_sum}
+    return {
+        "product_out_of_plane_A": _point_plane_distance(
+            coordinates, r["c12"], r["o2"], r["og1"], r["c11"]
+        ),
+        "product_angle_sum_deg": angle_sum,
+    }
 
 
 def geometry_from_coordinates(
@@ -239,11 +253,14 @@ def geometry_from_coordinates(
         "qPT_A": nalpha_hg1 - hg1_n3,
         "c12_n3_A": _distance(coordinates, r["c12"], r["n3"]),
         "c12_o2_A": _distance(coordinates, r["c12"], r["o2"]),
+        "attack_angle_deg": _angle(coordinates, r["o2"], r["c12"], r["og1"]),
+        "c12_reactant_plane_out_of_plane_A": _point_plane_distance(
+            coordinates, r["c12"], r["o2"], r["n3"], r["c11"]
+        ),
         "hg1_nearest_qm_heavy_atom": int(nearest),
     }
     result.update(measure_product_geometry(coordinates))
     return result
-
 
 def is_product_like(g: Mapping[str, Any]) -> bool:
     return bool(
@@ -464,17 +481,49 @@ def _read_structure_geometry(restart: pathlib.Path, manifest: Mapping[str, Any])
     )
 
 
-def _read_md_frames(trajectory: pathlib.Path, manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
+def _read_md_frames(
+    trajectory: pathlib.Path, manifest: Mapping[str, Any]
+) -> tuple[list[dict[str, Any]], tuple[str, ...]]:
     import parmed as pmd
-    topology = pmd.load_file(str(PRMTOP))
-    reader = pmd.amber.AmberMdcrd(str(trajectory), len(topology.atoms), hasbox=True, mode="r")
-    frames = reader.coordinates
+    captured: list[str] = []
+    with warnings.catch_warnings(record=True) as observed_warnings:
+        warnings.simplefilter("always")
+        topology = pmd.load_file(str(PRMTOP))
+        reader = pmd.amber.AmberMdcrd(
+            str(trajectory), len(topology.atoms), hasbox=True, mode="r"
+        )
+        coordinate_frames = reader.coordinates
+        captured.extend(str(item.message) for item in observed_warnings)
     heavy = manifest["qm_contract"]["qm_heavy_atom_indices"]
     results = []
-    for frame in frames:
+    for frame in coordinate_frames:
         coordinates = {index + 1: frame[index] for index in range(len(topology.atoms))}
         results.append(geometry_from_coordinates(coordinates, heavy))
-    return results
+    return results, tuple(captured)
+
+
+def _last_md_nstep(stage_output: str) -> Any:
+    matches = re.findall(r"\bNSTEP\s*=\s*(\d+)", stage_output, re.I)
+    return int(matches[-1]) if matches else None
+
+
+def release_md_evidence_complete(
+    frames: Sequence[Mapping[str, Any]],
+    stage_output: str,
+    parse_warnings: Sequence[str],
+) -> bool:
+    expected_frames = RELEASE_MD_STEPS // RELEASE_NTWX
+    if len(frames) != expected_frames or parse_warnings:
+        return False
+    if _last_md_nstep(stage_output) != RELEASE_MD_STEPS:
+        return False
+    for frame in frames:
+        for key, value in frame.items():
+            if key == "hg1_nearest_qm_heavy_atom":
+                continue
+            if not isinstance(value, (int, float)) or not math.isfinite(float(value)):
+                return False
+    return True
 
 
 def audit_stage(stage: str, output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
@@ -493,19 +542,34 @@ def audit_stage(stage: str, output: pathlib.Path, scratch: pathlib.Path) -> dict
     complete = "FINAL RESULTS" in text and bool(re.search(r"Run\s+done", text))
     geometry: dict[str, Any] = {}
     frames: list[dict[str, Any]] = []
+    md_warnings: list[str] = []
     if restart.is_file() and restart.stat().st_size:
         geometry = _read_structure_geometry(restart, manifest)
     if stage == "release_md" and (scratch / "release.mdcrd").is_file():
-        frames = _read_md_frames(scratch / "release.mdcrd", manifest)
+        try:
+            observed = _read_md_frames(scratch / "release.mdcrd", manifest)
+            if isinstance(observed, tuple) and len(observed) == 2:
+                frames = list(observed[0])
+                md_warnings = [str(message) for message in observed[1]]
+            else:
+                frames = list(observed)
+        except Exception as error:
+            md_warnings = [f"{type(error).__name__}: {error}"]
+            frames = []
     finite = bool(geometry) and all(
-        isinstance(value, (int, float)) and math.isfinite(value)
+        isinstance(value, (int, float)) and math.isfinite(float(value))
         for key, value in geometry.items() if key != "hg1_nearest_qm_heavy_atom"
+    )
+    md_complete = (
+        release_md_evidence_complete(frames, text, md_warnings)
+        if stage == "release_md" else True
     )
     technical = bool(
         complete and restart.is_file() and restart.stat().st_size
         and finite and scc == 0 and vlimit == 0 and overflow == 0
-        and sum(hard.values()) == 0 and (stage != "release_md" or bool(frames))
+        and sum(hard.values()) == 0 and md_complete
     )
+    expected_frames = RELEASE_MD_STEPS // RELEASE_NTWX if stage == "release_md" else None
     result = {
         "stage": stage, "technical_pass": technical,
         "input_restart_path": prepared["input_restart"],
@@ -516,6 +580,10 @@ def audit_stage(stage: str, output: pathlib.Path, scratch: pathlib.Path) -> dict
         "diagnostics": {
             "complete": complete, "scc_warnings": scc, "vlimit_warnings": vlimit,
             "bond_overflow": overflow, "hard_error_hits": hard,
+            "release_md_expected_frames": expected_frames,
+            "release_md_last_nstep": _last_md_nstep(text) if stage == "release_md" else None,
+            "release_md_parse_warnings": md_warnings,
+            "release_md_evidence_complete": md_complete if stage == "release_md" else None,
         },
     }
     if len(manifest["stages"]) != STAGE_ORDER.index(stage):
@@ -527,7 +595,6 @@ def audit_stage(stage: str, output: pathlib.Path, scratch: pathlib.Path) -> dict
     if not technical:
         raise RuntimeError(f"{stage} did not technically PASS")
     return result
-
 
 def _classify(manifest: Mapping[str, Any]) -> tuple[str, float]:
     stages = manifest.get("stages", [])
@@ -545,12 +612,31 @@ def _classify(manifest: Mapping[str, Any]) -> tuple[str, float]:
         return "MISROUTED_PROTON", occupancy
     if final.get("c12_n3_A", 0) >= 2.05 and final.get("attack_A", 0) > 1.65:
         return "ZWITTERIONIC_CLEAVAGE", occupancy
-    if final.get("attack_A", 99) <= 1.85 and final.get("c12_n3_A", 99) <= 1.90:
+    tetrahedral = bool(
+        final.get("attack_A", math.inf) <= 1.70
+        and 1.28 <= final.get("c12_o2_A", math.inf) <= 1.45
+        and final.get("c12_reactant_plane_out_of_plane_A", -math.inf) >= 0.20
+        and 1.30 <= final.get("c12_n3_A", math.inf) <= 1.60
+        and 90.0 <= final.get("attack_angle_deg", math.inf) <= 130.0
+        and final.get("nalpha_hg1_A", math.inf) <= 1.20
+        and final.get("qPT_A", math.inf) <= -0.40
+    )
+    if tetrahedral:
         return "RETURNS_TETRAHEDRAL", occupancy
     if is_product_like(stages[1]["geometry"]):
         return "RESTRAINT_DEPENDENT_PRODUCT", occupancy
-    return "RETURNS_REACTANT", occupancy
-
+    reactant = bool(
+        final.get("attack_A", -math.inf) >= 2.50
+        and 1.18 <= final.get("c12_o2_A", math.inf) <= 1.30
+        and final.get("c12_reactant_plane_out_of_plane_A", math.inf) <= 0.12
+        and final.get("c12_n3_A", math.inf) <= 1.50
+        and final.get("nalpha_hg1_A", math.inf) <= 1.20
+        and final.get("qPT_A", math.inf) <= -0.40
+        and final.get("hg1_nearest_qm_heavy_atom") == REACTIVE_ATOMS["nalpha"]
+    )
+    if reactant:
+        return "RETURNS_REACTANT", occupancy
+    return "UNCLASSIFIED_RELEASE_ENDPOINT", occupancy
 
 def finalize_seed(output: pathlib.Path, technical_failure: bool = False) -> dict[str, Any]:
     manifest_path = output / "ENDPOINT_MANIFEST.json"
@@ -581,10 +667,13 @@ def finalize_seed(output: pathlib.Path, technical_failure: bool = False) -> dict
             else manifest["stages"][-1].get("geometry", {}) if manifest.get("stages") else {}
         ),
     }
+    selected = output / ("PASS.json" if technical else "NOT_EVALUATED.json")
+    opposite = output / ("NOT_EVALUATED.json" if technical else "PASS.json")
     write_json(output / "RESULT.json", result)
-    write_json(output / ("PASS.json" if technical else "NOT_EVALUATED.json"), result)
+    write_json(selected, result)
+    if opposite.exists():
+        opposite.unlink()
     return result
-
 
 def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
     attempts = [output_root / f"attempt_{array_job}_{index}" for index in (0, 1)]

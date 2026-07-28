@@ -1611,7 +1611,9 @@ product_like = (
 For `release_md`, evaluate all frames and require at least 80% product-like frames in the final 40% of the 0.25 ps trajectory. Classify seed results as one of:
 `PERSISTS_ACYL_PRODUCT`, `RETURNS_TETRAHEDRAL`, `RETURNS_REACTANT`,
 `ZWITTERIONIC_CLEAVAGE`, `MISROUTED_PROTON`,
-`RESTRAINT_DEPENDENT_PRODUCT`, or `NOT_EVALUATED_TECHNICAL_FAILURE`.
+`RESTRAINT_DEPENDENT_PRODUCT`, `UNCLASSIFIED_RELEASE_ENDPOINT`, or
+`NOT_EVALUATED_TECHNICAL_FAILURE`.
+`UNCLASSIFIED_RELEASE_ENDPOINT` is neither a technical failure nor evidence of a product endpoint.
 Only `PERSISTS_ACYL_PRODUCT` is a per-seed scientific endpoint PASS.
 
 - [ ] **Step 4: Implement persistence and provenance**
