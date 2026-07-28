@@ -308,6 +308,7 @@ def prepare(
 
     final_targets = {
         "q_attack": window["attack_target_A"],
+        "q_pt2": window["pt2_q_target_A"],
         "nalpha_hg1": window["nh_target_A"],
         "hg1_n3": window["hn3_target_A"],
         "q_cn": window["cn_target_A"],
