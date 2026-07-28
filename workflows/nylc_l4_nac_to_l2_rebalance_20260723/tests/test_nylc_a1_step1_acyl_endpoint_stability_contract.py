@@ -7,6 +7,7 @@ behavior through the driver's small observable helper interfaces.
 """
 
 import importlib.util
+import json
 import pathlib
 import tempfile
 import unittest
@@ -28,6 +29,32 @@ def load_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def endpoint_frame(**updates):
+    frame = {
+        "attack_A": 2.00, "hg1_n3_A": 1.50, "nalpha_hg1_A": 1.40,
+        "qPT_A": 0.00, "c12_n3_A": 1.90, "c12_o2_A": 1.50,
+        "product_out_of_plane_A": 0.15, "product_angle_sum_deg": 330.0,
+        "attack_angle_deg": 140.0, "hg1_nearest_qm_heavy_atom": 10286,
+    }
+    frame.update(updates)
+    return frame
+
+
+def complete_manifest(final_frame, frames=None):
+    stages = []
+    for stage in ("intermediate", "product", "local_release", "full_release", "release_md"):
+        stages.append({
+            "stage": stage, "technical_pass": True,
+            "input_restart_sha256": "1" * 64, "restart_sha256": "2" * 64,
+            "geometry": endpoint_frame(), "frames": [],
+        })
+    stages[-1]["geometry"] = dict(final_frame)
+    stages[-1]["frames"] = (
+        [dict(final_frame) for _ in range(50)] if frames is None else frames
+    )
+    return {"seed": "seed26723", "seed_index": 0, "stages": stages}
 
 
 class A1AcylEndpointStabilityContract(unittest.TestCase):
@@ -184,7 +211,8 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
             set(module.SEED_CLASSIFICATIONS),
             {"PERSISTS_ACYL_PRODUCT", "RETURNS_TETRAHEDRAL", "RETURNS_REACTANT",
              "ZWITTERIONIC_CLEAVAGE", "MISROUTED_PROTON",
-             "RESTRAINT_DEPENDENT_PRODUCT", "NOT_EVALUATED_TECHNICAL_FAILURE"},
+             "RESTRAINT_DEPENDENT_PRODUCT", "UNCLASSIFIED_RELEASE_ENDPOINT",
+             "NOT_EVALUATED_TECHNICAL_FAILURE"},
         )
         for outcomes, expected in (
             (["PERSISTS_ACYL_PRODUCT"] * 2, "PASS_ACYL_PRODUCT_ENDPOINT_REPRODUCED"),
@@ -220,6 +248,184 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
             candidate.mkdir()
             with self.assertRaises(FileExistsError):
                 module.require_fresh_candidate_dir(candidate)
+
+    def test_finalize_seed_atomically_replaces_the_opposite_sentinel(self):
+        module = load_module()
+        product = endpoint_frame(
+            attack_A=1.50, hg1_n3_A=1.05, nalpha_hg1_A=1.60, qPT_A=0.55,
+            c12_n3_A=2.20, c12_o2_A=1.24, product_out_of_plane_A=0.08,
+            product_angle_sum_deg=355.0, hg1_nearest_qm_heavy_atom=10289,
+        )
+        for technical_failure, stale, expected in (
+            (True, "PASS.json", "NOT_EVALUATED.json"),
+            (False, "NOT_EVALUATED.json", "PASS.json"),
+        ):
+            with self.subTest(technical_failure=technical_failure):
+                with tempfile.TemporaryDirectory() as tmp:
+                    output = pathlib.Path(tmp)
+                    (output / "ENDPOINT_MANIFEST.json").write_text(
+                        json.dumps(complete_manifest(product)), encoding="utf-8"
+                    )
+                    (output / stale).write_text("{}\n", encoding="utf-8")
+                    module.finalize_seed(output, technical_failure=technical_failure)
+                    self.assertFalse((output / stale).exists())
+                    self.assertTrue((output / expected).is_file())
+                    self.assertEqual(
+                        sum((output / name).exists()
+                            for name in ("PASS.json", "NOT_EVALUATED.json")),
+                        1,
+                    )
+
+    def test_release_md_evidence_is_exactly_complete_and_audit_uses_the_gate(self):
+        module = load_module()
+        validator = getattr(module, "release_md_evidence_complete", None)
+        self.assertIsNotNone(
+            validator, "release_md needs a pure completeness validator used by audit_stage"
+        )
+        frames = [endpoint_frame() for _ in range(50)]
+        complete_out = " NSTEP = 490\n NSTEP = 500\n FINAL RESULTS\n Run done\n"
+        bad_nan = [dict(frame) for frame in frames]
+        bad_nan[7]["qPT_A"] = float("nan")
+        bad_inf = [dict(frame) for frame in frames]
+        bad_inf[12]["attack_A"] = float("inf")
+        cases = (
+            ("complete", frames, complete_out, (), True),
+            ("49_frames", frames[:-1], complete_out, (), False),
+            ("nan_metric", bad_nan, complete_out, (), False),
+            ("inf_metric", bad_inf, complete_out, (), False),
+            ("truncated_warning", frames, complete_out, ("trajectory truncated",), False),
+            ("eof_warning", frames, complete_out, ("unexpected EOF",), False),
+            ("nstep_499", frames, complete_out.replace("NSTEP = 500", "NSTEP = 499"), (), False),
+        )
+        for name, observed, stage_out, warnings, expected in cases:
+            with self.subTest(case=name):
+                self.assertIs(
+                    validator(observed, stage_out, warnings),
+                    expected,
+                )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            output, scratch = root / "output", root / "scratch"
+            output.mkdir()
+            scratch.mkdir()
+            manifest = complete_manifest(endpoint_frame())
+            manifest["stages"] = manifest["stages"][:4]
+            (output / "ENDPOINT_MANIFEST.json").write_text(
+                json.dumps(manifest), encoding="utf-8"
+            )
+            (scratch / "PREPARED.json").write_text(
+                json.dumps({
+                    "stage": "release_md", "input_restart": "full_release.rst7",
+                    "input_restart_sha256": "1" * 64,
+                }),
+                encoding="utf-8",
+            )
+            (scratch / "stage.out").write_text(complete_out, encoding="utf-8")
+            (scratch / "stage.rst7").write_text("restart\n", encoding="utf-8")
+            (scratch / "release.mdcrd").write_text("trajectory\n", encoding="utf-8")
+            with (
+                mock.patch.object(module, "_read_structure_geometry",
+                                  return_value=endpoint_frame()),
+                mock.patch.object(module, "_read_md_frames", return_value=frames),
+                mock.patch.object(module, "release_md_evidence_complete",
+                                  return_value=False) as completeness,
+            ):
+                with self.assertRaises(RuntimeError):
+                    module.audit_stage("release_md", output, scratch)
+            completeness.assert_called_once()
+
+    def test_release_classification_requires_complete_tetrahedral_or_reactant_gates(self):
+        module = load_module()
+
+        def classify(frame):
+            return module._classify(complete_manifest(frame))[0]
+
+        tetrahedral = endpoint_frame(
+            attack_A=1.70, c12_o2_A=1.28, product_out_of_plane_A=0.20,
+            c12_n3_A=1.30, attack_angle_deg=90.0, nalpha_hg1_A=1.20,
+            qPT_A=-0.40, hg1_nearest_qm_heavy_atom=8949,
+        )
+        self.assertEqual(classify(tetrahedral), "RETURNS_TETRAHEDRAL")
+        tetrahedral_negatives = {
+            "attack": {"attack_A": 1.701},
+            "carbonyl_low": {"c12_o2_A": 1.279},
+            "carbonyl_high": {"c12_o2_A": 1.451},
+            "oop": {"product_out_of_plane_A": 0.199},
+            "qcn_low": {"c12_n3_A": 1.299},
+            "qcn_high": {"c12_n3_A": 1.601},
+            "angle_low": {"attack_angle_deg": 89.9},
+            "angle_high": {"attack_angle_deg": 130.1},
+            "nalpha_hg1": {"nalpha_hg1_A": 1.201},
+            "qpt": {"qPT_A": -0.399},
+        }
+        for gate, update in tetrahedral_negatives.items():
+            with self.subTest(tetrahedral_gate=gate):
+                frame = dict(tetrahedral)
+                frame.update(update)
+                self.assertNotEqual(classify(frame), "RETURNS_TETRAHEDRAL")
+
+        reactant = endpoint_frame(
+            attack_A=2.50, c12_o2_A=1.18, product_out_of_plane_A=0.12,
+            c12_n3_A=1.55, nalpha_hg1_A=1.20, qPT_A=-0.40,
+            hg1_nearest_qm_heavy_atom=8949,
+        )
+        self.assertEqual(classify(reactant), "RETURNS_REACTANT")
+        reactant_negatives = {
+            "attack": {"attack_A": 2.499},
+            "carbonyl_low": {"c12_o2_A": 1.179},
+            "carbonyl_high": {"c12_o2_A": 1.301},
+            "oop": {"product_out_of_plane_A": 0.121},
+            "qcn": {"c12_n3_A": 1.551},
+            "nalpha_hg1": {"nalpha_hg1_A": 1.201},
+            "qpt": {"qPT_A": -0.399},
+            "nearest_nalpha": {"hg1_nearest_qm_heavy_atom": 10289},
+        }
+        for gate, update in reactant_negatives.items():
+            with self.subTest(reactant_gate=gate):
+                frame = dict(reactant)
+                frame.update(update)
+                self.assertNotEqual(classify(frame), "RETURNS_REACTANT")
+
+        unclassified = (
+            endpoint_frame(),
+            endpoint_frame(
+                attack_A=1.60, c12_n3_A=2.20, c12_o2_A=1.60,
+                product_out_of_plane_A=0.15, attack_angle_deg=150.0,
+            ),
+        )
+        for frame in unclassified:
+            with self.subTest(unclassified=frame):
+                self.assertEqual(classify(frame), "UNCLASSIFIED_RELEASE_ENDPOINT")
+
+        for outcomes, expected in (
+            (["PERSISTS_ACYL_PRODUCT", "UNCLASSIFIED_RELEASE_ENDPOINT"],
+             "NOT_REPRODUCED_A1_ACYL_PRODUCT_ENDPOINT"),
+            (["UNCLASSIFIED_RELEASE_ENDPOINT"] * 2,
+             "FAIL_NO_RELEASE_STABLE_A1_ACYL_PRODUCT_ENDPOINT"),
+            (["NOT_EVALUATED_TECHNICAL_FAILURE", "UNCLASSIFIED_RELEASE_ENDPOINT"],
+             "NOT_EVALUATED_TECHNICAL_A1_ACYL_PRODUCT_ENDPOINT"),
+        ):
+            with self.subTest(cross_seed=outcomes):
+                self.assertEqual(module.cross_seed_status(outcomes), expected)
+
+    def test_runner_finalizes_each_seed_once_and_always_attempts_locked_merge(self):
+        runner = RUNNER.read_text(encoding="utf-8")
+        self.assertRegex(runner, r"SEED_FINALIZED\s*=\s*0")
+        self.assertRegex(
+            runner,
+            r"(?s)finish\(\).*?OWNED\s*&&\s*!\s*SEED_FINALIZED"
+            r".*?finalize-seed.*?--technical-failure",
+        )
+        self.assertRegex(
+            runner,
+            r"(?s)--mode finalize-seed --output.*?SEED_FINALIZED\s*=\s*1",
+        )
+        self.assertIn("merge_if_ready_locked()", runner)
+        self.assertGreaterEqual(
+            runner.count("merge_if_ready_locked"), 3,
+            "one locked merge helper must be called after both normal and failure finalize",
+        )
 
     def test_runner_and_slurm_enforce_operational_safety_and_snapshot_coverage(self):
         module = load_module()
