@@ -318,6 +318,7 @@ def extract_shell_from_arrays(
     atom_radii: np.ndarray,
     atom_labels: np.ndarray,
     tile_id: str,
+    build_graph: bool = True,
 ) -> dict:
     occupied = np.asarray(occupied, dtype=bool)
     for channel in CHANNELS:
@@ -344,9 +345,16 @@ def extract_shell_from_arrays(
     else:
         nearest_atom = np.array([], dtype=np.int32)
         nearest_residue = np.array([], dtype="<U1")
-    indptr, neighbor_indices = coordinate_graph(coordinates, spacing, connectivity=26)
+    if build_graph:
+        indptr, neighbor_indices = coordinate_graph(
+            coordinates, spacing, connectivity=26
+        )
+    else:
+        indptr = np.zeros(coordinates.shape[0] + 1, dtype=np.int64)
+        neighbor_indices = np.array([], dtype=np.int32)
     result = {
         "coordinates": coordinates.astype(np.float32),
+        "grid_origin": np.asarray(origin, dtype=np.float64),
         "nearest_atom_index": nearest_atom,
         "nearest_residue": nearest_residue,
         "tile_provenance": np.full(coordinates.shape[0], str(tile_id)),
@@ -382,6 +390,8 @@ def merge_shell_records(
     phase_max_tolerance: float = 0.25,
     atom_coords: np.ndarray | None = None,
     atom_labels: np.ndarray | None = None,
+    validate_phase_fields: bool = True,
+    build_graph: bool = True,
 ) -> dict:
     """Merge phase-shifted tile shells using cross-tile mutual nearest neighbors."""
     if not records:
@@ -433,8 +443,40 @@ def merge_shell_records(
     n_exact_pairs = 0
     n_phase_pairs = 0
     maximum_pair_distance = 0.0
-    match_tolerance = phase_match_fraction * float(spacing)
+    pair_match_tolerances = []
     exact_coordinate_tolerance = max(1e-7, abs(float(spacing)) * 1e-7)
+
+    def pair_phase_match_tolerance(left_record: dict, right_record: dict) -> float:
+        if "grid_origin" not in left_record or "grid_origin" not in right_record:
+            return phase_match_fraction * float(spacing)
+        left_origin = np.asarray(left_record["grid_origin"], dtype=float)
+        right_origin = np.asarray(right_record["grid_origin"], dtype=float)
+        if left_origin.shape != (3,) or right_origin.shape != (3,):
+            raise ValueError("tile grid origins must have three coordinates")
+        delta = right_origin - left_origin
+        nearest_lattice = np.rint(delta / float(spacing))
+        candidate_distances = []
+        for offset in np.ndindex(3, 3, 3):
+            shift = np.asarray(offset, dtype=float) - 1.0
+            candidate = delta - float(spacing) * (nearest_lattice + shift)
+            candidate_distances.append(float(np.linalg.norm(candidate)))
+        candidate_distances.sort()
+        phase_distance = candidate_distances[0]
+        next_distance = next(
+            (
+                value
+                for value in candidate_distances[1:]
+                if value > phase_distance + 1e-12
+            ),
+            None,
+        )
+        epsilon = max(1e-4, 0.0025 * float(spacing))
+        if next_distance is not None:
+            gap = next_distance - phase_distance
+            if gap <= 2.0 * epsilon:
+                raise ValueError("ambiguous tile grid phase")
+            epsilon = min(epsilon, 0.1 * gap)
+        return phase_distance + epsilon
 
     for left_record_index in range(len(records)):
         left_coordinates = coordinates_by_record[left_record_index]
@@ -446,6 +488,10 @@ def merge_shell_records(
             if len(right_coordinates) == 0:
                 continue
             right_tree = cKDTree(right_coordinates)
+            match_tolerance = pair_phase_match_tolerance(
+                records[left_record_index], records[right_record_index]
+            )
+            pair_match_tolerances.append(float(match_tolerance))
             left_distance, left_neighbor = right_tree.query(
                 left_coordinates,
                 k=1,
@@ -517,7 +563,7 @@ def merge_shell_records(
             "fraction_over_0_1": fraction_over,
             "maximum_absolute_difference": maximum,
         }
-        if (
+        if validate_phase_fields and (
             p999 > phase_p999_tolerance
             or fraction_over > phase_fraction_over_tolerance
             or maximum > phase_max_tolerance
@@ -605,16 +651,23 @@ def merge_shell_records(
         output[channel] = np.asarray(
             representative_channels[channel], dtype=np.float32
         )[order]
-    output["neighbor_indptr"], output["neighbor_indices"] = coordinate_graph(
-        coordinates, spacing, connectivity=26
-    )
+    if build_graph:
+        output["neighbor_indptr"], output["neighbor_indices"] = coordinate_graph(
+            coordinates, spacing, connectivity=26
+        )
+    else:
+        output["neighbor_indptr"] = np.zeros(
+            len(coordinates) + 1, dtype=np.int64
+        )
+        output["neighbor_indices"] = np.array([], dtype=np.int32)
     output["merge_diagnostics"] = {
         "n_input_points": total_points,
         "n_output_points": int(len(coordinates)),
         "n_exact_cross_tile_pairs": int(n_exact_pairs),
         "n_phase_cross_tile_pairs": int(n_phase_pairs),
         "maximum_pair_distance": float(maximum_pair_distance),
-        "match_tolerance": float(match_tolerance),
+        "maximum_match_tolerance": float(max(pair_match_tolerances, default=0.0)),
+        "field_validation_applied": bool(validate_phase_fields),
         "phase_field_statistics": phase_statistics,
     }
     return output
@@ -716,6 +769,7 @@ def load_tile(
         atom_data["radii"],
         atom_data["labels"],
         tile_dir.name,
+        build_graph=False,
     )
     return {
         "record": record,
@@ -842,6 +896,7 @@ def main() -> int:
                         atom_data["radii"],
                         atom_data["labels"],
                         tile_dir.name,
+                        build_graph=False,
                     )
                 )
             merged_sensitivity = merge_shell_records(
@@ -849,6 +904,8 @@ def main() -> int:
                 spacing=spacing,
                 atom_coords=atom_data["coordinates"],
                 atom_labels=atom_data["labels"],
+                validate_phase_fields=False,
+                build_graph=False,
             )
             sensitivity.append(
                 {
