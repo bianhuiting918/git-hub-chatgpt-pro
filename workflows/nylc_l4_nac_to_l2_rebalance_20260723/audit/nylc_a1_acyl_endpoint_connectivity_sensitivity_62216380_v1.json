@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "audit_kind": "POST_HOC_VERSIONED_ACYL_CONNECTIVITY_SENSITIVITY",
+  "audited_at_utc": "2026-07-28T21:03:33Z",
+  "source": {
+    "job_id": "62216380",
+    "github_commit": "da505ab4f81821c73c2ab991998c2a8d93920786",
+    "attempts": [
+      "a1_activated_nac_20260726/qmmm/a1_step1_acyl_release_md_continuation/attempt_62216380_0",
+      "a1_activated_nac_20260726/qmmm/a1_step1_acyl_release_md_continuation/attempt_62216380_1"
+    ],
+    "formal_cross_seed_status": "FAIL_NO_RELEASE_STABLE_A1_ACYL_PRODUCT_ENDPOINT"
+  },
+  "denominator": {
+    "seeds": 2,
+    "release_md_frames_per_seed": 50,
+    "formal_tail_frames_per_seed": 20,
+    "note": "Tail frames are correlated trajectory observations, not independent replicas."
+  },
+  "formal_gate": {
+    "attack_A": [1.4, 1.65],
+    "occupancy_min": 0.8,
+    "result_preserved_without_modification": true
+  },
+  "sensitivity_gate": {
+    "name": "PRODUCT_GATE_ACYL_CONNECTIVITY_SENS_v1",
+    "change_from_formal_gate": "Remove only attack_A lower bound; retain attack_A <= 1.65 A, the other eight per-frame criteria, the same last-40-percent aggregation, and occupancy >= 0.80.",
+    "rationale": "A shorter intact C12-OG1 distance is not evidence of bond cleavage; anomalously short geometries remain covered by the unchanged technical, SCF, and geometry checks."
+  },
+  "per_seed": [
+    {
+      "seed": "seed26723",
+      "formal_classification": "RESTRAINT_DEPENDENT_PRODUCT",
+      "formal_product_like_frames": "6/20",
+      "formal_occupancy": 0.3,
+      "sensitivity_product_like_frames": "20/20",
+      "sensitivity_occupancy": 1.0,
+      "attack_A_min_median_max": [1.3585542141, 1.3851787957, 1.4318666905],
+      "attack_lower_only_failures": "14/20",
+      "attack_upper_failures": "0/20",
+      "frames_with_any_non_attack_failure": "0/20",
+      "other_eight_criteria_pass": "20/20 each"
+    },
+    {
+      "seed": "seed26737",
+      "formal_classification": "UNCLASSIFIED_RELEASE_ENDPOINT",
+      "formal_product_like_frames": "10/20",
+      "formal_occupancy": 0.5,
+      "sensitivity_product_like_frames": "20/20",
+      "sensitivity_occupancy": 1.0,
+      "attack_A_min_median_max": [1.3398892024, 1.4002321664, 1.4424485035],
+      "attack_lower_only_failures": "10/20",
+      "attack_upper_failures": "0/20",
+      "frames_with_any_non_attack_failure": "0/20",
+      "other_eight_criteria_pass": "20/20 each"
+    }
+  ],
+  "result": {
+    "status": "PASS_ACYL_CONNECTIVITY_SENSITIVITY_V1_REPRODUCED",
+    "provisional_scientific_gate": "PROVISIONAL_ACYL_ENDPOINT_SUPPORTED_FOR_EXPLORATORY_ENDPOINT_WORK",
+    "interpretation": "Both independent seeds retain acyl-product-like connectivity throughout their final 40 percent under the versioned one-sided connectivity sensitivity gate.",
+    "next_action": "ALLOW_PRODUCT_SIDE_REVERSE_BOUNDARY_SCOUT_AND_STEP2_ENDPOINT_PREPARATION; REVALIDATE_BOTH_STEP2_BASINS_UNDER_THE_FINAL_STEP2_QM_WATER_HAMILTONIAN_BEFORE_SHOOTING"
+  },
+  "limits": [
+    "Does not replace the original formal endpoint FAIL.",
+    "Does not prove a Step1 pathway, transition state, free-energy barrier, PMF, mechanism, or long-time kinetic stability.",
+    "Does not by itself validate a Step2 QM-water Hamiltonian or Step2 shooting endpoints."
+  ]
+}
