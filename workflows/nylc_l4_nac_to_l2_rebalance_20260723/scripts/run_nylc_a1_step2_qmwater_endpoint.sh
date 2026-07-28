@@ -14,7 +14,7 @@ OUT="$OUTPUT_ROOT/attempt_$ATTEMPT"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 DRIVER="$CODE_ROOT/scripts/prepare_audit_nylc_a1_step2_qmwater_endpoint.py"
 PRMTOP="$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_unified_core_dftb3_preflight/attempt_62011285/prepared/system.prmtop"
-SCRATCH_ROOT="${SLURM_TMPDIR:?SLURM_TMPDIR is required}/nylc_a1_step2_qmwater_$ATTEMPT"
+SCRATCH_ROOT="${SLURM_TMPDIR:-/tmp}/nylc_a1_step2_qmwater_$ATTEMPT"
 
 case "$INDEX" in
     0)
