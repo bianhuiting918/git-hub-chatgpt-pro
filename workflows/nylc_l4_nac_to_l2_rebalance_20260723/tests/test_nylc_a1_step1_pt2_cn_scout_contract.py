@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import importlib.util
+import inspect
 import pathlib
+import tempfile
 import unittest
 
 FLOW = pathlib.Path(__file__).resolve().parents[1]
@@ -68,13 +70,37 @@ class PT2CNScoutContract(unittest.TestCase):
         ):
             self.assertIn(token, text)
 
+    def test_guide_completion_does_not_require_persistent_restart(self):
+        spec = importlib.util.spec_from_file_location("_pt2_audit", PREPARE)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        self.assertIn(
+            "require_geometry",
+            inspect.signature(module.inspect_stage).parameters,
+        )
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = pathlib.Path(temporary)
+            (stage / "stage.out").write_text(
+                "FINAL RESULTS\nRun   done\n", encoding="utf-8"
+            )
+            result = module.inspect_stage(
+                stage / "unused.prmtop",
+                stage,
+                require_geometry=False,
+            )
+        self.assertTrue(result["complete"])
+        self.assertTrue(result["technical_pass"])
+        self.assertEqual(result["geometry"], {})
+
     def test_runner_and_slurm_are_reproducible_and_small(self):
         runner = RUNNER.read_text(encoding="utf-8")
         slurm = SLURM.read_text(encoding="utf-8")
         for token in ("run_history.tsv", "run_history.jsonl", "SHA256.tsv"):
             self.assertIn(token, runner)
         for token in (
-            "#SBATCH --array=0-15%4", "#SBATCH -n 8",
+            "#SBATCH --array=0-15%16", "#SBATCH -n 8",
             "#SBATCH --mem-per-cpu=2500M", "#SBATCH -t 01:00:00",
             "A1_PT2_CN_CODE_SOURCE", "A1_PT2_CN_GITHUB_COMMIT",
         ):
