@@ -9,6 +9,7 @@ behavior through the driver's small observable helper interfaces.
 import importlib.util
 import json
 import pathlib
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -436,6 +437,31 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
         ):
             with self.subTest(cross_seed=outcomes):
                 self.assertEqual(module.cross_seed_status(outcomes), expected)
+
+    def test_runner_avoids_empty_array_expansion_under_legacy_bash_nounset(self):
+        runner = RUNNER.read_text(encoding="utf-8")
+        version = subprocess.run(
+            ["bash", "-c", 'printf "%s %s\\n" "${BASH_VERSINFO[0]}" "${BASH_VERSINFO[1]}"'],
+            check=True, capture_output=True, text=True,
+        )
+        bash_version = tuple(int(part) for part in version.stdout.split())
+        if bash_version < (4, 4):
+            probe = subprocess.run(
+                ["bash", "-uc", 'PREVIOUS_ARGS=(); : "${PREVIOUS_ARGS[@]}"'],
+                capture_output=True, text=True,
+            )
+            self.assertNotEqual(probe.returncode, 0)
+            self.assertIn("unbound variable", probe.stderr)
+
+        self.assertNotIn("PREVIOUS_ARGS=()", runner)
+        self.assertNotIn('"${PREVIOUS_ARGS[@]}"', runner)
+        self.assertGreaterEqual(runner.count("--mode prepare"), 2)
+        self.assertRegex(
+            runner,
+            r'(?s)if \[\[ "\$STAGE" == release_md \]\]; then'
+            r'.*?--mode prepare.*?--previous-result "\$PREVIOUS_RESULT"'
+            r'.*?else.*?--mode prepare.*?fi',
+        )
 
     def test_runner_falls_back_to_unique_tmp_scratch_when_slurm_tmpdir_is_unset(self):
         runner = RUNNER.read_text(encoding="utf-8")
