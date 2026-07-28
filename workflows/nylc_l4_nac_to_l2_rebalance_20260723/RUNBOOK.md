@@ -1375,3 +1375,32 @@ state, PMF, activation barrier or mechanism proof.
 
 Compact authority:
 `audit/nylc_a1_pt2_nac_ensemble_20260728.json`.
+
+
+## Approved dual-seed q_attack x q_PT2 x q_CN scout plan (2026-07-28)
+
+The two hash-pinned outputs from SCNet job \`62112503\` are the only starting
+coordinates: \`seed26723_t378_f189\` and \`seed26737_t676_f338\`. The Hamiltonian
+is reused, not rebuilt: \`attempt_62011285/prepared/system.prmtop\`, SHA256
+\`a61d15bf0bf78675be93275d45f274e808ed6ae450fc1ca21a8e14aee8c12ca0\`,
+with the existing 146-explicit-atom, charge-zero, 510-electron, six-link-H,
+no-QM-water Step1 mask. The old constrained \`62021985\` coordinates are not
+a source.
+
+The approved scout is a seed-major 2 x 2 x 2 array (16 independent tasks).
+Each task starts from its seed's original GRO coordinate, never from another
+window. Targets are OG1--C12 2.35/1.85 A; paired Nalpha--HG1/HG1--N3 targets
+1.10/1.60 and 1.35/1.35 A (reported as the observed
+\`q_PT2 = d(Nalpha,HG1)-d(HG1,N3)\`, not falsely represented as a native
+difference restraint); and C12--N3 1.40/1.60 A. A 200-step midpoint guide uses
+5 kcal mol-1 A-2, followed by a 600-step target minimization at
+10 kcal mol-1 A-2. The attack angle is audited, not restrained.
+
+All 16 outputs are audited before release selection. Different biased windows
+must not be ranked by total QM/MM energy. Per seed, zero to two candidates may
+advance based on technical completion, intended three-coordinate response,
+chemical plausibility and path continuity; missing candidates are not filled.
+A later release removes every attack/PT2/CN reactive restraint and retains only
+the weak non-QM-solute environment restraint. PMF remains blocked unless both
+independent seeds produce the same class of persistent, reactive-restraint-free
+local basin. This scout is not a TS, committor, PMF, barrier or mechanism proof.
