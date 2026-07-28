@@ -5,7 +5,7 @@
 #SBATCH -n 8
 #SBATCH --mem-per-cpu=2500M
 #SBATCH -t 01:00:00
-#SBATCH --array=0-15%4
+#SBATCH --array=0-15%16
 #SBATCH -o /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/slurm-%x-%A_%a.out
 #SBATCH -e /work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/slurm-%x-%A_%a.err
 

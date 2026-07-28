@@ -391,7 +391,11 @@ def prepare(
     write_json(output / "SCOUT_MANIFEST.json", manifest)
 
 
-def inspect_stage(prmtop: pathlib.Path, directory: pathlib.Path) -> dict[str, Any]:
+def inspect_stage(
+    prmtop: pathlib.Path,
+    directory: pathlib.Path,
+    require_geometry: bool = True,
+) -> dict[str, Any]:
     output = directory / "stage.out"
     restart = directory / "stage.rst7"
     text = (
@@ -418,17 +422,18 @@ def inspect_stage(prmtop: pathlib.Path, directory: pathlib.Path) -> dict[str, An
         import parmed as pmd
 
         observed = geometry(pmd.load_file(str(prmtop), xyz=str(restart)))
-    finite = observed and all(
+    finite_geometry = bool(observed) and all(
         isinstance(value, (int, float)) and math.isfinite(value)
         for value in observed.values()
     )
+    geometry_ok = finite_geometry if require_geometry else True
     technical = bool(
         complete
         and scc == 0
         and vlimit == 0
         and bond_overflow == 0
         and sum(hard.values()) == 0
-        and finite
+        and geometry_ok
     )
     return {
         "complete": complete,
@@ -458,8 +463,12 @@ def audit(output: pathlib.Path) -> None:
         raise ValueError("scout manifest is not READY")
     window = manifest["window"]
     stages = {
-        name: inspect_stage(PRMTOP, output / name)
-        for name in ("guide", "target")
+        "guide": inspect_stage(
+            PRMTOP, output / "guide", require_geometry=False
+        ),
+        "target": inspect_stage(
+            PRMTOP, output / "target", require_geometry=True
+        ),
     }
     technical = all(stage["technical_pass"] for stage in stages.values())
     final = stages["target"]["geometry"] if technical else {}
