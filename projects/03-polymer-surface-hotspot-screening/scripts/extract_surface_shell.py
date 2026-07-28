@@ -104,6 +104,27 @@ def shell_area_proxy(
     return float(n_shell_points) * float(spacing) ** 3 / thickness
 
 
+def steiner_surface_area_from_counts(
+    cumulative_counts: list[int] | tuple[int, int, int] | np.ndarray,
+    spacing: float,
+) -> float:
+    """Estimate the zero-offset area from cumulative h, 2h, and 3h shell volumes."""
+    counts = np.asarray(cumulative_counts, dtype=float)
+    if counts.shape != (3,) or np.any(counts < 0):
+        raise ValueError("three nonnegative cumulative shell counts are required")
+    if spacing <= 0:
+        raise ValueError("spacing must be positive")
+    if np.any(np.diff(counts) < 0):
+        raise ValueError("cumulative shell counts must be nondecreasing")
+    volumes = counts * float(spacing) ** 3
+    estimate = (
+        18.0 * volumes[0] - 9.0 * volumes[1] + 2.0 * volumes[2]
+    ) / (6.0 * float(spacing))
+    if estimate <= 0:
+        raise ValueError("nonpositive Steiner surface-area estimate")
+    return float(estimate)
+
+
 def parse_autogrid_map(path: Path) -> dict:
     spacing = None
     n_elements = None
@@ -251,28 +272,28 @@ def _neighbor_offsets(connectivity: int = 26) -> list[tuple[int, int, int]]:
 def coordinate_graph(
     coordinates: np.ndarray, spacing: float, connectivity: int = 26
 ) -> tuple[np.ndarray, np.ndarray]:
+    """Build a symmetric distance graph without absolute-coordinate rounding."""
     coordinates = np.asarray(coordinates, dtype=float)
     if coordinates.size == 0:
         return np.array([0], dtype=np.int64), np.array([], dtype=np.int32)
-    lattice = np.rint(coordinates / float(spacing) * 1_000_000).astype(np.int64)
-    lookup = {tuple(row): index for index, row in enumerate(lattice)}
-    step = 1_000_000
-    rows = []
-    columns = []
-    for index, key_array in enumerate(lattice):
-        key = tuple(key_array)
-        for offset in _neighbor_offsets(connectivity):
-            neighbor_key = tuple(
-                key[axis] + offset[axis] * step for axis in range(3)
-            )
-            neighbor = lookup.get(neighbor_key)
-            if neighbor is not None:
-                rows.append(index)
-                columns.append(neighbor)
-    if not rows:
-        return np.zeros(coordinates.shape[0] + 1, dtype=np.int64), np.array([], dtype=np.int32)
-    rows = np.asarray(rows, dtype=np.int64)
-    columns = np.asarray(columns, dtype=np.int32)
+    if coordinates.ndim != 2 or coordinates.shape[1] != 3:
+        raise ValueError("coordinates must be N by 3")
+    if spacing <= 0:
+        raise ValueError("spacing must be positive")
+    radius_factors = {6: 1.0, 18: np.sqrt(2.0), 26: np.sqrt(3.0)}
+    if connectivity not in radius_factors:
+        raise ValueError("connectivity must be 6, 18, or 26")
+    tolerance = max(1e-6, abs(float(spacing)) * 1e-6)
+    radius = radius_factors[connectivity] * float(spacing) + tolerance
+    pairs = cKDTree(coordinates).query_pairs(radius, output_type="ndarray")
+    if pairs.size == 0:
+        return (
+            np.zeros(coordinates.shape[0] + 1, dtype=np.int64),
+            np.array([], dtype=np.int32),
+        )
+    pairs = np.asarray(pairs, dtype=np.int64).reshape(-1, 2)
+    rows = np.concatenate((pairs[:, 0], pairs[:, 1]))
+    columns = np.concatenate((pairs[:, 1], pairs[:, 0])).astype(np.int32)
     order = np.lexsort((columns, rows))
     rows = rows[order]
     columns = columns[order]
@@ -352,58 +373,251 @@ def _coordinate_key(coordinate: np.ndarray, spacing: float) -> tuple[int, int, i
 
 
 def merge_shell_records(
-    records: list[dict], spacing: float, value_tolerance: float = 1e-5
+    records: list[dict],
+    spacing: float,
+    value_tolerance: float = 1e-5,
+    phase_match_fraction: float = 0.5,
+    phase_p999_tolerance: float = 0.10,
+    phase_fraction_over_tolerance: float = 0.001,
+    phase_max_tolerance: float = 0.25,
+    atom_coords: np.ndarray | None = None,
+    atom_labels: np.ndarray | None = None,
 ) -> dict:
+    """Merge phase-shifted tile shells using cross-tile mutual nearest neighbors."""
     if not records:
         raise ValueError("no shell records to merge")
-    merged = {}
+    if spacing <= 0 or not 0 < phase_match_fraction <= 1:
+        raise ValueError("invalid tile merge geometry")
+
+    lengths = []
+    coordinates_by_record = []
     for record in records:
-        n_points = len(record["coordinates"])
-        for index in range(n_points):
-            key = _coordinate_key(record["coordinates"][index], spacing)
-            item = {
-                "coordinate": np.asarray(record["coordinates"][index], dtype=float),
-                "nearest_atom_index": int(record["nearest_atom_index"][index]),
-                "nearest_residue": str(record["nearest_residue"][index]),
-                "tiles": {str(record["tile_provenance"][index])},
-            }
-            for channel in CHANNELS:
-                item[channel] = float(record[channel][index])
-            if key not in merged:
-                merged[key] = item
+        coordinates = np.asarray(record["coordinates"], dtype=float)
+        if coordinates.ndim != 2 or coordinates.shape[1] != 3:
+            raise ValueError("tile coordinates must be N by 3")
+        n_points = len(coordinates)
+        for key in (
+            "nearest_atom_index",
+            "nearest_residue",
+            "tile_provenance",
+            *CHANNELS,
+        ):
+            if len(record[key]) != n_points:
+                raise ValueError(f"tile shell length mismatch: {key}")
+        lengths.append(n_points)
+        coordinates_by_record.append(coordinates)
+
+    offsets = np.concatenate(([0], np.cumsum(lengths))).astype(np.int64)
+    total_points = int(offsets[-1])
+    parents = np.arange(total_points, dtype=np.int64)
+    ranks = np.zeros(total_points, dtype=np.int8)
+
+    def find(index: int) -> int:
+        while parents[index] != index:
+            parents[index] = parents[parents[index]]
+            index = int(parents[index])
+        return index
+
+    def union(left: int, right: int) -> None:
+        left_root = find(left)
+        right_root = find(right)
+        if left_root == right_root:
+            return
+        if ranks[left_root] < ranks[right_root]:
+            left_root, right_root = right_root, left_root
+        parents[right_root] = left_root
+        if ranks[left_root] == ranks[right_root]:
+            ranks[left_root] += 1
+
+    phase_differences = {channel: [] for channel in CHANNELS}
+    n_exact_pairs = 0
+    n_phase_pairs = 0
+    maximum_pair_distance = 0.0
+    match_tolerance = phase_match_fraction * float(spacing)
+    exact_coordinate_tolerance = max(1e-7, abs(float(spacing)) * 1e-7)
+
+    for left_record_index in range(len(records)):
+        left_coordinates = coordinates_by_record[left_record_index]
+        if len(left_coordinates) == 0:
+            continue
+        left_tree = cKDTree(left_coordinates)
+        for right_record_index in range(left_record_index + 1, len(records)):
+            right_coordinates = coordinates_by_record[right_record_index]
+            if len(right_coordinates) == 0:
                 continue
-            existing = merged[key]
-            for channel in CHANNELS:
-                if not np.isclose(
-                    existing[channel], item[channel], rtol=0.0, atol=value_tolerance
+            right_tree = cKDTree(right_coordinates)
+            left_distance, left_neighbor = right_tree.query(
+                left_coordinates,
+                k=1,
+                distance_upper_bound=match_tolerance,
+            )
+            right_distance, right_neighbor = left_tree.query(
+                right_coordinates,
+                k=1,
+                distance_upper_bound=match_tolerance,
+            )
+            for left_local_index, distance in enumerate(left_distance):
+                if not np.isfinite(distance):
+                    continue
+                right_local_index = int(left_neighbor[left_local_index])
+                if right_local_index >= len(right_coordinates):
+                    continue
+                if (
+                    int(right_neighbor[right_local_index]) != left_local_index
+                    or not np.isfinite(right_distance[right_local_index])
                 ):
-                    raise ValueError(
-                        f"overlap value disagreement at {key} channel {channel}"
-                    )
-            existing["tiles"].update(item["tiles"])
-    ordered = [merged[key] for key in sorted(merged)]
-    coordinates = np.asarray([item["coordinate"] for item in ordered], dtype=np.float32)
+                    continue
+                left_global = int(offsets[left_record_index] + left_local_index)
+                right_global = int(offsets[right_record_index] + right_local_index)
+                maximum_pair_distance = max(maximum_pair_distance, float(distance))
+                if float(distance) <= exact_coordinate_tolerance:
+                    n_exact_pairs += 1
+                    for channel in CHANNELS:
+                        left_value = float(
+                            records[left_record_index][channel][left_local_index]
+                        )
+                        right_value = float(
+                            records[right_record_index][channel][right_local_index]
+                        )
+                        if not np.isclose(
+                            left_value,
+                            right_value,
+                            rtol=0.0,
+                            atol=value_tolerance,
+                        ):
+                            raise ValueError(
+                                "overlap value disagreement at exact tile coordinate "
+                                f"channel {channel}"
+                            )
+                else:
+                    n_phase_pairs += 1
+                    for channel in CHANNELS:
+                        difference = abs(
+                            float(records[left_record_index][channel][left_local_index])
+                            - float(
+                                records[right_record_index][channel][right_local_index]
+                            )
+                        )
+                        phase_differences[channel].append(difference)
+                union(left_global, right_global)
+
+    phase_statistics = {}
+    for channel in CHANNELS:
+        differences = np.asarray(phase_differences[channel], dtype=float)
+        if differences.size:
+            p999 = float(np.quantile(differences, 0.999))
+            fraction_over = float(np.mean(differences > phase_p999_tolerance))
+            maximum = float(np.max(differences))
+        else:
+            p999 = 0.0
+            fraction_over = 0.0
+            maximum = 0.0
+        phase_statistics[channel] = {
+            "p999_absolute_difference": p999,
+            "fraction_over_0_1": fraction_over,
+            "maximum_absolute_difference": maximum,
+        }
+        if (
+            p999 > phase_p999_tolerance
+            or fraction_over > phase_fraction_over_tolerance
+            or maximum > phase_max_tolerance
+        ):
+            raise ValueError(
+                "tile field disagreement after phase matching: "
+                f"{channel} p99.9={p999:.6g}, "
+                f"fraction_over_0.1={fraction_over:.6g}, max={maximum:.6g}"
+            )
+
+    all_coordinates = np.concatenate(coordinates_by_record, axis=0)
+    all_channels = {
+        channel: np.concatenate(
+            [np.asarray(record[channel], dtype=float) for record in records]
+        )
+        for channel in CHANNELS
+    }
+    all_atom_indices = np.concatenate(
+        [np.asarray(record["nearest_atom_index"], dtype=np.int32) for record in records]
+    )
+    all_residues = np.concatenate(
+        [np.asarray(record["nearest_residue"]).astype(str) for record in records]
+    )
+    all_tiles = np.concatenate(
+        [np.asarray(record["tile_provenance"]).astype(str) for record in records]
+    )
+
+    groups: dict[int, list[int]] = {}
+    for index in range(total_points):
+        groups.setdefault(find(index), []).append(index)
+
+    representative_coordinates = []
+    representative_channels = {channel: [] for channel in CHANNELS}
+    representative_tiles = []
+    fallback_atom_indices = []
+    fallback_residues = []
+    for members in groups.values():
+        member_indices = np.asarray(members, dtype=np.int64)
+        representative_coordinates.append(
+            np.mean(all_coordinates[member_indices], axis=0)
+        )
+        for channel in CHANNELS:
+            representative_channels[channel].append(
+                float(np.mean(all_channels[channel][member_indices]))
+            )
+        tile_set = set()
+        for tile_value in all_tiles[member_indices]:
+            tile_set.update(str(tile_value).split("|"))
+        representative_tiles.append("|".join(sorted(tile_set)))
+        first_member = int(member_indices.min())
+        fallback_atom_indices.append(int(all_atom_indices[first_member]))
+        fallback_residues.append(str(all_residues[first_member]))
+
+    coordinates = np.asarray(representative_coordinates, dtype=float)
+    if len(coordinates):
+        order = np.lexsort((coordinates[:, 2], coordinates[:, 1], coordinates[:, 0]))
+        coordinates = coordinates[order]
+    else:
+        order = np.array([], dtype=np.int64)
+
+    if (atom_coords is None) != (atom_labels is None):
+        raise ValueError("atom_coords and atom_labels must be provided together")
+    if atom_coords is not None:
+        atom_coords = np.asarray(atom_coords, dtype=float)
+        atom_labels = np.asarray(atom_labels)
+        if atom_coords.ndim != 2 or atom_coords.shape[1] != 3:
+            raise ValueError("atom coordinates must be N by 3")
+        if len(atom_coords) != len(atom_labels):
+            raise ValueError("atom coordinate and label counts differ")
+        nearest_atom = cKDTree(atom_coords).query(coordinates, k=1)[1].astype(np.int32)
+        nearest_residue = np.asarray(
+            [_residue_from_atom_label(atom_labels[index]) for index in nearest_atom]
+        )
+    else:
+        nearest_atom = np.asarray(fallback_atom_indices, dtype=np.int32)[order]
+        nearest_residue = np.asarray(fallback_residues)[order]
+
     output = {
-        "coordinates": coordinates,
-        "nearest_atom_index": np.asarray(
-            [item["nearest_atom_index"] for item in ordered], dtype=np.int32
-        ),
-        "nearest_residue": np.asarray(
-            [item["nearest_residue"] for item in ordered]
-        ),
-        "tile_provenance": np.asarray(
-            ["|".join(sorted(item["tiles"])) for item in ordered]
-        ),
+        "coordinates": coordinates.astype(np.float32),
+        "nearest_atom_index": nearest_atom,
+        "nearest_residue": nearest_residue,
+        "tile_provenance": np.asarray(representative_tiles)[order],
     }
     for channel in CHANNELS:
         output[channel] = np.asarray(
-            [item[channel] for item in ordered], dtype=np.float32
-        )
+            representative_channels[channel], dtype=np.float32
+        )[order]
     output["neighbor_indptr"], output["neighbor_indices"] = coordinate_graph(
         coordinates, spacing, connectivity=26
     )
+    output["merge_diagnostics"] = {
+        "n_input_points": total_points,
+        "n_output_points": int(len(coordinates)),
+        "n_exact_cross_tile_pairs": int(n_exact_pairs),
+        "n_phase_cross_tile_pairs": int(n_phase_pairs),
+        "maximum_pair_distance": float(maximum_pair_distance),
+        "match_tolerance": float(match_tolerance),
+        "phase_field_statistics": phase_statistics,
+    }
     return output
-
 
 def classify_sasa_crosscheck(
     shell_area: float,
@@ -528,7 +742,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--shell-inner", type=float, default=0.0)
     parser.add_argument("--shell-outer", type=float, default=2.25)
     parser.add_argument(
-        "--sensitivity-thicknesses", default="1.50,2.25,3.00"
+        "--sensitivity-thicknesses", default="0.75,1.50,2.25,3.00"
     )
     parser.add_argument("--probe-radius", type=float, default=1.4)
     parser.add_argument("--max-relative-area-difference", type=float, default=0.50)
@@ -592,13 +806,20 @@ def main() -> int:
             raise ValueError("tile spacings differ")
         spacing = loaded[0]["spacing"]
         merged = merge_shell_records(
-            [item["record"] for item in loaded], spacing=spacing
+            [item["record"] for item in loaded],
+            spacing=spacing,
+            atom_coords=atom_data["coordinates"],
+            atom_labels=atom_data["labels"],
         )
         if len(merged["coordinates"]) == 0:
             raise ValueError("empty exterior shell")
         np.savez_compressed(
             args.output_dir / "surface_shell.npz",
-            **merged,
+            **{
+                key: value
+                for key, value in merged.items()
+                if key != "merge_diagnostics"
+            },
         )
 
         sensitivity = []
@@ -623,7 +844,12 @@ def main() -> int:
                         tile_dir.name,
                     )
                 )
-            merged_sensitivity = merge_shell_records(records, spacing=spacing)
+            merged_sensitivity = merge_shell_records(
+                records,
+                spacing=spacing,
+                atom_coords=atom_data["coordinates"],
+                atom_labels=atom_data["labels"],
+            )
             sensitivity.append(
                 {
                     "shell_outer": outer,
@@ -643,6 +869,18 @@ def main() -> int:
             args.shell_inner,
             args.shell_outer,
         )
+        sensitivity_counts = {
+            round(item["shell_outer"], 9): item["n_shell_points"]
+            for item in sensitivity
+        }
+        steiner_area = None
+        if abs(args.shell_inner) <= 1e-12:
+            steiner_keys = [round(spacing * multiple, 9) for multiple in (1, 2, 3)]
+            if all(key in sensitivity_counts for key in steiner_keys):
+                steiner_area = steiner_surface_area_from_counts(
+                    [sensitivity_counts[key] for key in steiner_keys],
+                    spacing,
+                )
         freesasa_result = run_freesasa(args.receptor_pdb)
         crosscheck = classify_sasa_crosscheck(
             primary_area,
@@ -672,6 +910,8 @@ def main() -> int:
             "connectivity": 26,
             "n_shell_points": int(len(merged["coordinates"])),
             "shell_area_proxy": primary_area,
+            "steiner_surface_area_estimate": steiner_area,
+            "tile_merge": merged["merge_diagnostics"],
             "sensitivity": sensitivity,
             "sasa_crosscheck": crosscheck,
         }
