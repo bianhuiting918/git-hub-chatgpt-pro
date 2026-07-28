@@ -486,13 +486,21 @@ def _read_md_frames(
 ) -> tuple[list[dict[str, Any]], tuple[str, ...]]:
     import parmed as pmd
     captured: list[str] = []
+    reader = None
     with warnings.catch_warnings(record=True) as observed_warnings:
         warnings.simplefilter("always")
         topology = pmd.load_file(str(PRMTOP))
-        reader = pmd.amber.AmberMdcrd(
-            str(trajectory), len(topology.atoms), hasbox=True, mode="r"
-        )
-        coordinate_frames = reader.coordinates
+        try:
+            if trajectory_format(trajectory) == "NETCDF":
+                reader = pmd.amber.NetCDFTraj.open_old(str(trajectory))
+            else:
+                reader = pmd.amber.AmberMdcrd(
+                    str(trajectory), len(topology.atoms), hasbox=True, mode="r"
+                )
+            coordinate_frames = reader.coordinates
+        finally:
+            if reader is not None and hasattr(reader, "close"):
+                reader.close()
         captured.extend(str(item.message) for item in observed_warnings)
     heavy = manifest["qm_contract"]["qm_heavy_atom_indices"]
     results = []
@@ -505,6 +513,17 @@ def _read_md_frames(
 def _last_md_nstep(stage_output: str) -> Any:
     matches = re.findall(r"\bNSTEP\s*=\s*(\d+)", stage_output, re.I)
     return int(matches[-1]) if matches else None
+
+
+def trajectory_format(path: pathlib.Path) -> str:
+    with path.open("rb") as handle:
+        return "NETCDF" if handle.read(3) == b"CDF" else "AMBER_MDCRD"
+
+
+def stage_output_complete(stage: str, text: str) -> bool:
+    if stage == "release_md":
+        return _last_md_nstep(text) == RELEASE_MD_STEPS
+    return "FINAL RESULTS" in text and bool(re.search(r"Run\s+done", text))
 
 
 def release_md_evidence_complete(
@@ -539,7 +558,7 @@ def audit_stage(stage: str, output: pathlib.Path, scratch: pathlib.Path) -> dict
     scc = len(re.findall(r"Convergence could not be achieved", text, re.I))
     vlimit = len(re.findall(r"vlimit\s+exceeded", text, re.I))
     overflow = len(re.findall(r"BOND\s*=\s*\*+", text, re.I))
-    complete = "FINAL RESULTS" in text and bool(re.search(r"Run\s+done", text))
+    complete = stage_output_complete(stage, text)
     geometry: dict[str, Any] = {}
     frames: list[dict[str, Any]] = []
     md_warnings: list[str] = []
