@@ -348,7 +348,9 @@ def finalize(root: pathlib.Path, stop_reason: str, terminal_rst7: pathlib.Path |
                for path in sorted(root.glob("window_*/RESULT.json"))]
     release_path = root / "full_release" / "RESULT.json"
     release = json.loads(release_path.read_text(encoding="utf-8")) if release_path.is_file() else None
-    technical = bool(results) and all(item.get("technical_pass") is True for item in results)
+    windows_technical = bool(results) and all(
+        item.get("technical_pass") is True for item in results
+    )
     candidate = next((item for item in results if item["gates"]["TETRAHEDRAL_LIKE_RESTRAINED"]), None)
     persisted: dict[str, Any] = {}
     for label, source in (
@@ -373,6 +375,20 @@ def finalize(root: pathlib.Path, stop_reason: str, terminal_rst7: pathlib.Path |
             "output_sha256": item["output_restart_sha256"],
         })
         previous = item["output_restart_sha256"]
+    expected_windows = len(manifest["window_specs"])
+    terminal_complete = (
+        (stop_reason == "COMPLETED_ALL_WINDOWS" and len(results) == expected_windows)
+        or (
+            stop_reason == "OUT_OF_SCOPE_COUPLED_PT_OR_CN_RESPONSE"
+            and bool(results) and results[-1].get("stopped_by_reactant_guard") is True
+        )
+        or (
+            stop_reason == "FIRST_RESTRAINED_CANDIDATE_FULLY_RELEASED"
+            and candidate is not None and release is not None
+            and release.get("technical_pass") is True
+        )
+    )
+    technical = bool(windows_technical and inheritance_ok and terminal_complete)
     scientific_gate = (
         release["scientific_gate"] if release is not None
         else "RESTRAINED_TETRAHEDRAL_CANDIDATE_NOT_RELEASED" if candidate
