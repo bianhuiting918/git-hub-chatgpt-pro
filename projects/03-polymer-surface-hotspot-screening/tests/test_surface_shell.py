@@ -227,6 +227,34 @@ class SurfaceShellUnitTests(unittest.TestCase):
             sum("|" in str(value) for value in merged["tile_provenance"]), 2
         )
 
+    def test_grid_origin_phase_rejects_nearby_nonduplicate_pair(self):
+        def one_point(coordinate, origin, tile):
+            return {
+                "coordinates": np.asarray([coordinate], dtype=float),
+                "A": np.asarray([1.0]),
+                "C": np.asarray([1.0]),
+                "OA": np.asarray([1.0]),
+                "HD": np.asarray([1.0]),
+                "nearest_atom_index": np.asarray([0], dtype=np.int32),
+                "nearest_residue": np.asarray(["A:RES:1"]),
+                "tile_provenance": np.asarray([tile]),
+                "grid_origin": np.asarray(origin, dtype=float),
+            }
+
+        left = one_point([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], "left")
+        shifted_but_not_duplicate = one_point(
+            [0.35, 0.0, 0.0], [0.25, 0.0, 0.0], "right"
+        )
+
+        merged = shell.merge_shell_records(
+            [left, shifted_but_not_duplicate], spacing=1.0
+        )
+
+        self.assertEqual(len(merged["coordinates"]), 2)
+        self.assertEqual(
+            sum("|" in str(value) for value in merged["tile_provenance"]), 0
+        )
+
     def test_coordinate_graph_connects_phase_shifted_tile_seam(self):
         coordinates = np.array(
             [[0.0, 0.0, 0.0], [1.10, 0.0, 0.0], [2.10, 0.0, 0.0]]
