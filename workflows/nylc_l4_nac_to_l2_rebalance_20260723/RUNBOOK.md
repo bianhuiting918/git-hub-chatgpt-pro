@@ -1548,7 +1548,7 @@ test(nylc): define acyl endpoint stability contract
 
 **Interfaces:**
 - Consumes: `BASE.validate_authority(source)`, `BASE.qmmm_block(qmmask)`, `BASE.NON_QM_SOLUTE_HEAVY_MASK`, `BASE.HARD_PATTERNS` from `prepare_audit_nylc_a1_step1_pt2_cn_scout.py`.
-- Produces: CLI modes `initialize`, `prepare`, `audit-stage`, `finalize-seed` and `merge-if-ready`; per-seed `ENDPOINT_MANIFEST.json`, `RESULT.json`, `PASS.json` or `NOT_EVALUATED.json`; cross-seed `audit/nylc_a1_acyl_endpoint_<job>.json`.
+- Produces: CLI modes `initialize`, `prepare`, `audit-stage`, `finalize-seed` and `merge-if-ready`; per-seed `ENDPOINT_MANIFEST.json`, `RESULT.json`, `PASS.json` or `NOT_EVALUATED.json`; cross-seed `audit/nylc_a1_acyl_endpoint_${SLURM_ARRAY_JOB_ID}.json`.
 
 - [ ] **Step 1: Implement authority and chemistry validation**
 
@@ -1655,9 +1655,9 @@ feat(nylc): test acyl endpoint stability
 ### Task 3: Deploy immutably and submit only through the attack-chain gate
 
 **Files:**
-- Remote create: `$TASK_ROOT/code_snapshots/a1_acyl_endpoint_<commit8>_20260728/GITHUB_COMMIT`
-- Remote create: `$TASK_ROOT/code_snapshots/a1_acyl_endpoint_<commit8>_20260728/SNAPSHOT_SHA256.tsv`
-- Remote outputs: `$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_step1_acyl_endpoint_stability/attempt_<job>_<seed-index>/`
+- Remote create: `$TASK_ROOT/code_snapshots/a1_acyl_endpoint_${FULL_COMMIT:0:8}_20260728/GITHUB_COMMIT`
+- Remote create: `$TASK_ROOT/code_snapshots/a1_acyl_endpoint_${FULL_COMMIT:0:8}_20260728/SNAPSHOT_SHA256.tsv`
+- Remote outputs: `$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_step1_acyl_endpoint_stability/attempt_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}/`
 
 **Interfaces:**
 - Consumes: one reviewed GitHub commit containing the RED test and GREEN production commits.
@@ -1673,14 +1673,14 @@ Do not submit this fallback if either seed has a release-eligible tetrahedral-li
 
 - [ ] **Step 3: Create and verify one immutable deployment**
 
-Clone the exact approved commit to the new snapshot directory, write `GITHUB_COMMIT`, hash the tracked workflow files into `SNAPSHOT_SHA256.tsv`, run the new and regression tests, Python compilation and Bash syntax checks there, then verify every hash. Never patch the snapshot in place.
+Inside the exact approved clone, set `FULL_COMMIT="$(git rev-parse HEAD)"`, `SNAPSHOT_ROOT="$TASK_ROOT/code_snapshots/a1_acyl_endpoint_${FULL_COMMIT:0:8}_20260728"` and `SNAPSHOT_WORKFLOW="$SNAPSHOT_ROOT/workflows/nylc_l4_nac_to_l2_rebalance_20260723"`. Clone the exact approved commit to the new snapshot directory, write `GITHUB_COMMIT`, hash the tracked workflow files into `SNAPSHOT_SHA256.tsv`, run the new and regression tests, Python compilation and Bash syntax checks there, then verify every hash. Never patch the snapshot in place.
 
 - [ ] **Step 4: Submit exactly once**
 
 Run:
 
 ```bash
-sbatch --export=ALL,A1_ACYL_ENDPOINT_CODE_SOURCE=<absolute_snapshot_workflow>,A1_ACYL_ENDPOINT_GITHUB_COMMIT=<full_commit_sha> slurm/run_nylc_a1_step1_acyl_endpoint_stability.sbatch
+sbatch --export=ALL,A1_ACYL_ENDPOINT_CODE_SOURCE="$SNAPSHOT_WORKFLOW",A1_ACYL_ENDPOINT_GITHUB_COMMIT="$FULL_COMMIT" slurm/run_nylc_a1_step1_acyl_endpoint_stability.sbatch
 ```
 
 Before submission, query the queue once for an existing matching job and inspect the output root for an existing attempt. If either exists, do not submit. Record the exact job ID in both run-history formats.
