@@ -255,6 +255,35 @@ class SurfaceShellUnitTests(unittest.TestCase):
             sum("|" in str(value) for value in merged["tile_provenance"]), 0
         )
 
+    def test_geometry_only_sensitivity_merge_does_not_apply_field_gate(self):
+        def one_point(coordinate, origin, value, tile):
+            return {
+                "coordinates": np.asarray([coordinate], dtype=float),
+                "A": np.asarray([value]),
+                "C": np.asarray([value]),
+                "OA": np.asarray([value]),
+                "HD": np.asarray([value]),
+                "nearest_atom_index": np.asarray([0], dtype=np.int32),
+                "nearest_residue": np.asarray(["A:RES:1"]),
+                "tile_provenance": np.asarray([tile]),
+                "grid_origin": np.asarray(origin, dtype=float),
+            }
+
+        left = one_point([0.0, 0.0, 0.0], [0.0, 0.0, 0.0], 0.0, "left")
+        shifted = one_point([0.25, 0.0, 0.0], [0.25, 0.0, 0.0], 1.0, "right")
+
+        with self.assertRaisesRegex(ValueError, "tile field disagreement"):
+            shell.merge_shell_records([left, shifted], spacing=1.0)
+        geometry_only = shell.merge_shell_records(
+            [left, shifted],
+            spacing=1.0,
+            validate_phase_fields=False,
+            build_graph=False,
+        )
+
+        self.assertEqual(len(geometry_only["coordinates"]), 1)
+        self.assertEqual(len(geometry_only["neighbor_indices"]), 0)
+
     def test_coordinate_graph_connects_phase_shifted_tile_seam(self):
         coordinates = np.array(
             [[0.0, 0.0, 0.0], [1.10, 0.0, 0.0], [2.10, 0.0, 0.0]]
