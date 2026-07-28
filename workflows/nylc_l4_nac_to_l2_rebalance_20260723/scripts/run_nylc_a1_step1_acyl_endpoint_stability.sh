@@ -41,7 +41,7 @@ with open(tsv_path,"a+",encoding="utf-8") as tsv,open(jsonl_path,"a+",encoding="
  except BaseException:
   tsv.seek(toff); tsv.truncate(); jsonl.seek(joff); jsonl.truncate(); raise
 PY
-    ) 9>"$TASK_ROOT/.run_history.lock"
+    ) 9>>"$TASK_ROOT/run_history.tsv"
 }
 
 write_hashes() {
@@ -144,7 +144,7 @@ CURRENT=merge_if_ready
 (
     flock -x 9
     "$PY" "$DRIVER" --mode merge-if-ready --output-root "$OUTPUT_ROOT" --array-job "$ARRAY_JOB"
-) 9>"$OUTPUT_ROOT/.cross_seed_audit.lock"
+) 9<"$OUTPUT_ROOT"
 
 STATE=PASS_TECHNICAL
 CURRENT=terminal_history

@@ -332,9 +332,14 @@ def _coordinate_map(structure: Any) -> dict[int, Any]:
 
 
 def _qm_indices(qmmask: str) -> list[int]:
-    values = [int(value) for value in qmmask.split(",") if value.strip()]
-    if len(values) != BASE.EXPECTED_QM_ATOMS:
-        raise ValueError("frozen qmmask no longer contains 146 explicit atoms")
+    tokens = [token.strip() for token in qmmask.split(",") if token.strip()]
+    values = [int(token[1:] if token.startswith("@") else token) for token in tokens]
+    if (
+        len(values) != BASE.EXPECTED_QM_ATOMS
+        or len(set(values)) != len(values)
+        or any(index < 1 or index > EXPECTED_SYSTEM_ATOMS for index in values)
+    ):
+        raise ValueError("frozen qmmask atom identity/count/range changed")
     return values
 
 
