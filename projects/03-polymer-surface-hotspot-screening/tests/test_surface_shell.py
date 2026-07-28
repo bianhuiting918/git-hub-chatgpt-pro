@@ -192,6 +192,60 @@ class SurfaceShellUnitTests(unittest.TestCase):
             for channel in ("A", "C", "OA", "HD"):
                 self.assertAlmostEqual(float(whole[channel][wi]), float(merged[channel][mi]))
 
+    def test_phase_shifted_tile_overlap_is_deduplicated(self):
+        def record(coordinates, values, residues, tile):
+            coordinates = np.asarray(coordinates, dtype=float)
+            values = np.asarray(values, dtype=float)
+            return {
+                "coordinates": coordinates,
+                "A": values.copy(),
+                "C": values.copy(),
+                "OA": values.copy(),
+                "HD": values.copy(),
+                "nearest_atom_index": np.arange(len(coordinates), dtype=np.int32),
+                "nearest_residue": np.asarray(residues),
+                "tile_provenance": np.full(len(coordinates), tile),
+            }
+
+        left = record(
+            [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [2.0, 0.0, 0.0]],
+            [0.0, 1.0, 2.0],
+            ["A:RES:1", "A:RES:2", "A:RES:3"],
+            "tile_left",
+        )
+        shifted = record(
+            [[1.25, 0.0, 0.0], [2.25, 0.0, 0.0], [3.25, 0.0, 0.0]],
+            [1.0, 2.0, 3.0],
+            ["A:RES:2", "A:RES:3", "A:RES:4"],
+            "tile_shifted",
+        )
+
+        merged = shell.merge_shell_records([left, shifted], spacing=1.0)
+
+        self.assertEqual(len(merged["coordinates"]), 4)
+        self.assertEqual(
+            sum("|" in str(value) for value in merged["tile_provenance"]), 2
+        )
+
+    def test_coordinate_graph_connects_phase_shifted_tile_seam(self):
+        coordinates = np.array(
+            [[0.0, 0.0, 0.0], [1.10, 0.0, 0.0], [2.10, 0.0, 0.0]]
+        )
+        indptr, indices = shell.coordinate_graph(
+            coordinates, spacing=1.0, connectivity=26
+        )
+        visited = {0}
+        frontier = [0]
+        while frontier:
+            node = frontier.pop()
+            for neighbor in indices[indptr[node] : indptr[node + 1]]:
+                neighbor = int(neighbor)
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    frontier.append(neighbor)
+
+        self.assertEqual(visited, {0, 1, 2})
+
     def test_merge_rejects_disagreeing_overlap_values(self):
         record = {
             "coordinates": np.array([[0.0, 0.0, 0.0]]),
