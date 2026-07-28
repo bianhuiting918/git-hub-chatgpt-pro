@@ -205,7 +205,10 @@ def initialize(seed_index: int, start_rst7: pathlib.Path, chain_state: pathlib.P
             "link_atom_count": BASE.EXPECTED_LINK_ATOMS, "step1_qm_water_count": 0,
             "qmmask": qmmask,
         },
+        "start_rst7": str(start_rst7),
+        "start_rst7_sha256": sha256(start_rst7),
         "baseline_3p0_geometry": start_geometry,
+        "baseline_source": "immutable_source_pre_window_00",
         "scientific_status": SCIENTIFIC_STATUS, "next_action": SCIENTIFIC_ACTION,
         "scope": SCOPE,
     })
@@ -233,6 +236,7 @@ def prepare(seed_index: int, window_index: int, output: pathlib.Path,
         "schema_version": 1, "status": "READY_A1_ATTACK_INHERITED_WINDOW",
         "github_commit": github_commit, "window": window,
         "inherited_restart": str(start_rst7),
+        "inherited_restart_sha256": sha256(start_rst7),
         "frozen_prmtop": state["source"]["frozen_prmtop"],
         "frozen_prmtop_sha256": state["source"]["frozen_prmtop_sha256"],
         "baseline_3p0_geometry": state["baseline_3p0_geometry"],
@@ -279,7 +283,7 @@ def inspect_stage(prmtop: pathlib.Path, directory: pathlib.Path) -> dict[str, An
     }
 
 
-def audit(output: pathlib.Path, scratch: pathlib.Path) -> None:
+def audit(output: pathlib.Path, scratch: pathlib.Path, chain_state: pathlib.Path) -> None:
     manifest = json.loads((output / "WINDOW_MANIFEST.json").read_text(encoding="utf-8"))
     if manifest.get("status") != "READY_A1_ATTACK_INHERITED_WINDOW":
         raise ValueError("window manifest is not READY")
@@ -287,6 +291,8 @@ def audit(output: pathlib.Path, scratch: pathlib.Path) -> None:
     window = manifest["window"]
     final = stage["geometry"]
     technical = stage["technical_pass"]
+    restart_path = scratch / "stage.rst7"
+    output_restart_sha256 = sha256(restart_path) if restart_path.is_file() and restart_path.stat().st_size else None
     residual = abs(final["attack_A"] - window["attack_target_A"]) if technical else None
     baseline_co = manifest["baseline_3p0_geometry"]["c12_o2_A"]
     elongation = final["c12_o2_A"] - baseline_co if technical else None
@@ -326,8 +332,20 @@ def audit(output: pathlib.Path, scratch: pathlib.Path) -> None:
             "TETRAHEDRAL_LIKE_RESTRAINED": tetrahedral_like,
             "FORCED_CLOSE_CONTACT": forced_close,
         },
-        "target_residual_A": residual, "observed": final, "stage": stage,
+        "target_residual_A": residual,
+        "output_restart": str(restart_path),
+        "output_restart_sha256": output_restart_sha256,
+        "observed": final, "stage": stage,
     }
+    # The operational 3.0 A baseline is the actual technically valid window-00
+    # endpoint, never an inferred geometry from a later inherited restart.
+    if technical and int(window["window_index"]) == 0:
+        state = json.loads(chain_state.read_text(encoding="utf-8"))
+        state["baseline_3p0_geometry"] = final
+        state["baseline_source"] = "window_00_3p0_endpoint"
+        state["baseline_restart"] = str(restart_path)
+        state["baseline_restart_sha256"] = output_restart_sha256
+        write_json(chain_state, state)
     write_json(output / "RESULT.json", result)
     write_json(output / ("PASS.json" if technical else "NOT_EVALUATED.json"), result)
 
@@ -355,7 +373,7 @@ def main() -> int:
     else:
         if args.output is None or args.scratch is None:
             parser.error("--output and --scratch are required for audit")
-        audit(args.output.resolve(), args.scratch.resolve())
+        audit(args.output.resolve(), args.scratch.resolve(), args.chain_state.resolve())
     return 0
 
 
