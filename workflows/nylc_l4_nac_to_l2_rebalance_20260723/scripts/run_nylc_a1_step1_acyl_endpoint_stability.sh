@@ -12,7 +12,7 @@ OUT="$OUTPUT_ROOT/attempt_$ATTEMPT"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 DRIVER="$CODE_ROOT/scripts/prepare_audit_nylc_a1_step1_acyl_endpoint_stability.py"
 PRMTOP="$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_unified_core_dftb3_preflight/attempt_62011285/prepared/system.prmtop"
-SCRATCH_ROOT="${SLURM_TMPDIR:?SLURM_TMPDIR is required}/nylc_a1_acyl_endpoint_$ATTEMPT"
+SCRATCH_ROOT="${SLURM_TMPDIR:-/tmp}/nylc_a1_acyl_endpoint_$ATTEMPT"
 START_RST7="$SCRATCH_ROOT/start.rst7"
 
 EVENT=nylc_a1_acyl_endpoint_stability
