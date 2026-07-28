@@ -240,6 +240,39 @@ class SurfaceShellUnitTests(unittest.TestCase):
         expected = 4.0 * math.pi * radius * radius
         self.assertLess(abs(estimate - expected) / expected, 0.35)
 
+    def test_steiner_estimator_removes_offset_curvature_bias(self):
+        spacing = 0.75
+        radius = 3.1
+        margin = radius + 4.0 * spacing
+        n = int(math.ceil(2.0 * margin / spacing)) + 1
+        center = (margin, margin, margin)
+        occupied = sphere_occupancy(
+            (n, n, n), center, radius, spacing=spacing
+        )
+        cumulative_counts = []
+        for multiple in (1.0, 2.0, 3.0):
+            mask, _, _ = shell.exterior_shell_mask(
+                occupied,
+                spacing=spacing,
+                inner=0.0,
+                outer=multiple * spacing,
+                connectivity=26,
+            )
+            cumulative_counts.append(int(mask.sum()))
+
+        estimate = shell.steiner_surface_area_from_counts(
+            cumulative_counts, spacing
+        )
+        old_offset_volume_proxy = shell.shell_area_proxy(
+            cumulative_counts[-1], spacing, 0.0, 3.0 * spacing
+        )
+        expected = 4.0 * math.pi * radius * radius
+
+        self.assertGreater(
+            abs(old_offset_volume_proxy - expected) / expected, 0.50
+        )
+        self.assertLess(abs(estimate - expected) / expected, 0.20)
+
     def test_sasa_disagreement_is_a_review_status_not_biological_failure(self):
         good = shell.classify_sasa_crosscheck(
             shell_area=100.0,
