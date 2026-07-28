@@ -2,14 +2,14 @@
 set -euo pipefail
 
 TASK_ROOT=/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723
-CODE_ROOT="\${A1_PRODUCT_REVERSE_CODE_ROOT:?set immutable code root}"
-GITHUB_COMMIT="\${A1_PRODUCT_REVERSE_GITHUB_COMMIT:?set immutable GitHub commit}"
-INDEX="\${SLURM_ARRAY_TASK_ID:?run as array task 0 or 1}"
-ARRAY_JOB="\${SLURM_ARRAY_JOB_ID:-\${SLURM_JOB_ID:-manual}}"
-ATTEMPT="\${ARRAY_JOB}_\${INDEX}"
+CODE_ROOT="${A1_PRODUCT_REVERSE_CODE_ROOT:?set immutable code root}"
+GITHUB_COMMIT="${A1_PRODUCT_REVERSE_GITHUB_COMMIT:?set immutable GitHub commit}"
+INDEX="${SLURM_ARRAY_TASK_ID:?run as array task 0 or 1}"
+ARRAY_JOB="${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID:-manual}}"
+ATTEMPT="${ARRAY_JOB}_${INDEX}"
 OUTPUT_ROOT="$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_step1_product_reverse_boundary"
 OUT="$OUTPUT_ROOT/attempt_$ATTEMPT"
-SCRATCH_ROOT="\${SLURM_TMPDIR:-/tmp}/nylc_a1_product_reverse_$ATTEMPT"
+SCRATCH_ROOT="${SLURM_TMPDIR:-/tmp}/nylc_a1_product_reverse_$ATTEMPT"
 DRIVER="$CODE_ROOT/scripts/prepare_audit_nylc_a1_step1_product_reverse_boundary.py"
 PRMTOP="$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_unified_core_dftb3_preflight/attempt_62011285/prepared/system.prmtop"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
@@ -170,7 +170,7 @@ for WINDOW_INDEX in 0 1 2 3; do
     CURRENT="run_window_$WINDOW_TAG"
     (
         cd "$WINDOW_SCRATCH"
-        mpirun --bind-to none -np "\${SLURM_NTASKS:-8}" sander.MPI -O \
+        mpirun --bind-to none -np "${SLURM_NTASKS:-8}" sander.MPI -O \
             -i stage.in -o stage.out -p "$PRMTOP" \
             -c "$CURRENT_RST7" -ref "$CURRENT_RST7" \
             -r stage.rst7 -inf stage.mdinfo
@@ -215,7 +215,7 @@ PY
         CURRENT="run_release_$WINDOW_TAG"
         (
             cd "$RELEASE_SCRATCH"
-            mpirun --bind-to none -np "\${SLURM_NTASKS:-8}" sander.MPI -O \
+            mpirun --bind-to none -np "${SLURM_NTASKS:-8}" sander.MPI -O \
                 -i stage.in -o stage.out -p "$PRMTOP" \
                 -c "$CURRENT_RST7" -r stage.rst7 \
                 -x release.mdcrd -inf stage.mdinfo
