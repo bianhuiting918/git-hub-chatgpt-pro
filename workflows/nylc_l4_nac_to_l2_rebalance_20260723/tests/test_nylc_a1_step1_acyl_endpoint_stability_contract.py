@@ -35,7 +35,9 @@ def endpoint_frame(**updates):
     frame = {
         "attack_A": 2.00, "hg1_n3_A": 1.50, "nalpha_hg1_A": 1.40,
         "qPT_A": 0.00, "c12_n3_A": 1.90, "c12_o2_A": 1.50,
-        "product_out_of_plane_A": 0.15, "product_angle_sum_deg": 330.0,
+        "product_out_of_plane_A": 0.15,
+        "c12_reactant_plane_out_of_plane_A": 0.15,
+        "product_angle_sum_deg": 330.0,
         "attack_angle_deg": 140.0, "hg1_nearest_qm_heavy_atom": 10286,
     }
     frame.update(updates)
@@ -156,6 +158,30 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
             with self.subTest(invalid=invalid):
                 with self.assertRaises(ValueError):
                     module.release_md_spec("seed26723", invalid)
+
+    def test_product_and_reactant_oop_metrics_use_distinct_explicit_planes(self):
+        module = load_module()
+        coordinates = {
+            8949: (0.0, 0.0, 2.0),
+            8960: (1.0, 0.0, 0.0),
+            8961: (0.0, 0.0, 1.1),
+            10286: (0.0, 1.0, 0.0),
+            10287: (0.2, 0.3, 0.1),
+            10288: (0.0, 0.0, 0.0),
+            10289: (0.0, 0.0, 1.0),
+        }
+        measured = module.geometry_from_coordinates(
+            coordinates, (8949, 8960, 10286, 10287, 10288, 10289)
+        )
+        self.assertAlmostEqual(measured["product_out_of_plane_A"], 0.10, places=7)
+        self.assertIn("c12_reactant_plane_out_of_plane_A", measured)
+        self.assertAlmostEqual(
+            measured["c12_reactant_plane_out_of_plane_A"], 0.20, places=7
+        )
+        self.assertNotEqual(
+            measured["product_out_of_plane_A"],
+            measured["c12_reactant_plane_out_of_plane_A"],
+        )
 
     def test_product_geometry_uses_o2_og1_c11_plane_and_all_gate_boundaries(self):
         module = load_module()
@@ -342,7 +368,8 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
             return module._classify(complete_manifest(frame))[0]
 
         tetrahedral = endpoint_frame(
-            attack_A=1.70, c12_o2_A=1.28, product_out_of_plane_A=0.20,
+            attack_A=1.70, c12_o2_A=1.28,
+            c12_reactant_plane_out_of_plane_A=0.20,
             c12_n3_A=1.30, attack_angle_deg=90.0, nalpha_hg1_A=1.20,
             qPT_A=-0.40, hg1_nearest_qm_heavy_atom=8949,
         )
@@ -351,7 +378,7 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
             "attack": {"attack_A": 1.701},
             "carbonyl_low": {"c12_o2_A": 1.279},
             "carbonyl_high": {"c12_o2_A": 1.451},
-            "oop": {"product_out_of_plane_A": 0.199},
+            "reactant_plane_oop": {"c12_reactant_plane_out_of_plane_A": 0.199},
             "qcn_low": {"c12_n3_A": 1.299},
             "qcn_high": {"c12_n3_A": 1.601},
             "angle_low": {"attack_angle_deg": 89.9},
@@ -366,8 +393,9 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
                 self.assertNotEqual(classify(frame), "RETURNS_TETRAHEDRAL")
 
         reactant = endpoint_frame(
-            attack_A=2.50, c12_o2_A=1.18, product_out_of_plane_A=0.12,
-            c12_n3_A=1.55, nalpha_hg1_A=1.20, qPT_A=-0.40,
+            attack_A=2.50, c12_o2_A=1.18,
+            c12_reactant_plane_out_of_plane_A=0.12,
+            c12_n3_A=1.50, nalpha_hg1_A=1.20, qPT_A=-0.40,
             hg1_nearest_qm_heavy_atom=8949,
         )
         self.assertEqual(classify(reactant), "RETURNS_REACTANT")
@@ -375,8 +403,8 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
             "attack": {"attack_A": 2.499},
             "carbonyl_low": {"c12_o2_A": 1.179},
             "carbonyl_high": {"c12_o2_A": 1.301},
-            "oop": {"product_out_of_plane_A": 0.121},
-            "qcn": {"c12_n3_A": 1.551},
+            "reactant_plane_oop": {"c12_reactant_plane_out_of_plane_A": 0.121},
+            "qcn": {"c12_n3_A": 1.501},
             "nalpha_hg1": {"nalpha_hg1_A": 1.201},
             "qpt": {"qPT_A": -0.399},
             "nearest_nalpha": {"hg1_nearest_qm_heavy_atom": 10289},
