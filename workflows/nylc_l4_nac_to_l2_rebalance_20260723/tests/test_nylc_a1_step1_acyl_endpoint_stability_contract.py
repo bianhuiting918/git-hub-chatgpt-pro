@@ -303,6 +303,28 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
                         1,
                     )
 
+    def test_release_md_binary_format_and_completion_are_stage_specific(self):
+        module = load_module()
+        detector = getattr(module, "trajectory_format", None)
+        completion = getattr(module, "stage_output_complete", None)
+        self.assertIsNotNone(detector, "release MD must dispatch binary NetCDF by file magic")
+        self.assertIsNotNone(completion, "MD completion must not reuse minimization footers")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            netcdf = root / "release.mdcrd"
+            ascii_traj = root / "release_ascii.mdcrd"
+            netcdf.write_bytes(b"CDF\x01" + b"\x00" * 64)
+            ascii_traj.write_text("AMBER trajectory\n", encoding="ascii")
+            self.assertEqual(detector(netcdf), "NETCDF")
+            self.assertEqual(detector(ascii_traj), "AMBER_MDCRD")
+        self.assertTrue(completion("release_md", " NSTEP = 490\n NSTEP = 500\n"))
+        self.assertFalse(completion("release_md", " NSTEP = 499\n"))
+        self.assertTrue(completion("product", " FINAL RESULTS\n Run done\n"))
+        self.assertFalse(completion("product", " NSTEP = 500\n"))
+        source = PREPARE.read_text(encoding="utf-8")
+        self.assertIn("NetCDFTraj.open_old", source)
+        self.assertIn('stage_output_complete(stage, text)', source)
+
     def test_release_md_evidence_is_exactly_complete_and_audit_uses_the_gate(self):
         module = load_module()
         validator = getattr(module, "release_md_evidence_complete", None)
