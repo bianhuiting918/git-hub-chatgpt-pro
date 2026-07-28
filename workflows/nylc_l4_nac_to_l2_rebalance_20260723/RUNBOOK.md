@@ -1453,3 +1453,257 @@ If Amber18 chain-of-states plus the frozen QM/MM Hamiltonian fails its technical
 preflight, record that exact blocker instead of substituting an unvalidated
 driver. Keep only the rerunnable script, per-seed manifest, compact audit,
 RUNBOOK entry and run-history rows.
+
+# NylC A1 Acyl-Endpoint Stability Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Build and run a dual-seed, restraint-release stability test for the complete Step1 acyl-enzyme endpoint without repeating the prior tetrahedral scouts or starting a PMF.
+
+**Architecture:** One Python driver owns immutable-source validation, stage generation, geometry analysis, per-seed audit and the race-safe two-seed merge. One shell runner executes two restrained construction stages followed conditionally by local release, full release and a 0.25 ps NVT persistence check in node-local scratch. One Slurm array runs the two seeds concurrently; only compact JSON, SHA records and at most the constructed/released endpoint restarts persist.
+
+**Tech Stack:** Python 3, ParmEd, Amber18 `sander.MPI` with DFTB3/3OB-3-1, Bash, Slurm, `unittest`.
+
+## Global Constraints
+
+- Compute only on SCNet under `/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723`.
+- Trigger only after both attack-only seed chains terminate and neither supplies a release-stable tetrahedral-like candidate.
+- Never cancel, overwrite or resubmit jobs `62136360` or `62156801`; never reuse job-`62021985` coordinates.
+- Reuse prmtop SHA256 `a61d15bf0bf78675be93275d45f274e808ed6ae450fc1ca21a8e14aee8c12ca0`, 146 explicit QM atoms, charge 0, 510 electrons including six link H, and no Step1 QM water.
+- Starting coordinates are only `seed26723_t378_f189` and `seed26737_t676_f338` from attempt `62112503`.
+- Atom identities are N-alpha 8949, OG1 8960, HG1 8961, C12 10287, O2 10288, N3 10289 and C11 10286.
+- Validate from the frozen prmtop that N3 is bonded to C12, one other carbon and one hydrogen before constructing the product. A different graph is a hard precondition failure.
+- Do not restrain C12--O2 or carbonyl planarity. Carbonyl restoration must be spontaneous.
+- Do not compare total energies between unlike restraint states. Do not start NEB, string, umbrella sampling or PMF in this implementation plan.
+- Amber18 chain-of-states support on SCNet is `NOT_VERIFIED`; it receives a separate plan only after both endpoints pass release.
+- GitHub contains only the four files named below plus this RUNBOOK entry. Remote outputs contain no trajectory, TPR/XTC, topology copy, checkpoint or secret.
+
+---
+
+### Task 1: Add the endpoint-stability contract at TDD RED
+
+**Files:**
+- Create: `workflows/nylc_l4_nac_to_l2_rebalance_20260723/tests/test_nylc_a1_step1_acyl_endpoint_stability_contract.py`
+- Expected absent production files:
+  - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/scripts/prepare_audit_nylc_a1_step1_acyl_endpoint_stability.py`
+  - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/scripts/run_nylc_a1_step1_acyl_endpoint_stability.sh`
+  - `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_a1_step1_acyl_endpoint_stability.sbatch`
+
+**Interfaces:**
+- Consumes: the file paths and frozen constants in this plan.
+- Produces: a RED contract that fixes source identity, construction targets, release gates, persistence policy and Slurm resources.
+
+- [ ] **Step 1: Write the failing contract test**
+
+The test module must define `FLOW`, `PREPARE`, `RUNNER` and `SLURM`, dynamically import `PREPARE`, and contain these exact assertions:
+
+```python
+self.assertEqual(module.INTERMEDIATE_TARGETS_A,
+                 {"attack": 1.60, "hg1_n3": 1.40, "cn": 1.75})
+self.assertEqual(module.PRODUCT_TARGETS_A,
+                 {"attack": 1.50, "hg1_n3": 1.05, "cn": 2.20})
+self.assertEqual(module.BUILD_FORCE_KCAL_MOL_A2, (25.0, 50.0))
+self.assertEqual(module.LOCAL_RELEASE_STEPS, 800)
+self.assertEqual(module.FULL_RELEASE_STEPS, 800)
+self.assertEqual(module.RELEASE_MD_STEPS, 500)
+self.assertEqual(module.RELEASE_DT_PS, 0.0005)
+self.assertEqual(module.PRODUCT_GATE["attack_A"], (1.40, 1.65))
+self.assertEqual(module.PRODUCT_GATE["hg1_n3_A"], (0.95, 1.20))
+self.assertEqual(module.PRODUCT_GATE["nalpha_hg1_A_min"], 1.55)
+self.assertEqual(module.PRODUCT_GATE["c12_n3_A_min"], 2.05)
+self.assertEqual(module.PRODUCT_GATE["c12_o2_A"], (1.18, 1.30))
+self.assertEqual(module.PRODUCT_GATE["product_out_of_plane_A_max"], 0.12)
+self.assertEqual(module.PRODUCT_GATE["product_angle_sum_deg_min"], 350.0)
+self.assertEqual(module.PRODUCT_GATE["last_fraction"], 0.40)
+self.assertEqual(module.PRODUCT_GATE["occupancy_min"], 0.80)
+```
+
+It must also assert both immutable source names, the frozen prmtop SHA, 146/q0/510e/6link/no-water, the N3 reactant bond-graph validation, and absence of `62021985`, `tleap`, C12--O2 restraints, automatic NEB/string and PMF. Runner assertions require stage order `intermediate -> product -> local_release -> full_release -> release_md`, scratch-only trajectory, atomic run-history append, failure trap and nonzero exit for technical failure. Slurm assertions require `#SBATCH --array=0-1%2`, eight MPI ranks, 2500M per rank, no GPU request and snapshot-SHA verification.
+
+- [ ] **Step 2: Run RED**
+
+Run from the workflow root:
+
+```bash
+"$PY" -m unittest discover -s tests -p 'test_nylc_a1_step1_acyl_endpoint_stability_contract.py' -v
+```
+
+Expected: at least `test_minimal_production_files_exist` fails because the three production files are absent. Preserve the exact RED output in the commit message or GitHub task record; do not create a remote run directory.
+
+- [ ] **Step 3: Commit only the RED test**
+
+Commit message:
+
+```text
+test(nylc): define acyl endpoint stability contract
+```
+
+### Task 2: Implement the dual-seed endpoint construction and release
+
+**Files:**
+- Create: `workflows/nylc_l4_nac_to_l2_rebalance_20260723/scripts/prepare_audit_nylc_a1_step1_acyl_endpoint_stability.py`
+- Create: `workflows/nylc_l4_nac_to_l2_rebalance_20260723/scripts/run_nylc_a1_step1_acyl_endpoint_stability.sh`
+- Create: `workflows/nylc_l4_nac_to_l2_rebalance_20260723/slurm/run_nylc_a1_step1_acyl_endpoint_stability.sbatch`
+- Test: `workflows/nylc_l4_nac_to_l2_rebalance_20260723/tests/test_nylc_a1_step1_acyl_endpoint_stability_contract.py`
+
+**Interfaces:**
+- Consumes: `BASE.validate_authority(source)`, `BASE.qmmm_block(qmmask)`, `BASE.NON_QM_SOLUTE_HEAVY_MASK`, `BASE.HARD_PATTERNS` from `prepare_audit_nylc_a1_step1_pt2_cn_scout.py`.
+- Produces: CLI modes `initialize`, `prepare`, `audit-stage`, `finalize-seed` and `merge-if-ready`; per-seed `ENDPOINT_MANIFEST.json`, `RESULT.json`, `PASS.json` or `NOT_EVALUATED.json`; cross-seed `audit/nylc_a1_acyl_endpoint_<job>.json`.
+
+- [ ] **Step 1: Implement authority and chemistry validation**
+
+Load the existing PT2/CN module by path. Validate both source GRO hashes, prmtop SHA, atom count/box, the six named atom identities and all frozen QM fields. Inspect the prmtop bond graph and require N3 to have C12, exactly one other carbon and exactly one hydrogen as reactant neighbors. Record the complete N3 neighbor list in `ENDPOINT_MANIFEST.json`.
+
+Extend geometry output with:
+
+```python
+{
+    "attack_A": r(8960, 10287),
+    "nalpha_hg1_A": r(8949, 8961),
+    "hg1_n3_A": r(8961, 10289),
+    "qPT_A": r(8949, 8961) - r(8961, 10289),
+    "c12_n3_A": r(10287, 10289),
+    "c12_o2_A": r(10287, 10288),
+    "product_out_of_plane_A": distance_of_C12_to_plane(O2, OG1, C11),
+    "product_angle_sum_deg": sum_of_O2_C12_OG1__OG1_C12_C11__C11_C12_O2,
+    "hg1_nearest_qm_heavy_atom": nearest_QM_heavy_atom_to_HG1,
+}
+```
+
+A product-like structure requires HG1's nearest QM heavy atom to be N3.
+
+- [ ] **Step 2: Generate exactly five stages**
+
+Use only three reactive distance restraints in `intermediate` and `product`: OG1--C12, HG1--N3 and C12--N3. Use `INTERMEDIATE_TARGETS_A` with force 25 and `PRODUCT_TARGETS_A` with force 50. Do not restrain N-alpha--HG1, C12--O2, an improper or any protein/ligand reaction angle.
+
+Use `maxcyc=400,ncyc=100` for `intermediate`, `maxcyc=800,ncyc=200` for `product`, `maxcyc=800,ncyc=200` for each minimization release. `local_release` removes all reactive restraints and keeps the existing 1 kcal mol-1 A-2 non-QM-solute-heavy position restraint. `full_release` sets `ntr=0,nmropt=0`.
+
+`release_md` starts only from a technically valid full-release restart and uses:
+
+```text
+imin=0, irest=0, ntx=1, nstlim=500, dt=0.0005,
+ntb=1, ntt=3, gamma_ln=2.0, temp0=300.0,
+ntc=1, ntf=1, ntwx=10, ntpr=10, ifqnt=1
+```
+
+Use seed-specific deterministic `ig=26723` and `ig=26737`. Write trajectory only below `$SLURM_TMPDIR`; audit it before scratch cleanup and never copy it to the task root.
+
+- [ ] **Step 3: Implement stage and scientific classifications**
+
+Technical PASS requires `FINAL RESULTS`, `Run done`, a nonempty restart, finite geometry, zero SCC/vlimit/bond-overflow and zero hard-pattern hits. Technical failure writes `NOT_EVALUATED_A1_ACYL_ENDPOINT_STABILITY` and exits nonzero.
+
+A released-frame predicate is exactly:
+
+```python
+product_like = (
+    1.40 <= g["attack_A"] <= 1.65
+    and 0.95 <= g["hg1_n3_A"] <= 1.20
+    and g["nalpha_hg1_A"] >= 1.55
+    and g["qPT_A"] >= 0.45
+    and g["c12_n3_A"] >= 2.05
+    and 1.18 <= g["c12_o2_A"] <= 1.30
+    and g["product_out_of_plane_A"] <= 0.12
+    and g["product_angle_sum_deg"] >= 350.0
+    and g["hg1_nearest_qm_heavy_atom"] == 10289
+)
+```
+
+For `release_md`, evaluate all frames and require at least 80% product-like frames in the final 40% of the 0.25 ps trajectory. Classify seed results as one of:
+`PERSISTS_ACYL_PRODUCT`, `RETURNS_TETRAHEDRAL`, `RETURNS_REACTANT`,
+`ZWITTERIONIC_CLEAVAGE`, `MISROUTED_PROTON`,
+`RESTRAINT_DEPENDENT_PRODUCT`, or `NOT_EVALUATED_TECHNICAL_FAILURE`.
+Only `PERSISTS_ACYL_PRODUCT` is a per-seed scientific endpoint PASS.
+
+- [ ] **Step 4: Implement persistence and provenance**
+
+Run every stage in a seed/job-specific scratch directory. Explicitly copy each stage's restraint file into its run directory before `sander.MPI`. Verify every stage input restart SHA equals the preceding output restart SHA. Persist only manifests, compact stage results, `constructed_product.rst7`, `released_endpoint.rst7`, `SHA256.tsv` and the run-history rows.
+
+Under a task-root `flock`, `merge-if-ready` writes the cross-seed audit only when both terminal per-seed results exist. It reports denominator 2, both classifications and:
+- `PASS_ACYL_PRODUCT_ENDPOINT_REPRODUCED` only for 2/2 `PERSISTS_ACYL_PRODUCT`;
+- `NOT_REPRODUCED_A1_ACYL_PRODUCT_ENDPOINT` for 1/2;
+- `FAIL_NO_RELEASE_STABLE_A1_ACYL_PRODUCT_ENDPOINT` for 0/2;
+- `NOT_EVALUATED_TECHNICAL_A1_ACYL_PRODUCT_ENDPOINT` if either seed lacks technical completion.
+
+All statuses retain `NOT_EVALUATED_TS_PMF_BARRIER_MECHANISM` and `DO_NOT_START_PMF`.
+
+- [ ] **Step 5: Implement Slurm wrapper and immutable-snapshot guards**
+
+The array runs two seeds concurrently, one node and eight MPI ranks per task, with 20 GB total requested memory and an eight-hour walltime. Require `A1_ACYL_ENDPOINT_CODE_SOURCE` and `A1_ACYL_ENDPOINT_GITHUB_COMMIT`. Verify `GITHUB_COMMIT`, the complete `SNAPSHOT_SHA256.tsv`, all three new production files and the imported PT2/CN base before invoking the runner.
+
+- [ ] **Step 6: Run GREEN and regressions**
+
+Run:
+
+```bash
+"$PY" -m unittest discover -s tests -p 'test_nylc_a1_step1_acyl_endpoint_stability_contract.py' -v
+"$PY" -m unittest discover -s tests -p 'test_nylc_a1_step1_attack_inherited_contract.py' -v
+"$PY" -m py_compile scripts/prepare_audit_nylc_a1_step1_acyl_endpoint_stability.py
+bash -n scripts/run_nylc_a1_step1_acyl_endpoint_stability.sh
+bash -n slurm/run_nylc_a1_step1_acyl_endpoint_stability.sbatch
+```
+
+Expected: every command exits 0. The new contract and the attack-inherited regression both report all tests PASS.
+
+- [ ] **Step 7: Commit the minimal implementation**
+
+Commit only the three production files:
+
+```text
+feat(nylc): test acyl endpoint stability
+```
+
+### Task 3: Deploy immutably and submit only through the attack-chain gate
+
+**Files:**
+- Remote create: `$TASK_ROOT/code_snapshots/a1_acyl_endpoint_<commit8>_20260728/GITHUB_COMMIT`
+- Remote create: `$TASK_ROOT/code_snapshots/a1_acyl_endpoint_<commit8>_20260728/SNAPSHOT_SHA256.tsv`
+- Remote outputs: `$TASK_ROOT/a1_activated_nac_20260726/qmmm/a1_step1_acyl_endpoint_stability/attempt_<job>_<seed-index>/`
+
+**Interfaces:**
+- Consumes: one reviewed GitHub commit containing the RED test and GREEN production commits.
+- Produces: one immutable SCNet deployment and at most one two-task array job ID.
+
+- [ ] **Step 1: Check the current attack job once**
+
+Use one discrete `squeue` or `sacct` query. If `62156801_1` is running, record its job ID and stop without deploying or submitting. If it is terminal, require both attack-chain manifests, inheritance SHA verification and the exact two-seed candidate denominator.
+
+- [ ] **Step 2: Apply the trigger gate**
+
+Do not submit this fallback if either seed has a release-eligible tetrahedral-like candidate awaiting its prescribed release. Submit only when both seed chains have terminal technical evidence and zero release-stable tetrahedral-like candidates. A technical failure is not a scientific zero and blocks submission until separately resolved by the user.
+
+- [ ] **Step 3: Create and verify one immutable deployment**
+
+Clone the exact approved commit to the new snapshot directory, write `GITHUB_COMMIT`, hash the tracked workflow files into `SNAPSHOT_SHA256.tsv`, run the new and regression tests, Python compilation and Bash syntax checks there, then verify every hash. Never patch the snapshot in place.
+
+- [ ] **Step 4: Submit exactly once**
+
+Run:
+
+```bash
+sbatch --export=ALL,A1_ACYL_ENDPOINT_CODE_SOURCE=<absolute_snapshot_workflow>,A1_ACYL_ENDPOINT_GITHUB_COMMIT=<full_commit_sha> slurm/run_nylc_a1_step1_acyl_endpoint_stability.sbatch
+```
+
+Before submission, query the queue once for an existing matching job and inspect the output root for an existing attempt. If either exists, do not submit. Record the exact job ID in both run-history formats.
+
+### Task 4: Audit the two-seed endpoint denominator and stop at the scientific gate
+
+**Files:**
+- Read: both per-seed `RESULT.json`, `ENDPOINT_MANIFEST.json`, restart-inheritance record and `SHA256.tsv`.
+- Produce: one compact cross-seed audit under `a1_step1_acyl_endpoint_stability/audit/`.
+- Modify: `workflows/nylc_l4_nac_to_l2_rebalance_20260723/RUNBOOK.md` with the final job ID and denominator.
+
+**Interfaces:**
+- Consumes: two terminal seed attempts.
+- Produces: one of the four cross-seed endpoint gates; no automatic downstream job.
+
+- [ ] **Step 1: Verify technical denominator**
+
+Require two expected seeds, correct source GRO hashes, frozen prmtop/QM contract, stage restart-SHA continuity, no unexpected persistent trajectory and stage-specific technical outcomes.
+
+- [ ] **Step 2: Report chemical outcomes without energy ranking**
+
+Report per seed: attack, N-alpha--HG1, HG1--N3, qPT, C12--N3, C12--O2, product planarity, nearest HG1 heavy atom and last-window product occupancy. Do not rank the two differently initialized seeds by their total QM/MM energies.
+
+- [ ] **Step 3: Apply the terminal decision**
+
+Only 2/2 release-stable endpoints authorize a separate Amber18 chain-of-states compatibility plan. A 1/2 result is not reproduced and does not auto-advance. A 0/2 result stops this Hamiltonian/path branch for model reassessment. Technical incompleteness stays `NOT_EVALUATED`. None of these states authorizes PMF, a barrier value or a mechanism claim.
