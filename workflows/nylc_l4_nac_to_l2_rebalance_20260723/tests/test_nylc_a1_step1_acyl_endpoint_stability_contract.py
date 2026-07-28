@@ -437,6 +437,19 @@ class A1AcylEndpointStabilityContract(unittest.TestCase):
             with self.subTest(cross_seed=outcomes):
                 self.assertEqual(module.cross_seed_status(outcomes), expected)
 
+    def test_runner_falls_back_to_unique_tmp_scratch_when_slurm_tmpdir_is_unset(self):
+        runner = RUNNER.read_text(encoding="utf-8")
+        self.assertIn(
+            "${SLURM_TMPDIR:-/tmp}", runner,
+            "SCNet may omit SLURM_TMPDIR; runner must fall back to node-local /tmp",
+        )
+        self.assertNotIn("SLURM_TMPDIR:?", runner)
+        self.assertIn('ATTEMPT="${ARRAY_JOB}_${INDEX}"', runner)
+        self.assertRegex(
+            runner,
+            r'(?m)^SCRATCH_ROOT=.*\$\{SLURM_TMPDIR:-/tmp\}.*\$ATTEMPT',
+        )
+
     def test_runner_finalizes_each_seed_once_and_always_attempts_locked_merge(self):
         runner = RUNNER.read_text(encoding="utf-8")
         self.assertRegex(runner, r"SEED_FINALIZED\s*=\s*0")
