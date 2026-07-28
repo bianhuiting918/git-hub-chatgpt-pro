@@ -303,9 +303,12 @@ def audit(output: pathlib.Path, scratch: pathlib.Path) -> None:
         and 1.30 <= final["qCN_A"] <= 1.60
         and 90.0 <= final["attack_angle_deg"] <= 130.0 and reactant_guard)
     forced_close = bool(restrained_close and not tetrahedral_like)
-    classification = ("TETRAHEDRAL_LIKE_RESTRAINED" if tetrahedral_like else
+    # A guard excursion takes precedence over all structural labels: it is kept,
+    # audited, and terminates inheritance without becoming a technical failure.
+    classification = (guard_reason if guard_reason else
+                      "TETRAHEDRAL_LIKE_RESTRAINED" if tetrahedral_like else
                       "FORCED_CLOSE_CONTACT" if forced_close else
-                      guard_reason if guard_reason else "NO_TETRAHEDRAL_LIKE_RESPONSE")
+                      "NO_TETRAHEDRAL_LIKE_RESPONSE")
     result = {
         "schema_version": 1, "status": PASS_STATUS if technical else FAIL_STATUS,
         "scientific_status": SCIENTIFIC_STATUS, "next_action": SCIENTIFIC_ACTION,
