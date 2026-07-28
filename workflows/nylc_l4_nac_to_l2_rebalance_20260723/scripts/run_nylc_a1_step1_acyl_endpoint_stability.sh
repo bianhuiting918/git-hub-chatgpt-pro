@@ -108,11 +108,12 @@ for STAGE in intermediate product local_release full_release release_md; do
     STAGE_SCRATCH="$SCRATCH_ROOT/$STAGE"
     NEXT_RST7="$STAGE_SCRATCH/stage.rst7"
     CURRENT="prepare_$STAGE"
-    PREVIOUS_ARGS=()
     if [[ "$STAGE" == release_md ]]; then
-        PREVIOUS_ARGS=(--previous-result "$PREVIOUS_RESULT")
+        test -s "$PREVIOUS_RESULT"
+        "$PY" "$DRIVER" --mode prepare --stage "$STAGE" --output "$OUT"             --scratch "$STAGE_SCRATCH" --input-rst7 "$CURRENT_RST7"             --previous-result "$PREVIOUS_RESULT"
+    else
+        "$PY" "$DRIVER" --mode prepare --stage "$STAGE" --output "$OUT"             --scratch "$STAGE_SCRATCH" --input-rst7 "$CURRENT_RST7"
     fi
-    "$PY" "$DRIVER" --mode prepare --stage "$STAGE" --output "$OUT"         --scratch "$STAGE_SCRATCH" --input-rst7 "$CURRENT_RST7" "${PREVIOUS_ARGS[@]}"
 
     CURRENT="run_$STAGE"
     if [[ "$STAGE" == release_md ]]; then
