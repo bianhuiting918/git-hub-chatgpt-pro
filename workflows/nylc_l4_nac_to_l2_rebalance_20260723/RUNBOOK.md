@@ -1413,3 +1413,43 @@ local basin. This scout is not a TS, committor, PMF, barrier or mechanism proof.
 - Both seeds had 8/8 attack-angle gates but 0/8 target-response gates. RMS-gradient gates passed 3/8 and 4/8, respectively. The bounded restraints did not produce a release-eligible q_attack/PT2/CN window.
 - Gate: `NO_A1_PT2_CN_SCOUT_WINDOW_CANDIDATE`. Apply no forced fill, launch no reactive-restraint-free release, and do not start PMF.
 - Technical completion and restrained geometry do not establish proton transfer, a transition state, PMF, a barrier, or a mechanism.
+
+## Approved fallback: acyl-enzyme endpoint then minimum-energy path (2026-07-28)
+
+This fallback is triggered only if both hash-pinned natural NAC seeds complete the
+attack-only inherited scan without a released tetrahedral-like candidate. It
+does not repeat the earlier job-`62033771` attack/C12--O2 scout and does not
+reuse the strongly pulled job-`62021985` coordinates.
+
+The same frozen Step1 Hamiltonian is retained: system prmtop SHA256
+`a61d15bf0bf78675be93275d45f274e808ed6ae450fc1ca21a8e14aee8c12ca0`,
+146 explicit QM atoms, charge zero, 510 electrons including six link H,
+Tyr146/Lys189/Asn219/Thr267/Asp306/Asp308 plus complete PA66-L2, DFTB3/3OB-3-1,
+and no QM water. The only starting coordinates are
+`seed26723_t378_f189` and `seed26737_t676_f338`.
+
+First test whether the Hamiltonian supports a complete Step1 acyl-enzyme/product
+basin. Construct both seed endpoints in parallel with coordinated restraints
+representing OG1--C12 bond formation, C12--N3 cleavage, HG1 transfer from
+N-alpha to N3, and restoration of the C12--O2 carbonyl. Then remove every
+reactive restraint, followed by the weak environment restraint, without forced
+candidate filling. A released endpoint is eligible only if it retains the
+acyl-enzyme bond, cleaved C12--N3 contact, protonated leaving N3, restored
+carbonyl, valid A1/QM bond graph, and no SCC, bonded-overflow, NaN, FATAL,
+SANDER BOMB, segmentation or forrtl finding. A constructed or restrained
+endpoint is not mechanism evidence.
+
+Only release-stable endpoints advance. For each eligible seed, use Amber18
+QM/MM chain-of-states support after a small technical preflight to optimize a
+reactant-to-acyl-enzyme minimum-energy path. Monitor OG1--C12, C12--N3,
+N-alpha--HG1, HG1--N3, C12--O2 and carbonyl pyramidalization without assuming
+in advance that the mechanism is stepwise or concerted. Do not compare total
+energies across unlike restraint states, do not start umbrella/PMF production,
+and do not call a converged path a free-energy barrier or mechanism proof.
+
+If neither product endpoint survives full release, stop path construction and
+reassess the Hamiltonian, QM region, A1 microstate and possible QM-water role.
+If Amber18 chain-of-states plus the frozen QM/MM Hamiltonian fails its technical
+preflight, record that exact blocker instead of substituting an unvalidated
+driver. Keep only the rerunnable script, per-seed manifest, compact audit,
+RUNBOOK entry and run-history rows.
