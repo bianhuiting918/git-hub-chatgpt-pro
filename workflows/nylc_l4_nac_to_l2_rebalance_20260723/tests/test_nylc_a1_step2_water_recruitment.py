@@ -95,7 +95,7 @@ class Step2WaterRecruitmentContract(unittest.TestCase):
         manifest = {
             "qm_contract": {
                 "expected": dict(driver.EXPECTED_CONTRACT),
-                "qmmask": "@1,2,3",
+                "qmmask": "@" + ",".join(str(index) for index in range(1, 150)),
             },
             "recruitment": {"guided_result": guided},
         }
