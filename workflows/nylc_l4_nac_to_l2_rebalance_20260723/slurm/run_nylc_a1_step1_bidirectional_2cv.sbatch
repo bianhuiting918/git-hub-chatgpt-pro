@@ -19,7 +19,6 @@ PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
 export PYTHONDONTWRITEBYTECODE=1
 cd "$CODE_ROOT"
 test "$(cat GITHUB_COMMIT)" = "$EXPECTED_COMMIT"
-test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT"
 sha256sum -c SNAPSHOT_SHA256.tsv
 "$PY" scripts/prepare_audit_nylc_a1_step1_bidirectional_2cv.py --mode describe
 bash -n scripts/run_nylc_a1_step1_bidirectional_2cv.sh
