@@ -98,6 +98,32 @@ class Step2WaterReorganizationSamplingContract(unittest.TestCase):
         self.assertEqual(events[0]["water_oxygen_index1"], 13046)
         self.assertEqual(driver.collapse_events(rows[:2]), [])
 
+    def test_near_miss_selection_is_relaxed_ranked_and_water_unique(self):
+        driver = load_driver()
+        base = {
+            "c12_ow_A": 3.10,
+            "o2_c12_ow_deg": 110.0,
+            "h_nalpha_A": 2.20,
+            "ow_h_nalpha_deg": 155.0,
+            "acyl_guard_pass": True,
+            "proton_guard_pass": True,
+            "replica": 0,
+            "water_hydrogen_indices1": [13047, 13048],
+        }
+        rows = [
+            dict(base, frame=1, water_oxygen_index1=13046, donor_h_index1=13047),
+            dict(base, frame=2, c12_ow_A=3.40, water_oxygen_index1=13046, donor_h_index1=13047),
+            dict(base, frame=3, c12_ow_A=4.20, o2_c12_ow_deg=90.0,
+                 h_nalpha_A=3.20, ow_h_nalpha_deg=105.0,
+                 water_oxygen_index1=14000, donor_h_index1=14001),
+            dict(base, frame=4, c12_ow_A=5.10,
+                 water_oxygen_index1=15000, donor_h_index1=15001),
+        ]
+        selected = driver.select_near_misses(rows, limit=4)
+        self.assertEqual([row["water_oxygen_index1"] for row in selected], [13046, 14000])
+        self.assertEqual(selected[0]["frame"], 1)
+        self.assertLessEqual(selected[0]["near_miss_score"], selected[1]["near_miss_score"])
+
     def test_mdin_runner_and_sbatch_are_unrestrained_and_compact(self):
         driver = load_driver()
         mdin = driver.sampling_input("seed26723", 0, 26723011, "@1,2,3")
