@@ -54,7 +54,7 @@ GUIDED="$SCRATCH_ROOT/guided"
 (
     cd "$GUIDED"
     set +e
-    srun --exclusive -N 1 -n 8 sander.MPI -O -i stage.in -o stage.out -p "$PRMTOP" -c "$SOURCE_RST7" -ref "$SOURCE_RST7" -r stage.rst7 -inf stage.mdinfo
+    mpirun --bind-to none -np 8 sander.MPI -O -i stage.in -o stage.out -p "$PRMTOP" -c "$SOURCE_RST7" -ref "$SOURCE_RST7" -r stage.rst7 -inf stage.mdinfo
     printf '%s\n' "$?" > engine.rc
     exit 0
 )
@@ -71,7 +71,7 @@ if [[ "$GUIDED_PASS" = 1 ]]; then
         (
             cd "$STAGE"
             set +e
-            srun --exclusive -N 1 -n 8 sander.MPI -O -i stage.in -o stage.out -p "$PRMTOP" -c "$GUIDED/stage.rst7" -r stage.rst7 -x a2.mdcrd -inf stage.mdinfo
+            mpirun --bind-to none -np 8 sander.MPI -O -i stage.in -o stage.out -p "$PRMTOP" -c "$GUIDED/stage.rst7" -r stage.rst7 -x a2.mdcrd -inf stage.mdinfo
             printf '%s\n' "$?" > engine.rc
             exit 0
         ) &
