@@ -358,3 +358,24 @@ Use this recovery path after a technical interruption such as shared-filesystem 
 - Obsolete single-CPU recovery arrays 61995851 and 61995852 were cancelled only after the four-core smoke passed; their completed artifacts remain untouched.
 
 Scientific boundary: these jobs generate whole-receptor A/C/OA/HD field artifacts only. A technical PASS is not evidence of polymer binding, adsorption strength, catalytic geometry, or enzyme activity.
+
+
+## Nature 2022 multicondition patch association (2026-07-29)
+
+This analysis reuses the 30 exact-canonical Nature 2022 PET controls with valid `PATCH_PASS`. Protein 202 remains `NONCANONICAL_MAPPING_REQUIRED` and is excluded. It does not recompute structures, fields, probes, shells, or patches.
+
+Run on Sugon:
+
+    /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/envs/surface-screen-py311/bin/python3.11 \
+      runs/experimental_control31_20260729_v1/analyze_pet_control_multicondition_patch.py --self-test
+
+    /work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725/envs/surface-screen-py311/bin/python3.11 \
+      runs/experimental_control31_20260729_v1/analyze_pet_control_multicondition_patch.py
+
+Output:
+
+    results/experimental_control31_multicondition_patch_analysis_20260729_v1/ANALYSIS_PASS.json
+
+Table D3 is the main 30–70 C by six-buffer replication set. Table D6 is a low-power substrate-form sensitivity analysis. Table D4 is excluded because each condition has only 3–4 records. Raw mg/L values are never pooled across conditions; cross-condition summaries average tied activity percentiles computed within each condition.
+
+The activity field is the endpoint sum of aromatic products in mg/L. It is not a single-product measurement, `kcat`, a free-energy barrier, or proof of a causal surface mechanism.
