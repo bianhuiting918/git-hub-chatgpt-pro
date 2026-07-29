@@ -56,6 +56,13 @@ class AdaptiveGapfillContract(unittest.TestCase):
         self.assertIn("#SBATCH --array=0-7", sbatch)
         self.assertNotIn("#SBATCH --array=0-7%", sbatch)
 
+    def test_python_checks_use_task_local_pycache(self):
+        sbatch = SBATCH.read_text(encoding="utf-8")
+        marker = 'export PYTHONPYCACHEPREFIX="${SLURM_TMPDIR:-/tmp}/nylc_a1_adaptive_pycache_${SLURM_ARRAY_JOB_ID:-manual}_${SLURM_ARRAY_TASK_ID:-manual}"'
+        self.assertIn(marker, sbatch)
+        self.assertLess(sbatch.index(marker), sbatch.index('"$PY" tests/test_nylc_a1_step1_adaptive_gapfill.py'))
+        self.assertLess(sbatch.index(marker), sbatch.index('"$PY" -m py_compile'))
+
 
 if __name__ == "__main__":
     unittest.main()
