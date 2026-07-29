@@ -1,6 +1,6 @@
 # PET Experimental-Control Multicondition Analysis Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Reuse the 30 exact-canonical PET `PATCH_PASS` records to test catalytic and external 14 Å stickiness against Nature 2022 product amounts across Table D3 conditions, with Table D6 as low-power sensitivity.
 
@@ -29,7 +29,7 @@
 
 **Interfaces:**
 - Consumes:
-  - `results/experimental_control31_patch_relative_stickiness_20260729_v1/patch_relative_stickiness_metrics.tsv`
+  - `results/experimental_control31_patch_relative_stickiness_20260729_v1/patch_relative_stickiness_metrics.tsv`\n  - `results/experimental_control31_activity_analysis_20260729_v1/experimental_control30_metrics.tsv`
   - `/work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/inputs/activity/activity_energy_long_authority.tsv`
 - Produces:
   - `d3_joined_records.tsv`
@@ -41,7 +41,7 @@
   - `d6_form_associations.tsv`
   - `ANALYSIS_PASS.json`
 
-- [ ] **Step 1: Add deterministic self-tests before the analysis entrypoint**
+- [x] **Step 1: Add deterministic self-tests before the analysis entrypoint**
 
 The script must expose and test:
 
@@ -66,7 +66,7 @@ def self_test() -> None:
     assert pct == {"a": 0.25, "b": 0.25, "c": 1.0}
 ```
 
-- [ ] **Step 2: Verify the self-test initially fails before the script exists**
+- [x] **Step 2: Verify the self-test initially fails before the script exists**
 
 Run:
 
@@ -76,7 +76,7 @@ Run:
 
 Expected before sync: file-not-found failure.
 
-- [ ] **Step 3: Implement the minimal analysis**
+- [x] **Step 3: Implement the minimal analysis**
 
 Required constants:
 
@@ -103,18 +103,18 @@ SEED = 20260729
 
 Implementation requirements:
 
-- verify the patch metrics contain exactly 30 unique MD5s;
+- verify both patch tables contain exactly 30 unique MD5s and that their MD5 sets match;
 - verify each activity `(sequence_md5, condition)` key is unique;
 - condition-level D3 analysis uses only joined rows and records missing MD5 counts separately;
 - per-condition rank percentile uses tied average ranks scaled as `(rank - 1)/(n - 1)`;
 - cross-condition aggregation averages percentiles per protein and records `n_conditions`;
 - D3 BH correction covers all condition-by-primary-metric tests;
-- D3 aggregate BH correction covers the nine radius-by-metric tests;
+- D3 aggregate BH correction covers the 15 radius-by-metric tests (three raw/relative primary metric families plus two percentile sensitivities);
 - D6 BH correction covers all substrate-form-by-primary-metric tests;
 - all TSVs use stable sorting and tab delimiters;
 - `ANALYSIS_PASS.json` records input hashes, output hashes, exact denominators, excluded Table D4, protein 202 exclusion, random seed, permutation/bootstrap counts, and endpoint limitations.
 
-- [ ] **Step 4: Run self-test and production analysis**
+- [x] **Step 4: Run self-test and production analysis**
 
 Run:
 
@@ -131,7 +131,7 @@ SELF_TEST_PASS
 MULTICONDITION_ANALYSIS_PASS
 ```
 
-- [ ] **Step 5: Commit the script on Draft PR #2**
+- [x] **Step 5: Commit the script on Draft PR #2**
 
 Commit message:
 
@@ -150,11 +150,11 @@ analysis: compare PET patch metrics across assay conditions
 - Consumes: Task 1 output files.
 - Produces: independently checkable hashes, denominator summaries, and the scientific interpretation.
 
-- [ ] **Step 1: Add the exact rerun command and claim boundary to both RUNBOOKs**
+- [x] **Step 1: Add the exact rerun command and claim boundary to both RUNBOOKs**
 
 Document that the activity values are endpoint sums of aromatic products, not `kcat`, barriers, or single-product measurements.
 
-- [ ] **Step 2: Independently audit results without importing the analysis script**
+- [x] **Step 2: Independently audit results without importing the analysis script**
 
 Use a separate one-shot standard-library Python audit to verify:
 
@@ -167,11 +167,11 @@ assert all(Path(v["path"]).is_file() for v in audit["outputs"].values())
 assert all(sha256(Path(v["path"])) == v["sha256"] for v in audit["outputs"].values())
 ```
 
-- [ ] **Step 3: Append one run-history record**
+- [x] **Step 3: Append one run-history record**
 
 Record UTC time, script path, input/output paths, exit status, exact D3 and D6 denominators, and audit SHA256. Do not record credentials.
 
-- [ ] **Step 4: Read the audited output and report**
+- [x] **Step 4: Read the audited output and report**
 
 Report separately:
 
@@ -187,3 +187,4 @@ Report separately:
 - Placeholder scan: no TBD/TODO or unspecified implementation steps.
 - Type consistency: metric names exactly match the existing patch metrics TSV.
 - Scope: one analysis script and two documentation updates; no structure or patch recomputation.
+\n## Execution correction\n\nThe initial implementation used catalytic-candidate percentile metrics as primary. A failing assertion exposed the mismatch with the previously reported raw catalytic-patch analysis. Commit `965d4ca8dd9c3df32cab098f730d46e9b94627f5` corrected the primary metrics to `r14_composite_cat_top` and `r14_mean_cat_top_ACOA`; percentile metrics remain secondary sensitivity analyses. The corrected remote run and independent audit both passed.\n
