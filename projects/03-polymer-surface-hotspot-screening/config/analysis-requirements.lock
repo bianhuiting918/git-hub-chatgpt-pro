@@ -1,0 +1,9 @@
+# Python 3.11 server-local analysis environment for Phase 1.
+numpy==1.26.4
+scipy==1.13.1
+pandas==2.2.3
+biopython==1.84
+PyYAML==6.0.2
+rdkit==2024.3.2
+freesasa==2.2.1
+pytest==8.3.5
