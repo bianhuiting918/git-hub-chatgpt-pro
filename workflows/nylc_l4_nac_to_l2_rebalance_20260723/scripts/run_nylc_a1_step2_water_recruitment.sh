@@ -58,6 +58,11 @@ GUIDED="$SCRATCH_ROOT/guided"
     printf '%s\n' "$?" > engine.rc
     exit 0
 )
+if [[ -f "$GUIDED/stage.out" ]]; then cp "$GUIDED/stage.out" "$OUT/GUIDED_ENGINE.out"; fi
+if [[ -f "$GUIDED/stage.mdinfo" ]]; then cp "$GUIDED/stage.mdinfo" "$OUT/GUIDED_ENGINE.mdinfo"; fi
+if [[ -f "$GUIDED/stage.in" ]]; then cp "$GUIDED/stage.in" "$OUT/GUIDED_ENGINE.in"; fi
+if [[ -f "$GUIDED/restraints.RST" ]]; then cp "$GUIDED/restraints.RST" "$OUT/GUIDED_ENGINE.restraints"; fi
+if [[ -f "$GUIDED/engine.rc" ]]; then cp "$GUIDED/engine.rc" "$OUT/GUIDED_ENGINE.rc"; fi
 "$PY" "$DRIVER" --mode audit-guided --output "$OUT" --scratch "$SCRATCH_ROOT"
 GUIDED_PASS="$("$PY" - "$OUT/GUIDED_RESULT.json" <<'PY'
 import json,sys
