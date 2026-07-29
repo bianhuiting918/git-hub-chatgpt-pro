@@ -53,6 +53,20 @@ class Step2WaterReorganizationSamplingContract(unittest.TestCase):
         self.assertEqual(driver.task_spec(7)["replica"], 3)
         self.assertEqual(len({driver.task_spec(i)["velocity_seed"] for i in range(8)}), 8)
 
+    def test_engine_contract_accepts_frozen_authority_dftb_banner(self):
+        driver = load_driver()
+        observed = {
+            "qm_atom_count": [146],
+            "qmcharge": [0],
+            "spin": [1],
+            "link_atom_count": [6],
+            "dftb_doubly_occupied_levels": [190],
+        }
+        self.assertTrue(
+            driver._engine_contract_pass(observed),
+            "Amber18/DFTB3 authority job 62011285 reports 190 occupied valence levels",
+        )
+
     def test_hit_thresholds_and_temporal_collapse(self):
         driver = load_driver()
         passing = {
