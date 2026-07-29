@@ -124,6 +124,13 @@ def _nearest_complete_water(structure: Any) -> tuple[Any, tuple[Any, Any], float
     return oxygen, hydrogens, float(distance), complete
 
 
+def format_qmmask(indices: Sequence[int]) -> str:
+    values = [int(index) for index in indices]
+    if not values:
+        raise ValueError("QM mask requires at least one atom")
+    return "@" + ",".join(str(index) for index in values)
+
+
 def _derive_qm_contract(structure: Any, source_manifest: Mapping[str, Any], water_indices: Sequence[int]) -> tuple[list[int], dict[str, Any], str]:
     base_indices = S2._parse_qmmask(source_manifest["qm_contract"]["qmmask"], 146)
     if set(base_indices).intersection(water_indices):
@@ -141,7 +148,7 @@ def _derive_qm_contract(structure: Any, source_manifest: Mapping[str, Any], wate
     }
     if any(derived[key] != value for key, value in EXPECTED_CONTRACT.items()):
         raise ValueError(f"derived Step2 contract {derived} != {EXPECTED_CONTRACT}")
-    qmmask = ",".join(f"@{index}" for index in qm_indices)
+    qmmask = format_qmmask(qm_indices)
     contract = dict(source_manifest["qm_contract"])
     contract.update(
         {
