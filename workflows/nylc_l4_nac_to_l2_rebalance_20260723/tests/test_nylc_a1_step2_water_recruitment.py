@@ -2,6 +2,7 @@
 from __future__ import annotations
 import importlib.util
 import pathlib
+import tempfile
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -35,8 +36,9 @@ class Step2WaterRecruitmentContract(unittest.TestCase):
             "donor_h_nalpha": 2.00,
             "ow_nalpha": 2.87,
         })
-        self.assertEqual(driver.GUIDED_FORCE_KCAL_MOL_A2, 15.0)
-        self.assertEqual(driver.GUIDED_MAXCYC, 1000)
+        self.assertEqual(driver.GUIDED_FORCE_KCAL_MOL_A2, 20.0)
+        self.assertEqual(driver.GUIDED_MAXCYC, 1500)
+        self.assertEqual(driver.GUIDED_NCYC, 450)
         self.assertEqual(driver.format_qmmask([8949, 8950, 13046]), "@8949,8950,13046")
         self.assertNotIn(",@", driver.format_qmmask([8949, 8950, 13046]))
         self.assertEqual(driver.EXPECTED_CONTRACT, {
@@ -64,6 +66,60 @@ class Step2WaterRecruitmentContract(unittest.TestCase):
         self.assertIn("#SBATCH -n 16", sbatch)
         self.assertIn("#SBATCH --array=0-3", sbatch)
         self.assertNotIn("#SBATCH --array=0-3%", sbatch)
+
+
+    def test_release_binary_format_and_same_hamiltonian_banner_authority(self):
+        driver = load_driver()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            netcdf = root / "a2.nc"
+            ascii_mdcrd = root / "a2.mdcrd"
+            netcdf.write_bytes(b"CDF" + bytes([2, 0, 0, 0]))
+            ascii_mdcrd.write_text("TITLE\\n", encoding="ascii")
+            self.assertEqual(driver.S2.trajectory_format(netcdf), "NETCDF")
+            self.assertEqual(driver.S2.trajectory_format(ascii_mdcrd), "AMBER_MDCRD")
+
+        guided = {
+            "banner_contract_pass": True,
+            "banner_observed": {
+                "qm_atom_count": [149],
+                "qmcharge": [0],
+                "spin": [1],
+                "link_atom_count": [6],
+                "dftb_doubly_occupied_levels": [194],
+                "dftb_valence_electron_count": [388],
+            },
+            "derived_all_electron_count": 518,
+            "restart_sha256": "guided-restart-sha",
+        }
+        manifest = {
+            "qm_contract": {
+                "expected": dict(driver.EXPECTED_CONTRACT),
+                "qmmask": "@1,2,3",
+            },
+            "recruitment": {"guided_result": guided},
+        }
+        prepared = {
+            "input_restart_sha256": "guided-restart-sha",
+            "expected_contract": dict(driver.EXPECTED_CONTRACT),
+        }
+        incomplete_leg_banner = {
+            "qm_atom_count": [],
+            "qmcharge": [],
+            "link_atom_count": [6],
+            "electron_count": [],
+        }
+        effective, source = driver.S2.resolve_leg_banner_contract(
+            manifest, prepared, incomplete_leg_banner
+        )
+        self.assertEqual(source, "GUIDED_ENGINE_SAME_HAMILTONIAN")
+        self.assertTrue(driver.S2.banner_pass(effective))
+        prepared["input_restart_sha256"] = "different-restart-sha"
+        effective, source = driver.S2.resolve_leg_banner_contract(
+            manifest, prepared, incomplete_leg_banner
+        )
+        self.assertEqual(source, "UNVERIFIED")
+        self.assertFalse(driver.S2.banner_pass(effective))
 
 
     def test_amber18_dftb_banner_contract_uses_engine_and_derived_evidence(self):
