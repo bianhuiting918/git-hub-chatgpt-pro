@@ -144,6 +144,9 @@ class Step2WaterReorganizationSamplingContract(unittest.TestCase):
         self.assertIn("#SBATCH -n 8", sbatch)
         self.assertIn("#SBATCH --array=0-7", sbatch)
         self.assertNotIn("#SBATCH --array=0-7%", sbatch)
+        self.assertIn("PYTHONPYCACHEPREFIX", sbatch)
+        self.assertNotIn("tests/test_nylc_a1_step2_water_reorganization_sampling.py", sbatch)
+        self.assertNotIn("-m py_compile", sbatch)
 
 
 if __name__ == "__main__":
