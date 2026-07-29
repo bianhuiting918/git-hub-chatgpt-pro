@@ -35,7 +35,8 @@ class Step2WaterRecruitmentContract(unittest.TestCase):
             "donor_h_nalpha": 2.00,
             "ow_nalpha": 2.87,
         })
-        self.assertEqual(driver.GUIDED_FORCE_KCAL_MOL_A2, 5.0)
+        self.assertEqual(driver.GUIDED_FORCE_KCAL_MOL_A2, 15.0)
+        self.assertEqual(driver.GUIDED_MAXCYC, 1000)
         self.assertEqual(driver.format_qmmask([8949, 8950, 13046]), "@8949,8950,13046")
         self.assertNotIn(",@", driver.format_qmmask([8949, 8950, 13046]))
         self.assertEqual(driver.EXPECTED_CONTRACT, {
