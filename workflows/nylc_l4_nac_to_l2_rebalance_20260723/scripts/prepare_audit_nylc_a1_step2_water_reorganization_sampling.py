@@ -57,8 +57,16 @@ HIT_FILTER = {
     "h_nalpha_A_max": 2.50,
     "ow_h_nalpha_deg_min": 130.0,
 }
+NEAR_MISS_FILTER = {
+    "c12_ow_A": (2.50, 4.50),
+    "o2_c12_ow_deg": (80.0, 145.0),
+    "h_nalpha_A_max": 3.50,
+    "ow_h_nalpha_deg_min": 100.0,
+}
 MIN_CONSECUTIVE_FRAMES = 3
 MAX_EVENTS_PER_SEED = 2
+MAX_NEAR_MISSES_PER_TASK = 4
+MAX_NEAR_MISSES_PER_SEED = 4
 EXPECTED_DFTB_DOUBLY_OCCUPIED = 190
 SCOPE = "STEP2_WATER_REORGANIZATION_SAMPLING_ONLY_NOT_PRODUCT_TS_PATH_PMF_BARRIER_OR_MECHANISM"
 NEXT = "PROMOTE_STRICT_WATER_HITS_TO_149QM_A2_ONLY_AFTER_CROSS_SEED_PASS"
@@ -138,8 +146,11 @@ def describe() -> dict[str, Any]:
         "scan_all_complete_waters": True,
         "triclinic_minimum_image": True,
         "hit_filter": HIT_FILTER,
+        "near_miss_filter": NEAR_MISS_FILTER,
         "minimum_consecutive_frames": MIN_CONSECUTIVE_FRAMES,
         "maximum_events_per_seed": MAX_EVENTS_PER_SEED,
+        "maximum_near_misses_per_task": MAX_NEAR_MISSES_PER_TASK,
+        "maximum_near_misses_per_seed": MAX_NEAR_MISSES_PER_SEED,
         "velocity_seeds": VELOCITY_SEEDS,
         "source_restart_sha256": {
             item["seed"]: item["restart_sha256"] for item in SOURCES
@@ -226,6 +237,54 @@ def _hit_score(row: Mapping[str, Any]) -> float:
     )
 
 
+def near_miss_candidate(row: Mapping[str, Any]) -> bool:
+    return bool(
+        NEAR_MISS_FILTER["c12_ow_A"][0]
+        <= float(row["c12_ow_A"])
+        <= NEAR_MISS_FILTER["c12_ow_A"][1]
+        and NEAR_MISS_FILTER["o2_c12_ow_deg"][0]
+        <= float(row["o2_c12_ow_deg"])
+        <= NEAR_MISS_FILTER["o2_c12_ow_deg"][1]
+        and float(row["h_nalpha_A"]) <= NEAR_MISS_FILTER["h_nalpha_A_max"]
+        and float(row["ow_h_nalpha_deg"]) >= NEAR_MISS_FILTER["ow_h_nalpha_deg_min"]
+        and row.get("acyl_guard_pass") is True
+        and row.get("proton_guard_pass") is True
+    )
+
+
+def select_near_misses(
+    rows: Sequence[Mapping[str, Any]], limit: int = MAX_NEAR_MISSES_PER_TASK
+) -> list[dict[str, Any]]:
+    best_by_water: dict[int, dict[str, Any]] = {}
+    for source in rows:
+        if not near_miss_candidate(source):
+            continue
+        row = dict(source)
+        row["near_miss_score"] = _hit_score(row)
+        key = int(row["water_oxygen_index1"])
+        incumbent = best_by_water.get(key)
+        rank = (row["near_miss_score"], int(row["frame"]), int(row["donor_h_index1"]))
+        if incumbent is None:
+            best_by_water[key] = row
+            continue
+        incumbent_rank = (
+            incumbent["near_miss_score"],
+            int(incumbent["frame"]),
+            int(incumbent["donor_h_index1"]),
+        )
+        if rank < incumbent_rank:
+            best_by_water[key] = row
+    return sorted(
+        best_by_water.values(),
+        key=lambda row: (
+            row["near_miss_score"],
+            int(row["replica"]),
+            int(row["frame"]),
+            int(row["water_oxygen_index1"]),
+        ),
+    )[: int(limit)]
+
+
 def collapse_events(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[tuple[int, int, int], list[dict[str, Any]]] = {}
     for item in rows:
@@ -293,7 +352,13 @@ def _complete_water_indices(topology: Any) -> list[tuple[int, tuple[int, int]]]:
 
 def _scan_frames(
     trajectory: pathlib.Path, manifest: Mapping[str, Any]
-) -> tuple[list[Any], list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+) -> tuple[
+    list[Any],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[str],
+]:
     import parmed as pmd
 
     topology = pmd.load_file(str(PRMTOP))
@@ -302,6 +367,7 @@ def _scan_frames(
     cell = S2._periodic_cell(manifest["box"])
     heavy = [int(value) for value in manifest["qm_heavy_atom_indices"]]
     hits: list[dict[str, Any]] = []
+    near_rows: list[dict[str, Any]] = []
     frame_guards: list[dict[str, Any]] = []
     for frame_index, frame in enumerate(frames):
         coords = {index + 1: frame[index] for index in range(len(frame))}
@@ -320,10 +386,14 @@ def _scan_frames(
         for oxygen_index1, hydrogen_indices1 in waters:
             oxygen = coords[oxygen_index1]
             c12_ow = S2._distance(c12, oxygen, cell)
-            if not HIT_FILTER["c12_ow_A"][0] <= c12_ow <= HIT_FILTER["c12_ow_A"][1]:
+            if not NEAR_MISS_FILTER["c12_ow_A"][0] <= c12_ow <= NEAR_MISS_FILTER["c12_ow_A"][1]:
                 continue
             attack_angle = S2._angle(o2, c12, oxygen, cell)
-            if not HIT_FILTER["o2_c12_ow_deg"][0] <= attack_angle <= HIT_FILTER["o2_c12_ow_deg"][1]:
+            if not (
+                NEAR_MISS_FILTER["o2_c12_ow_deg"][0]
+                <= attack_angle
+                <= NEAR_MISS_FILTER["o2_c12_ow_deg"][1]
+            ):
                 continue
             donors = []
             for hydrogen_index1 in hydrogen_indices1:
@@ -346,9 +416,11 @@ def _scan_frames(
                 "acyl_guard_pass": acyl_guard,
                 "proton_guard_pass": proton_guard,
             }
+            if near_miss_candidate(row):
+                near_rows.append(row)
             if strict_hit(row):
                 hits.append(row)
-    return frames, hits, frame_guards, warnings
+    return frames, hits, near_rows, frame_guards, warnings
 
 
 def _write_selected_restart(
@@ -451,12 +523,13 @@ def audit(output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
     hard = {name: len(re.findall(pattern, text, re.I)) for name, pattern in HARD_PATTERNS.items()}
     frames: list[Any] = []
     hits: list[dict[str, Any]] = []
+    near_rows: list[dict[str, Any]] = []
     guards: list[dict[str, Any]] = []
     parse_warnings: list[str] = []
     parse_error = None
     if trajectory.is_file() and trajectory.stat().st_size:
         try:
-            frames, hits, guards, parse_warnings = _scan_frames(trajectory, manifest)
+            frames, hits, near_rows, guards, parse_warnings = _scan_frames(trajectory, manifest)
         except Exception as error:
             parse_error = f"{type(error).__name__}: {error}"
     technical = bool(
@@ -473,6 +546,7 @@ def audit(output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         and parse_error is None
     )
     events = collapse_events(hits)[:MAX_EVENTS_PER_SEED] if technical else []
+    near_misses = select_near_misses(near_rows) if technical else []
     trajectory_sha = sha256(trajectory) if trajectory.is_file() else ""
     for rank, event in enumerate(events):
         event["trajectory_sha256"] = trajectory_sha
@@ -486,6 +560,18 @@ def audit(output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
     with (output / "WATER_HITS.jsonl").open("w", encoding="utf-8") as handle:
         for event in events:
             handle.write(json.dumps(event, sort_keys=True) + "\n")
+    for rank, row in enumerate(near_misses):
+        row["trajectory_sha256"] = trajectory_sha
+        row["source_restart_sha256"] = manifest["source"]["restart_sha256"]
+        row["seed"] = manifest["seed"]
+        row["task_index"] = manifest["task_index"]
+        selected = output / f"selected_near_miss_{rank}.rst7"
+        _write_selected_restart(selected, frames[int(row["frame"])], manifest["box"])
+        row["selected_restart"] = selected.name
+        row["selected_restart_sha256"] = sha256(selected)
+    with (output / "NEAR_MISSES.jsonl").open("w", encoding="utf-8") as handle:
+        for row in near_misses:
+            handle.write(json.dumps(row, sort_keys=True) + "\n")
     result = {
         "schema_version": 1,
         "status": (
@@ -502,6 +588,8 @@ def audit(output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         "strict_hit_frame_count": len(hits),
         "event_count": len(events),
         "events": events,
+        "near_miss_count": len(near_misses),
+        "near_misses": near_misses,
         "guard_occupancy": {
             "acyl": sum(item["acyl_guard_pass"] for item in guards) / len(guards) if guards else 0.0,
             "proton": sum(item["proton_guard_pass"] for item in guards) / len(guards) if guards else 0.0,
@@ -559,6 +647,22 @@ def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
                 candidates,
                 key=lambda item: (item["score"], item["task_index"], item["start_frame"]),
             )[:MAX_EVENTS_PER_SEED]
+        selected_near_misses_by_seed: dict[str, list[dict[str, Any]]] = {}
+        for seed in ("seed26723", "seed26737"):
+            candidates = [
+                dict(row)
+                for result in results if result["seed"] == seed
+                for row in result.get("near_misses", [])
+            ]
+            selected_near_misses_by_seed[seed] = sorted(
+                candidates,
+                key=lambda row: (
+                    row["near_miss_score"],
+                    row["task_index"],
+                    row["frame"],
+                    row["water_oxygen_index1"],
+                ),
+            )[:MAX_NEAR_MISSES_PER_SEED]
         reproduced = technical and all(selected_by_seed[seed] for seed in selected_by_seed)
         status = (
             "NOT_EVALUATED_TECHNICAL_STEP2_WATER_REORGANIZATION"
@@ -572,6 +676,7 @@ def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
             "status": status,
             "technical_denominator": f"{sum(item.get('technical_complete') is True for item in results)}/8",
             "per_seed_selected_events": selected_by_seed,
+            "per_seed_selected_near_misses": selected_near_misses_by_seed,
             "per_task": sorted(results, key=lambda item: item["task_index"]),
             "automatic_downstream_action": "NONE",
             "NEXT": NEXT,
