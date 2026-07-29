@@ -65,5 +65,28 @@ class Step2WaterRecruitmentContract(unittest.TestCase):
         self.assertNotIn("#SBATCH --array=0-3%", sbatch)
 
 
+    def test_amber18_dftb_banner_contract_uses_engine_and_derived_evidence(self):
+        driver = load_driver()
+        amber = """
+QMMM options:
+             ifqnt = True       nquant =      149
+              qmgb =        0  qmcharge =        0   adjust_q =        2
+              spin =        1     qmcut =  10.0000
+QMMM:  nlink =     6                   Link Coords
+QMMM: SINGLET STATE CALCULATION
+QMMM: RHF CALCULATION, NO. OF DOUBLY OCCUPIED LEVELS =194
+   NSTEP       ENERGY          RMS
+"""
+        observed = driver.parse_recruitment_engine_contract(amber)
+        self.assertEqual(observed["qm_atom_count"], [149])
+        self.assertEqual(observed["qmcharge"], [0])
+        self.assertEqual(observed["spin"], [1])
+        self.assertEqual(observed["link_atom_count"], [6])
+        self.assertEqual(observed["dftb_doubly_occupied_levels"], [194])
+        self.assertEqual(observed["dftb_valence_electron_count"], [388])
+        self.assertTrue(driver.recruitment_engine_contract_pass(observed, derived_all_electron_count=518))
+        self.assertFalse(driver.recruitment_engine_contract_pass(observed, derived_all_electron_count=510))
+
+
 if __name__ == "__main__":
     unittest.main()
