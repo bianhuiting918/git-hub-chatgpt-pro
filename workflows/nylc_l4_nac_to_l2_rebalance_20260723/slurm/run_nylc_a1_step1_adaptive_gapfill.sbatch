@@ -16,6 +16,7 @@ set -euo pipefail
 CODE_ROOT="$A1_ADAPTIVE_GAPFILL_CODE_ROOT"
 EXPECTED_COMMIT="$A1_ADAPTIVE_GAPFILL_GITHUB_COMMIT"
 PY=/work/home/acshdt1dks/opt/interface-stability-tools/envs/interface/bin/python
+export PYTHONPYCACHEPREFIX="${SLURM_TMPDIR:-/tmp}/nylc_a1_adaptive_pycache_${SLURM_ARRAY_JOB_ID:-manual}_${SLURM_ARRAY_TASK_ID:-manual}"
 cd "$CODE_ROOT"
 test "$(cat GITHUB_COMMIT)" = "$EXPECTED_COMMIT"
 test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT"
