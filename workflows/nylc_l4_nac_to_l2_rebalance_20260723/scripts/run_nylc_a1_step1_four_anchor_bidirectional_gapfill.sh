@@ -75,6 +75,7 @@ PY
 done
 
 "$PY" "$DRIVER" --mode finalize --root "$OUT" --stop-reason "$STOP"
+test -s "$OUT/SHA256.tsv"
 FINALIZED=1
 (
     flock -x 9
