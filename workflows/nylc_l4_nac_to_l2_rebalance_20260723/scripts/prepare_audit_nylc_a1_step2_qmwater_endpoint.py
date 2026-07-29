@@ -856,6 +856,45 @@ def banner_pass(observed: Mapping[str, Sequence[int]]) -> bool:
     )
 
 
+def resolve_leg_banner_contract(
+    manifest: Mapping[str, Any],
+    prepared: Mapping[str, Any],
+    leg_banner: Mapping[str, Sequence[int]],
+) -> tuple[dict[str, list[int]], str]:
+    raw = {key: list(value) for key, value in leg_banner.items()}
+    if banner_pass(raw):
+        return raw, "LEG_ENGINE"
+    try:
+        guided = manifest["recruitment"]["guided_result"]
+        expected = dict(EXPECTED_CONTRACT)
+        if guided.get("banner_contract_pass") is not True:
+            raise ValueError("guided engine contract did not pass")
+        if dict(manifest["qm_contract"]["expected"]) != expected:
+            raise ValueError("manifest Step2 contract changed")
+        if dict(prepared["expected_contract"]) != expected:
+            raise ValueError("release prepared contract changed")
+        if prepared["input_restart_sha256"] != guided["restart_sha256"]:
+            raise ValueError("release did not inherit guided restart")
+        _parse_qmmask(manifest["qm_contract"]["qmmask"], 149)
+        observed = guided["banner_observed"]
+        effective = {
+            "qm_atom_count": list(observed.get("qm_atom_count", [])),
+            "qmcharge": list(observed.get("qmcharge", [])),
+            "link_atom_count": list(observed.get("link_atom_count", [])),
+            "electron_count": [int(guided["derived_all_electron_count"])],
+        }
+        if not banner_pass(effective):
+            raise ValueError("guided engine evidence does not reproduce Step2 contract")
+        return effective, "GUIDED_ENGINE_SAME_HAMILTONIAN"
+    except (KeyError, TypeError, ValueError):
+        return raw, "UNVERIFIED"
+
+
+def trajectory_format(trajectory: pathlib.Path) -> str:
+    with trajectory.open("rb") as handle:
+        return "NETCDF" if handle.read(3) == b"CDF" else "AMBER_MDCRD"
+
+
 def _read_md_frames(
     trajectory: pathlib.Path, atom_count: int
 ) -> tuple[list[Any], list[str]]:
@@ -867,9 +906,12 @@ def _read_md_frames(
     with warnings.catch_warnings(record=True) as observed:
         warnings.simplefilter("always")
         try:
-            reader = pmd.amber.AmberMdcrd(
-                str(trajectory), atom_count, hasbox=True, mode="r"
-            )
+            if trajectory_format(trajectory) == "NETCDF":
+                reader = pmd.amber.NetCDFTraj.open_old(str(trajectory))
+            else:
+                reader = pmd.amber.AmberMdcrd(
+                    str(trajectory), atom_count, hasbox=True, mode="r"
+                )
             frames = list(reader.coordinates)
         finally:
             if reader is not None and hasattr(reader, "close"):
@@ -975,6 +1017,12 @@ def audit_leg(output: pathlib.Path, scratch: pathlib.Path, leg: int) -> None:
         else 999
     )
     banner = parse_banner(text)
+    prepared_path = stage / "PREPARED.json"
+    prepared = _load_json(prepared_path) if prepared_path.is_file() else {}
+    effective_banner, banner_authority_source = resolve_leg_banner_contract(
+        manifest, prepared, banner
+    )
+    banner_contract_ok = banner_pass(effective_banner)
     hard = {
         name: len(re.findall(pattern, text, re.I))
         for name, pattern in HARD_PATTERNS.items()
@@ -1004,7 +1052,7 @@ def audit_leg(output: pathlib.Path, scratch: pathlib.Path, leg: int) -> None:
         and vlimit == 0
         and overflow == 0
         and sum(hard.values()) == 0
-        and banner_pass(banner)
+        and banner_contract_ok
     )
     geometries: list[dict[str, Any]] = []
     geometry_error = None
@@ -1056,8 +1104,10 @@ def audit_leg(output: pathlib.Path, scratch: pathlib.Path, leg: int) -> None:
         "leg": leg,
         "engine_exit_code": engine_rc,
         "technical_pass": technical,
-        "banner_contract_pass": banner_pass(banner),
+        "banner_contract_pass": banner_contract_ok,
         "banner_observed": banner,
+        "banner_effective": effective_banner,
+        "banner_authority_source": banner_authority_source,
         "banner_expected": EXPECTED_CONTRACT,
         "banner_region_found": bool(engine_banner_region(text)),
         "banner_region_sha256": hashlib.sha256(
@@ -1069,7 +1119,7 @@ def audit_leg(output: pathlib.Path, scratch: pathlib.Path, leg: int) -> None:
             if scientific_pass
             else (
                 "NOT_EVALUATED_A2_QM_CONTRACT"
-                if not banner_pass(banner)
+                if not banner_contract_ok
                 else (
                     "NOT_EVALUATED_A2_TECHNICAL"
                     if not technical
