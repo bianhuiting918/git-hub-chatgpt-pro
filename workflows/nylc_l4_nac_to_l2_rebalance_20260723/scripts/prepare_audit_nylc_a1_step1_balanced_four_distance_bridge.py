@@ -118,6 +118,13 @@ def source_from_index(seed_index: int) -> dict[str, Any]:
     return REVERSE.source_from_index(seed_index)
 
 
+def serializable_source(source: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        key: str(value) if isinstance(value, pathlib.Path) else value
+        for key, value in source.items()
+    }
+
+
 def branch_spec(branch_index: int) -> dict[str, Any]:
     if not 0 <= int(branch_index) < len(BRANCHES):
         raise ValueError("branch index must be 0, 1, or 2")
@@ -186,7 +193,7 @@ def initialize(
         "seed_index": seed_index,
         "seed": source["seed"],
         "branch_index": branch_index,
-        "source": dict(source),
+        "source": serializable_source(source),
         "prmtop": str(PRMTOP),
         "prmtop_sha256": sha256(PRMTOP),
         "qm_contract": dict(source_manifest["qm_contract"]),
