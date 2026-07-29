@@ -40,6 +40,11 @@ class BalancedFourDistanceBridgeContractTest(unittest.TestCase):
         for index in range(6): self.assertIn(f"    {index})", runner)
         self.assertNotIn("for WINDOW_INDEX", runner)
         self.assertIn("CANDIDATE_LIMIT_REACHED", runner)
+        self.assertIn(
+            'SCRATCH=${SLURM_TMPDIR:-/tmp}/nylc_a1_balanced_bridge_',
+            runner,
+        )
+        self.assertNotIn('SCRATCH=$SLURM_TMPDIR/', runner)
         sbatch = SBATCH.read_text(encoding="utf-8")
         self.assertIn("#SBATCH -n 8", sbatch)
         self.assertIn("#SBATCH --array=0-5", sbatch)
