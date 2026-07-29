@@ -190,27 +190,118 @@ def _xyz(value: Any) -> tuple[float, float, float]:
     return tuple(float(component) for component in value)  # type: ignore[return-value]
 
 
-def _box_lengths(structure: Any) -> tuple[float, float, float]:
-    if structure.box is None or len(structure.box) < 6:
+def _inverse_3x3(
+    matrix: Sequence[Sequence[float]],
+) -> tuple[tuple[float, float, float], ...]:
+    a, b, c = matrix[0]
+    d, e, f = matrix[1]
+    g, h, i = matrix[2]
+    determinant = (
+        a * (e * i - f * h)
+        - b * (d * i - f * g)
+        + c * (d * h - e * g)
+    )
+    scale = max(abs(a), abs(b), abs(c), abs(d), abs(e), abs(f), abs(g), abs(h), abs(i), 1.0)
+    if not math.isfinite(determinant) or abs(determinant) <= 1.0e-12 * scale**3:
+        raise ValueError("periodic cell matrix is singular or degenerate")
+    return (
+        (
+            (e * i - f * h) / determinant,
+            (c * h - b * i) / determinant,
+            (b * f - c * e) / determinant,
+        ),
+        (
+            (f * g - d * i) / determinant,
+            (a * i - c * g) / determinant,
+            (c * d - a * f) / determinant,
+        ),
+        (
+            (d * h - e * g) / determinant,
+            (b * g - a * h) / determinant,
+            (a * e - b * d) / determinant,
+        ),
+    )
+
+
+def _matvec(
+    matrix: Sequence[Sequence[float]], vector: Sequence[float]
+) -> tuple[float, float, float]:
+    return tuple(
+        sum(float(matrix[row][column]) * float(vector[column]) for column in range(3))
+        for row in range(3)
+    )  # type: ignore[return-value]
+
+
+def _periodic_cell(
+    box_values: Sequence[float],
+) -> tuple[
+    tuple[tuple[float, float, float], ...],
+    tuple[tuple[float, float, float], ...],
+]:
+    if box_values is None or len(box_values) < 6:
         raise ValueError("source restart lacks a periodic box")
-    box = tuple(float(value) for value in structure.box[:6])
-    if any(abs(angle - 90.0) > 1.0e-3 for angle in box[3:]):
-        raise ValueError(f"only orthorhombic minimum-image selection is supported: {box}")
-    if any(length <= 0.0 for length in box[:3]):
-        raise ValueError(f"invalid box lengths: {box[:3]}")
-    return box[0], box[1], box[2]
+    box = tuple(float(value) for value in box_values[:6])
+    if not all(math.isfinite(value) for value in box):
+        raise ValueError(f"periodic box contains non-finite values: {box}")
+    a, b, c, alpha_deg, beta_deg, gamma_deg = box
+    if any(length <= 0.0 for length in (a, b, c)):
+        raise ValueError(f"invalid box lengths: {(a, b, c)}")
+    if any(not 0.0 < angle < 180.0 for angle in (alpha_deg, beta_deg, gamma_deg)):
+        raise ValueError(f"invalid box angles: {(alpha_deg, beta_deg, gamma_deg)}")
+
+    alpha, beta, gamma = (
+        math.radians(alpha_deg),
+        math.radians(beta_deg),
+        math.radians(gamma_deg),
+    )
+    sin_gamma = math.sin(gamma)
+    if abs(sin_gamma) <= 1.0e-12:
+        raise ValueError(f"periodic cell has degenerate gamma angle: {gamma_deg}")
+    bx = b * math.cos(gamma)
+    by = b * sin_gamma
+    cx = c * math.cos(beta)
+    cy = c * (
+        math.cos(alpha) - math.cos(beta) * math.cos(gamma)
+    ) / sin_gamma
+    cz_squared = c * c - cx * cx - cy * cy
+    if not math.isfinite(cz_squared) or cz_squared <= 1.0e-12 * c * c:
+        raise ValueError(f"periodic cell is degenerate: {box}")
+    cz = math.sqrt(cz_squared)
+
+    matrix = (
+        (a, bx, cx),
+        (0.0, by, cy),
+        (0.0, 0.0, cz),
+    )
+    return matrix, _inverse_3x3(matrix)
 
 
 def _delta(
-    left: Any, right: Any, box: Sequence[float]
+    left: Any,
+    right: Any,
+    cell: tuple[
+        tuple[tuple[float, float, float], ...],
+        tuple[tuple[float, float, float], ...],
+    ],
 ) -> tuple[float, float, float]:
+    matrix, inverse = cell
     a, b = _xyz(left), _xyz(right)
-    values = []
-    for x, y, length in zip(a, b, box):
-        value = x - y
-        value -= round(value / length) * length
-        values.append(value)
-    return values[0], values[1], values[2]
+    displacement = tuple(x - y for x, y in zip(a, b))
+    fractional = _matvec(inverse, displacement)
+    center = tuple(round(value) for value in fractional)
+    candidates = []
+    for da in (-1, 0, 1):
+        for db in (-1, 0, 1):
+            for dc in (-1, 0, 1):
+                shift = (center[0] + da, center[1] + db, center[2] + dc)
+                lattice = _matvec(matrix, shift)
+                vector = tuple(
+                    displacement[axis] - lattice[axis] for axis in range(3)
+                )
+                candidates.append(
+                    (sum(value * value for value in vector), shift, vector)
+                )
+    return min(candidates, key=lambda item: (item[0], item[1]))[2]
 
 
 def _norm(vector: Sequence[float]) -> float:
@@ -292,7 +383,7 @@ def _no_clash(
 
 
 def select_water(structure: Any) -> tuple[dict[str, int], list[dict[str, Any]]]:
-    box = _box_lengths(structure)
+    box = _periodic_cell(structure.box)
     c12 = structure.atoms[REACTIVE["c12"] - 1]
     o2 = structure.atoms[REACTIVE["o2"] - 1]
     nalpha = structure.atoms[REACTIVE["nalpha"] - 1]
@@ -619,7 +710,7 @@ def prepare(
                 f"!= {EXPECTED_CONTRACT}"
             )
         qmmask = ",".join(f"@{index}" for index in qm_indices)
-        box = _box_lengths(structure)
+        box = tuple(float(value) for value in structure.box[:6])
         scratch.mkdir(parents=True, exist_ok=False)
         for leg, velocity_seed in enumerate(source["velocity_seeds"]):
             stage = scratch / f"a2_leg{leg}"
@@ -810,7 +901,7 @@ def frame_geometry(
     frame: Any, manifest: Mapping[str, Any], topology: Any
 ) -> dict[str, Any]:
     coords = _coordinates(frame)
-    box = tuple(float(value) for value in manifest["box_lengths_A"])
+    box = _periodic_cell(manifest["box_lengths_A"])
     water = manifest["selected_water"]
     ow = int(water["oxygen_index1"])
     hydrogens = [int(value) for value in water["hydrogen_indices1"]]
