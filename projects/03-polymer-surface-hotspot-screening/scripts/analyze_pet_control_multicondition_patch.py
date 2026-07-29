@@ -14,18 +14,21 @@ from collections import defaultdict
 
 ROOT = pathlib.Path("/work/home/acshdt1dks/polymer_surface_hotspot_screen_20260725")
 PATCH_METRICS = ROOT / "results/experimental_control31_patch_relative_stickiness_20260729_v1/patch_relative_stickiness_metrics.tsv"
+RAW_PATCH_METRICS = ROOT / "results/experimental_control31_activity_analysis_20260729_v1/experimental_control30_metrics.tsv"
 ACTIVITY = pathlib.Path("/work/home/acshdt1dks/petase_orbmol_lg1_lg4_layer8343_20260721/inputs/activity/activity_energy_long_authority.tsv")
 OUT = ROOT / "results/experimental_control31_multicondition_patch_analysis_20260729_v1"
 PRIMARY_METRICS = (
     "r14_relative_external_sticky_fraction",
-    "r14_composite_catalytic_candidate_percentile",
-    "r14_mean_catalytic_candidate_percentile_ACOA",
+    "r14_composite_cat_top",
+    "r14_mean_cat_top_ACOA",
 )
 ALL_AGGREGATE_METRICS = tuple(
     f"r{radius}_{suffix}"
     for radius in (6, 10, 14)
     for suffix in (
         "relative_external_sticky_fraction",
+        "composite_cat_top",
+        "mean_cat_top_ACOA",
         "composite_catalytic_candidate_percentile",
         "mean_catalytic_candidate_percentile_ACOA",
     )
@@ -203,6 +206,8 @@ def self_test():
         {"sequence_md5": "c", "activity_value": 2.0},
     ])
     assert percentiles == {"a": 0.25, "b": 0.25, "c": 1.0}
+    assert "r14_composite_cat_top" in PRIMARY_METRICS
+    assert "r14_mean_cat_top_ACOA" in PRIMARY_METRICS
     rows = [{"p": 0.01}, {"p": 0.04}, {"p": 0.03}]
     bh(rows, "p", "q")
     assert [round(row["q"], 12) for row in rows] == [0.03, 0.04, 0.04]
@@ -210,23 +215,44 @@ def self_test():
 
 
 def load_features():
-    rows = read_tsv(PATCH_METRICS)
-    if len(rows) != 30 or len({row["sequence_md5"] for row in rows}) != 30:
-        raise SystemExit("patch feature denominator is not 30 unique MD5")
-    required = {"sequence_md5", "protein_names", *ALL_AGGREGATE_METRICS}
-    if not required.issubset(rows[0]):
-        raise SystemExit("patch feature columns missing")
+    percentile_rows = read_tsv(PATCH_METRICS)
+    raw_rows = read_tsv(RAW_PATCH_METRICS)
+    for label, rows in (("patch percentile", percentile_rows), ("raw patch", raw_rows)):
+        if len(rows) != 30 or len({row["sequence_md5"] for row in rows}) != 30:
+            raise SystemExit(f"{label} feature denominator is not 30 unique MD5")
+    percentile_by_md5 = {row["sequence_md5"]: row for row in percentile_rows}
+    raw_by_md5 = {row["sequence_md5"]: row for row in raw_rows}
+    if set(percentile_by_md5) != set(raw_by_md5):
+        raise SystemExit("raw and percentile patch MD5 sets differ")
     output = {}
-    for row in rows:
+    for md5 in sorted(percentile_by_md5):
+        percentile = percentile_by_md5[md5]
+        raw = raw_by_md5[md5]
         record = {
-            "sequence_md5": row["sequence_md5"],
-            "protein_names": row["protein_names"],
+            "sequence_md5": md5,
+            "protein_names": percentile["protein_names"],
         }
-        for metric in ALL_AGGREGATE_METRICS:
-            record[metric] = float(row[metric])
-        output[row["sequence_md5"]] = record
+        for radius in (6, 10, 14):
+            record[f"r{radius}_relative_external_sticky_fraction"] = float(
+                percentile[f"r{radius}_relative_external_sticky_fraction"]
+            )
+            record[f"r{radius}_composite_catalytic_candidate_percentile"] = float(
+                percentile[f"r{radius}_composite_catalytic_candidate_percentile"]
+            )
+            record[f"r{radius}_mean_catalytic_candidate_percentile_ACOA"] = float(
+                percentile[f"r{radius}_mean_catalytic_candidate_percentile_ACOA"]
+            )
+            record[f"r{radius}_composite_cat_top"] = float(
+                raw[f"r{radius}_composite_cat_top"]
+            )
+            record[f"r{radius}_mean_cat_top_ACOA"] = float(
+                raw[f"r{radius}_mean_cat_top_ACOA"]
+            )
+        output[md5] = record
+    required = {"sequence_md5", "protein_names", *ALL_AGGREGATE_METRICS}
+    if not required.issubset(next(iter(output.values()))):
+        raise SystemExit("merged patch feature columns missing")
     return output
-
 
 def load_activity(feature_md5s):
     source = read_tsv(ACTIVITY)
@@ -516,6 +542,7 @@ def main():
         "d3_crosscondition_primary_associations": primary_d3,
         "d3_direction_consistency": directions,
         "input_patch_metrics": {"path": str(PATCH_METRICS), "sha256": sha256(PATCH_METRICS)},
+        "input_raw_patch_metrics": {"path": str(RAW_PATCH_METRICS), "sha256": sha256(RAW_PATCH_METRICS)},
         "input_activity_authority": {"path": str(ACTIVITY), "sha256": sha256(ACTIVITY)},
         "outputs": {
             name: {"path": str(path), "sha256": sha256(path)}
