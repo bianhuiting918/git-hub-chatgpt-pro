@@ -46,6 +46,8 @@ GUIDED_TARGETS_A = {
 GUIDED_FORCE_KCAL_MOL_A2 = 5.0
 GUIDED_MAXCYC = 600
 GUIDED_NCYC = 200
+EXPECTED_DFTB_DOUBLY_OCCUPIED_LEVELS = 194
+EXPECTED_DFTB_VALENCE_ELECTRON_COUNT = 388
 ARRAY_TASKS = 4
 SCOPE = "STEP2_BOUNDED_WATER_RECRUITMENT_A2_ONLY_NOT_PRODUCT_TS_PATH_PMF_BARRIER_OR_MECHANISM"
 NEXT = "STEP2_PRODUCT_ENDPOINT_BLOCKED_PENDING_RECRUITED_A2_PASS"
@@ -129,6 +131,49 @@ def format_qmmask(indices: Sequence[int]) -> str:
     if not values:
         raise ValueError("QM mask requires at least one atom")
     return "@" + ",".join(str(index) for index in values)
+
+
+def parse_recruitment_engine_contract(text: str) -> dict[str, list[int]]:
+    start = text.find("QMMM options:")
+    if start < 0:
+        region = ""
+    else:
+        stop = text.find("\n   NSTEP", start)
+        region = text[start : stop if stop >= 0 else len(text)]
+    patterns = {
+        "qm_atom_count": r"\bnquant\s*[=:]\s*(\d+)",
+        "qmcharge": r"\bqmcharge\s*[=:]\s*(-?\d+)",
+        "spin": r"\bspin\s*[=:]\s*(\d+)",
+        "link_atom_count": r"\bnlink\s*[=:]\s*(\d+)",
+        "dftb_doubly_occupied_levels": (
+            r"RHF\s+CALCULATION,\s+NO\.\s+OF\s+DOUBLY\s+OCCUPIED\s+LEVELS\s*=\s*(\d+)"
+        ),
+    }
+    observed = {
+        key: sorted(set(int(value) for value in re.findall(pattern, region, re.I)))
+        for key, pattern in patterns.items()
+    }
+    observed["dftb_valence_electron_count"] = sorted(
+        set(2 * value for value in observed["dftb_doubly_occupied_levels"])
+    )
+    return observed
+
+
+def recruitment_engine_contract_pass(
+    observed: Mapping[str, Sequence[int]], derived_all_electron_count: int
+) -> bool:
+    expected = {
+        "qm_atom_count": [EXPECTED_CONTRACT["qm_atom_count"]],
+        "qmcharge": [EXPECTED_CONTRACT["qmcharge"]],
+        "spin": [EXPECTED_CONTRACT["spin"]],
+        "link_atom_count": [EXPECTED_CONTRACT["link_atom_count"]],
+        "dftb_doubly_occupied_levels": [EXPECTED_DFTB_DOUBLY_OCCUPIED_LEVELS],
+        "dftb_valence_electron_count": [EXPECTED_DFTB_VALENCE_ELECTRON_COUNT],
+    }
+    return bool(
+        int(derived_all_electron_count) == EXPECTED_CONTRACT["electron_count"]
+        and all(list(observed.get(key, [])) == value for key, value in expected.items())
+    )
 
 
 def _derive_qm_contract(structure: Any, source_manifest: Mapping[str, Any], water_indices: Sequence[int]) -> tuple[list[int], dict[str, Any], str]:
@@ -293,7 +338,9 @@ def audit_guided(output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
     text = (stage / "stage.out").read_text(encoding="utf-8", errors="replace") if (stage / "stage.out").is_file() else ""
     engine_rc = int((stage / "engine.rc").read_text().strip()) if (stage / "engine.rc").is_file() else 999
     restart = stage / "stage.rst7"
-    banner = S2.parse_banner(text)
+    banner = parse_recruitment_engine_contract(text)
+    derived_all_electron_count = int(manifest["qm_contract"]["derived"]["electron_count"])
+    banner_contract_pass = recruitment_engine_contract_pass(banner, derived_all_electron_count)
     hard = {name: len(re.findall(pattern, text, re.I)) for name, pattern in S2.HARD_PATTERNS.items()}
     geometry: dict[str, Any] = {}
     geometry_error = None
@@ -307,7 +354,7 @@ def audit_guided(output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         and AC.stage_output_complete("guided_min", text)
         and restart.is_file()
         and restart.stat().st_size > 0
-        and S2.banner_pass(banner)
+        and banner_contract_pass
         and sum(hard.values()) == 0
         and geometry
         and geometry_error is None
@@ -320,8 +367,9 @@ def audit_guided(output: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         "guided_attack_pose_pass": guided_pass,
         "classification": "PASS_GUIDED_ATTACK_POSE" if guided_pass else "FAIL_GUIDED_ATTACK_POSE" if technical else "NOT_EVALUATED_GUIDED_TECHNICAL",
         "engine_exit_code": engine_rc,
-        "banner_contract_pass": S2.banner_pass(banner),
+        "banner_contract_pass": banner_contract_pass,
         "banner_observed": banner,
+        "derived_all_electron_count": derived_all_electron_count,
         "geometry": geometry,
         "restart_path": str(restart),
         "restart_sha256": sha256(restart) if restart.is_file() and restart.stat().st_size else "",
