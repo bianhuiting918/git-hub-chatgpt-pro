@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 import importlib.util
+import json
 import pathlib
 import unittest
 
@@ -26,6 +27,9 @@ class BalancedFourDistanceBridgeContractTest(unittest.TestCase):
         self.assertTrue(RUNNER.is_file(), "RED: balanced bridge runner is missing")
         self.assertTrue(SBATCH.is_file(), "RED: balanced bridge sbatch is missing")
         driver = load_driver()
+        source = driver.serializable_source(driver.source_from_index(0))
+        json.dumps(source)
+        self.assertIsInstance(source["restart"], str)
         self.assertEqual(driver.SOURCES[0]["restart_sha256"], "5d8f76d2c90e3e8c707b640c55a93938f53e18dc30d6f93d54adda467da25f41")
         self.assertEqual(driver.SOURCES[1]["restart_sha256"], "4cc60ad4d7be099b3f76040f1ee8c49b91deecebb20ed98570bc192b3d511132")
         self.assertEqual([(x["attack_A"], x["cn_A"]) for x in driver.BRANCHES], [(1.675,1.925),(1.800,1.800),(1.925,1.675)])
