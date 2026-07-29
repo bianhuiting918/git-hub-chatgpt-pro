@@ -8,7 +8,7 @@ This is a post hoc association analysis. It does not recompute structures, probe
 
 ## Evaluated universe
 
-- Patch features: the 30 exact-canonical Nature 2022 controls with valid PET `PATCH_PASS`.
+- Patch features: the 30 exact-canonical Nature 2022 controls with valid PET `PATCH_PASS`, joining the raw catalytic-patch table and the relative/percentile patch table by `sequence_md5`.
 - Excluded: protein 202, retained as `NONCANONICAL_MAPPING_REQUIRED`.
 - Activity authority: `activity_energy_long_authority.tsv`, restricted to `dataset=NATURAL2022`, `activity_metric=sum aromatic products`, and `activity_unit=mg/L`.
 - PET and nylon denominators remain separate.
@@ -41,7 +41,7 @@ These summaries are descriptive because assay endpoints are correlated repeated 
 
 ### Radius sensitivity
 
-Repeat the cross-condition aggregate analysis for 6 and 10 Å. Radius results are sensitivity analyses, not independent confirmations.
+Repeat the cross-condition aggregate analysis for 6 and 10 Å. Also retain catalytic-candidate percentile versions at 6, 10, and 14 Å as secondary normalization sensitivity. Radius and percentile results are sensitivity analyses, not independent confirmations.
 
 ### Table D6 sensitivity
 
