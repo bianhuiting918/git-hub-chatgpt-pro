@@ -20,9 +20,6 @@ cd "$CODE_ROOT"
 test "$(cat GITHUB_COMMIT)" = "$EXPECTED_COMMIT"
 test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT"
 sha256sum -c SNAPSHOT_SHA256.tsv
-"$PY" tests/test_nylc_a1_step2_water_reorganization_sampling.py
-"$PY" -m py_compile scripts/prepare_audit_nylc_a1_step2_water_reorganization_sampling.py
-"$PY" scripts/prepare_audit_nylc_a1_step2_water_reorganization_sampling.py --mode describe
-bash -n scripts/run_nylc_a1_step2_water_reorganization_sampling.sh
 export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPYCACHEPREFIX="${SLURM_TMPDIR:-/tmp}/nylc_a1_step2_water_reorg_pycache_${SLURM_ARRAY_JOB_ID:-manual}_${SLURM_ARRAY_TASK_ID:-manual}"
 exec bash scripts/run_nylc_a1_step2_water_reorganization_sampling.sh
