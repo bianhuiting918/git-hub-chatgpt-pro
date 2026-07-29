@@ -94,7 +94,9 @@ write_hashes() {
         cd "$OUT"
         for name in             A2_MANIFEST.json READY.json WATER_SELECTION.json WATER_CANDIDATES.tsv             A2_LEG_0.json A2_LEG_1.json RESULT.json PASS.json FAIL.json             NOT_EVALUATED.json a2_leg0_endpoint.rst7 a2_leg1_endpoint.rst7
         do
-            [[ -f "$name" ]] && sha256sum "$name"
+            if [[ -f "$name" ]]; then
+                sha256sum "$name"
+            fi
         done | sort -k2
     ) >"$OUT/SHA256.tsv"
 }
