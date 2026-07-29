@@ -37,5 +37,18 @@ class LaunchEnvironmentContract(unittest.TestCase):
         self.assertNotIn("${SLURM_TMPDIR:?", STEP2)
 
 
+    def test_step2_sparse_hash_manifest_does_not_fail_under_pipefail(self):
+        self.assertNotIn(
+            '[[ -f "$name" ]] && sha256sum "$name"',
+            STEP2,
+        )
+        self.assertIn(
+            'if [[ -f "$name" ]]; then\n'
+            '                sha256sum "$name"\n'
+            '            fi',
+            STEP2,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
