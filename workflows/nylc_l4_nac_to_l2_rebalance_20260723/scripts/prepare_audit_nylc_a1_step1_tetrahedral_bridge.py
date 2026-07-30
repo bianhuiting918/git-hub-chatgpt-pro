@@ -35,6 +35,7 @@ OUTPUT_ROOT = TASK_ROOT / "a1_activated_nac_20260726/qmmm/a1_step1_tetrahedral_b
 TECHNICAL_PASS = "PASS_TECHNICAL_A1_TETRAHEDRAL_BRIDGE"
 TECHNICAL_FAIL = "NOT_EVALUATED_TECHNICAL_A1_TETRAHEDRAL_BRIDGE"
 SCIENTIFIC_STATUS = "NOT_EVALUATED_TS_COMMITTOR_PMF_BARRIER_MECHANISM"
+MINIMIZATION_DRMS = 0.01
 
 SOURCES = {
     1: {
@@ -95,6 +96,7 @@ def describe() -> dict[str, Any]:
         "strict_serial_restart_inheritance": True,
         "failed_restart_inheritance": False,
         "explicit_carbonyl_restraint": True,
+        "minimization_drms": MINIMIZATION_DRMS,
         "tetrahedral_target": dict(TETRA_TARGET),
         "frozen_step1_contract": BASE.describe()["frozen_step1_contract"],
         "automatic_downstream_action": "NONE",
@@ -250,6 +252,16 @@ def _terminal(manifest: Mapping[str, Any]) -> tuple[bool, str | None]:
     return False, None
 
 
+def tetra_minimization_input(
+    task: Mapping[str, Any], stage: Mapping[str, Any], qmmask: str
+) -> str:
+    text = BASE.minimization_input(task, stage, qmmask)
+    old = "drms=0.10,"
+    if text.count(old) != 1:
+        raise ValueError("base minimization drms authority changed")
+    return text.replace(old, f"drms={MINIMIZATION_DRMS:.2f},")
+
+
 def prepare_window(
     root: pathlib.Path,
     output: pathlib.Path,
@@ -271,7 +283,7 @@ def prepare_window(
     output.mkdir(parents=True, exist_ok=False)
     scratch.mkdir(parents=True, exist_ok=False)
     (scratch / "stage.in").write_text(
-        BASE.minimization_input(
+        tetra_minimization_input(
             manifest["task"], stage, manifest["qm_contract"]["qmmask"]
         ),
         encoding="utf-8",
