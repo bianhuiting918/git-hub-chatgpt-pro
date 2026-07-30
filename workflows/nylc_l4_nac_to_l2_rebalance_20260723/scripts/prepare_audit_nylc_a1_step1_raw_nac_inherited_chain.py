@@ -29,7 +29,7 @@ CALIBRATION_JOB = "62471131"
 CALIBRATION_ROOT = RAW.OUTPUT_ROOT
 CALIBRATION_AUDIT = (
     CALIBRATION_ROOT / "audit"
-    / f"nylc_a1_raw_nac_forward_calibration_{CALIBRATION_JOB}.json"
+    / f"nylc_a1_raw_nac_forward_calibration_{CALIBRATION_JOB}_v2.json"
 )
 OUTPUT_ROOT = (
     TASK_ROOT / "a1_activated_nac_20260726/qmmm"
@@ -281,6 +281,7 @@ def restrained_hint(mode: str, geometry: Mapping[str, Any]) -> dict[str, Any]:
     angle_sum = float(geometry.get("product_angle_sum_deg", 360.0))
     tetra_response = carbonyl >= 1.28 or oop >= 0.15 or angle_sum <= 350.0
     if mode == "ADDITION_FIRST_RAW_NAC":
+        hint_kind = "TETRAHEDRAL_INTERMEDIATE_HINT"
         checks = {
             "attack_bond_formed": 1.30 <= attack <= 1.75,
             "cn_bond_retained": 1.25 <= cn <= 1.90,
@@ -290,6 +291,7 @@ def restrained_hint(mode: str, geometry: Mapping[str, Any]) -> dict[str, Any]:
             "tetrahedral_response": tetra_response,
         }
     elif mode == "FULLY_CONCERTED_RAW_NAC":
+        hint_kind = "CONCERTED_BOUNDARY_HINT"
         checks = {
             "attack_boundary": 1.45 <= attack <= 2.20,
             "cn_boundary": 1.45 <= cn <= 2.20,
@@ -301,6 +303,7 @@ def restrained_hint(mode: str, geometry: Mapping[str, Any]) -> dict[str, Any]:
     else:
         raise ValueError("unknown mechanism")
     checks["all"] = all(checks.values())
+    checks["hint_kind"] = hint_kind
     return checks
 
 
@@ -334,7 +337,7 @@ def initialize(task_index: int, root: pathlib.Path, commit: str) -> dict[str, An
     ]
     if (
         not all(checks) or len(audit_rows) != 1
-        or audit_rows[0].get("eligible_for_inherited_chain") is not True
+        or audit_rows[0].get("eligible_for_inherited_chain_v2") is not True
     ):
         raise ValueError("selected calibration source authority failed")
     contract = RAW.validate_full_contract(
@@ -536,7 +539,7 @@ def finalize(root: pathlib.Path) -> dict[str, Any]:
     gate = (
         "NOT_EVALUATED_TECHNICAL_A1_RAW_NAC_INHERITED_CHAIN"
         if not technical else
-        "PASS_RESTRAINED_FORWARD_BOUNDARY_HINT"
+        "PASS_RESTRAINED_FORWARD_CHEMICAL_RESPONSE_HINT"
         if hints else
         "PARTIAL_FORWARD_ACTUAL_RESPONSE"
         if accepted_count else
@@ -593,7 +596,7 @@ def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
         "status": (
             "NOT_EVALUATED_TECHNICAL_A1_RAW_NAC_INHERITED_CHAIN"
             if technical != ARRAY_TASKS else
-            "PASS_BOTH_MECHANISMS_RESTRAINED_HINTS_REPRODUCED"
+            "PASS_BOTH_MECHANISMS_RESTRAINED_RESPONSE_HINTS_REPRODUCED"
             if all(row["restrained_hint_seeds"] == 2 for row in per_mode.values()) else
             "PARTIAL_A1_RAW_NAC_INHERITED_CHAIN"
         ),
@@ -601,7 +604,11 @@ def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
         "technical_pass_tasks": technical,
         "per_mechanism": per_mode,
         "per_task": results,
-        "next_action": "REACTION_COORDINATE_FREE_RELEASE_OF_RESTRAINED_HINTS_ONLY",
+        "next_action": (
+            "REACTION_COORDINATE_FREE_RELEASE_OF_HINTS_ONLY"
+            if any(row["restrained_hint_seeds"] > 0 for row in per_mode.values())
+            else "NO_RELEASE_BRANCH_SPECIFIC_RECALIBRATION"
+        ),
         "scientific_status": SCIENTIFIC_STATUS,
         "automatic_downstream_action": "NONE",
     }
