@@ -523,6 +523,48 @@ def force_effect_vs_baseline(
             "active_coordinates": active, "checks": checks}
 
 
+def force_effect_vs_baseline_v2(
+    item: Mapping[str, Any], baseline: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Versioned distance-to-target control comparison.
+
+    Absolute source-to-forced direction is already required by
+    eligible_by_absolute_response.  The matched baseline may drift beyond the
+    target, so the sign of forced-minus-baseline is diagnostic but cannot be a
+    second direction requirement.  V2 requires the forced structure to be
+    closer to the predeclared target than the no-reaction-coordinate control.
+    """
+    active = list(item["response_from_raw_source"]["active_coordinates"])
+    checks = {}
+    for name in active:
+        source = _coordinate_value(item["source_geometry"], name)
+        target = _coordinate_value(item["target_geometry"], name)
+        final = _coordinate_value(item["final_geometry"], name)
+        control = _coordinate_value(baseline["final_geometry"], name)
+        expected = target - source
+        effect = final - control
+        checks[name] = {
+            "expected_delta_from_raw_A": expected,
+            "forced_minus_baseline_A": effect,
+            "forced_minus_baseline_toward_raw_target": expected * effect > 0.0,
+            "forced_closer_to_target_than_baseline": (
+                abs(final - target) < abs(control - target)
+            ),
+            "baseline_overshot_target_along_raw_direction": (
+                expected * (control - target) > 0.0
+            ),
+        }
+        checks[name]["pass"] = checks[name][
+            "forced_closer_to_target_than_baseline"
+        ]
+    return {
+        "criterion_version": "MATCHED_BASELINE_DISTANCE_V2",
+        "all": bool(active) and all(row["pass"] for row in checks.values()),
+        "active_coordinates": active,
+        "checks": checks,
+    }
+
+
 def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
     paths = [
         output_root / f"attempt_{array_job}_{index}" / "RESULT.json"
@@ -602,10 +644,114 @@ def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
     return True
 
 
+def merge_v2_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
+    paths = [
+        output_root / f"attempt_{array_job}_{index}" / "RESULT.json"
+        for index in range(ARRAY_TASKS)
+    ]
+    if not all(path.is_file() for path in paths):
+        return False
+    results = [BASE.read_json(path) for path in paths]
+    baselines = {
+        item["task"]["seed"]: item for item in results if item["matched_baseline"]
+    }
+    per_task = []
+    selected = []
+    for item in sorted(results, key=lambda row: row["task"]["task_index"]):
+        row = dict(item)
+        if not row["matched_baseline"] and row.get("technical_complete") is True:
+            effect = force_effect_vs_baseline_v2(
+                row, baselines[row["task"]["seed"]]
+            )
+            row["force_effect_vs_matched_baseline_v2"] = effect
+            row["eligible_for_inherited_chain_v2"] = bool(
+                row["eligible_by_absolute_response"] and effect["all"]
+            )
+        else:
+            row["force_effect_vs_matched_baseline_v2"] = None
+            row["eligible_for_inherited_chain_v2"] = False
+        per_task.append(row)
+    for seed in (26723, 26737):
+        for mode in MODES[1:]:
+            candidates = [
+                row for row in per_task
+                if row["task"]["seed"] == seed
+                and row["task"]["mode"] == mode
+                and row["eligible_for_inherited_chain_v2"]
+            ]
+            selected.append({
+                "seed": seed,
+                "mode": mode,
+                "selected_weakest_scale": (
+                    min(row["task"]["scale"] for row in candidates)
+                    if candidates else None
+                ),
+            })
+    technical = sum(row.get("technical_complete") is True for row in results)
+    baseline_pass = sum(
+        row.get("technical_complete") is True and row["matched_baseline"]
+        for row in results
+    )
+    selected_count = sum(
+        row["selected_weakest_scale"] is not None for row in selected
+    )
+    legacy = (
+        output_root / "audit"
+        / f"nylc_a1_raw_nac_forward_calibration_{array_job}.json"
+    )
+    if not legacy.is_file():
+        raise FileNotFoundError("v2 audit requires immutable legacy audit")
+    payload = {
+        "schema_version": 2,
+        "criterion_version": "MATCHED_BASELINE_DISTANCE_V2",
+        "status": (
+            "NOT_EVALUATED_TECHNICAL_A1_RAW_NAC_FORWARD_CALIBRATION_V2"
+            if technical != ARRAY_TASKS or baseline_pass != 2 else
+            "PASS_RAW_NAC_FORWARD_FORCE_CALIBRATION_MATRIX_V2"
+            if selected_count == 4 else
+            "PARTIAL_RAW_NAC_FORWARD_FORCE_CALIBRATION_MATRIX_V2"
+        ),
+        "legacy_audit": str(legacy),
+        "legacy_audit_sha256": sha256(legacy),
+        "legacy_gate_preserved": True,
+        "denominator_tasks": ARRAY_TASKS,
+        "technical_pass_tasks": technical,
+        "matched_baseline_pass_seeds": baseline_pass,
+        "qualified_force_tasks_v2": sum(
+            row["eligible_for_inherited_chain_v2"] for row in per_task
+        ),
+        "selected_minimum_force_scales": selected,
+        "per_task": per_task,
+        "next_action": (
+            "STRICT_INHERITED_WINDOWS_FROM_ALL_SELECTED_SCALES"
+            if selected_count == 4 else
+            "STRICT_INHERITED_WINDOWS_FOR_SELECTED_BRANCHES_AND_LOCAL_RECALIBRATION_FOR_MISSING"
+            if selected_count else
+            "LOCAL_RECALIBRATION_ONLY"
+        ),
+        "scientific_status": SCIENTIFIC_STATUS,
+        "automatic_downstream_action": "NONE",
+        "interpretation_boundary": (
+            "V2 corrects matched-baseline overshoot geometry only; "
+            "absolute-response failures remain failures"
+        ),
+    }
+    audit = (
+        output_root / "audit"
+        / f"nylc_a1_raw_nac_forward_calibration_{array_job}_v2.json"
+    )
+    audit.parent.mkdir(parents=True, exist_ok=True)
+    if audit.exists() and BASE.read_json(audit) != payload:
+        raise FileExistsError(audit)
+    if not audit.exists():
+        BASE.write_json(audit, payload)
+    return True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", required=True, choices=(
-        "describe", "initialize", "prepare", "audit", "merge-if-ready",
+        "describe", "initialize", "prepare", "audit", "merge-if-ready", "merge-v2",
     ))
     parser.add_argument("--task-index", type=int)
     parser.add_argument("--root", type=pathlib.Path)
@@ -622,8 +768,10 @@ def main() -> int:
         prepare(args.root.resolve(), args.scratch.resolve())
     elif args.mode == "audit":
         audit(args.root.resolve(), args.scratch.resolve())
-    else:
+    elif args.mode == "merge-if-ready":
         merge_if_ready(args.output_root.resolve(), args.array_job)
+    else:
+        merge_v2_if_ready(args.output_root.resolve(), args.array_job)
     return 0
 
 
