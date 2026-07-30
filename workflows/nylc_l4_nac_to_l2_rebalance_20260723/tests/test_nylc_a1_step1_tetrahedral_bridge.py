@@ -98,6 +98,27 @@ class TetrahedralBridgeContract(unittest.TestCase):
         self.assertIn("iat=10287,10288", blocks[2])
         self.assertIn("r2=1.375, r3=1.385", blocks[2])
 
+    def test_each_tetrahedral_restraint_is_a_physical_line(self):
+        driver = load_driver()
+        stage = {
+            "targets": {
+                "attack_A": 1.48,
+                "c12_n3_A": 1.62,
+                "c12_o2_A": 1.38,
+                "nalpha_hg1_A": 1.05,
+                "hg1_n3_A": 2.20,
+            },
+            "force_bond": 24.0,
+            "force_carbonyl": 30.0,
+            "force_pt": 18.0,
+            "proton_coordinate_active": False,
+        }
+        text = driver.restraints(stage)
+        self.assertNotIn("\\n", text)
+        lines = text.splitlines()
+        self.assertEqual(len(lines), 3)
+        self.assertTrue(all(line.startswith("&rst ") for line in lines))
+
     def test_strict_inheritance_parallel_array_and_no_automatic_downstream(self):
         runner = RUNNER.read_text(encoding="utf-8")
         sbatch = SBATCH.read_text(encoding="utf-8")
