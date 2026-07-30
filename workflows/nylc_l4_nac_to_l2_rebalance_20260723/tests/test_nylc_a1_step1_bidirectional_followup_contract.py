@@ -108,9 +108,9 @@ class BidirectionalFollowupContract(unittest.TestCase):
             contract = desc["frozen_step1_contract"]
             self.assertEqual(contract["qm_atom_count"], 146)
             self.assertEqual(contract["qmcharge"], 0)
-            self.assertEqual(contract["electron_count_including_link_h"], 510)
+            self.assertEqual(contract["electron_count"], 510)
             self.assertEqual(contract["link_atom_count"], 6)
-            self.assertEqual(contract["step1_qm_water_count"], 0)
+            self.assertEqual(contract["qm_water_count"], 0)
             self.assertEqual(desc["automatic_downstream_action"], "NONE")
             self.assertTrue(desc["restrained_structures_are_not_ts"])
 
