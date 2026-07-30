@@ -118,6 +118,32 @@ class RawNacInheritedChainContract(unittest.TestCase):
         self.assertEqual(rst.count("&rst"), 2)
         self.assertEqual(rst.count("/\n"), 2)
 
+    @unittest.skipUnless(DRIVER.exists(), "production driver not implemented yet")
+    def test_hint_semantics_do_not_call_stepwise_tetrahedral_structure_a_boundary(self):
+        addition = {
+            "attack_A": 1.55,
+            "c12_n3_A": 1.42,
+            "c12_o2_A": 1.36,
+            "nalpha_hg1_A": 1.04,
+            "hg1_n3_A": 2.00,
+            "attack_angle_deg": 105.0,
+            "product_out_of_plane_A": 0.20,
+            "product_angle_sum_deg": 345.0,
+        }
+        concerted = dict(
+            addition,
+            attack_A=1.80,
+            c12_n3_A=1.75,
+            nalpha_hg1_A=1.30,
+            hg1_n3_A=1.30,
+        )
+        stepwise = self.mod.restrained_hint("ADDITION_FIRST_RAW_NAC", addition)
+        boundary = self.mod.restrained_hint("FULLY_CONCERTED_RAW_NAC", concerted)
+        self.assertTrue(stepwise["all"])
+        self.assertEqual(stepwise["hint_kind"], "TETRAHEDRAL_INTERMEDIATE_HINT")
+        self.assertTrue(boundary["all"])
+        self.assertEqual(boundary["hint_kind"], "CONCERTED_BOUNDARY_HINT")
+
 
 if __name__ == "__main__":
     unittest.main()
