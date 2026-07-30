@@ -198,17 +198,27 @@ def initialize(task_index: int, root: pathlib.Path, commit: str) -> dict[str, An
     return manifest
 
 
+def _tight_distance_restraint(
+    first: int, second: int, target: float, force: float, half_width: float = 0.005
+) -> str:
+    return (
+        f"&rst iat={first},{second}, r1={max(0.1, target - 0.35):.3f}, "
+        f"r2={target - half_width:.3f}, r3={target + half_width:.3f}, r4=4.500, "
+        f"rk2={force:.1f}, rk3={force:.1f}, /\\n"
+    )
+
+
 def restraints(stage: Mapping[str, Any]) -> str:
     target = stage["targets"]
     text = "".join(
         (
-            BASE.AUTH.AC.distance_restraint(
+            _tight_distance_restraint(
                 REACTIVE["og1"], REACTIVE["c12"], target["attack_A"], stage["force_bond"]
             ),
-            BASE.AUTH.AC.distance_restraint(
+            _tight_distance_restraint(
                 REACTIVE["c12"], REACTIVE["n3"], target["c12_n3_A"], stage["force_bond"]
             ),
-            BASE.AUTH.AC.distance_restraint(
+            _tight_distance_restraint(
                 REACTIVE["c12"], REACTIVE["o2"], target["c12_o2_A"],
                 stage["force_carbonyl"],
             ),
@@ -217,11 +227,11 @@ def restraints(stage: Mapping[str, Any]) -> str:
     if stage["proton_coordinate_active"]:
         text += "".join(
             (
-                BASE.AUTH.AC.distance_restraint(
+                _tight_distance_restraint(
                     REACTIVE["nalpha"], REACTIVE["hg1"],
                     target["nalpha_hg1_A"], stage["force_pt"],
                 ),
-                BASE.AUTH.AC.distance_restraint(
+                _tight_distance_restraint(
                     REACTIVE["hg1"], REACTIVE["n3"],
                     target["hg1_n3_A"], stage["force_pt"],
                 ),
@@ -280,13 +290,15 @@ def prepare_window(
     return prepared
 
 
-def _response(previous: float, current: float, target: float, tolerance: float = 0.06) -> dict[str, Any]:
+def _response(previous: float, current: float, target: float, tolerance: float = 0.01) -> dict[str, Any]:
     expected = float(target) - float(previous)
     actual = float(current) - float(previous)
     required = abs(expected) >= 0.005
     same_direction = expected * actual > 0.0
     at_target = abs(float(current) - float(target)) <= tolerance
-    passed = (not required) or at_target or (same_direction and abs(actual) >= 0.005)
+    passed = (not required) or (
+        same_direction and (at_target or abs(actual) >= 0.005)
+    )
     return {
         "required": required,
         "expected_delta_A": expected,
