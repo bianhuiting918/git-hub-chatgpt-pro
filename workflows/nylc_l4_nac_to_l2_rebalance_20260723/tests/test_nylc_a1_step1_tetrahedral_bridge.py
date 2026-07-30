@@ -119,6 +119,17 @@ class TetrahedralBridgeContract(unittest.TestCase):
         self.assertEqual(len(lines), 3)
         self.assertTrue(all(line.startswith("&rst ") for line in lines))
 
+    def test_tetrahedral_minimization_uses_local_response_sensitive_drms(self):
+        driver = load_driver()
+        text = driver.tetra_minimization_input(
+            {"task_index": 1},
+            {"window_index": 0, "maxcyc": 2200, "ncyc": 550},
+            "@1",
+        )
+        self.assertIn("drms=0.01", text)
+        self.assertNotIn("drms=0.10", text)
+        self.assertEqual(driver.describe()["minimization_drms"], 0.01)
+
     def test_strict_inheritance_parallel_array_and_no_automatic_downstream(self):
         runner = RUNNER.read_text(encoding="utf-8")
         sbatch = SBATCH.read_text(encoding="utf-8")
