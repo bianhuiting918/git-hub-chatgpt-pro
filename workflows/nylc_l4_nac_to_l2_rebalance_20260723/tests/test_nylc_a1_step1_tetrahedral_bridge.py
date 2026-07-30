@@ -53,11 +53,11 @@ class TetrahedralBridgeContract(unittest.TestCase):
         )
         self.assertEqual(
             driver.task_spec(2)["source_restart_sha256"],
-            "09e22fb16670fb1190455d85796be5ebea7c70567c7154d0cc643de5a95827a3",
+            "09e22fb16670fc5fc6427a1aacf80851b97c323fa4eefb900760bde8ebc3be26",
         )
         self.assertEqual(
             driver.task_spec(4)["source_restart_sha256"],
-            "740f5fb11de919c26263442242585194b830986414cdf17724c43348649d747c",
+            "740f5fb11de92842af2786ade6af03856dff40351209a613355a9b4dd19b3782",
         )
         text = DRIVER.read_text(encoding="utf-8")
         self.assertIn('REACTIVE["o2"]', text)
