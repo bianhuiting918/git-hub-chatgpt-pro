@@ -77,6 +77,25 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
         self.assertNotIn("attack_candidate_upper", self.mod.first_window_guard(reactant_like)["checks"])
 
     @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
+    def test_full_geometry_contract_requires_qm_heavy_atom_indices(self):
+        payload = {
+            "qm_contract": {
+                "qm_atom_count": 146,
+                "qmcharge": 0,
+                "electron_count_including_link_h": 510,
+                "link_atom_count": 6,
+                "step1_qm_water_count": 0,
+                "qmmask": "@1",
+                "qm_heavy_atom_indices": [1],
+            }
+        }
+        contract = self.mod.validate_full_contract(payload, "@1")
+        self.assertEqual(contract["qm_heavy_atom_indices"], [1])
+        del payload["qm_contract"]["qm_heavy_atom_indices"]
+        with self.assertRaises(ValueError):
+            self.mod.validate_full_contract(payload, "@1")
+
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
     def test_frozen_contract_and_no_automatic_downstream(self):
         self.assertEqual(self.mod.QM_CONTRACT["qm_atoms"], 146)
         self.assertEqual(self.mod.QM_CONTRACT["qm_charge"], 0)
