@@ -17,8 +17,12 @@ def load_driver():
 class RawNacForwardCalibrationContract(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.mod = load_driver()
+        cls.mod = load_driver() if DRIVER_PATH.exists() else None
 
+    def test_driver_exists(self):
+        self.assertTrue(DRIVER_PATH.exists(), f"missing production driver: {DRIVER_PATH}")
+
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
     def test_matrix_is_two_seeds_times_baseline_and_two_mechanisms_four_scales(self):
         self.assertEqual(self.mod.ARRAY_TASKS, 18)
         self.assertEqual(tuple(self.mod.FORCE_SCALES), (1, 2, 4, 8))
@@ -33,6 +37,7 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
                     [1, 2, 4, 8],
                 )
 
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
     def test_sources_are_hash_fixed_raw_unbiased_nac_frames(self):
         expected = {
             26723: {
@@ -51,12 +56,14 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
             self.assertIn("pt2_preorganized_frame_extraction", str(source["source_gro"]))
             self.assertNotIn("attack_inherited", str(source["source_gro"]))
 
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
     def test_baseline_has_no_reaction_coordinate_restraints(self):
         baseline = self.mod.task_spec(0)
         self.assertEqual(baseline["mode"], "REACTION_COORDINATE_FREE_BASELINE")
         self.assertEqual(self.mod.reactive_restraints(baseline, {}), [])
         self.assertFalse(self.mod.nmropt_for_spec(baseline))
 
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
     def test_first_window_guard_is_reactant_safe_not_tetrahedral_candidate_gate(self):
         reactant_like = {
             "attack_A": 3.10,
@@ -69,6 +76,7 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
         self.assertFalse(self.mod.first_window_guard(overcompressed)["pass"])
         self.assertNotIn("attack_candidate_upper", self.mod.first_window_guard(reactant_like)["checks"])
 
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
     def test_frozen_contract_and_no_automatic_downstream(self):
         self.assertEqual(self.mod.QM_CONTRACT["qm_atoms"], 146)
         self.assertEqual(self.mod.QM_CONTRACT["qm_charge"], 0)
