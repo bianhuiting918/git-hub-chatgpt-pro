@@ -50,10 +50,15 @@ SOURCE_ROOT = (
     / "a1_activated_nac_20260726/pt2_preorganized_frame_extraction"
     / "attempt_62112503"
 )
+CONTRACT_ROOT = (
+    TASK_ROOT
+    / "a1_activated_nac_20260726/qmmm/a1_step1_acyl_release_md_continuation"
+)
 SOURCES = {
     26723: {
         "seed_index": 0,
         "candidate": "seed26723_t378_f189",
+        "contract_attempt": "attempt_62216380_0",
         "source_gro": SOURCE_ROOT / "seed26723_t378_f189/source.gro",
         "source_gro_sha256": "14477791ce14a35cef0adf9b802b562e091660526ca06de1132f6a74070faf10",
         "start_rst7_sha256": "2440de548c385f092c37f683de7b379ff5b18b6dc16593f7dbc80a9a8a167e14",
@@ -61,6 +66,7 @@ SOURCES = {
     26737: {
         "seed_index": 1,
         "candidate": "seed26737_t676_f338",
+        "contract_attempt": "attempt_62216380_1",
         "source_gro": SOURCE_ROOT / "seed26737_t676_f338/source.gro",
         "source_gro_sha256": "a7924184ad3db4c13e0eab4929d46ee99621eacd523e899c0aca39c540350bc8",
         "start_rst7_sha256": "48c3944d3295158b06e96e32e4e07d9bcae9ceba2731f95aae9c1335ff972abe",
@@ -258,15 +264,18 @@ def _baseline_input(spec: Mapping[str, Any], stage: Mapping[str, Any], qmmask: s
     return "\n".join(kept) + "\n"
 
 
-def _contract(qmmask: str) -> dict[str, Any]:
-    return {
-        "qm_atom_count": QM_CONTRACT["qm_atoms"],
-        "qmcharge": QM_CONTRACT["qm_charge"],
-        "electron_count_including_link_h": QM_CONTRACT["electrons"],
-        "link_atom_count": QM_CONTRACT["link_atoms"],
-        "step1_qm_water_count": QM_CONTRACT["qm_waters"],
-        "qmmask": qmmask,
-    }
+def validate_full_contract(
+    payload: Mapping[str, Any], qmmask: str
+) -> dict[str, Any]:
+    contract = FWD.CAL._validate_contract(payload)
+    heavy = contract.get("qm_heavy_atom_indices")
+    if contract.get("qmmask") != qmmask:
+        raise ValueError("raw NAC qmmask differs from frozen full contract")
+    if not isinstance(heavy, list) or not heavy or not all(
+        isinstance(index, int) and index > 0 for index in heavy
+    ):
+        raise ValueError("full QM geometry contract lacks qm_heavy_atom_indices")
+    return contract
 
 
 def initialize(task_index: int, root: pathlib.Path, commit: str) -> dict[str, Any]:
@@ -307,7 +316,12 @@ def initialize(task_index: int, root: pathlib.Path, commit: str) -> dict[str, An
     structure.save(str(start), overwrite=False)
     if sha256(start) != source["start_rst7_sha256"]:
         raise ValueError("deterministic raw NAC restart SHA changed")
-    contract = _contract(qmmask)
+    contract_manifest = (
+        CONTRACT_ROOT / source["contract_attempt"] / "ENDPOINT_MANIFEST.json"
+    )
+    if not contract_manifest.is_file():
+        raise FileNotFoundError(contract_manifest)
+    contract = validate_full_contract(BASE.read_json(contract_manifest), qmmask)
     geometry = BASE.AUTH._geometry(start, {"qm_contract": contract})
     manifest = {
         "schema_version": 1,
