@@ -64,6 +64,40 @@ class TetrahedralBridgeContract(unittest.TestCase):
         self.assertIn('"c12_o2_A"', text)
         self.assertIn("distance_restraint", text)
 
+    def test_required_response_rejects_opposite_direction_near_target(self):
+        driver = load_driver()
+        response = driver._response(
+            previous=1.2302340709352817,
+            current=1.2291623894039534,
+            target=1.2676755532014612,
+        )
+        self.assertTrue(response["required"])
+        self.assertFalse(response["same_direction"])
+        self.assertFalse(response["pass"])
+
+    def test_tetrahedral_restraints_use_narrow_reaction_coordinate_wells(self):
+        driver = load_driver()
+        stage = {
+            "targets": {
+                "attack_A": 1.48,
+                "c12_n3_A": 1.62,
+                "c12_o2_A": 1.38,
+                "nalpha_hg1_A": 1.05,
+                "hg1_n3_A": 2.20,
+            },
+            "force_bond": 24.0,
+            "force_carbonyl": 30.0,
+            "force_pt": 18.0,
+            "proton_coordinate_active": False,
+        }
+        text = driver.restraints(stage)
+        blocks = [block for block in text.split("&rst ") if block.strip()]
+        self.assertEqual(len(blocks), 3)
+        self.assertIn("r2=1.475, r3=1.485", blocks[0])
+        self.assertIn("r2=1.615, r3=1.625", blocks[1])
+        self.assertIn("iat=10287,10288", blocks[2])
+        self.assertIn("r2=1.375, r3=1.385", blocks[2])
+
     def test_strict_inheritance_parallel_array_and_no_automatic_downstream(self):
         runner = RUNNER.read_text(encoding="utf-8")
         sbatch = SBATCH.read_text(encoding="utf-8")
