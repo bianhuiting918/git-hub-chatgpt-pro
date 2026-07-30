@@ -78,6 +78,10 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
 
     @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
     def test_full_geometry_contract_requires_qm_heavy_atom_indices(self):
+        self.assertTrue(
+            hasattr(self.mod, "validate_full_contract"),
+            "missing full QM geometry-contract validator",
+        )
         payload = {
             "qm_contract": {
                 "qm_atom_count": 146,
