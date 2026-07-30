@@ -204,7 +204,7 @@ def _tight_distance_restraint(
     return (
         f"&rst iat={first},{second}, r1={max(0.1, target - 0.35):.3f}, "
         f"r2={target - half_width:.3f}, r3={target + half_width:.3f}, r4=4.500, "
-        f"rk2={force:.1f}, rk3={force:.1f}, /\\n"
+        f"rk2={force:.1f}, rk3={force:.1f}, /\n"
     )
 
 
