@@ -115,6 +115,54 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
         self.assertFalse(self.mod.AUTO_SHOOTING)
         self.assertFalse(self.mod.AUTO_PMF)
 
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
+    def test_v2_relative_gate_handles_baseline_overshoot_without_sign_error(self):
+        item = {
+            "source_geometry": {
+                "attack_A": 3.00,
+                "c12_n3_A": 1.35,
+                "c12_o2_A": 1.22,
+                "nalpha_hg1_A": 1.02,
+                "hg1_n3_A": 2.00,
+            },
+            "target_geometry": {
+                "attack_A": 2.96,
+                "c12_n3_A": 1.35,
+                "c12_o2_A": 1.25,
+                "nalpha_hg1_A": 1.02,
+                "hg1_n3_A": 2.00,
+            },
+            "final_geometry": {
+                "attack_A": 2.97,
+                "c12_n3_A": 1.35,
+                "c12_o2_A": 1.251,
+                "nalpha_hg1_A": 1.02,
+                "hg1_n3_A": 2.00,
+            },
+            "response_from_raw_source": {
+                "active_coordinates": ["attack", "carbonyl"]
+            },
+        }
+        baseline = {
+            "final_geometry": {
+                "attack_A": 3.20,
+                "c12_n3_A": 1.35,
+                "c12_o2_A": 1.27,
+                "nalpha_hg1_A": 1.02,
+                "hg1_n3_A": 2.00,
+            }
+        }
+        legacy = self.mod.force_effect_vs_baseline(item, baseline)
+        revised = self.mod.force_effect_vs_baseline_v2(item, baseline)
+        self.assertFalse(legacy["all"])
+        self.assertTrue(revised["all"])
+        self.assertFalse(
+            revised["checks"]["carbonyl"]["forced_minus_baseline_toward_raw_target"]
+        )
+        self.assertTrue(
+            revised["checks"]["carbonyl"]["forced_closer_to_target_than_baseline"]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
