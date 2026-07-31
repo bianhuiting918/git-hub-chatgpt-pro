@@ -43,11 +43,7 @@ def test_adapter_exposes_single_seed_base_driver_contract():
     assert callable(module.validate_task6_authority)
 
 
-def test_base_driver_uses_amber18_single_prefix_atom_mask():
-    source = (
-        WORKFLOW_ROOT
-        / "scripts"
-        / "prepare_audit_nylc_a1_step2_qmwater_endpoint.py"
-    ).read_text(encoding="utf-8")
-    assert 'qmmask = "@" + ",".join(str(index) for index in qm_indices)' in source
-    assert 'qmmask = ",".join(f"@{index}" for index in qm_indices)' not in source
+def test_adapter_normalizes_repeated_atom_mask_prefixes_for_amber18():
+    module = load_adapter()
+    assert module.normalize_amber_atom_mask("@1,@2,@3") == "@1,2,3"
+    assert module.normalize_amber_atom_mask("@1,2,3") == "@1,2,3"
