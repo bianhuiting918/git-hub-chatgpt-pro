@@ -92,6 +92,8 @@ AUTO_RELEASE = False
 AUTO_SHOOTING = False
 AUTO_PMF = False
 SCIENTIFIC_STATUS = "NOT_EVALUATED_TS_COMMITTOR_PMF_BARRIER_MECHANISM"
+NUMERICAL_RMS_HARD_LIMIT = 1.0e6
+NUMERICAL_GMAX_HARD_LIMIT = 1.0e9
 
 
 def sha256(path: pathlib.Path) -> str:
@@ -155,6 +157,55 @@ def describe() -> dict[str, Any]:
 
 def _qpt(geometry: Mapping[str, Any]) -> float:
     return float(geometry["nalpha_hg1_A"]) - float(geometry["hg1_n3_A"])
+
+
+def _amber_float(token: str) -> float:
+    return float(token.replace("D", "E").replace("d", "e"))
+
+
+def engine_numerical_health(text: str) -> dict[str, Any]:
+    """Reject unmistakable Amber/QM numerical divergence.
+
+    This deliberately uses very loose hard limits: it is a technical-safety
+    gate, not a convergence or scientific-quality criterion.
+    """
+    hard_errors: list[str] = []
+    if re.search(r"(?m)^\s*(?:DFTBESCF|EAMBER)\s*=\s*\*+", text):
+        hard_errors.append("ENERGY_FIELD_OVERFLOW")
+    if re.search(r"(?i)(?<![A-Za-z])(?:nan|[+-]?inf(?:inity)?)(?![A-Za-z])", text):
+        hard_errors.append("NONFINITE_ENGINE_OUTPUT")
+
+    rms_values: list[float] = []
+    gmax_values: list[float] = []
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        if "NSTEP" not in line or "RMS" not in line or "GMAX" not in line:
+            continue
+        for candidate in lines[index + 1:index + 5]:
+            fields = candidate.split()
+            if len(fields) < 4 or not fields[0].isdigit():
+                continue
+            try:
+                rms_values.append(abs(_amber_float(fields[2])))
+                gmax_values.append(abs(_amber_float(fields[3])))
+            except ValueError:
+                pass
+            break
+    max_rms = max(rms_values) if rms_values else None
+    max_gmax = max(gmax_values) if gmax_values else None
+    if max_rms is not None and max_rms > NUMERICAL_RMS_HARD_LIMIT:
+        hard_errors.append("RMS_NUMERICAL_DIVERGENCE")
+    if max_gmax is not None and max_gmax > NUMERICAL_GMAX_HARD_LIMIT:
+        hard_errors.append("GMAX_NUMERICAL_DIVERGENCE")
+    return {
+        "pass": not hard_errors,
+        "hard_errors": hard_errors,
+        "max_abs_rms": max_rms,
+        "max_abs_gmax": max_gmax,
+        "rms_hard_limit": NUMERICAL_RMS_HARD_LIMIT,
+        "gmax_hard_limit": NUMERICAL_GMAX_HARD_LIMIT,
+        "criterion": "AMBER_QMMM_NUMERICAL_HEALTH_V1",
+    }
 
 
 def stage_spec(spec: Mapping[str, Any], source: Mapping[str, Any]) -> dict[str, Any]:
@@ -419,9 +470,18 @@ def audit(root: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
     manifest = BASE.read_json(root / "MANIFEST.json")
     prepared = BASE.read_json(root / "WINDOW_MANIFEST.json")
     stage = prepared["stage"]
+    stage_out = scratch / "stage.out"
     technical, geometry, diagnostics = BASE.AUTH.TETRA._technical(
-        scratch / "stage.out", scratch / "stage.rst7", manifest
+        stage_out, scratch / "stage.rst7", manifest
     )
+    engine_text = (
+        stage_out.read_text(encoding="utf-8", errors="replace")
+        if stage_out.is_file() else ""
+    )
+    numerical_health = engine_numerical_health(engine_text)
+    technical = bool(technical and numerical_health["pass"])
+    diagnostics = dict(diagnostics)
+    diagnostics["numerical_health"] = numerical_health
     previous = manifest["source_geometry"]
     baseline = manifest["task"]["mode"] == MODES[0]
     response: dict[str, Any] = {"all": False, "active_coordinates": []}
@@ -437,7 +497,6 @@ def audit(root: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         path = scratch / name
         if path.is_file():
             shutil.copy2(path, root / name)
-    stage_out = scratch / "stage.out"
     if stage_out.is_file():
         tail = stage_out.read_text(encoding="utf-8", errors="replace").splitlines()[-200:]
         (root / "ENGINE_TAIL.txt").write_text("\n".join(tail) + "\n", encoding="utf-8")
@@ -644,6 +703,26 @@ def merge_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
     return True
 
 
+def reclassify_numerical_result(
+    item: Mapping[str, Any], engine_text: str
+) -> dict[str, Any]:
+    row = dict(item)
+    health = engine_numerical_health(engine_text)
+    row["numerical_health_v1"] = health
+    if not health["pass"]:
+        row["legacy_status_before_numerical_reclassification"] = row.get("status")
+        row["legacy_scientific_gate_before_numerical_reclassification"] = row.get(
+            "scientific_gate"
+        )
+        row["status"] = "NOT_EVALUATED_TECHNICAL_NUMERICAL_DIVERGENCE"
+        row["scientific_gate"] = "NOT_EVALUATED_TECHNICAL_NUMERICAL_DIVERGENCE"
+        row["technical_complete"] = False
+        row["eligible_by_absolute_response"] = False
+        row["eligible_for_inherited_chain"] = False
+        row["eligible_for_inherited_chain_v2"] = False
+    return row
+
+
 def merge_v2_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
     paths = [
         output_root / f"attempt_{array_job}_{index}" / "RESULT.json"
@@ -748,10 +827,97 @@ def merge_v2_if_ready(output_root: pathlib.Path, array_job: str) -> bool:
     return True
 
 
+def merge_v3_numerical_health_if_ready(
+    output_root: pathlib.Path, array_job: str
+) -> bool:
+    paths = [
+        output_root / f"attempt_{array_job}_{index}" / "RESULT.json"
+        for index in range(ARRAY_TASKS)
+    ]
+    if not all(path.is_file() for path in paths):
+        return False
+    legacy_v2 = (
+        output_root / "audit"
+        / f"nylc_a1_raw_nac_forward_calibration_{array_job}_v2.json"
+    )
+    if not legacy_v2.is_file():
+        raise FileNotFoundError("v3 numerical audit requires immutable v2 audit")
+    legacy_payload = BASE.read_json(legacy_v2)
+    legacy_rows = {
+        row["task"]["task_index"]: row
+        for row in legacy_payload["per_task"]
+    }
+    per_task = []
+    for index in range(ARRAY_TASKS):
+        tail = output_root / f"attempt_{array_job}_{index}" / "ENGINE_TAIL.txt"
+        engine_text = (
+            tail.read_text(encoding="utf-8", errors="replace")
+            if tail.is_file() else ""
+        )
+        per_task.append(reclassify_numerical_result(legacy_rows[index], engine_text))
+
+    selected = []
+    for seed in (26723, 26737):
+        for mode in MODES[1:]:
+            candidates = [
+                row for row in per_task
+                if row["task"]["seed"] == seed
+                and row["task"]["mode"] == mode
+                and row.get("technical_complete") is True
+                and row.get("eligible_for_inherited_chain_v2") is True
+            ]
+            selected.append({
+                "seed": seed,
+                "mode": mode,
+                "selected_weakest_scale": (
+                    min(row["task"]["scale"] for row in candidates)
+                    if candidates else None
+                ),
+            })
+    technical = sum(row.get("technical_complete") is True for row in per_task)
+    divergent = [
+        row["task"]["task_index"] for row in per_task
+        if row["numerical_health_v1"]["pass"] is not True
+    ]
+    payload = {
+        "schema_version": 3,
+        "criterion_version": "AMBER_QMMM_NUMERICAL_HEALTH_V1",
+        "status": (
+            "NOT_EVALUATED_TECHNICAL_A1_RAW_NAC_FORWARD_CALIBRATION_V3"
+            if technical != ARRAY_TASKS else
+            "PASS_RAW_NAC_FORWARD_FORCE_CALIBRATION_MATRIX_V3"
+            if all(row["selected_weakest_scale"] is not None for row in selected)
+            else "PARTIAL_RAW_NAC_FORWARD_FORCE_CALIBRATION_MATRIX_V3"
+        ),
+        "legacy_v2_audit": str(legacy_v2),
+        "legacy_v2_audit_sha256": sha256(legacy_v2),
+        "legacy_gate_preserved": True,
+        "denominator_tasks": ARRAY_TASKS,
+        "technical_pass_tasks_v3": technical,
+        "numerically_divergent_task_indices": divergent,
+        "selected_minimum_force_scales_after_numerical_health": selected,
+        "per_task": per_task,
+        "next_action": "DO_NOT_REUSE_DIVERGENT_OR_DEPREORGANIZED_RESTARTS",
+        "scientific_status": SCIENTIFIC_STATUS,
+        "automatic_downstream_action": "NONE",
+    }
+    audit = (
+        output_root / "audit"
+        / f"nylc_a1_raw_nac_forward_calibration_{array_job}_v3_numerical_health.json"
+    )
+    audit.parent.mkdir(parents=True, exist_ok=True)
+    if audit.exists() and BASE.read_json(audit) != payload:
+        raise FileExistsError(audit)
+    if not audit.exists():
+        BASE.write_json(audit, payload)
+    return True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", required=True, choices=(
         "describe", "initialize", "prepare", "audit", "merge-if-ready", "merge-v2",
+        "merge-v3-numerical-health",
     ))
     parser.add_argument("--task-index", type=int)
     parser.add_argument("--root", type=pathlib.Path)
@@ -770,8 +936,12 @@ def main() -> int:
         audit(args.root.resolve(), args.scratch.resolve())
     elif args.mode == "merge-if-ready":
         merge_if_ready(args.output_root.resolve(), args.array_job)
-    else:
+    elif args.mode == "merge-v2":
         merge_v2_if_ready(args.output_root.resolve(), args.array_job)
+    else:
+        merge_v3_numerical_health_if_ready(
+            args.output_root.resolve(), args.array_job
+        )
     return 0
 
 
