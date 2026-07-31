@@ -15,8 +15,8 @@ This is a restrained response experiment. A passing result is not a transition s
 
 Use coordinates directly from the existing activated-A1 unbiased MM trajectories. Never inherit a restart produced by jobs 62471131, 62477118, or 62500360.
 
-- seed26723: evt25 frame 240, time 480 ps; OG1-C12 2.972 A; O2-C12-OG1 107.16 degrees; 8 of 11 neighboring frames satisfy strict NAC.
-- seed26737: evt25 frame 103, time 206 ps; OG1-C12 2.947 A; O2-C12-OG1 106.32 degrees; 7 of 11 neighboring frames satisfy strict NAC.
+- seed26723: evt25 frame 240, time 480 ps; OG1-C12 2.972 A; O2-C12-OG1 107.16 degrees; 8 of 11 neighboring frames satisfy strict NAC. TPR: `/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26723/attempt_61970146_4_61970151/npt300free/run.tpr`, SHA256 `c60078a92c2ace51facde4ef64e453f690177fc88b4d6363427f935944fa2e43`; XTC: sibling `run.xtc`, SHA256 `1a54f1b5b9f139b746c22d9e0f7e9a4a94eb8154bf2b881888986eedca933d89`.
+- seed26737: evt25 frame 103, time 206 ps; OG1-C12 2.947 A; O2-C12-OG1 106.32 degrees; 7 of 11 neighboring frames satisfy strict NAC. TPR: `/work/home/acshdt1dks/nylon_pa66_scnet_20260708/l4_nac_to_l2_rebalance_20260723/a1_activated_nac_20260726/equilibration/nac_evt25_time1462ps/seed26737/attempt_61970146_5_61970146/npt300free/run.tpr`, SHA256 `dbd19a399547319d10630430ed494d33f6271bab0f30cb0de5a466c6af13ba20`; XTC: sibling `run.xtc`, SHA256 `fcba14da98b331368061dcd990f2467628ad77b9b7a9c4ce88090f92e0831b05`.
 
 Before calculation, extract each frame once and record TPR/XTC provenance, frame/time, coordinate SHA256, topology SHA256, atom mapping, and periodic box. The extracted topology must prove:
 
