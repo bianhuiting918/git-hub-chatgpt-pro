@@ -119,5 +119,29 @@ class ActivatedMmFrameAdditionContract(unittest.TestCase):
         self.assertEqual(payload["automatic_downstream_action"], "NONE")
 
 
+    @unittest.skipUnless(DRIVER.exists(), "production driver not implemented yet")
+    def test_bonded_fragments_are_whole_before_writing_amber_restart(self):
+        import numpy as np
+        from MDAnalysis.lib.mdamath import triclinic_vectors
+
+        box = np.array([10.0, 10.0, 10.0, 60.0, 60.0, 90.0])
+        cell = triclinic_vectors(box)
+        fractional = np.array([
+            [0.98, 0.20, 0.20],
+            [0.03, 0.20, 0.20],
+            [0.98, 0.25, 0.20],
+        ])
+        split = fractional @ cell
+        self.assertGreater(np.linalg.norm(split[1] - split[0]), 5.0)
+
+        whole = self.mod.make_bonded_fragments_whole(
+            split, [(0, 1), (0, 2)], box
+        )
+
+        self.assertLess(np.linalg.norm(whole[1] - whole[0]), 1.0)
+        self.assertLess(np.linalg.norm(whole[2] - whole[0]), 1.0)
+        self.assertTrue(np.allclose(whole[0], split[0]))
+
+
 if __name__ == "__main__":
     unittest.main()
