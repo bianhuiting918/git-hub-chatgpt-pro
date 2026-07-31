@@ -11,6 +11,7 @@ import importlib.util
 import itertools
 import json
 import pathlib
+import re
 from typing import Any, Mapping
 
 import numpy as np
@@ -53,6 +54,9 @@ _ORIGINAL_SOURCE_FOR_INDEX = BASE.source_for_index
 _ORIGINAL_VALIDATE_AUTHORITY = BASE.validate_authority
 _ORIGINAL_SELECT_WATER = BASE.select_water
 _ORIGINAL_PREPARE = BASE.prepare
+_ORIGINAL_AUDIT_LEG = BASE.audit_leg
+_ORIGINAL_RESOLVE_LEG_BANNER = BASE.resolve_leg_banner_contract
+EXPECTED_DFTB_DOUBLY_OCCUPIED = 194
 
 
 def _load_json(path: pathlib.Path) -> dict[str, Any]:
@@ -265,10 +269,141 @@ def prepare_with_amber18_mask(*args: Any, **kwargs: Any) -> None:
         stage_input.write_text(text.replace(needle, replacement), encoding="utf-8")
 
 
+def parse_direct_engine_banner(text: str) -> dict[str, list[int]]:
+    """Parse Amber18 QMMM options plus DFTB valence-level authority."""
+    start = re.search(r"(?im)^\s*QMMM\s+options:\s*$", text)
+    if start is None:
+        return {
+            "qm_atom_count": [],
+            "qmcharge": [],
+            "link_atom_count": [],
+            "electron_count": [],
+            "doubly_occupied_levels": [],
+        }
+    first_step = re.search(r"(?im)^\s*NSTEP\s*=", text[start.start():])
+    stop = start.start() + first_step.start() if first_step else len(text)
+    region = text[start.start():stop]
+    patterns = {
+        "qm_atom_count": r"\bnquant\s*[=:]\s*(\d+)",
+        "qmcharge": r"\bqmcharge\s*[=:]\s*(-?\d+)",
+        "link_atom_count": r"\bnlink\s*[=:]\s*(\d+)",
+        "doubly_occupied_levels": (
+            r"NO\.\s+OF\s+DOUBLY\s+OCCUPIED\s+LEVELS\s*=\s*(\d+)"
+        ),
+    }
+    observed = {
+        key: sorted({int(value) for value in re.findall(pattern, region, re.I)})
+        for key, pattern in patterns.items()
+    }
+    observed["electron_count"] = []
+    return observed
+
+
+def resolve_direct_leg_banner_contract(
+    manifest: Mapping[str, Any],
+    prepared: Mapping[str, Any],
+    leg_banner: Mapping[str, Any],
+) -> tuple[dict[str, list[int]], str]:
+    expected = dict(BASE.EXPECTED_CONTRACT)
+    raw_ok = (
+        list(leg_banner.get("qm_atom_count", [])) == [149]
+        and list(leg_banner.get("qmcharge", [])) == [0]
+        and list(leg_banner.get("link_atom_count", [])) == [6]
+        and list(leg_banner.get("doubly_occupied_levels", []))
+        == [EXPECTED_DFTB_DOUBLY_OCCUPIED]
+    )
+    try:
+        if not raw_ok:
+            raise ValueError("direct leg Amber18/DFTB banner mismatch")
+        if dict(manifest["qm_contract"]["expected"]) != expected:
+            raise ValueError("manifest Step2 contract changed")
+        if dict(prepared["expected_contract"]) != expected:
+            raise ValueError("prepared Step2 contract changed")
+        BASE._parse_qmmask(manifest["qm_contract"]["qmmask"], 149)
+        effective = {
+            "qm_atom_count": [149],
+            "qmcharge": [0],
+            "link_atom_count": [6],
+            "electron_count": [518],
+        }
+        return effective, "LEG_ENGINE_DFTB_VALENCE_PLUS_FIXED_COMPOSITION"
+    except (KeyError, TypeError, ValueError):
+        return _ORIGINAL_RESOLVE_LEG_BANNER(
+            manifest, prepared, leg_banner
+        )
+
+
+def _minimum_image_distance(
+    coordinates: np.ndarray, left: int, right: int, box: Any
+) -> float:
+    cell, inverse = _triclinic_cell(box)
+    displacement = coordinates[left - 1] - coordinates[right - 1]
+    fractional = displacement @ inverse.T
+    center = np.rint(fractional)
+    best = np.inf
+    for shift in itertools.product((-1, 0, 1), repeat=3):
+        candidate = displacement - (center + np.array(shift)) @ cell.T
+        best = min(best, float(np.linalg.norm(candidate)))
+    return best
+
+
+def audit_thr267_heavy_skeleton(restart: pathlib.Path) -> dict[str, Any]:
+    import parmed as pmd
+
+    structure = pmd.load_file(str(BASE.PRMTOP), xyz=str(restart))
+    coordinates = np.array(
+        [[atom.xx, atom.xy, atom.xz] for atom in structure.atoms], dtype=float
+    )
+    pairs = {
+        "Nalpha-CA": (8949, 8952, 1.85),
+        "CA-CB": (8952, 8954, 1.95),
+        "CB-OG1": (8954, 8960, 1.85),
+        "C267-N268": (8962, 8964, 1.85),
+    }
+    distances = {
+        name: _minimum_image_distance(
+            coordinates, left, right, structure.box
+        )
+        for name, (left, right, _limit) in pairs.items()
+    }
+    checks = {
+        name: distances[name] <= limit
+        for name, (_left, _right, limit) in pairs.items()
+    }
+    return {
+        "pass": all(checks.values()),
+        "distances_A": distances,
+        "checks": checks,
+    }
+
+
+def audit_leg_with_persisted_thr_integrity(
+    output: pathlib.Path, scratch: pathlib.Path, leg: int
+) -> None:
+    _ORIGINAL_AUDIT_LEG(output, scratch, leg)
+    result_path = output / f"A2_LEG_{leg}.json"
+    result = _load_json(result_path)
+    restart = scratch / f"a2_leg{leg}" / "stage.rst7"
+    integrity = (
+        audit_thr267_heavy_skeleton(restart)
+        if restart.is_file()
+        else {"pass": False, "distances_A": {}, "checks": {}}
+    )
+    result["thr267_heavy_skeleton"] = integrity
+    if not integrity["pass"]:
+        result["technical_pass"] = False
+        result["scientific_A2_leg_pass"] = False
+        result["classification"] = "NOT_EVALUATED_A2_CHEMICAL_INTEGRITY"
+    BASE.write_json(result_path, result)
+
+
 BASE.source_for_index = source_for_index
 BASE.validate_authority = validate_task6_authority
 BASE.select_water = fixed_select_water
 BASE.prepare = prepare_with_amber18_mask
+BASE.parse_banner = parse_direct_engine_banner
+BASE.resolve_leg_banner_contract = resolve_direct_leg_banner_contract
+BASE.audit_leg = audit_leg_with_persisted_thr_integrity
 BASE.SCIENTIFIC_SCOPE = (
     "EXPLORATORY_TASK6_DIRECT_EVENT_149QM_A2_PREFLIGHT_ONLY_"
     "NOT_PRODUCT_TS_PATH_PMF_BARRIER_OR_MECHANISM"
