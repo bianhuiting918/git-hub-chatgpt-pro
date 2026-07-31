@@ -307,7 +307,7 @@ def _authority_input(qmmask: str) -> str:
 
 
 def _reaction_input(qmmask: str, index: int) -> str:
-    mask = FWD.RAW.NON_QM_SOLUTE_HEAVY_MASK
+    mask = PRE.RAW.BASE.NON_QM_SOLUTE_HEAVY_MASK
     return f"""NylC activated A1 addition window {index}
 &cntrl
   imin=1, ntmin=2, maxcyc={MAXCYC}, ncyc={NCYC}, dx0=0.005, drms=0.01,
