@@ -38,6 +38,9 @@ SOURCE_RESTART_SHA256 = (
 )
 SOURCE_RESULT = ATTEMPT_ROOT / "RESULT.json"
 SOURCE_SAMPLING_MANIFEST = ATTEMPT_ROOT / "SOURCE_MANIFEST.json"
+EXPECTED_SAMPLING_SOURCE_RESTART_SHA256 = (
+    "42c46ebe61ad3016c86a91880ac1d6f94d7f7c7fdcda385bd89935277d378583"
+)
 SELECTED_WATER_ATOMS1 = (13046, 13047, 13048)
 SELECTED_DONOR_H1 = 13048
 ALLOWED_REACTED_TOPOLOGY_BONDS1 = {
@@ -180,7 +183,7 @@ def validate_task6_authority(
         raise ValueError("task6 water-network technical authority changed")
     if (
         sampling.get("source", {}).get("restart_sha256")
-        != old_source["restart_sha256"]
+        != EXPECTED_SAMPLING_SOURCE_RESTART_SHA256
     ):
         raise ValueError("task6 sampling lineage no longer binds seed26737 endpoint")
     matches = [
