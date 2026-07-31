@@ -70,9 +70,9 @@ EXPANDED_BOUNDARIES = (
     (8976, 8978), (9565, 9567), (9585, 9587),
 )
 REQUIRED_HEAVY_BONDS = (
-    frozenset((8949, 8953)),  # Thr267 N-CA
-    frozenset((8953, 8955)),  # CA-CB
-    frozenset((8955, 8960)),  # CB-OG1
+    frozenset((8949, 8952)),  # Thr267 N-CA
+    frozenset((8952, 8954)),  # CA-CB
+    frozenset((8954, 8960)),  # CB-OG1
     frozenset((8962, 8964)),  # Thr267 C - Thr268 N
 )
 REQUIRED_NH_BONDS = (
@@ -177,7 +177,7 @@ def _boundary_pairs(structure: Any, qmmask: str) -> tuple[tuple[int, int], ...]:
     for bond in structure.bonds:
         left, right = bond.atom1.idx + 1, bond.atom2.idx + 1
         if (left in qm) != (right in qm):
-            pairs.append((left, right) if left not in qm else (right, left))
+            pairs.append(tuple(sorted((left, right))))
     return tuple(sorted(pairs))
 
 
@@ -215,9 +215,9 @@ def measure_integrity(prmtop: pathlib.Path, restart: pathlib.Path) -> dict[str, 
     coordinates = structure.coordinates
     box = structure.box
     pairs = {
-        "Nalpha-CA": (8949, 8953, 1.85),
-        "CA-CB": (8953, 8955, 1.95),
-        "CB-OG1": (8955, 8960, 1.85),
+        "Nalpha-CA": (8949, 8952, 1.85),
+        "CA-CB": (8952, 8954, 1.95),
+        "CB-OG1": (8954, 8960, 1.85),
         "C267-N268": (8962, 8964, 1.85),
         "Nalpha-H1": (8949, 8950, 1.35),
         "Nalpha-H2": (8949, 8951, 1.35),
