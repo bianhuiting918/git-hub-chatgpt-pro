@@ -9,6 +9,7 @@ ADAPTER = (
     / "scripts"
     / "prepare_audit_nylc_a1_step2_direct_event_a2.py"
 )
+SBATCH = WORKFLOW_ROOT / "slurm" / "run_nylc_a1_step2_direct_event_a2.sbatch"
 
 
 def load_adapter():
@@ -47,3 +48,9 @@ def test_adapter_normalizes_repeated_atom_mask_prefixes_for_amber18():
     module = load_adapter()
     assert module.normalize_amber_atom_mask("@1,@2,@3") == "@1,2,3"
     assert module.normalize_amber_atom_mask("@1,2,3") == "@1,2,3"
+
+
+def test_sbatch_uses_cluster_working_openmpi_launcher_for_both_legs():
+    text = SBATCH.read_text(encoding="utf-8")
+    assert "srun --exclusive" not in text
+    assert text.count("mpirun --bind-to none -np 8 sander.MPI") == 1
