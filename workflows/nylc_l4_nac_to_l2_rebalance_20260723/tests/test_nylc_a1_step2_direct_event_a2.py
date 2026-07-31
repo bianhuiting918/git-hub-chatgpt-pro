@@ -54,3 +54,58 @@ def test_sbatch_uses_cluster_working_openmpi_launcher_for_both_legs():
     text = SBATCH.read_text(encoding="utf-8")
     assert "srun --exclusive" not in text
     assert text.count("mpirun --bind-to none -np 8 sander.MPI") == 1
+
+
+def test_direct_engine_banner_uses_qmmm_options_and_dftb_valence_authority():
+    module = load_adapter()
+    text = """
+QMMM options:
+             ifqnt = True       nquant =      149
+              qmgb =        0  qmcharge =        0   adjust_q =        2
+|QMMM: Running QMMM calculation in parallel mode on    8 threads.
+QMMM:  nlink =     6                   Link Coords
+QMMM: RHF CALCULATION, NO. OF DOUBLY OCCUPIED LEVELS =194
+ NSTEP =        1
+"""
+    observed = module.parse_direct_engine_banner(text)
+    assert observed["qm_atom_count"] == [149]
+    assert observed["qmcharge"] == [0]
+    assert observed["link_atom_count"] == [6]
+    assert observed["doubly_occupied_levels"] == [194]
+    manifest = {
+        "qm_contract": {
+            "expected": dict(module.BASE.EXPECTED_CONTRACT),
+            "qmmask": "@1-149",
+        }
+    }
+    prepared = {"expected_contract": dict(module.BASE.EXPECTED_CONTRACT)}
+    effective, source = module.resolve_direct_leg_banner_contract(
+        manifest, prepared, observed
+    )
+    assert effective == {
+        "qm_atom_count": [149],
+        "qmcharge": [0],
+        "link_atom_count": [6],
+        "electron_count": [518],
+    }
+    assert source == "LEG_ENGINE_DFTB_VALENCE_PLUS_FIXED_COMPOSITION"
+
+
+def test_sbatch_persists_reauditable_engine_and_geometry_artifacts():
+    text = SBATCH.read_text(encoding="utf-8")
+    for name in (
+        "stage.out",
+        "stage.mdinfo",
+        "stage.rst7",
+        "a2.mdcrd",
+        "engine.rc",
+    ):
+        assert name in text
+    assert "A2_LEG_${LEG}.stage.out" in text
+    assert "A2_LEG_${LEG}.a2.mdcrd" in text
+
+
+def test_adapter_adds_thr267_heavy_skeleton_integrity_audit():
+    module = load_adapter()
+    assert callable(module.audit_thr267_heavy_skeleton)
+    assert callable(module.audit_leg_with_persisted_thr_integrity)
