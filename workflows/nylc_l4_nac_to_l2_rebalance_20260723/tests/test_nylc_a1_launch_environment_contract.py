@@ -66,11 +66,11 @@ class LaunchEnvironmentContract(unittest.TestCase):
         runner = NEARMISS_RUNNER.read_text(encoding="utf-8")
         sbatch = NEARMISS_SBATCH.read_text(encoding="utf-8")
         for token in (
-            "attempt_62425747_2/direct_near_miss_0.rst7",
+            "SOURCE_ATTEMPT=attempt_62425747_2",
             "309e419b7f14c73c9388fea7325d9e54e2434669019e24b209bf0052981058a4",
-            "attempt_62425747_6/direct_near_miss_0.rst7",
+            "SOURCE_ATTEMPT=attempt_62425747_6",
             "42c46ebe61ad3016c86a91880ac1d6f94d7f7c7fdcda385bd89935277d378583",
-            "a1_step2_water_network_nearmiss_continuation",
+            "$SOURCE_ATTEMPT/direct_near_miss_0.rst7",\n            "a1_step2_water_network_nearmiss_continuation",
             'mpirun --bind-to none -np 8 sander.MPI',
             '-c "$SOURCE_RST7"',
             "prepare_audit_nylc_a1_step2_water_network_sampling.py",
