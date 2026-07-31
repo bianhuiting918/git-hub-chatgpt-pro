@@ -11,6 +11,18 @@ STEP2 = (
     WORKFLOW_ROOT
     / "scripts/run_nylc_a1_step2_qmwater_endpoint.sh"
 ).read_text(encoding="utf-8")
+NEARMISS_RUNNER = (
+    WORKFLOW_ROOT
+    / "scripts/run_nylc_a1_step2_water_network_nearmiss_continuation.sh"
+)
+NEARMISS_SBATCH = (
+    WORKFLOW_ROOT
+    / "slurm/run_nylc_a1_step2_water_network_nearmiss_continuation.sbatch"
+)
+WATERNET_DRIVER = (
+    WORKFLOW_ROOT
+    / "scripts/prepare_audit_nylc_a1_step2_water_network_sampling.py"
+).read_text(encoding="utf-8")
 
 
 class LaunchEnvironmentContract(unittest.TestCase):
@@ -36,7 +48,6 @@ class LaunchEnvironmentContract(unittest.TestCase):
         )
         self.assertNotIn("${SLURM_TMPDIR:?", STEP2)
 
-
     def test_step2_sparse_hash_manifest_does_not_fail_under_pipefail(self):
         self.assertNotIn(
             '[[ -f "$name" ]] && sha256sum "$name"',
@@ -48,6 +59,29 @@ class LaunchEnvironmentContract(unittest.TestCase):
             '            fi',
             STEP2,
         )
+
+    def test_step2_nearmiss_continuation_is_sha_fixed_and_unrestrained(self):
+        self.assertTrue(NEARMISS_RUNNER.is_file())
+        self.assertTrue(NEARMISS_SBATCH.is_file())
+        runner = NEARMISS_RUNNER.read_text(encoding="utf-8")
+        sbatch = NEARMISS_SBATCH.read_text(encoding="utf-8")
+        for token in (
+            "attempt_62425747_2/direct_near_miss_0.rst7",
+            "309e419b7f14c73c9388fea7325d9e54e2434669019e24b209bf0052981058a4",
+            "attempt_62425747_6/direct_near_miss_0.rst7",
+            "42c46ebe61ad3016c86a91880ac1d6f94d7f7c7fdcda385bd89935277d378583",
+            "a1_step2_water_network_nearmiss_continuation",
+            'mpirun --bind-to none -np 8 sander.MPI',
+            '-c "$SOURCE_RST7"',
+            "prepare_audit_nylc_a1_step2_water_network_sampling.py",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, runner)
+        self.assertIn("#SBATCH --array=0-7", sbatch)
+        self.assertIn("#SBATCH -n 8", sbatch)
+        self.assertNotIn("%", sbatch.split("#SBATCH --array=", 1)[1].splitlines()[0])
+        self.assertIn("ntr=0, nmropt=0", WATERNET_DRIVER)
+        self.assertIn("MIN_CONSECUTIVE_FRAMES = 5", WATERNET_DRIVER)
 
 
 if __name__ == "__main__":
