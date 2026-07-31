@@ -140,7 +140,7 @@ for LEG in 0 1; do
     (
         cd "$STAGE"
         set +e
-        srun --exclusive -N 1 -n 8 sander.MPI -O \
+        mpirun --bind-to none -np 8 sander.MPI -O \
             -i stage.in -o stage.out -p "$PRMTOP" -c "$SOURCE" \
             -r stage.rst7 -x a2.mdcrd -inf stage.mdinfo
         printf '%s\n' "$?" >engine.rc
