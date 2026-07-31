@@ -26,10 +26,21 @@ def _load(name: str, path: pathlib.Path):
 
 
 RAW_FORWARD = _load("_a1_raw_forward", RAW_FORWARD_PATH)
+PBC_PATH = HERE / "prepare_audit_nylc_a1_step2_qmwater_endpoint.py"
+PBC = _load("_a1_triclinic_pbc", PBC_PATH)
 FWD = RAW_FORWARD.FWD
 RAW = RAW_FORWARD.RAW
 BASE = RAW_FORWARD.BASE
 REACTIVE = RAW_FORWARD.REACTIVE
+THR267 = {
+    "nalpha": 8949,
+    "h1": 8950,
+    "h2": 8951,
+    "ca": 8952,
+    "cb": 8954,
+    "og1": 8960,
+    "hg1": 8961,
+}
 TASK_ROOT = RAW_FORWARD.TASK_ROOT
 PRMTOP = RAW_FORWARD.PRMTOP
 PRMTOP_SHA256 = RAW_FORWARD.PRMTOP_SHA256
@@ -116,6 +127,65 @@ def describe() -> dict[str, Any]:
 
 def _qpt(geometry: Mapping[str, Any]) -> float:
     return float(geometry["nalpha_hg1_A"]) - float(geometry["hg1_n3_A"])
+
+
+def thr267_chemical_integrity(
+    distances: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate the A1 Thr267 covalent graph from measured distances."""
+    bounds = {
+        "nalpha_ca_A": (1.25, 1.75),
+        "ca_cb_A": (1.30, 1.80),
+        "cb_og1_A": (1.20, 1.65),
+        "nalpha_h1_A": (0.75, 1.30),
+        "nalpha_h2_A": (0.75, 1.30),
+        "nalpha_hg1_A": (0.75, 1.30),
+    }
+    checks: dict[str, bool] = {}
+    for key, (lower, upper) in bounds.items():
+        value = float(distances[key])
+        checks[key.removesuffix("_A") + "_covalent"] = (
+            math.isfinite(value) and lower <= value <= upper
+        )
+    return {
+        "pass": all(checks.values()),
+        "checks": checks,
+        "distances_A": {
+            key: float(distances[key]) for key in bounds
+        },
+        "bounds_A": {
+            key: [lower, upper] for key, (lower, upper) in bounds.items()
+        },
+    }
+
+
+def measure_thr267_chemical_integrity(
+    restart: pathlib.Path,
+) -> dict[str, Any]:
+    import parmed as pmd
+
+    structure = pmd.load_file(str(PRMTOP), xyz=str(restart))
+    if structure.box is None:
+        raise ValueError("restart lacks periodic box for Thr267 integrity audit")
+    cell = PBC._periodic_cell(structure.box)
+
+    def distance(left: str, right: str) -> float:
+        return PBC._distance(
+            structure.atoms[THR267[left] - 1],
+            structure.atoms[THR267[right] - 1],
+            cell,
+        )
+
+    return thr267_chemical_integrity(
+        {
+            "nalpha_ca_A": distance("nalpha", "ca"),
+            "ca_cb_A": distance("ca", "cb"),
+            "cb_og1_A": distance("cb", "og1"),
+            "nalpha_h1_A": distance("nalpha", "h1"),
+            "nalpha_h2_A": distance("nalpha", "h2"),
+            "nalpha_hg1_A": distance("nalpha", "hg1"),
+        }
+    )
 
 
 def stage_spec(
@@ -328,9 +398,15 @@ def audit(root: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         if stage_out.is_file() else ""
     )
     numerical = RAW_FORWARD.engine_numerical_health(engine_text)
-    technical = bool(technical and numerical["pass"])
+    engine_technical = bool(technical and numerical["pass"])
+    integrity = {"pass": False, "checks": {}, "distances_A": {}}
+    if engine_technical:
+        integrity = measure_thr267_chemical_integrity(scratch / "stage.rst7")
+    technical = bool(engine_technical and integrity["pass"])
     diagnostics = dict(diagnostics)
     diagnostics["numerical_health"] = numerical
+    diagnostics["engine_technical_complete"] = engine_technical
+    diagnostics["thr267_chemical_integrity"] = integrity
     source = manifest["source_geometry"]
     response = {"all": False, "active_coordinates": ["attack", "carbonyl"]}
     guard = {"pass": False, "checks": {}}
@@ -350,6 +426,7 @@ def audit(root: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
             response["attack"]["pass"] and response["carbonyl"]["pass"]
         )
         guard = preorganization_guard(geometry)
+    if engine_technical:
         shutil.copy2(scratch / "stage.rst7", root / "stage.rst7")
     for name in ("stage.in", "restraints.RST", "stage.mdinfo"):
         path = scratch / name
@@ -362,8 +439,10 @@ def audit(root: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         )
 
     qualified = bool(technical and response["all"] and guard["pass"])
-    if not technical:
+    if not engine_technical:
         gate = "NOT_EVALUATED_TECHNICAL_NUMERICAL_OR_ENGINE_FAILURE"
+    elif not integrity["pass"]:
+        gate = "NOT_EVALUATED_TECHNICAL_CHEMICAL_INTEGRITY"
     elif qualified:
         gate = "PASS_PREORGANIZED_FIRST_WINDOW_RESPONSE"
     else:
@@ -373,9 +452,13 @@ def audit(root: pathlib.Path, scratch: pathlib.Path) -> dict[str, Any]:
         "status": (
             "PASS_TECHNICAL_A1_RAW_NAC_PREORGANIZED_CALIBRATION"
             if technical else
+            "NOT_EVALUATED_TECHNICAL_CHEMICAL_INTEGRITY"
+            if engine_technical and not integrity["pass"] else
             "NOT_EVALUATED_TECHNICAL_A1_RAW_NAC_PREORGANIZED_CALIBRATION"
         ),
         "technical_complete": technical,
+        "engine_technical_complete": engine_technical,
+        "thr267_chemical_integrity": integrity,
         "scientific_gate": gate,
         "scientific_status": SCIENTIFIC_STATUS,
         "task": manifest["task"],
