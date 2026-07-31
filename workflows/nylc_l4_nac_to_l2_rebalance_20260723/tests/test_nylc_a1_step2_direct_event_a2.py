@@ -41,3 +41,13 @@ def test_adapter_exposes_single_seed_base_driver_contract():
     assert source["velocity_seeds"] == (26737621, 26737622)
     assert callable(module.fixed_select_water)
     assert callable(module.validate_task6_authority)
+
+
+def test_base_driver_uses_amber18_single_prefix_atom_mask():
+    source = (
+        WORKFLOW_ROOT
+        / "scripts"
+        / "prepare_audit_nylc_a1_step2_qmwater_endpoint.py"
+    ).read_text(encoding="utf-8")
+    assert 'qmmask = "@" + ",".join(str(index) for index in qm_indices)' in source
+    assert 'qmmask = ",".join(f"@{index}" for index in qm_indices)' not in source
