@@ -85,9 +85,9 @@ class ProtonationBoundaryAuthorityContract(unittest.TestCase):
     @unittest.skipUnless(DRIVER.exists(), "production driver not implemented yet")
     def test_heavy_skeleton_gate_excludes_proton_identity(self):
         required = set(self.mod.REQUIRED_HEAVY_BONDS)
-        self.assertIn(frozenset((8949, 8953)), required)
-        self.assertIn(frozenset((8953, 8955)), required)
-        self.assertIn(frozenset((8955, 8960)), required)
+        self.assertIn(frozenset((8949, 8952)), required)
+        self.assertIn(frozenset((8952, 8954)), required)
+        self.assertIn(frozenset((8954, 8960)), required)
         self.assertIn(frozenset((8962, 8964)), required)
         self.assertNotIn(frozenset((8949, 8961)), required)
         self.assertNotIn(frozenset((8960, 8961)), required)
