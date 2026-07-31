@@ -186,6 +186,21 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
         self.assertIn("GMAX_NUMERICAL_DIVERGENCE", bad["hard_errors"])
         self.assertTrue(good["pass"])
         self.assertEqual(good["hard_errors"], [])
+        legacy = {
+            "status": "PASS_TECHNICAL_A1_RAW_NAC_FORWARD_CALIBRATION",
+            "technical_complete": True,
+            "scientific_gate": "PASS_FIRST_FORWARD_WINDOW_ABSOLUTE_RESPONSE",
+            "eligible_by_absolute_response": True,
+            "eligible_for_inherited_chain_v2": True,
+        }
+        revised = self.mod.reclassify_numerical_result(legacy, catastrophic)
+        self.assertFalse(revised["technical_complete"])
+        self.assertEqual(
+            revised["status"],
+            "NOT_EVALUATED_TECHNICAL_NUMERICAL_DIVERGENCE",
+        )
+        self.assertFalse(revised["eligible_by_absolute_response"])
+        self.assertFalse(revised["eligible_for_inherited_chain_v2"])
 
 
 if __name__ == "__main__":
