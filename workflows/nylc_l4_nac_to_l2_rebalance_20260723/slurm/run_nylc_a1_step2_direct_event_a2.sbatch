@@ -35,7 +35,11 @@ write_hashes() {
         for name in A2_MANIFEST.json READY.json WATER_SELECTION.json \
             WATER_CANDIDATES.tsv A2_LEG_0.json A2_LEG_1.json RESULT.json \
             PASS.json FAIL.json NOT_EVALUATED.json \
-            a2_leg0_endpoint.rst7 a2_leg1_endpoint.rst7
+            a2_leg0_endpoint.rst7 a2_leg1_endpoint.rst7 \
+            A2_LEG_0.stage.out A2_LEG_0.stage.mdinfo \
+            A2_LEG_0.stage.rst7 A2_LEG_0.a2.mdcrd A2_LEG_0.engine.rc \
+            A2_LEG_1.stage.out A2_LEG_1.stage.mdinfo \
+            A2_LEG_1.stage.rst7 A2_LEG_1.a2.mdcrd A2_LEG_1.engine.rc
         do
             [[ -f "$name" ]] && sha256sum "$name"
         done | sort -k2
@@ -149,6 +153,15 @@ for LEG in 0 1; do
     PIDS[$LEG]=$!
 done
 for LEG in 0 1; do wait "${PIDS[$LEG]}"; done
+
+# Persist raw evidence before auditing so future parser changes are reauditable.
+for LEG in 0 1; do
+    STAGE="$SCRATCH/a2_leg$LEG"
+    for NAME in stage.out stage.mdinfo stage.rst7 a2.mdcrd engine.rc; do
+        test -s "$STAGE/$NAME"
+        cp "$STAGE/$NAME" "$OUT/A2_LEG_${LEG}.$NAME"
+    done
+done
 
 for LEG in 0 1; do
     "$PY" "$DRIVER" --mode audit-leg --output "$OUT" \
