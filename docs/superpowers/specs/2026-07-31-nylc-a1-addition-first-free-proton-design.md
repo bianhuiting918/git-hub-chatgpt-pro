@@ -5,7 +5,7 @@ Branch: `codex/nylc-l4-nac-to-l2-rebalance`
 
 ## Objective
 
-Test whether a persistent Michaelis/NAC geometry can undergo carbonyl addition before proton transfer. The pilot must induce tetrahedralization while leaving Thr267 HG1 chemically free to choose among all acceptors represented in the QM region.
+Test whether a persistent Michaelis/NAC geometry can undergo carbonyl addition before proton transfer. The pilot induces early tetrahedralization while leaving Thr267 HG1 chemically free to choose among all acceptors represented in the QM region.
 
 This is a restrained response experiment. A passing result is not a transition state, barrier, minimum-free-energy path, or mechanism proof.
 
@@ -38,8 +38,15 @@ Use approach 1. If the first window lacks healthy same-direction response, stop 
 
 Biased coordinates:
 
-- decrease OG1-C12 progressively;
-- increase C12-O2 progressively to promote carbonyl tetrahedralization.
+- OG1-C12: harmonic flat-bottom center moves by -0.04 A per accepted window;
+- C12-O2: harmonic flat-bottom center moves by +0.03 A per accepted window.
+
+Use the established base restraint constants without scale multiplication:
+
+- OG1-C12: 24.0 kcal mol-1 A-2;
+- C12-O2: 30.0 kcal mol-1 A-2.
+
+Do not apply attack-angle or proton-position protection restraints in this pilot. The stable MM starting frames supply the initial geometry; angle loss is an observed failure mode.
 
 Unbiased/monitored coordinates:
 
@@ -47,47 +54,48 @@ Unbiased/monitored coordinates:
 - HG1 to substrate N3;
 - HG1 to Thr Nalpha;
 - HG1 to carbonyl O2;
-- HG1 to every other QM heteroatom within the defined monitoring cutoff;
+- HG1 to every QM N/O/S acceptor, retaining the ranked list for acceptors within 4.0 A;
 - C12-N3;
 - O2-C12-OG1 angle, carbonyl pyramidalization, and local OOP metrics.
 
-No restraint may be applied to qPT, HG1, C12-N3, or a selected proton acceptor.
+No restraint may be applied to qPT, HG1, C12-N3, a proton acceptor, or the attack angle.
 
-## Window inheritance
+## Pilot size and window inheritance
 
-Run the two seeds independently. Within each seed:
+Run two independent array tasks, one per seed, with 8 MPI ranks per task. Each task is bounded to six sequential minimization windows. The six target increments are defined relative to the SHA-fixed starting geometry: window n uses n times -0.04 A for OG1-C12 and n times +0.03 A for C12-O2, for n = 1 through 6.
 
-1. Start window 0 from the SHA-fixed extracted MM frame.
-2. Move the two biased targets by a small conservative increment.
-3. Accept a window only when the engine is numerically healthy, Thr267/substrate covalent integrity passes, the biased coordinates respond in the required directions, and all chemical guards pass.
-4. Only an accepted restart may seed the next window.
-5. On failure, stop that chain; do not inherit the failed restart and do not silently increase force.
-6. Persist source and output restart SHA256 for every window.
+Within each seed:
 
-The initial implementation should be bounded to a short pilot chain sufficient to show response and early pyramidalization. Extending to a full tetrahedral endpoint requires a separately recorded decision based on the pilot response.
+1. Start window 1 from the SHA-fixed extracted MM frame.
+2. Accept a window only when the Amber engine is numerically healthy, the 146-QM/q0/510e/6link banner is present, Thr267 and substrate covalent integrity pass, both biased coordinates respond in the required directions, and all chemical guards pass.
+3. Only an accepted restart may seed the next window.
+4. On failure, stop that chain; do not inherit the failed restart and do not silently change force or target step.
+5. Persist source and output restart SHA256, input restraints, engine tail, RMS/GMAX/energy, and compact geometry audit for every attempted window.
+
+The six-window pilot tests response and early pyramidalization. It does not claim a completed tetrahedral intermediate. Extending the same accepted chain toward a full tetrahedral endpoint requires review of these six windows and a separately recorded continuation decision.
 
 ## Proton destination audit
 
-At every accepted window, report:
+At the starting frame and every attempted window, report:
 
 - OG1-HG1 distance;
-- distance and donor-H-acceptor angle for every QM acceptor;
-- nearest acceptor identity;
+- distance and donor-H-acceptor angle for every QM N/O/S acceptor;
+- ranked acceptors within 4.0 A and the nearest acceptor identity;
 - whether proton ownership remains OG1, becomes ambiguous, or transfers;
-- the window at which any change first occurs;
-- simultaneous OG1-C12, C12-O2, C12-N3, attack-angle, and OOP values.
+- the first window at which any ownership change occurs;
+- simultaneous OG1-C12, C12-O2, C12-N3, O2-C12-OG1 angle, pyramidalization, and OOP values.
 
 Classify the outcome as one of:
 
-- TETRAHEDRALIZATION_WITH_H_ON_OG1;
-- TETRAHEDRALIZATION_WITH_H_TO_N3;
-- TETRAHEDRALIZATION_WITH_H_TO_NALPHA;
-- TETRAHEDRALIZATION_WITH_H_TO_OTHER_QM_ACCEPTOR;
+- EARLY_TETRAHEDRALIZATION_WITH_H_ON_OG1;
+- EARLY_TETRAHEDRALIZATION_WITH_H_TO_N3;
+- EARLY_TETRAHEDRALIZATION_WITH_H_TO_NALPHA;
+- EARLY_TETRAHEDRALIZATION_WITH_H_TO_OTHER_QM_ACCEPTOR;
 - NO_TETRAHEDRAL_RESPONSE;
 - NOT_EVALUATED_TECHNICAL.
 
 ## Success boundary
 
-A seed qualifies only if it shows numerically healthy, chemically intact, inherited movement toward a tetrahedral geometry. Proton transfer is an observed response, not a required gate for the addition stage.
+A seed qualifies only if it shows numerically healthy, chemically intact, inherited movement toward tetrahedral geometry. Proton transfer is an observed response, not a required gate for the addition stage. Cross-seed status must report the denominator explicitly; one passing seed cannot be labeled a two-seed result.
 
 No result from this pilot automatically authorizes release, shooting, PMF, NEB, string, Step2 product construction, or a TS/barrier/mechanism claim.
