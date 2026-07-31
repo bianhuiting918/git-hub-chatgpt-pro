@@ -49,6 +49,7 @@ VELOCITY_SEEDS = (26737621, 26737622)
 _ORIGINAL_SOURCE_FOR_INDEX = BASE.source_for_index
 _ORIGINAL_VALIDATE_AUTHORITY = BASE.validate_authority
 _ORIGINAL_SELECT_WATER = BASE.select_water
+_ORIGINAL_PREPARE = BASE.prepare
 
 
 def _load_json(path: pathlib.Path) -> dict[str, Any]:
@@ -227,9 +228,44 @@ def fixed_select_water(structure: Any):
     return funnel, matches
 
 
+def normalize_amber_atom_mask(qmmask: str) -> str:
+    tokens = [token.strip() for token in qmmask.split(",") if token.strip()]
+    if not tokens:
+        raise ValueError("empty Amber atom mask")
+    values = [token[1:] if token.startswith("@") else token for token in tokens]
+    if any(not value.isdigit() for value in values):
+        raise ValueError(f"non-explicit Amber atom mask: {qmmask!r}")
+    return "@" + ",".join(values)
+
+
+def prepare_with_amber18_mask(*args: Any, **kwargs: Any) -> None:
+    _ORIGINAL_PREPARE(*args, **kwargs)
+    output = pathlib.Path(kwargs.get("output", args[1] if len(args) > 1 else ""))
+    manifest_path = output / "A2_MANIFEST.json"
+    if not manifest_path.is_file():
+        return
+    manifest = _load_json(manifest_path)
+    old_mask = str(manifest["qm_contract"]["qmmask"])
+    new_mask = normalize_amber_atom_mask(old_mask)
+    if BASE._parse_qmmask(new_mask, 149) != BASE._parse_qmmask(old_mask, 149):
+        raise ValueError("Amber mask normalization changed atom identities")
+    manifest["qm_contract"]["qmmask"] = new_mask
+    BASE.write_json(manifest_path, manifest)
+    scratch = pathlib.Path(kwargs.get("scratch", args[2] if len(args) > 2 else ""))
+    needle = f"qmmask='{old_mask}'"
+    replacement = f"qmmask='{new_mask}'"
+    for leg in (0, 1):
+        stage_input = scratch / f"a2_leg{leg}" / "stage.in"
+        text = stage_input.read_text(encoding="utf-8")
+        if text.count(needle) != 1:
+            raise ValueError(f"unexpected qmmask occurrence count in {stage_input}")
+        stage_input.write_text(text.replace(needle, replacement), encoding="utf-8")
+
+
 BASE.source_for_index = source_for_index
 BASE.validate_authority = validate_task6_authority
 BASE.select_water = fixed_select_water
+BASE.prepare = prepare_with_amber18_mask
 BASE.SCIENTIFIC_SCOPE = (
     "EXPLORATORY_TASK6_DIRECT_EVENT_149QM_A2_PREFLIGHT_ONLY_"
     "NOT_PRODUCT_TS_PATH_PMF_BARRIER_OR_MECHANISM"
