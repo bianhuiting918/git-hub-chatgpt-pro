@@ -91,6 +91,61 @@ FORBIDDEN_A1_BOND = frozenset((THR267["og1"], THR267["hg1"]))
 SCIENTIFIC_STATUS = "NOT_EVALUATED_TS_COMMITTOR_PMF_BARRIER_MECHANISM"
 
 
+
+def make_bonded_fragments_whole(
+    coordinates: Any, bonds: Any, box: Any
+):
+    """Return coordinates with every covalently bonded fragment made whole."""
+    import numpy as np
+    from MDAnalysis.lib.distances import minimize_vectors
+
+    original = np.asarray(coordinates, dtype=float)
+    if original.ndim != 2 or original.shape[1] != 3:
+        raise ValueError("coordinates must have shape (n_atoms, 3)")
+    dimensions = np.asarray(box, dtype=float)
+    if dimensions.shape != (6,):
+        raise ValueError("triclinic box must contain a,b,c,alpha,beta,gamma")
+
+    adjacency = [[] for _ in range(len(original))]
+    normalized_bonds = []
+    for left, right in bonds:
+        i, j = int(left), int(right)
+        if not (0 <= i < len(original) and 0 <= j < len(original)):
+            raise ValueError("bond atom index outside coordinate array")
+        adjacency[i].append(j)
+        adjacency[j].append(i)
+        normalized_bonds.append((i, j))
+
+    whole = original.copy()
+    visited = [False] * len(original)
+    for root in range(len(original)):
+        if visited[root]:
+            continue
+        visited[root] = True
+        stack = [root]
+        while stack:
+            parent = stack.pop()
+            for child in adjacency[parent]:
+                if visited[child]:
+                    continue
+                displacement = original[child] - original[parent]
+                minimum = minimize_vectors(
+                    displacement.reshape(1, 3), dimensions
+                )[0]
+                whole[child] = whole[parent] + minimum
+                visited[child] = True
+                stack.append(child)
+
+    split = [
+        (i + 1, j + 1, float(np.linalg.norm(whole[j] - whole[i])))
+        for i, j in normalized_bonds
+        if np.linalg.norm(whole[j] - whole[i]) > 3.0
+    ]
+    if split:
+        raise ValueError(f"bonded-fragment reconstruction left split bonds: {split[:8]}")
+    return whole
+
+
 def sha256(path: pathlib.Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -230,10 +285,13 @@ def initialize(task_index: int, root: pathlib.Path, commit: str) -> dict[str, An
     structure = pmd.load_file(str(PRMTOP))
     if len(universe.atoms) != len(structure.atoms):
         raise ValueError("TPR/XTC atom count differs from frozen Amber topology")
-    structure.coordinates = universe.atoms.positions.copy()
     dims = universe.dimensions
     if dims is None or len(dims) != 6:
         raise ValueError("source frame lacks triclinic periodic box")
+    bonds = [(bond.atom1.idx, bond.atom2.idx) for bond in structure.bonds]
+    structure.coordinates = make_bonded_fragments_whole(
+        universe.atoms.positions.copy(), bonds, dims
+    )
     structure.box = [float(value) for value in dims]
 
     root.mkdir(parents=True, exist_ok=False)
