@@ -75,7 +75,7 @@ QMMM: RHF CALCULATION, NO. OF DOUBLY OCCUPIED LEVELS =194
     manifest = {
         "qm_contract": {
             "expected": dict(module.BASE.EXPECTED_CONTRACT),
-            "qmmask": "@1-149",
+            "qmmask": "@" + ",".join(str(i) for i in range(1, 150)),
         }
     }
     prepared = {"expected_contract": dict(module.BASE.EXPECTED_CONTRACT)}
@@ -101,8 +101,7 @@ def test_sbatch_persists_reauditable_engine_and_geometry_artifacts():
         "engine.rc",
     ):
         assert name in text
-    assert "A2_LEG_${LEG}.stage.out" in text
-    assert "A2_LEG_${LEG}.a2.mdcrd" in text
+    assert 'cp "$STAGE/$NAME" "$OUT/A2_LEG_${LEG}.$NAME"' in text
 
 
 def test_adapter_adds_thr267_heavy_skeleton_integrity_audit():
