@@ -74,6 +74,17 @@ class ActivatedMmFrameAdditionContract(unittest.TestCase):
         self.assertEqual(payload["authority_stage_count"], 1)
 
     @unittest.skipUnless(DRIVER.exists(), "production driver not implemented yet")
+    def test_generated_inputs_match_authority_and_reaction_contracts(self):
+        authority = self.mod._authority_input("@1,2")
+        self.assertIn("nmropt=0", authority)
+        self.assertIn("ntr=0", authority)
+        self.assertNotIn("DISANG", authority)
+        reaction = self.mod._reaction_input("@1,2", 1)
+        self.assertIn("nmropt=1", reaction)
+        self.assertIn("ntr=1", reaction)
+        self.assertIn("DISANG=restraints.RST", reaction)
+
+    @unittest.skipUnless(DRIVER.exists(), "production driver not implemented yet")
     def test_six_window_schedule_and_base_forces(self):
         self.assertEqual(self.mod.WINDOWS, 6)
         self.assertEqual(self.mod.ATTACK_DELTA_A, -0.04)
