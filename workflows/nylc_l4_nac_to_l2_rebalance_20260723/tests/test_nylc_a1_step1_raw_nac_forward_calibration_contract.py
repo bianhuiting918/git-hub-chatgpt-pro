@@ -164,5 +164,29 @@ class RawNacForwardCalibrationContract(unittest.TestCase):
         )
 
 
+    @unittest.skipUnless(DRIVER_PATH.exists(), "production driver not implemented yet")
+    def test_engine_overflow_is_technical_failure_and_cannot_be_selected(self):
+        catastrophic = """
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+     2200      -1.0000E+08     3.2922E+10     1.2916E+13   C12     10287
+ DFTBESCF=**************
+ EAMBER  = *************
+"""
+        healthy = """
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+     2200      -5.7000E+05     2.3340E-01     8.6258E+01   C12     10287
+ DFTBESCF=   -15545.0964
+ EAMBER  =  -569216.7280
+"""
+        bad = self.mod.engine_numerical_health(catastrophic)
+        good = self.mod.engine_numerical_health(healthy)
+        self.assertFalse(bad["pass"])
+        self.assertIn("ENERGY_FIELD_OVERFLOW", bad["hard_errors"])
+        self.assertIn("RMS_NUMERICAL_DIVERGENCE", bad["hard_errors"])
+        self.assertIn("GMAX_NUMERICAL_DIVERGENCE", bad["hard_errors"])
+        self.assertTrue(good["pass"])
+        self.assertEqual(good["hard_errors"], [])
+
+
 if __name__ == "__main__":
     unittest.main()
