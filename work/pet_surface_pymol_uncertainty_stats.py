@@ -334,7 +334,7 @@ def process_mesh(mesh,halo,xyz,cat,segs,sites,box,out,save):
             summary["per_ester_"+key]={"mean":float(vals.mean()),"median":float(np.median(vals)),"p10":float(np.quantile(vals,.1)),"p90":float(np.quantile(vals,.9))}
         summary["unresolved_surface_area_A2"]=float(uww.sum())
         summary["unresolved_fraction_of_known_plus_unresolved_area"]=float(uww.sum()/(w.sum()+uww.sum()))
-        summary["uncertain_only_ester_membership_count"]=sum(atomarea[z["atom_indices"]].sum()==0 and ua[z["atom_indices"]].sum()>0 for z in sites)
+        summary["uncertain_only_ester_membership_count"]=int(sum(atomarea[z["atom_indices"]].sum()==0 and ua[z["atom_indices"]].sum()>0 for z in sites))
         summary["complete_patch_count"]=sum(r["unresolved_patch_area_A2"]==0 for r in rows)
         summary["partial_patch_count"]=len(rows)-summary["complete_patch_count"]
         complete=[r for r in rows if r["unresolved_patch_area_A2"]==0]
