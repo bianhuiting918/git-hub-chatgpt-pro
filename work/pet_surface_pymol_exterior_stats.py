@@ -383,6 +383,11 @@ def run_analysis(args):
         base_summary=[];base_rows=[]
         for q in [1,2]:
             mesh=args.reuse_mesh.resolve()/f"pymol_surface_q{q}.npz"
+            deadline=time.monotonic()+1800
+            if not Path(str(mesh)+".json").is_file():record("WAIT_FOR_MESH",str(mesh))
+            while not Path(str(mesh)+".json").is_file():
+                if time.monotonic()>deadline:raise TimeoutError("Precomputed mesh was not ready within 30 minutes")
+                time.sleep(5)
             assert mesh.is_file(),"Required precomputed mesh missing"
             record("REUSE_MESH",json.dumps({"path":str(mesh),"sha256":sha(mesh)}))
             print("MESH_REUSED",q,flush=True)
