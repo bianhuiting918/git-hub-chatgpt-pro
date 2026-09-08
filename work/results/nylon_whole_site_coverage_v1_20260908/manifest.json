@@ -1,0 +1,68 @@
+[
+  {
+    "name": "PA6_N2240_paired_water_material_enzyme.svg",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA6_N2240_v1/nylon_water_preview_v1/PA6_N2240_paired_water_material_enzyme.svg",
+    "bytes": 736605,
+    "sha256": "f5f7e2b09406a149a0e10219b5372bb6a75d186191bb274cc97054abdf8b70b9"
+  },
+  {
+    "name": "PA6_N2240_coverage90_material_view.py",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA6_N2240_v1/coverage90/water_surface_views/PA6_N2240_coverage90_material_view.py",
+    "bytes": 1021727,
+    "sha256": "d9a2e5d5a373936b502ac13e3c52a9fcc6c71b41f3b79837902e8bbfa872cc6d"
+  },
+  {
+    "name": "PA6_N2240_coverage70_material_view.py",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA6_N2240_v1/coverage70/water_surface_views/PA6_N2240_coverage70_material_view.py",
+    "bytes": 1131995,
+    "sha256": "2bb5ec96d77d092ac1138c34e518e95957c60c50c756f8a26f3155626609700d"
+  },
+  {
+    "name": "PA6_N2240_coverage50_material_view.py",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA6_N2240_v1/coverage50/water_surface_views/PA6_N2240_coverage50_material_view.py",
+    "bytes": 1143519,
+    "sha256": "1ccf71bd5ab27be87d506584495cbb81b6f7942f7c76978f5dcdd09d21dbba34"
+  },
+  {
+    "name": "PA66_N0564_paired_water_material_enzyme.svg",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA66_N0564_v1/nylon_water_preview_v1/PA66_N0564_paired_water_material_enzyme.svg",
+    "bytes": 950265,
+    "sha256": "536ff71db08b1c9718ca861e34638b87deec332c29871efab94bd0cdae0ec27c"
+  },
+  {
+    "name": "PA66_N0564_coverage90_material_view.py",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA66_N0564_v1/coverage90/water_surface_views/PA66_N0564_coverage90_material_view.py",
+    "bytes": 967559,
+    "sha256": "a7cbf8aed5b039cf2fac492cd74a726cd6b8ed82e6a41a9db0abf647214e9b7e"
+  },
+  {
+    "name": "PA66_N0564_coverage70_material_view.py",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA66_N0564_v1/coverage70/water_surface_views/PA66_N0564_coverage70_material_view.py",
+    "bytes": 972155,
+    "sha256": "44ec04298e28ad112ee8bbc92384cdcc3287c641c7bf05a22d559ff5ec669207"
+  },
+  {
+    "name": "PA66_N0564_coverage50_material_view.py",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA66_N0564_v1/coverage50/water_surface_views/PA66_N0564_coverage50_material_view.py",
+    "bytes": 840003,
+    "sha256": "84891cd6570d00c113e455ca88b9f58a77534c9474e6d5500cab8a76c6b7d65d"
+  },
+  {
+    "name": "PA6_SC4415918_paired_water_material_enzyme.svg",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA6_SC4415918_v1/nylon_water_preview_v1/PA6_SC4415918_paired_water_material_enzyme.svg",
+    "bytes": 658388,
+    "sha256": "3270c7c27e066f3c5cb175689263291404ad2d987e332e86b443dc190ea284ef"
+  },
+  {
+    "name": "PA66_SC4874583_paired_water_material_enzyme.svg",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_PA66_SC4874583_v1/nylon_water_preview_v1/PA66_SC4874583_paired_water_material_enzyme.svg",
+    "bytes": 695323,
+    "sha256": "04bfb3777e7eeb3857bf7d1f7a15696935389abbbcd257920454330d84886605"
+  },
+  {
+    "name": "README.md",
+    "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/whole_site_panel_v1/nylon_publication_v1/README.md",
+    "bytes": 2955,
+    "sha256": "e2db37287586a0fc1220013becf91daefab0db322e339b1cfa9e6bde946aeccb"
+  }
+]
