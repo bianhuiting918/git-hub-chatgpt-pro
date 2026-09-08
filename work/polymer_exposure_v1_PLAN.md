@@ -1,0 +1,15 @@
+# Polymer-only exposure interface analysis implementation plan
+Goal: analyze all existing original dense-surface sites (PET 578, PA6 413, PA66 445), independent of every catalyst candidate.
+Architecture: one CPU-only script in existing remote project; one synthetic regression test; versioned output. Existing input NPZs and site table reused. Do not change old outputs or use trimmed fragments.
+Global constraints: XY periodic, original all-atom environments; existing support>=0.70 and density-boundary selection retained; no enzyme filters. One snapshot only. No electrostatic-potential claims.
+Steps:
+1. Write and run synthetic tests before implementation: periodic XY cavity connectivity, closed cavity exclusion, outward frame determinant and carbonyl tangential alignment, exact isolated-carbon SASA, bins and disjoint support groups.
+2. Implement 1A external-water connectivity grid seeded at top/bottom; atom vdW radii C1.70 N1.55 O1.52 H1.20, water radius1.4A, Fibonacci4096 shell samples. Report local shell accessibility separately from external-connected accessibility; uncertain shell connectivity separately, never label uncertain as truly buried. Full carbon inflated-sphere area is the denominator, not isolated ester area.
+3. Align local neighborhoods to negative gradient of Gaussian3A smoothed atomic mass density and carbonyl projected tangential direction; preserve original chemical-frame transform. Retain top/bottom separately. If local gradient ambiguous or inward by slab side, flag rather than silently flip.
+4. Primary exposure bins: sampled_zero, (0,.05], (.05,.15], (.15,1]. These are reporting conventions, not physical universal thresholds. Low sample-size fits flagged. Main 15A sphere at1A; supply 0.25/0.50/0.75 occupancy contours, uncertainty, representative real site. The fitted field is external water-center exclusion envelope (not atomic SES or enzyme volume).
+5. Summaries by material/exposure/side, with disjoint support70-80/80-90/90-100 secondary strata. Local shell area, connected area, chemical accessibility, normal orientation, sphere occupancy, clearance/depth, and bootstrap by original chain. Identify heterogeneous groups via within-group deviation; do not assert flat/convex clusters without validation.
+6. Pilot 3 sites per material, then all after synthetic tests and pilot finite/unit/denominator audits. Independent exact atom-shell recalculation and grid connectivity sensitivity checks for boundary cases. Save JSON, NPZ and open OBJ surfaces for PyMOL conversion; never emit capped fake patch surfaces.
+7. Append RUN_LOG.jsonl and RUNBOOK.md; technical completion distinct from numerical convergence and scientific interpretation.
+Implementation location: /data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/polymer_exposure_v1.py
+Outputs: same root /polymer_exposure_v1/ (exclusive creation), pilot /polymer_exposure_pilot_v1/.
+No local writes; tracked source on existing codex/pet-surface-stats-20260907 GitHub branch.
