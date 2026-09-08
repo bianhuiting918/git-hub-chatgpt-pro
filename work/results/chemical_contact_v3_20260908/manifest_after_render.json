@@ -1,0 +1,1582 @@
+[
+  {
+    "file": "summary.json",
+    "bytes": 190892,
+    "sha256": "196fb8f9b94d95714c54aab8cb737228b221e6ca4f5622a12dbffa04055026e6"
+  },
+  {
+    "file": "PET/polymer_SES_fields.npz",
+    "bytes": 52436719,
+    "sha256": "66ea5ba7ad3881f372fbf03087da505c761fed0356893592c7dc93ad0aeff9e6"
+  },
+  {
+    "file": "PET/material_atlas_summary.json",
+    "bytes": 5151,
+    "sha256": "c8df4850f21471d648d6a20b37de7534f302ff00dd5e708a8685a99fb24f37b7"
+  },
+  {
+    "file": "PET/site_index.json",
+    "bytes": 66432,
+    "sha256": "064f26acb1d4a038432e5b20e6c38b9c4c27e23aecdf97530102458f22b383ef"
+  },
+  {
+    "file": "PET/chemical_typing_audit.json",
+    "bytes": 413,
+    "sha256": "39ff109053fcc9629d50e88f45f7c4b29d31319fa9eb357177e84192dfb34531"
+  },
+  {
+    "file": "PET/summary.json",
+    "bytes": 74608,
+    "sha256": "99a3359915b50ab3e3c9b80c9d5571e6ed53c3ffdbac3e1884c5db57de6127e1"
+  },
+  {
+    "file": "PET/material_atlas/PET_sampled_zero_bottom_view.py",
+    "bytes": 99643,
+    "sha256": "dd39348ccac57c9c00339f55cc6201e6f56306ec4e5d597e20f00dff3e834bd6"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt1_le2pct_top.ply",
+    "bytes": 80165,
+    "sha256": "ab6f466a3b490984f7c9e7bb4d5a3e980530b2786147d05ec717f106389cba82"
+  },
+  {
+    "file": "PET/material_atlas/PET_positive_le1pct_bottom.npz",
+    "bytes": 108417,
+    "sha256": "e9933bee4f4d65f6334aeeb0e46d6447d3df9e449452ca4da447a34c041a2db2"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt5pct_bottom.ply",
+    "bytes": 127808,
+    "sha256": "24c807fd906af89ad2bdca47debbf7da681b567671137305b429a71e741915cd"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt5pct_bottom_view.py",
+    "bytes": 144007,
+    "sha256": "021978f37c8dfaba1bec6c8c48b50049eb27fc3257df7d77b730e9a498c2d2bb"
+  },
+  {
+    "file": "PET/material_atlas/PET_sampled_zero_top.ply",
+    "bytes": 79469,
+    "sha256": "d10ab54be0b02719fd3fe108e141dda601ccc0d5ac039d0287425c95b61ece64"
+  },
+  {
+    "file": "PET/material_atlas/PET_sampled_zero_bottom.npz",
+    "bytes": 119043,
+    "sha256": "b929ada1896571470378635b57570d7917869580f8ec57bf36eafb2a36741d71"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt1_le2pct_top.npz",
+    "bytes": 112133,
+    "sha256": "f1511a8fe0f4169b7caf64d6f79483999c974f8f4bd6b15d990190851a6a2b61"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt5pct_top.ply",
+    "bytes": 111925,
+    "sha256": "adb1750a4e8d396923e0b066ed7613590e5628f4532ad5090776ec2d8f1f0da8"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt1_le2pct_bottom.npz",
+    "bytes": 111967,
+    "sha256": "8284b10c1182b8ae4feeffb823b6a1c3dc4d2c966d39e95dfb6fc4e06509fca8"
+  },
+  {
+    "file": "PET/material_atlas/PET_positive_le1pct_bottom_view.py",
+    "bytes": 91183,
+    "sha256": "ff0ef46f2e3aa74697486c7e44bcc35f3bf658324f7160e4415380504a4e50cf"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt2_le5pct_top_view.py",
+    "bytes": 85447,
+    "sha256": "feb280ccb12cbe8688ffd24f2653f2c0b3b3ccccc95e8ff3526a705d6bd990aa"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt2_le5pct_bottom_view.py",
+    "bytes": 80371,
+    "sha256": "6d4a89ad3976e781d45fdd282d7500ee4ddc68a3bad3c4547110c1f47b8f6cc9"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt2_le5pct_bottom.npz",
+    "bytes": 96613,
+    "sha256": "5a014ad8ae34aeed800e00d72d65f916cd06fc828200eca90791e4ea92949011"
+  },
+  {
+    "file": "PET/material_atlas/PET_sampled_zero_top.npz",
+    "bytes": 110954,
+    "sha256": "28bd848d6f94170ac5959d485355b94fc1bad4c1566bbc18ba617dd6b5059379"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt5pct_bottom.npz",
+    "bytes": 172605,
+    "sha256": "3cab513514b13e854ff8030d7ab87b7046a0791909920452442dc74858efce39"
+  },
+  {
+    "file": "PET/material_atlas/PET_positive_le1pct_top.npz",
+    "bytes": 112279,
+    "sha256": "6d0551ba8c71e384e6fb4e41880e5c745010dbcca3a484aff69e6b2ab476d4e0"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt5pct_top.npz",
+    "bytes": 150762,
+    "sha256": "4173c2cd443373025624c98c575096e5e156e387004086e704d983ea19b9463a"
+  },
+  {
+    "file": "PET/material_atlas/PET_positive_le1pct_bottom.ply",
+    "bytes": 77270,
+    "sha256": "16c87449c2ac9238879dbb667775a22251dae39abb2c5566dfe8a56aa5443cbe"
+  },
+  {
+    "file": "PET/material_atlas/PET_sampled_zero_top_view.py",
+    "bytes": 93171,
+    "sha256": "6066e17bc25e20b8b6d109d9060b44a0927ddd90366f4f04e5c829943e1d92db"
+  },
+  {
+    "file": "PET/material_atlas/PET_sampled_zero_bottom.ply",
+    "bytes": 85322,
+    "sha256": "1869e367196e3ef5ee03663f0491d33bf3ea1d1e7080f6de9dbd2257ad57e6a9"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt1_le2pct_top_view.py",
+    "bytes": 94239,
+    "sha256": "28f75d66341b519a11b7fa03af2111296a0541c4036542583c9b3fdccbabd891"
+  },
+  {
+    "file": "PET/material_atlas/PET_positive_le1pct_top.ply",
+    "bytes": 80142,
+    "sha256": "453458262a363cface652d3d9f9a0880a3601a6369a48f5e07c89c0352c9fb70"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt2_le5pct_bottom.ply",
+    "bytes": 67826,
+    "sha256": "4dde2efc8470ce3ea78158689ad770da732674dc393edef0ae9303caa38f0076"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt2_le5pct_top.npz",
+    "bytes": 102348,
+    "sha256": "2e0641cc97247c36355de97b3d65f8e967686e1af5d9fd00c1cc0acbe7305000"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt2_le5pct_top.ply",
+    "bytes": 72810,
+    "sha256": "43ac7bf319f746da81481ebdb1b94743e990ab99176daea374ffe1c90fc48c2b"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt5pct_top_view.py",
+    "bytes": 126447,
+    "sha256": "b3623610b4ac4e5c54795456845716a7a6ab927528b0e9a6f6b41a924e9dc2f3"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt1_le2pct_bottom.ply",
+    "bytes": 79969,
+    "sha256": "36f6f834b765746fb317435922991ff5d239af3dfdba80807dce314f10997a76"
+  },
+  {
+    "file": "PET/material_atlas/PET_gt1_le2pct_bottom_view.py",
+    "bytes": 94003,
+    "sha256": "e8d4ff24e586ef59c04c39800c279e5b434966ccf7825eda6d6bbf6f4007aec0"
+  },
+  {
+    "file": "PET/material_atlas/PET_positive_le1pct_top_view.py",
+    "bytes": 94147,
+    "sha256": "92fa863349fcdfae756114b7769dbfdb87551cb29f5ddab31dc3bb871d2b4571"
+  },
+  {
+    "file": "PET/M450/matched_material_median.ply",
+    "bytes": 93498,
+    "sha256": "9a114be3cf0f4f5d0cffe206c755d8ef14e3589d015b3f64fe7d98acc08a8b41"
+  },
+  {
+    "file": "PET/M450/PET_M450_view.py",
+    "bytes": 347023,
+    "sha256": "9a1d3b4c81d6919e3e326063a7c6394a0026408ec7e9444404a185fcf6e86650"
+  },
+  {
+    "file": "PET/M450/enzyme_contact_q100.ply",
+    "bytes": 49840,
+    "sha256": "c650ae705cfd107b70eb15071dca582506f46335d53ef214b15d094a9761b55d"
+  },
+  {
+    "file": "PET/M450/matched_material_fields.npz",
+    "bytes": 5708764,
+    "sha256": "ffd366e29f8a6cd15eabeaf84bc69e7ea4329d3ccaddec8a53ad8a30990f3ac0"
+  },
+  {
+    "file": "PET/M450/enzyme_contact_q90.npz",
+    "bytes": 85051,
+    "sha256": "954e5b6bb8327cd655e94c4008664b21597647963708755216b37beee82b5de4"
+  },
+  {
+    "file": "PET/M450/enzyme_contact_q90.ply",
+    "bytes": 79734,
+    "sha256": "faf61516ecd23657dac3d7146911064ea25f99ba906755d74d915c80691e692a"
+  },
+  {
+    "file": "PET/M450/matched_material_median.npz",
+    "bytes": 128675,
+    "sha256": "fc2c7cc12c544fe22575b52125eb85aa493f682c9656c26ebbc12a1728081ed2"
+  },
+  {
+    "file": "PET/M450/enzyme_contact_q50.ply",
+    "bytes": 83026,
+    "sha256": "697eb4d46df4de6ca9fb2e58b16503f682cb6e8bc0afdb6d2acd0fc4bbe52a13"
+  },
+  {
+    "file": "PET/M450/summary.json",
+    "bytes": 9517,
+    "sha256": "c605cc7b6fc035da34137a7d979e2fc671b9d467f814a0ce4a912d0e0fe656ed"
+  },
+  {
+    "file": "PET/M450/enzyme_contact_q50.npz",
+    "bytes": 87447,
+    "sha256": "4eaf17575ab9c155e1160d37420e2c4100b0643c5c0ea222a33ceb788ff2cbbe"
+  },
+  {
+    "file": "PET/M450/enzyme_contact_q100.npz",
+    "bytes": 56439,
+    "sha256": "f55780f66169aa75ec46d444fa13d8ef1ae650ed7fcc281c19dce7d275a14c41"
+  },
+  {
+    "file": "PET/SC1345656/matched_material_median.ply",
+    "bytes": 83063,
+    "sha256": "eb32ebaac838bb6d68d4a59aac4aadb72c9720a2f59e141f5d85e9ea2d5d53dd"
+  },
+  {
+    "file": "PET/SC1345656/enzyme_contact_q100.ply",
+    "bytes": 53432,
+    "sha256": "c40733fadfe9e8307ab925fabb40a6ca5ce7bda1197ca6ebbe231e35ac51b459"
+  },
+  {
+    "file": "PET/SC1345656/matched_material_fields.npz",
+    "bytes": 8136747,
+    "sha256": "76c36e53d48c987feaf1e3b5b5a03cb5b5ddf41351c1af3c1a267d65c5c14b97"
+  },
+  {
+    "file": "PET/SC1345656/PET_SC1345656_view.py",
+    "bytes": 319259,
+    "sha256": "10962b761da236a9654c1adff396d0d9eb6854e54e744423650cdd4a70856e3a"
+  },
+  {
+    "file": "PET/SC1345656/enzyme_contact_q90.npz",
+    "bytes": 69787,
+    "sha256": "46ef6f0292893aeeb2cfd9dd607abc697547e167a3663b29422133ea0c5067c1"
+  },
+  {
+    "file": "PET/SC1345656/enzyme_contact_q90.ply",
+    "bytes": 64760,
+    "sha256": "8ff9097cd02a6893c85171526bd92acaeef539e34ad697a69e2a93b4f928cf3c"
+  },
+  {
+    "file": "PET/SC1345656/matched_material_median.npz",
+    "bytes": 116264,
+    "sha256": "df22110c14f2b5e2cf36c713a53155fa7d146dd336a26b78efe38737471c3873"
+  },
+  {
+    "file": "PET/SC1345656/enzyme_contact_q50.ply",
+    "bytes": 79448,
+    "sha256": "b39c3887744a25f0a5a1013b7f9e966c12b6371e01e26dfc3a681513c2f19675"
+  },
+  {
+    "file": "PET/SC1345656/summary.json",
+    "bytes": 11483,
+    "sha256": "b58f1473b49883510d1f636882f55a5675780c0a2b83185ca091ae5fb7144e17"
+  },
+  {
+    "file": "PET/SC1345656/enzyme_contact_q50.npz",
+    "bytes": 85228,
+    "sha256": "13756186522a6b5c7fb7d5b94bc26fb6a60d7f9cfe389bf60bfb9d844a2e3057"
+  },
+  {
+    "file": "PET/SC1345656/enzyme_contact_q100.npz",
+    "bytes": 58994,
+    "sha256": "2784d96b45acc5d3f97b049fae431478eb35a3328a4d58b0aabe59051592af80"
+  },
+  {
+    "file": "PET/SC3000704/matched_material_median.ply",
+    "bytes": 92179,
+    "sha256": "0aa9b36327b23c8e57fe1d54505e1b25b0fd94a72af8c9464b36234c6eb00f9f"
+  },
+  {
+    "file": "PET/SC3000704/enzyme_contact_q100.ply",
+    "bytes": 44996,
+    "sha256": "8646cbf46e6b6701f1b14944ab3103f8657c55037095a35d23b64ff02cbc7455"
+  },
+  {
+    "file": "PET/SC3000704/matched_material_fields.npz",
+    "bytes": 7613473,
+    "sha256": "df7135b1d5f2dd209d1083c2041d48808c98122702553bfc98b7e901c66e6bd8"
+  },
+  {
+    "file": "PET/SC3000704/enzyme_contact_q90.npz",
+    "bytes": 77693,
+    "sha256": "1026b6416ea6c08cbca4f04c72c6ed6e6c9e5a2b697567a1cac26b05cc2aba99"
+  },
+  {
+    "file": "PET/SC3000704/enzyme_contact_q90.ply",
+    "bytes": 73053,
+    "sha256": "db8b992b5a8fa3c9080b91e0179fb01473973c627866fec6905d4dbad4606d47"
+  },
+  {
+    "file": "PET/SC3000704/matched_material_median.npz",
+    "bytes": 127324,
+    "sha256": "945fccf46d78de3c9c7f2a3a225e3932282caed6fafcac106706b07bd8db1019"
+  },
+  {
+    "file": "PET/SC3000704/enzyme_contact_q50.ply",
+    "bytes": 84995,
+    "sha256": "1b8923f0762c4b7c92a4943b14f63bb1d1c6f4c92e9bf4c6409deca5b1952b6c"
+  },
+  {
+    "file": "PET/SC3000704/summary.json",
+    "bytes": 10999,
+    "sha256": "d77dc9f6054970876c96e9100b102eb78b936859fe02edbcee72ef0f80418aa3"
+  },
+  {
+    "file": "PET/SC3000704/enzyme_contact_q50.npz",
+    "bytes": 89701,
+    "sha256": "675c7df6f5b78234dadfd1b16f64a835803b81bdae0f1897334a1661a86b3356"
+  },
+  {
+    "file": "PET/SC3000704/enzyme_contact_q100.npz",
+    "bytes": 50474,
+    "sha256": "004662cb403d7e0266311a26bee90e7e095b65c0869a75c49a9971f47080fadc"
+  },
+  {
+    "file": "PET/SC3000704/PET_SC3000704_view.py",
+    "bytes": 333023,
+    "sha256": "40bb92679795e6475f7d5e85d038343f5e40b57768ad972a1ae181b355dfc355"
+  },
+  {
+    "file": "PET/M329/matched_material_median.ply",
+    "bytes": 97616,
+    "sha256": "0505e8813ad93b3f8b0fac57ad55084eb03ae82ce91dbacbda38696b08297e9e"
+  },
+  {
+    "file": "PET/M329/enzyme_contact_q100.ply",
+    "bytes": 57020,
+    "sha256": "9a8d3a9065bce21520ab5a0daf7e69c3c72302c0efea57516b12bc62d0ef8edb"
+  },
+  {
+    "file": "PET/M329/matched_material_fields.npz",
+    "bytes": 5369596,
+    "sha256": "c125640176cf35f094f01aa6f3c052823e5b6c212f82f4bc783fce51f48ae949"
+  },
+  {
+    "file": "PET/M329/enzyme_contact_q90.npz",
+    "bytes": 75240,
+    "sha256": "cf5a5c34044f828be594a98007e5214fb7808da4c30a0ebfe70f30408b16b660"
+  },
+  {
+    "file": "PET/M329/enzyme_contact_q90.ply",
+    "bytes": 69988,
+    "sha256": "9495e8578a0cbabb7754e68a8839d6f17e7560ae7500300a1a977d828d9d6691"
+  },
+  {
+    "file": "PET/M329/matched_material_median.npz",
+    "bytes": 133135,
+    "sha256": "34762752e38fa4fa22c9897cf6c543d32ffeab057563257e896f03dd4db5d86b"
+  },
+  {
+    "file": "PET/M329/enzyme_contact_q50.ply",
+    "bytes": 95665,
+    "sha256": "048d28304f63ca26dbac7e85ae91d56b3bae00f03f5e992b85e2845705ed2ffa"
+  },
+  {
+    "file": "PET/M329/PET_M329_view.py",
+    "bytes": 359763,
+    "sha256": "3d8f81ff8fda90fde836e54c3c8243055cf4d42be6429f6538c4c680d495a5ba"
+  },
+  {
+    "file": "PET/M329/summary.json",
+    "bytes": 9154,
+    "sha256": "14ffad915403096b08a30940854e9c418a4bbfaac9363c8e6dc391ca3559524c"
+  },
+  {
+    "file": "PET/M329/enzyme_contact_q50.npz",
+    "bytes": 100434,
+    "sha256": "0b494b0e1d91690a5724dba4c24fda939be221d24e5b7ee461eef9a2398ef9cf"
+  },
+  {
+    "file": "PET/M329/enzyme_contact_q100.npz",
+    "bytes": 62762,
+    "sha256": "19c249ec8608134fefa976dfcb93c3db485a24b53a4668715cfd9572b97a979f"
+  },
+  {
+    "file": "PET/SC1989827/matched_material_median.ply",
+    "bytes": 80103,
+    "sha256": "409f1cd709208c8dba1b21c7ca9930e067968cc6288cfbb40bd7628070d47c45"
+  },
+  {
+    "file": "PET/SC1989827/enzyme_contact_q100.ply",
+    "bytes": 55767,
+    "sha256": "78a8efbbcdf651cfbc013055f5b7bafc3fd3fd2fff0a70e461ed96cecb76a75a"
+  },
+  {
+    "file": "PET/SC1989827/matched_material_fields.npz",
+    "bytes": 7396715,
+    "sha256": "6ab3a0abc4e1cf1bdca784e05415d0155ee1c0723d6e24fb0bb80a3368ebfce6"
+  },
+  {
+    "file": "PET/SC1989827/PET_SC1989827_view.py",
+    "bytes": 322423,
+    "sha256": "fa5930a5d1229e4f8c4f46228e18b93931e1d01fce73c5d9bb51bfe3de5a27f0"
+  },
+  {
+    "file": "PET/SC1989827/enzyme_contact_q90.npz",
+    "bytes": 72751,
+    "sha256": "17e13f6ad381c680d2781438534a462a8075ccbaa67a734d5081ff3052d68ada"
+  },
+  {
+    "file": "PET/SC1989827/enzyme_contact_q90.ply",
+    "bytes": 67334,
+    "sha256": "788515626647b698ba86c7ee51bacbe16bb66abf244be0a92684a934cef7d956"
+  },
+  {
+    "file": "PET/SC1989827/matched_material_median.npz",
+    "bytes": 112417,
+    "sha256": "aaf269a7324f3c19ffadba8632b090ee17f5757e5e9d7aa6667b3eb417d5fdcd"
+  },
+  {
+    "file": "PET/SC1989827/enzyme_contact_q50.ply",
+    "bytes": 80954,
+    "sha256": "2b626ace767eedf57a66ca5d52d4835398cd55812148088988d09153dc33db82"
+  },
+  {
+    "file": "PET/SC1989827/summary.json",
+    "bytes": 10752,
+    "sha256": "c00d2e80168eb3b52fc601ad4a26dd54e49a1e65d09c727a67b7351267338d20"
+  },
+  {
+    "file": "PET/SC1989827/enzyme_contact_q50.npz",
+    "bytes": 86610,
+    "sha256": "c6e35348ba7be13d12b715db0cebac0c532ae2b96297de34dfbdd3346c383df5"
+  },
+  {
+    "file": "PET/SC1989827/enzyme_contact_q100.npz",
+    "bytes": 61266,
+    "sha256": "66b2f768da38b5accde896e820ca75877c4548c975453658dadb001b208c2ed0"
+  },
+  {
+    "file": "PET/M318/matched_material_median.ply",
+    "bytes": 91507,
+    "sha256": "9630259d96dfe07e12019454699614e1a380961eb962f353314f4cd07c181a57"
+  },
+  {
+    "file": "PET/M318/enzyme_contact_q100.ply",
+    "bytes": 42747,
+    "sha256": "299c94d58c332d7ce6cf2eac09f351c88e4c10dbb1ea16169eb91a094c181035"
+  },
+  {
+    "file": "PET/M318/matched_material_fields.npz",
+    "bytes": 4812286,
+    "sha256": "b0d73dcc374e228ce8c7a34a9250ad3ccbbe1bc22835d297ccc9217bdaa125ae"
+  },
+  {
+    "file": "PET/M318/enzyme_contact_q90.npz",
+    "bytes": 82187,
+    "sha256": "b9cfb7d4ee72cfe0d07e41f2cd03f74e704e8e87104dc7c45ba98f4e07ff54d7"
+  },
+  {
+    "file": "PET/M318/enzyme_contact_q90.ply",
+    "bytes": 77960,
+    "sha256": "2f40482b063d4f813243d84b4224b0e018f6b6406610b238d2ebfd16a9929aa2"
+  },
+  {
+    "file": "PET/M318/matched_material_median.npz",
+    "bytes": 125986,
+    "sha256": "b6285fd8adafc7fa83e9268fb9e1774f4fb13ac3175f68f043bea51cfdd009d3"
+  },
+  {
+    "file": "PET/M318/enzyme_contact_q50.ply",
+    "bytes": 87900,
+    "sha256": "8db3fe1c2715b58cfca1067131e458cb28060edc06258b27ebb9bfeb88851ec1"
+  },
+  {
+    "file": "PET/M318/summary.json",
+    "bytes": 8527,
+    "sha256": "ddbca688df7c3d5d6e77a166f80f4d86d697b70c16f05a1024e7313261941048"
+  },
+  {
+    "file": "PET/M318/PET_M318_view.py",
+    "bytes": 339251,
+    "sha256": "c64f7ea2feb0536a90e413148caeaf98887c5a860ae3bd08a3cd36da824fd811"
+  },
+  {
+    "file": "PET/M318/enzyme_contact_q50.npz",
+    "bytes": 93381,
+    "sha256": "a446084d9a75beca910515235ce4ee7815bed807a9988c9f76d80833358433d3"
+  },
+  {
+    "file": "PET/M318/enzyme_contact_q100.npz",
+    "bytes": 49487,
+    "sha256": "9dfb7bd80cae9f73329a48fa16b2d5f7480e1e11b120cc2b09d0d1b3d4a82d30"
+  },
+  {
+    "file": "PA66/polymer_SES_fields.npz",
+    "bytes": 40696001,
+    "sha256": "7a669bbd7f5ae0a0155ac1628ce15946a5e0e31f6a64f1ee9c1e417844805d91"
+  },
+  {
+    "file": "PA66/material_atlas_summary.json",
+    "bytes": 5403,
+    "sha256": "d3d56615a439c2fccb2c73f275c449309842d55c31a314de3fc37286e722eb66"
+  },
+  {
+    "file": "PA66/site_index.json",
+    "bytes": 51250,
+    "sha256": "f689831094232b7663b846345e160a6286983e52ed649a5a7f2f30401c1ed8fa"
+  },
+  {
+    "file": "PA66/chemical_typing_audit.json",
+    "bytes": 426,
+    "sha256": "046f5b6c90c7330cebafa0a52b8301cc9dd75b71b48cc1027b3033e976b3ee39"
+  },
+  {
+    "file": "PA66/summary.json",
+    "bytes": 50246,
+    "sha256": "48ef00d790871b28ae745187f3b7c54fc24968b1d7f19328728fab803885a70c"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_positive_le1pct_bottom.npz",
+    "bytes": 133085,
+    "sha256": "b395b6649094d8b02cd7c8de37f113481b2d46f1135bec8e55e12592b9c887d6"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt2_le5pct_bottom_view.py",
+    "bytes": 93895,
+    "sha256": "f8f5b19c01905b271bc3acba49d3e111a83e253154161b0cf0adc1fd4fc75680"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt5pct_top.npz",
+    "bytes": 161322,
+    "sha256": "f637739cf70b5f6c621334ce63b46783360bc05f40142a417330ac1a21cd5872"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt5pct_top_view.py",
+    "bytes": 158275,
+    "sha256": "2e7afb83f7cbdaa65deab475761fec01ae3b6afa3a5e3c410aa882f18f1cb652"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_positive_le1pct_top.ply",
+    "bytes": 89245,
+    "sha256": "34332c5c0aba1976fe64e98ece89791d47fd6fb10d00d04469ff52eee860c248"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt2_le5pct_bottom.npz",
+    "bytes": 131403,
+    "sha256": "8f3ba78951819af69481c7e5086b380db31ecbebe7e85ed21af7fc5cf1b4e9b0"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_sampled_zero_bottom.ply",
+    "bytes": 86266,
+    "sha256": "36a0e34d50b4b1cd3c69398a83af3952333a19002c239fd2ae0f41ce73961bda"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt1_le2pct_top.npz",
+    "bytes": 178613,
+    "sha256": "551d0eec9b3c2f24c268887c4fe949d32ebe0fa877b8a225e2a8ad4c826cb77f"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt2_le5pct_top_view.py",
+    "bytes": 86679,
+    "sha256": "ef983518b57a16690d693760d87c38f5520dd4c8b29afcc62ae137815677c8f6"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt5pct_bottom.npz",
+    "bytes": 163690,
+    "sha256": "2c825b017ad39bd6d084f9d6697118de6eaf4db8b0fc9463caf970f19de719c4"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_positive_le1pct_top_view.py",
+    "bytes": 104911,
+    "sha256": "5a89f62621668c20964b5b4d2d5fba3c05317aec5049411831fbf253fd002a28"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt5pct_top.ply",
+    "bytes": 137811,
+    "sha256": "c18fcfe773e3f23797bc0e25317673e6e63609778ecc2c6aa3bff2ebc29e6ea1"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_positive_le1pct_top.npz",
+    "bytes": 146569,
+    "sha256": "220306d9bddb1f6d01c5a59d7a3b5ee4449934010efd84b876d0f02ac6174045"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_positive_le1pct_bottom_view.py",
+    "bytes": 95243,
+    "sha256": "5c238a1b9be61bb2128477503c08cb3e31f7295652820431e3318d11f9acb0f4"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt1_le2pct_bottom_view.py",
+    "bytes": 110151,
+    "sha256": "ae6762507d0e9c036ac26b57a501cd718eb7022ca0ac08084edc71f65749216d"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt2_le5pct_top.ply",
+    "bytes": 72738,
+    "sha256": "3cf4794a205880f3006ae47fd94d4cf39528200c936aec3140159f29bc70a018"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt1_le2pct_bottom.ply",
+    "bytes": 93484,
+    "sha256": "96c0c0a6607e736fac6f0a09df7225c22fd75095183f811cf5a4bcbd8cba4bdd"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt5pct_bottom_view.py",
+    "bytes": 161059,
+    "sha256": "1f8197fb09fbc9b9091b43e9ba01ec3c39d39ef9bff2c78cd81a133664515416"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt2_le5pct_bottom.ply",
+    "bytes": 79658,
+    "sha256": "af39c5161ce2e976f4e626f377557fb3d500d0aac55b253dd7ed1bed21056be1"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_positive_le1pct_bottom.ply",
+    "bytes": 80183,
+    "sha256": "6052aa47b1e8d6e5ef8d668d04ea7c0de587f6c858102f0c76eca478b32b3955"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_sampled_zero_bottom.npz",
+    "bytes": 141892,
+    "sha256": "ef286130a94f3bbd5996c7ba678272b977654eeb8878c7e912afeaf20f481f75"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt5pct_bottom.ply",
+    "bytes": 138874,
+    "sha256": "e6a667e139e9545edf2ef0601050c9af9c3ab4b75089fd3f2975db025d72f3de"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_sampled_zero_top_view.py",
+    "bytes": 107959,
+    "sha256": "f6959c28f0eef0b98bab3016e4eae6fdb8626f041323b74f97dc4b26b46a77ed"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt1_le2pct_top.ply",
+    "bytes": 110607,
+    "sha256": "1675d201945d458ee6016e90f9eb59aeb3fdbfc7ed1a196e99b25963c324d3b9"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt2_le5pct_top.npz",
+    "bytes": 121408,
+    "sha256": "4165ecc9d874673189d33c6b358bbbddc93af164accf144f7ef7692812426753"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_sampled_zero_top.ply",
+    "bytes": 92339,
+    "sha256": "2ac3727ab42ce0f47813ceb71bd3c1a824f4a3aaa33b75572bcf7871c6f68e4f"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt1_le2pct_top_view.py",
+    "bytes": 126823,
+    "sha256": "1a185a3ca2506edc465e5c8ce7e5c7d8c36371926a3d30fd635cde52ae789200"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_sampled_zero_top.npz",
+    "bytes": 151179,
+    "sha256": "68ee3b0b57e39898466df5ccf1d445b48472201f30793d805dc3c0ef32785eda"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_sampled_zero_bottom_view.py",
+    "bytes": 101311,
+    "sha256": "d74258697fc45e624005fa94facb56872c2480e4d0c53407a2c2d957e103dbde"
+  },
+  {
+    "file": "PA66/material_atlas/PA66_gt1_le2pct_bottom.npz",
+    "bytes": 153477,
+    "sha256": "d0b38b389d85f5d3c7c0be9f4b9c57a727b933f0eb300dedda4b4c368c0bb3da"
+  },
+  {
+    "file": "PA66/SC4927359/matched_material_median.ply",
+    "bytes": 111971,
+    "sha256": "5ecda360dd95d32581c7f4c3f8fbbf85d80d79ae010e83bdbb56735ea78c74f6"
+  },
+  {
+    "file": "PA66/SC4927359/enzyme_contact_q100.ply",
+    "bytes": 54902,
+    "sha256": "1a48100b63ee2149236e149d4a9fc3593004761daf3023b49829bb6637140e03"
+  },
+  {
+    "file": "PA66/SC4927359/matched_material_fields.npz",
+    "bytes": 3185028,
+    "sha256": "68439e3d73ee0ffcaac57813dde53eea4440d596cfa767921020cfc0a7852fa6"
+  },
+  {
+    "file": "PA66/SC4927359/enzyme_contact_q90.npz",
+    "bytes": 100929,
+    "sha256": "ee8b4f68864cb9e3be2d430eaa7ebe342ef4a5b540dc65254987552d60f7960a"
+  },
+  {
+    "file": "PA66/SC4927359/enzyme_contact_q90.ply",
+    "bytes": 66284,
+    "sha256": "53cc9bf0355b7a8c3f58cdf7291c60c4fbfbd290bea45034fa4c8c85efb28d8b"
+  },
+  {
+    "file": "PA66/SC4927359/matched_material_median.npz",
+    "bytes": 179899,
+    "sha256": "b5dd24f230a7b29ca51114533b6222b83ad3f8446627e7eac7a592c4e00352e1"
+  },
+  {
+    "file": "PA66/SC4927359/enzyme_contact_q50.ply",
+    "bytes": 99372,
+    "sha256": "536c5938dd8538df78dbbdf3a6d89f3929612aa8b5ba0890ef6df4028a9cd696"
+  },
+  {
+    "file": "PA66/SC4927359/PA66_SC4927359_view.py",
+    "bytes": 385171,
+    "sha256": "f3297fc8e8f346a85ca50f6e8902f77d067e0eca335cf8407d315d0e89b6c2b0"
+  },
+  {
+    "file": "PA66/SC4927359/summary.json",
+    "bytes": 6797,
+    "sha256": "5076e620bd77652bb00912f593560c9134c9be59092a7eb856e5a06522dbb733"
+  },
+  {
+    "file": "PA66/SC4927359/enzyme_contact_q50.npz",
+    "bytes": 161007,
+    "sha256": "f029cc18de0732f478b7fca1c17243fa3815107a3fbb6859b45584771582b1da"
+  },
+  {
+    "file": "PA66/SC4927359/enzyme_contact_q100.npz",
+    "bytes": 76233,
+    "sha256": "fe05a7936f91237483503d61127fc5fd5c771c454036290f24a404bec50ada0e"
+  },
+  {
+    "file": "PA66/N2240/matched_material_median.ply",
+    "bytes": 101937,
+    "sha256": "cc148b74a7bdd93eb435c499f64df5f5789f0c186f5961e1a8db08f3e948c569"
+  },
+  {
+    "file": "PA66/N2240/enzyme_contact_q100.ply",
+    "bytes": 51652,
+    "sha256": "f3419fe00366bc4be3305b88eb03e60f9701a6dca60d125024903bf688944e02"
+  },
+  {
+    "file": "PA66/N2240/matched_material_fields.npz",
+    "bytes": 2248649,
+    "sha256": "2ef1b81aeb33fd022e60a725fa6ad77fa492fa503b67d918690b64f383d667eb"
+  },
+  {
+    "file": "PA66/N2240/enzyme_contact_q90.npz",
+    "bytes": 107827,
+    "sha256": "f49026584d1eb7c24ef84b3ea2695ae1ec6fee45dc6aa03939b32b9317c22a73"
+  },
+  {
+    "file": "PA66/N2240/enzyme_contact_q90.ply",
+    "bytes": 69892,
+    "sha256": "b616e084a1a4e9a8ef967a488ffa1cd9b14b6aab398db5679289029a05a0e309"
+  },
+  {
+    "file": "PA66/N2240/matched_material_median.npz",
+    "bytes": 165245,
+    "sha256": "e78176fa6145117b1c6917bf64d0839a59cb1177e7a70fb7e769f7c990df5858"
+  },
+  {
+    "file": "PA66/N2240/enzyme_contact_q50.ply",
+    "bytes": 90809,
+    "sha256": "7eb6b4f3dc22e3212a0800d7a87687f40d8e3bdee48031c630fb17b43f498075"
+  },
+  {
+    "file": "PA66/N2240/summary.json",
+    "bytes": 5907,
+    "sha256": "4a035dd427fb607968076d79a16eabc2e25eea0906390a727c297894f8e9dda8"
+  },
+  {
+    "file": "PA66/N2240/enzyme_contact_q50.npz",
+    "bytes": 148233,
+    "sha256": "9e048b4c88164a39bf2bff51eb0681da2e1e99c1df8791162fd146144133f71c"
+  },
+  {
+    "file": "PA66/N2240/enzyme_contact_q100.npz",
+    "bytes": 75401,
+    "sha256": "3ca79ccf37f255e0f44f4d72b4b59be22b4c491bc0720dcd2fa7a0ecbd97c067"
+  },
+  {
+    "file": "PA66/N2240/PA66_N2240_view.py",
+    "bytes": 369923,
+    "sha256": "b20ab361db1b05d37dcffd41871a90d1007c5b7f4a03a897cd32e94d1510c4ba"
+  },
+  {
+    "file": "PA66/SC4874583/matched_material_median.ply",
+    "bytes": 143081,
+    "sha256": "fbcd3affc4340bb882222c2fde17fbcc3e2db36e2c293fb79d28fac7b78d1f20"
+  },
+  {
+    "file": "PA66/SC4874583/enzyme_contact_q100.ply",
+    "bytes": 44279,
+    "sha256": "8e23b98c360eda5f1154c030d791c3c908e927a562ecc470074ff02f2a1fc19f"
+  },
+  {
+    "file": "PA66/SC4874583/matched_material_fields.npz",
+    "bytes": 3930689,
+    "sha256": "0863f107c845a9ef6f69b9a743c0eb2fc0971eae99cc8ba25d3c8cdf998c77c7"
+  },
+  {
+    "file": "PA66/SC4874583/enzyme_contact_q90.npz",
+    "bytes": 101233,
+    "sha256": "050f32e12f089bf5b6190a025db88f24760ee96871290ec163fec7a65b28a457"
+  },
+  {
+    "file": "PA66/SC4874583/PA66_SC4874583_view.py",
+    "bytes": 425523,
+    "sha256": "0c1a0f21608dbaf75dd1430ddaecd3834dda97ac133d366e3b34937bcc8c8c5d"
+  },
+  {
+    "file": "PA66/SC4874583/enzyme_contact_q90.ply",
+    "bytes": 67823,
+    "sha256": "7845fa0951264a35cb4ca0afbff7cb3f6b1d98f8cf93def9c620c44126f5663a"
+  },
+  {
+    "file": "PA66/SC4874583/matched_material_median.npz",
+    "bytes": 225510,
+    "sha256": "9d57aa8f583b0c61c83e95bdc80a747e836eea1f6153aa7349c3b9849c9e5e5b"
+  },
+  {
+    "file": "PA66/SC4874583/enzyme_contact_q50.ply",
+    "bytes": 116923,
+    "sha256": "ee2183ea20c47caa255c816c09d261587e04ace1cee429e7cb47dcad7dcf7005"
+  },
+  {
+    "file": "PA66/SC4874583/summary.json",
+    "bytes": 7526,
+    "sha256": "a4661cbe3d7532cb7c131058a57acd71a6a918b18cc23759c3db90066da18f58"
+  },
+  {
+    "file": "PA66/SC4874583/enzyme_contact_q50.npz",
+    "bytes": 190481,
+    "sha256": "f836bec736037ac7ee5faf5fa17f094d26c626c8ccc6ad26abe013f032c89da7"
+  },
+  {
+    "file": "PA66/SC4874583/enzyme_contact_q100.npz",
+    "bytes": 62436,
+    "sha256": "cc87d85feb5d0b87943103345863e24ab7b4a5ee35822d47cde5cdf1f948330d"
+  },
+  {
+    "file": "PA66/N2303/matched_material_median.ply",
+    "bytes": 106330,
+    "sha256": "f73d9a5852093b6707a4ef051d12d0839a0158d4421f355aced82b1f43ef95ed"
+  },
+  {
+    "file": "PA66/N2303/enzyme_contact_q100.ply",
+    "bytes": 57925,
+    "sha256": "10d1bdcaf223ab53dc8ea9516ed836dd25518cca69a44289599302c7a2d8bca0"
+  },
+  {
+    "file": "PA66/N2303/matched_material_fields.npz",
+    "bytes": 2248712,
+    "sha256": "ee3eb4d4fcc2281e57699b4ef193c6f920f6988ed56ba3f461b0aee23a6e8aa8"
+  },
+  {
+    "file": "PA66/N2303/enzyme_contact_q90.npz",
+    "bytes": 116700,
+    "sha256": "4b4b7b8f566fa1696f63f54090a247fec0add9cdcd4a7a70820062751e6c9747"
+  },
+  {
+    "file": "PA66/N2303/enzyme_contact_q90.ply",
+    "bytes": 75883,
+    "sha256": "249a51da32508cb96fb9ad0401e99ac7b302a4717d03cb0360f5a38bee840285"
+  },
+  {
+    "file": "PA66/N2303/matched_material_median.npz",
+    "bytes": 171638,
+    "sha256": "da1520782b676e722e5b7c7e90eba63990b7847a689f36f4dd5497af70693eb4"
+  },
+  {
+    "file": "PA66/N2303/enzyme_contact_q50.ply",
+    "bytes": 92509,
+    "sha256": "1e518e875e41e85d9e4a1cd5f1952c9ae3299f4a4cf595081b1e047017455f28"
+  },
+  {
+    "file": "PA66/N2303/PA66_N2303_view.py",
+    "bytes": 392475,
+    "sha256": "d9d2ec3a62a84b260e75d8bc150377ef5e7226d6a637e997e195ab11c394362a"
+  },
+  {
+    "file": "PA66/N2303/summary.json",
+    "bytes": 5936,
+    "sha256": "b5118aa106285ac689ff5561b74116e828baf6a812ca851c7d4b7621a7c3899a"
+  },
+  {
+    "file": "PA66/N2303/enzyme_contact_q50.npz",
+    "bytes": 150990,
+    "sha256": "790aa297eaf7164fc9dfb637a28d277db984c1175d94997845bee4b5324903ea"
+  },
+  {
+    "file": "PA66/N2303/enzyme_contact_q100.npz",
+    "bytes": 84247,
+    "sha256": "0bcaf1d2d6f0346db6c59315476e102ad290fe75ee7bcd09dfbee1ae691f9df2"
+  },
+  {
+    "file": "PA66/N0564/matched_material_median.ply",
+    "bytes": 102766,
+    "sha256": "247389fe915bb04e309218f359d0c953039aa83335421b14b7cfde50ca35149e"
+  },
+  {
+    "file": "PA66/N0564/enzyme_contact_q100.ply",
+    "bytes": 68262,
+    "sha256": "5bc90d238bf0b0a2455a4b85d763687bc789bc6431cecb9f1ee42d07ef5a8f4c"
+  },
+  {
+    "file": "PA66/N0564/matched_material_fields.npz",
+    "bytes": 2249525,
+    "sha256": "0912389afba2620eb39317028b668099603082194b53e6ea19959b2a2dd220ac"
+  },
+  {
+    "file": "PA66/N0564/enzyme_contact_q90.npz",
+    "bytes": 120647,
+    "sha256": "822514f72b4c8415544c23a4a3c9481a3690cac5839f6e8bf70d2f2bd9f192da"
+  },
+  {
+    "file": "PA66/N0564/enzyme_contact_q90.ply",
+    "bytes": 78282,
+    "sha256": "c6016bdacf4965157f5960f65d4c374d583db12f57b5ad8b1bb1a5265e5ba5dd"
+  },
+  {
+    "file": "PA66/N0564/matched_material_median.npz",
+    "bytes": 165728,
+    "sha256": "a43d363016d9cf9fa0e3416a638ae61473fc379223bfe13189a32d8e9cf2818c"
+  },
+  {
+    "file": "PA66/N0564/enzyme_contact_q50.ply",
+    "bytes": 97888,
+    "sha256": "f7a04c6482d729c9f4a3ebec3b770b13bfe477d11fccce5b0e1cd80d54138089"
+  },
+  {
+    "file": "PA66/N0564/summary.json",
+    "bytes": 5974,
+    "sha256": "947f33e003cc9d77d0d9f5e5b9b91a25f88b11ff3c32e107e5cb4ea9708ee559"
+  },
+  {
+    "file": "PA66/N0564/enzyme_contact_q50.npz",
+    "bytes": 159255,
+    "sha256": "96f0d33535cd720fc13f5da44538cb113d9b1cef49257cd3ce9006b1f2fd367e"
+  },
+  {
+    "file": "PA66/N0564/PA66_N0564_view.py",
+    "bytes": 406419,
+    "sha256": "5708b4f1dd2d1a6bf3df75a490619d3984aae01565cc5f3eae357f15175779e6"
+  },
+  {
+    "file": "PA66/N0564/enzyme_contact_q100.npz",
+    "bytes": 95713,
+    "sha256": "eb0f83ad85804f7fccc1ce8671b192e46b57b2d3cef94974d853d5ff96032935"
+  },
+  {
+    "file": "PA66/SC4309501/matched_material_median.ply",
+    "bytes": 104534,
+    "sha256": "ecca768289f7e7d24deda75e4187663977c142d6d1f497a4af63e60a87722337"
+  },
+  {
+    "file": "PA66/SC4309501/enzyme_contact_q100.ply",
+    "bytes": 42702,
+    "sha256": "7cd9b6046bd2b3f519fca06e2f648778cc447c5b186682b19ff94bc662b5f8eb"
+  },
+  {
+    "file": "PA66/SC4309501/matched_material_fields.npz",
+    "bytes": 3370991,
+    "sha256": "bc8c09de6866faff9eabfae0a4d0fe96027b279fb34672039266a7addeac7c31"
+  },
+  {
+    "file": "PA66/SC4309501/enzyme_contact_q90.npz",
+    "bytes": 99756,
+    "sha256": "64c0a3f8522b4ad8bb2cb0aa27d579db922aed805f4bc7c6a4ef04f5f65d0a28"
+  },
+  {
+    "file": "PA66/SC4309501/PA66_SC4309501_view.py",
+    "bytes": 366259,
+    "sha256": "5a5ecb9d75ce8c1701b5f2d94053f6cdad836266b0e8b28832054c3d3b80bd1c"
+  },
+  {
+    "file": "PA66/SC4309501/enzyme_contact_q90.ply",
+    "bytes": 63672,
+    "sha256": "926aefe51d36751b1bebd0b066a8ba4d4c0438679bb580df6d1f29b241b619df"
+  },
+  {
+    "file": "PA66/SC4309501/matched_material_median.npz",
+    "bytes": 169085,
+    "sha256": "9f6a68fe1cec49ce84707ad4ed528a373417c986d2e92ca81730f317b9643686"
+  },
+  {
+    "file": "PA66/SC4309501/enzyme_contact_q50.ply",
+    "bytes": 99780,
+    "sha256": "223d966cc3412a054f697fe0e2c470a9fd56a9fb4dc8289abbdc67ecf8581404"
+  },
+  {
+    "file": "PA66/SC4309501/summary.json",
+    "bytes": 6996,
+    "sha256": "8d88979544271b59fd09eb8d3701cbdb57da0e395b9acb78ea56e3e8becacaef"
+  },
+  {
+    "file": "PA66/SC4309501/enzyme_contact_q50.npz",
+    "bytes": 162315,
+    "sha256": "dee863401fec2ee301ecae3a6a87ba0a2b109af98edddb12a8f261d6bac98405"
+  },
+  {
+    "file": "PA66/SC4309501/enzyme_contact_q100.npz",
+    "bytes": 62401,
+    "sha256": "81112bc32637770b1a2d646b78bce1c9eae641e5353a034f42edcd649b7611e4"
+  },
+  {
+    "file": "PA6/polymer_SES_fields.npz",
+    "bytes": 37802545,
+    "sha256": "1017369a2843c2d4c09e4ae7c7b881e9c8095317d38d3650a415cb3f4a9d0416"
+  },
+  {
+    "file": "PA6/material_atlas_summary.json",
+    "bytes": 4903,
+    "sha256": "ee0906538fd1718ae39b8ce00e297dec3443d3a43dd92b6efabdd84ae3b24207"
+  },
+  {
+    "file": "PA6/site_index.json",
+    "bytes": 47625,
+    "sha256": "321432619e5e294970a0d1790147574b2506433f52c21bceaf6401a007f9e209"
+  },
+  {
+    "file": "PA6/chemical_typing_audit.json",
+    "bytes": 426,
+    "sha256": "650d61a44646dff59c8bb207696290e5b34b55235c12756d22ad8dddbb14f0ef"
+  },
+  {
+    "file": "PA6/summary.json",
+    "bytes": 45454,
+    "sha256": "48e1e53371bb166965f0a9cb5642166220010b13c2f8ee3d48c0420ab7865a31"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_sampled_zero_top.ply",
+    "bytes": 86823,
+    "sha256": "25001363e4c0622ad499f16e0757ac9aa710a35dfdda289a45762ac886930928"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt2_le5pct_bottom.npz",
+    "bytes": 124551,
+    "sha256": "ce77278586554abc13c1e4b2285ced8cb3e60ee5bc6176398a3ae529bc91e5b2"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_positive_le1pct_bottom.ply",
+    "bytes": 89297,
+    "sha256": "0982780cb36ff26e58a8ce4e0c5cefc9679da6f5ef8523536a27ede0b0abe746"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt5pct_top.ply",
+    "bytes": 188046,
+    "sha256": "f60e90167dbf0e86e10314a9b4535ba47dcbc7337103892ca4caf3843539c177"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_sampled_zero_bottom_view.py",
+    "bytes": 107051,
+    "sha256": "ae03d7ecf78eaf260491c3b9dfe807212b74d7ca99deb9e2353c8426e8161e1f"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt2_le5pct_top.npz",
+    "bytes": 131595,
+    "sha256": "b1ddc0dd21d26091b8d7dfdbaa50566bb47fc50e490c38378874dca6641106f2"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt1_le2pct_top_view.py",
+    "bytes": 138379,
+    "sha256": "b3a3b368c3edb73425a2b2d7256352d0b3d125b89ad5884a93e9ddd87c2cd818"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_sampled_zero_bottom.ply",
+    "bytes": 91258,
+    "sha256": "a356b287a4a331283d293e2e147bb3d9a25f38491b3896f5f1318fa566d2ff77"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_positive_le1pct_bottom_view.py",
+    "bytes": 104583,
+    "sha256": "c14b60bca0c05921b3560bd68aea34df7742b2b3f0662139126c41d98aaabe1f"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt1_le2pct_bottom.ply",
+    "bytes": 104983,
+    "sha256": "fe4268892ac81dfc4d85aecbc898c77e93e6cbd5604fc5a52ac2482b8bdc5d4c"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_positive_le1pct_top.npz",
+    "bytes": 141580,
+    "sha256": "72ff6a336791bd492997862bfc253c35562351a243c93b6a24b6e13385909792"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt5pct_top.npz",
+    "bytes": 296985,
+    "sha256": "8f432c7ade5a25a0be7cbf0270cb49b57710ae9898c4740c87e885f707398335"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt1_le2pct_bottom.npz",
+    "bytes": 169493,
+    "sha256": "72f50dd21535273af4c7dcd34a9113a730b8cdc36e340ecdd03ba4482e892a42"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_sampled_zero_bottom.npz",
+    "bytes": 149344,
+    "sha256": "206bf5df44a732b390e65d0971a73812456861038602e6a34bdbe81d95b8c5cc"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt1_le2pct_bottom_view.py",
+    "bytes": 120967,
+    "sha256": "df0550f14fb9aabbb748aab1fc3a6827dea8c53ecfe3f8f60e54c29389de8140"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_positive_le1pct_bottom.npz",
+    "bytes": 146152,
+    "sha256": "26bad26061ae4307cb8377f7b6b0e6edb9dbab4e05593a2347363dc811cf5b2c"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_positive_le1pct_top.ply",
+    "bytes": 85660,
+    "sha256": "8b4ad246668fa383c27a2454ba5bd5e29c8ec13dd3b842fab351fb29dbe35dae"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_sampled_zero_top_view.py",
+    "bytes": 102263,
+    "sha256": "7d58cdd9e0a0e079d77354907b614702658e8c1ed13e4a38c70b3504fb8ae75a"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt2_le5pct_bottom.ply",
+    "bytes": 74970,
+    "sha256": "98efd61aa9e64ec7463c1d274b2328415c9c118398c69c6b637c539b3c75b36b"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt2_le5pct_bottom_view.py",
+    "bytes": 88963,
+    "sha256": "73a09280497d640cb7f23d9ceb8a251bd2bc05ee35ede680506900cebeb97f3e"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt2_le5pct_top.ply",
+    "bytes": 79814,
+    "sha256": "fe3dc6cabbc19b77e2d2066010b0082d6e63fcd904e7259b8ac822f959460d9c"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt5pct_top_view.py",
+    "bytes": 211031,
+    "sha256": "2f3e6de2bd28b23e0d5010e7886adb465a10a4a1df83a84db185bf253d382745"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_sampled_zero_top.npz",
+    "bytes": 142819,
+    "sha256": "71e44b9d93da402a62cbd0ee7f352e94dc2296fb3ae4b97cedfb542029228055"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt1_le2pct_top.ply",
+    "bytes": 122362,
+    "sha256": "ad4f399efdd80ba48801f7c6879a98f676468b7793dcbc7880c45cacae2c7a32"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_positive_le1pct_top_view.py",
+    "bytes": 101815,
+    "sha256": "dd53b6b8135c6cab080a259a53100de9c894a9fc12f1c91788674e4aee513823"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt1_le2pct_top.npz",
+    "bytes": 195819,
+    "sha256": "ed86575b55843685d241fc0742502cf6f98334263ba1f9de4a6066d99b80ed23"
+  },
+  {
+    "file": "PA6/material_atlas/PA6_gt2_le5pct_top_view.py",
+    "bytes": 94119,
+    "sha256": "8b81713a1b52d6cdcd537871dcc0af50f5d4b0a82a4b9213c907486975965a65"
+  },
+  {
+    "file": "PA6/SC4927359/matched_material_median.ply",
+    "bytes": 121004,
+    "sha256": "39f6d59ed0e38593ed1a3722f53e2291a2bce80d21ba490c338a0873555301c3"
+  },
+  {
+    "file": "PA6/SC4927359/PA6_SC4927359_view.py",
+    "bytes": 402955,
+    "sha256": "3703c74d132c1aca6857dd6a80d8d97e2a6a3fa4d3fe5ddea04db6a4a7ae27d7"
+  },
+  {
+    "file": "PA6/SC4927359/enzyme_contact_q100.ply",
+    "bytes": 65778,
+    "sha256": "1aaed85f38cebfb15c903456b7846565e115876f772b675c4d1f7f1f2afd4727"
+  },
+  {
+    "file": "PA6/SC4927359/matched_material_fields.npz",
+    "bytes": 2966648,
+    "sha256": "d7c3b9a16ad1dcc11aab66e191f86393040cf29e3f78391023af32b2f38c8be9"
+  },
+  {
+    "file": "PA6/SC4927359/enzyme_contact_q90.npz",
+    "bytes": 100115,
+    "sha256": "82bd96823df0807134e4a2ac1dc0e3584aa8c0d26759021eed1e7f0630fc92cf"
+  },
+  {
+    "file": "PA6/SC4927359/enzyme_contact_q90.ply",
+    "bytes": 66625,
+    "sha256": "66875c894e19a23938b811481ac0595a0ec9b228fee08dd0fc8d8c02303cf075"
+  },
+  {
+    "file": "PA6/SC4927359/matched_material_median.npz",
+    "bytes": 192777,
+    "sha256": "5b22757a54357a5d99c430b6b83df4a3290b917e71d2d57b0553576b0d727de9"
+  },
+  {
+    "file": "PA6/SC4927359/enzyme_contact_q50.ply",
+    "bytes": 96587,
+    "sha256": "4d9bdb69b41eb6a915ab8ef740c8bb5f95ac664c2721814aa577ba683e38d1a5"
+  },
+  {
+    "file": "PA6/SC4927359/summary.json",
+    "bytes": 6752,
+    "sha256": "58778dc47c1f796876ee575a138aaec9882be05b1413693491483f4bbe866769"
+  },
+  {
+    "file": "PA6/SC4927359/enzyme_contact_q50.npz",
+    "bytes": 156877,
+    "sha256": "7b2a7403183b10f8de2836acdae86655e7011550f8b33833f7911d5b3d842cd3"
+  },
+  {
+    "file": "PA6/SC4927359/enzyme_contact_q100.npz",
+    "bytes": 89234,
+    "sha256": "8897a9b0de425753ae0e9730131c17dba1641688d218f9621a1059630953d8c3"
+  },
+  {
+    "file": "PA6/N2240/matched_material_median.ply",
+    "bytes": 141086,
+    "sha256": "0a93f4ea5d2552590e0a1bce30ccecbd4f3d30553b0fe52a84f70eded553be2c"
+  },
+  {
+    "file": "PA6/N2240/enzyme_contact_q100.ply",
+    "bytes": 57616,
+    "sha256": "bf0321d3e62b769a904cc56f0a44c4384b1110cff25a8b88200c1fffd63dd7d7"
+  },
+  {
+    "file": "PA6/N2240/matched_material_fields.npz",
+    "bytes": 1676173,
+    "sha256": "6450dcc17182fcbaeba5eed15a1517a2ab69bd94f9ae91ced2105037805a3172"
+  },
+  {
+    "file": "PA6/N2240/enzyme_contact_q90.npz",
+    "bytes": 122276,
+    "sha256": "edc8346751526f3ce239c1b247cccccd5eb717a65ae19254e6e372dadcf19c5d"
+  },
+  {
+    "file": "PA6/N2240/enzyme_contact_q90.ply",
+    "bytes": 77579,
+    "sha256": "273a1d714a43f4137ddffc6bb42a297da67e324a2ae03c2dc6d61feb4e1141dc"
+  },
+  {
+    "file": "PA6/N2240/matched_material_median.npz",
+    "bytes": 223143,
+    "sha256": "c3f59166927fec8264ef9aa8c6c2c0884a0146ea7cc20583409ea760c3689bf4"
+  },
+  {
+    "file": "PA6/N2240/enzyme_contact_q50.ply",
+    "bytes": 123494,
+    "sha256": "446fbac01d64de5e188a57e237289125d394405abe82430a3e3cb65008e0314e"
+  },
+  {
+    "file": "PA6/N2240/PA6_N2240_view.py",
+    "bytes": 461231,
+    "sha256": "cd7e0286008d82dd264678a96ea5aa05dddade85375202803f1da84832a20e8f"
+  },
+  {
+    "file": "PA6/N2240/summary.json",
+    "bytes": 5420,
+    "sha256": "3c9a208e9af3886b80419de85e911e43f73840086b47dcae95d3fafde41c7aab"
+  },
+  {
+    "file": "PA6/N2240/enzyme_contact_q50.npz",
+    "bytes": 200927,
+    "sha256": "524bdc69e3bc2b5b68e91b8de3fad428bbdd14d482a864dd74d7f85b0af98270"
+  },
+  {
+    "file": "PA6/N2240/enzyme_contact_q100.npz",
+    "bytes": 84810,
+    "sha256": "128a226b8bf4fd71e7a90880e93bff777162bf6f56ffb93bb86119a16544076f"
+  },
+  {
+    "file": "PA6/SC4415918/matched_material_median.ply",
+    "bytes": 109126,
+    "sha256": "d17e022e9ad89db677af423d4242892e0f6d1bbf76164f60cb575ea31caf6604"
+  },
+  {
+    "file": "PA6/SC4415918/enzyme_contact_q100.ply",
+    "bytes": 59385,
+    "sha256": "c653cfb8599637b3144cb5c3a1f78ee3a94006eea57d6c0b3d942087c7f0bf08"
+  },
+  {
+    "file": "PA6/SC4415918/matched_material_fields.npz",
+    "bytes": 2990074,
+    "sha256": "5fda4dac0633a94087d7d9dc22d8af6efc6daf0526f85de36ea552d08b50a9dd"
+  },
+  {
+    "file": "PA6/SC4415918/enzyme_contact_q90.npz",
+    "bytes": 101063,
+    "sha256": "0ca37d94849e6bad0aa62f0ce2f08b46c1e1fb4979e6f1ab46a3c92b487a0e6d"
+  },
+  {
+    "file": "PA6/SC4415918/PA6_SC4415918_view.py",
+    "bytes": 399371,
+    "sha256": "98c07b3d59cf481a48fff5236b29872ff9c93e51d900757ba5358b53fdfcf51e"
+  },
+  {
+    "file": "PA6/SC4415918/enzyme_contact_q90.ply",
+    "bytes": 68291,
+    "sha256": "6ba72379b44358962685a1b65dc2a1dc5ceddd29f5df4a237c1283c9f628c2ab"
+  },
+  {
+    "file": "PA6/SC4415918/matched_material_median.npz",
+    "bytes": 175933,
+    "sha256": "6621362d417b0572bf43c68e85e1aa046490d9840b1ad51e3b583a6fc4f79bd3"
+  },
+  {
+    "file": "PA6/SC4415918/enzyme_contact_q50.ply",
+    "bytes": 108960,
+    "sha256": "062d0f174120e89f795fd586136d3391429310567ca7a1729ed0911c9f932d00"
+  },
+  {
+    "file": "PA6/SC4415918/summary.json",
+    "bytes": 6695,
+    "sha256": "67c4aff173e9054f2b7123ba0515a5a31b19e07164546134738c078d4bc3a150"
+  },
+  {
+    "file": "PA6/SC4415918/enzyme_contact_q50.npz",
+    "bytes": 176222,
+    "sha256": "39f65bf20b17cd41b300f862aca75e0c91968d10f8147a92d2925eb8385e53ab"
+  },
+  {
+    "file": "PA6/SC4415918/enzyme_contact_q100.npz",
+    "bytes": 82520,
+    "sha256": "fb386d9f88868b4c0d96e06be9867734eca5277ccabfdf213404a1c3e25cf1bf"
+  },
+  {
+    "file": "PA6/N2403/matched_material_median.ply",
+    "bytes": 107697,
+    "sha256": "e9f685a0bbf17d6de54820641ba1528efb3c7f4e42141c52aee577b66e3dbc9c"
+  },
+  {
+    "file": "PA6/N2403/enzyme_contact_q100.ply",
+    "bytes": 65251,
+    "sha256": "394efe9d5125215934250521db08851cf997f74cb91c969eb6eab20488b2c6f5"
+  },
+  {
+    "file": "PA6/N2403/matched_material_fields.npz",
+    "bytes": 1124446,
+    "sha256": "cb1833191f09f87dea2ae14db9d1f4482b415c7266a4970b6326f56c23b7a75d"
+  },
+  {
+    "file": "PA6/N2403/enzyme_contact_q90.npz",
+    "bytes": 122617,
+    "sha256": "e014391ad3067595c45d409ae6937d9ab6baa5bd59a287ffc109ac660d5d1c01"
+  },
+  {
+    "file": "PA6/N2403/enzyme_contact_q90.ply",
+    "bytes": 79798,
+    "sha256": "50ecea52f44421e45a3ca225ac935111724ef872c19a3cdd3a68cac5163b4a7a"
+  },
+  {
+    "file": "PA6/N2403/PA6_N2403_view.py",
+    "bytes": 413379,
+    "sha256": "632a522b96938ad677a756dab44ef5a2163d73b8d365dd2ef3494037452e5ca5"
+  },
+  {
+    "file": "PA6/N2403/matched_material_median.npz",
+    "bytes": 172306,
+    "sha256": "de307f0159158b04419bbfa51be9e640d1916d70facdd4c54883175284ad0586"
+  },
+  {
+    "file": "PA6/N2403/enzyme_contact_q50.ply",
+    "bytes": 100500,
+    "sha256": "5d79f0ed051cf1931378427048b16b2b270d083c67df263e0897cadfcc5ef830"
+  },
+  {
+    "file": "PA6/N2403/summary.json",
+    "bytes": 4838,
+    "sha256": "3adb537fa326f758749bc275a229eb61501729723dda46bc9edc71cd6ccb76ab"
+  },
+  {
+    "file": "PA6/N2403/enzyme_contact_q50.npz",
+    "bytes": 159141,
+    "sha256": "51ef717100554c2796942ffefbef74fd1790b50548026df1bd83a705758667c3"
+  },
+  {
+    "file": "PA6/N2403/enzyme_contact_q100.npz",
+    "bytes": 96626,
+    "sha256": "c1c1499bcecf043c59a3935d7016b5b87122f599b136459e83b5e17790db8afd"
+  },
+  {
+    "file": "PA6/SC4399876/matched_material_median.ply",
+    "bytes": 129163,
+    "sha256": "2ddef8eb9a6f6f181bb09e10861accdb5f88845d6db0f69576c20e4be25315a7"
+  },
+  {
+    "file": "PA6/SC4399876/PA6_SC4399876_view.py",
+    "bytes": 427011,
+    "sha256": "5c14094ac0d2f40b2e9c1ddc7a5e6e00a0ef6ad35fe7e0402eb3fc59427d18fb"
+  },
+  {
+    "file": "PA6/SC4399876/enzyme_contact_q100.ply",
+    "bytes": 55647,
+    "sha256": "7119443fb60c353ff456985ca106b80c8868e134587d770a963519ca728fb3a6"
+  },
+  {
+    "file": "PA6/SC4399876/matched_material_fields.npz",
+    "bytes": 3173480,
+    "sha256": "e0488d6e7dde859567e9b300623aad826b82e24f3fe1e58dd9b82767aa186e2f"
+  },
+  {
+    "file": "PA6/SC4399876/enzyme_contact_q90.npz",
+    "bytes": 106294,
+    "sha256": "c99622ac36950f1d9dcd3d333bcd8587d505d61d2c992aaa6087e8a257179945"
+  },
+  {
+    "file": "PA6/SC4399876/enzyme_contact_q90.ply",
+    "bytes": 72858,
+    "sha256": "b793cd736822629a283cca3e0e3de2fba64766468587146bfeef314776b2b162"
+  },
+  {
+    "file": "PA6/SC4399876/matched_material_median.npz",
+    "bytes": 205333,
+    "sha256": "e6b872b13d1778b1184c062ff2454f25b45607957da483f4bd4b7abe8cc81f60"
+  },
+  {
+    "file": "PA6/SC4399876/enzyme_contact_q50.ply",
+    "bytes": 114177,
+    "sha256": "757b774f437034c51e7f3649377390cb738386de0d6b81b006f4bb39a4097cf2"
+  },
+  {
+    "file": "PA6/SC4399876/summary.json",
+    "bytes": 6899,
+    "sha256": "cc414b4516ffdfbae774f4e8f86d6a39dbf1585d6307e4b8b343451000456071"
+  },
+  {
+    "file": "PA6/SC4399876/enzyme_contact_q50.npz",
+    "bytes": 184439,
+    "sha256": "2e759bab2cc8dfe38ec651a999a39eb15537bc4f36a4e4692e1e2998e9c472e1"
+  },
+  {
+    "file": "PA6/SC4399876/enzyme_contact_q100.npz",
+    "bytes": 79095,
+    "sha256": "8eacb9da0764dee74bf9da38f4df7ec56ddc52cfe9ef6a16b8d5efc1a69a1189"
+  },
+  {
+    "file": "PA6/N1626/matched_material_median.ply",
+    "bytes": 127439,
+    "sha256": "0f3e4b303cb34254dfdca15635ff3ce531d49d0825a58aa129d306a751c852ee"
+  },
+  {
+    "file": "PA6/N1626/enzyme_contact_q100.ply",
+    "bytes": 62054,
+    "sha256": "52255ca7eeac440504e17c95bc45831c9b040d36e362c8aac794c311694ffe97"
+  },
+  {
+    "file": "PA6/N1626/matched_material_fields.npz",
+    "bytes": 1127129,
+    "sha256": "25e300373e92b4ee98113139bf65acc83d066076b3f49694575751651392b1ac"
+  },
+  {
+    "file": "PA6/N1626/PA6_N1626_view.py",
+    "bytes": 433279,
+    "sha256": "6c3b1c911c6330bbd76e0e0c431bd0a3e6c407b682f1cd8e171eaf4ee1c3a335"
+  },
+  {
+    "file": "PA6/N1626/enzyme_contact_q90.npz",
+    "bytes": 109062,
+    "sha256": "b07b36fbc3b14fc6572338b58889a52cf32c5a2e4a79b6652e35191824086ca9"
+  },
+  {
+    "file": "PA6/N1626/enzyme_contact_q90.ply",
+    "bytes": 70155,
+    "sha256": "429383271a8224884813b25bcb7008425b33511c741da3973ef13df1f9423116"
+  },
+  {
+    "file": "PA6/N1626/matched_material_median.npz",
+    "bytes": 200703,
+    "sha256": "41564f5bf47b611b74901928b82acd759f36d866b3b369fb4fe73ad6c42f4582"
+  },
+  {
+    "file": "PA6/N1626/enzyme_contact_q50.ply",
+    "bytes": 113065,
+    "sha256": "8fdab3718728b1d66d65fb80d03656c26ff2abd9b65f0875b5fc64808b4de6de"
+  },
+  {
+    "file": "PA6/N1626/summary.json",
+    "bytes": 4887,
+    "sha256": "a0d126dab2740f1a515f60f423fbfbf9248c2f3ba436b158680e493c2ec5d52d"
+  },
+  {
+    "file": "PA6/N1626/enzyme_contact_q50.npz",
+    "bytes": 177401,
+    "sha256": "331b1839fe7e8ff54ee12ebb683eb4f52d88a99c2f86563a83b99e6957351258"
+  },
+  {
+    "file": "PA6/N1626/enzyme_contact_q100.npz",
+    "bytes": 93591,
+    "sha256": "7e34a439c7e7e9b3b4ef5801f50a407b06280d74f719c4cd314b363e86a73ff2"
+  },
+  {
+    "file": "publication/PA66_material_view.py",
+    "bytes": 336987,
+    "sha256": "a3758b29f26443b8d5c36594527a701f1f7a2ce0f04b3df5c8ccb52b637cc5d9"
+  },
+  {
+    "file": "publication/PET_SC1345656_view.py",
+    "bytes": 543375,
+    "sha256": "b939f6341c6d094f41bd1e636f055b113f4f3d86850251d56617aeb833dc217c"
+  },
+  {
+    "file": "publication/audit.json",
+    "bytes": 200,
+    "sha256": "5eaec21240a9d9e7d59b037aca9abd7311101e0a371024988c7a5a9cc1539a95"
+  },
+  {
+    "file": "publication/PA6_SC4415918_view.py",
+    "bytes": 658763,
+    "sha256": "fd792d08c5273e016bde12a1dc8ff3fb8526679b4f4469b0de642dbed4a3007c"
+  },
+  {
+    "file": "publication/PA66_SC4874583_view.py",
+    "bytes": 679627,
+    "sha256": "a5ed4e29c5c11220efd02bc13452ad98c1bc7e9eeff48275f3d8017680816fff"
+  },
+  {
+    "file": "publication/README.md",
+    "bytes": 6314,
+    "sha256": "bdc18f6197af16105ef179c7a758c784049798e9dd394f1f46a2955dbe8e6bd5"
+  },
+  {
+    "file": "publication/PET_material_view.py",
+    "bytes": 329831,
+    "sha256": "1d9c6ef9ae8389322b56372e11612ce9d7a0ec26d6dcbfccd3c6ab5afe681b5a"
+  },
+  {
+    "file": "publication/PET_M329_view.py",
+    "bytes": 607591,
+    "sha256": "ec712c988d5c9c963d30f5a0dd04b3b082aacb8b309f3d6658b951deb1f47c95"
+  },
+  {
+    "file": "publication/PA6_N2240_view.py",
+    "bytes": 742495,
+    "sha256": "a6bc48a06dd974321a6961bf2e3866d4e1bf1ae6490a2c7a3d677568a8de9eda"
+  },
+  {
+    "file": "publication/core_contact_faces.svg",
+    "bytes": 414342,
+    "sha256": "6154e00cfff9ded764ac4555a0a9219367363d83d2bbf84ddf446c0c1650337e"
+  },
+  {
+    "file": "publication/material_chemistry.png",
+    "bytes": 496197,
+    "sha256": "45238e56b492e289b65c3126efa9bde30fc40f476b701b8b8549dc83d39cee41"
+  },
+  {
+    "file": "publication/PA66_N0564_view.py",
+    "bytes": 674291,
+    "sha256": "86d4ea972c34a6b7bdc307f70d7f9a07db961c257edf3202cf37a41754eb2b1f"
+  },
+  {
+    "file": "publication/material_chemistry.svg",
+    "bytes": 423505,
+    "sha256": "a6379ae54a04a349f122e624ede0fd84819522ceef55d351b87b8add25b97bd5"
+  },
+  {
+    "file": "publication/PA6_material_view.py",
+    "bytes": 364959,
+    "sha256": "b748caaa239f611abe87368071b7a21f3b2909c5cfeb56699eb097526ca69b46"
+  },
+  {
+    "file": "publication/core_contact_faces.png",
+    "bytes": 429409,
+    "sha256": "edf60896a409e9a0a2241946f6457a9b4ae7d886e1c3773d3ac43a913d20598e"
+  }
+]
