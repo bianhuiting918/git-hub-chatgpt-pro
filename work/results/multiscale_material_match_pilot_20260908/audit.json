@@ -1,0 +1,686 @@
+{
+  "status": "TECHNICAL_PILOT_CHECKS_PASS_NOT_SCIENTIFIC_ACCEPTANCE",
+  "materials": 3,
+  "sites_evaluated": 24,
+  "meshes_and_viewers_checked": 54,
+  "checks": [
+    {
+      "key": "PET_all_coverage90_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage90_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage90_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage70_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage70_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage70_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage50_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage50_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_all_coverage50_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage90_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage90_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage90_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage70_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage70_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage70_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage50_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage50_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PET_current_core_accessible_coverage50_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage90_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage90_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage90_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage70_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage70_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage70_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage50_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage50_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_all_coverage50_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage90_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage90_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage90_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage70_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage70_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage70_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage50_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage50_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA6_current_core_accessible_coverage50_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage90_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage90_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage90_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage70_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage70_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage70_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage50_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage50_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_all_coverage50_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage90_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage90_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage90_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage70_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage70_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage70_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage50_R10",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage50_R15",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    },
+    {
+      "key": "PA66_current_core_accessible_coverage50_R20",
+      "finite": true,
+      "one_component": true,
+      "within_radius": true,
+      "chosen_subset_matches": true
+    }
+  ],
+  "control_results": [
+    {
+      "frame": "local_density_normal",
+      "support_filter": false,
+      "radius_A": 10,
+      "pairwise_D95_quantiles_A": [
+        3.294399988560064,
+        4.044966983010216,
+        4.643945705477375,
+        5.024784935312631,
+        5.751875711803499
+      ]
+    },
+    {
+      "frame": "local_density_normal",
+      "support_filter": false,
+      "radius_A": 15,
+      "pairwise_D95_quantiles_A": [
+        4.8385951280023765,
+        6.500807011538205,
+        7.863078923712708,
+        8.795191660297817,
+        10.3933729270308
+      ]
+    },
+    {
+      "frame": "local_density_normal",
+      "support_filter": false,
+      "radius_A": 20,
+      "pairwise_D95_quantiles_A": [
+        5.26376497974147,
+        8.459687880443084,
+        10.218541184083069,
+        12.2858508071874,
+        14.061645474228197
+      ]
+    },
+    {
+      "frame": "slab_normal_control",
+      "support_filter": false,
+      "radius_A": 10,
+      "pairwise_D95_quantiles_A": [
+        3.2079626023321572,
+        4.056767215060974,
+        4.498989474449365,
+        5.102160946713347,
+        6.058035593736653
+      ]
+    },
+    {
+      "frame": "slab_normal_control",
+      "support_filter": false,
+      "radius_A": 15,
+      "pairwise_D95_quantiles_A": [
+        5.129145887297874,
+        5.979083185305248,
+        6.513697864611464,
+        7.527288286393489,
+        9.806883141166589
+      ]
+    },
+    {
+      "frame": "slab_normal_control",
+      "support_filter": false,
+      "radius_A": 20,
+      "pairwise_D95_quantiles_A": [
+        5.127923376317035,
+        7.01239325621696,
+        7.965921910781635,
+        9.71493141257456,
+        13.530839588112611
+      ]
+    }
+  ],
+  "manifest": [
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage90_R10/PET_all_coverage90_R10_view.py",
+      "sha256": "5c999915e8e02e03033b2f2423d5604257945d953ea756a382a1894ab5a2cc0c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage90_R15/PET_all_coverage90_R15_view.py",
+      "sha256": "7a33f91d496b1799be46a81d8c78d8d302e4ea742744c368a602a84d1998cec5"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage90_R20/PET_all_coverage90_R20_view.py",
+      "sha256": "0751591556c33f1154a9884ebdb71780a4fa62e5336ce046b3f2b183ca247faf"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage70_R10/PET_all_coverage70_R10_view.py",
+      "sha256": "263f3a6548ac0b364b26c187ca6832d7ad3156838e1d3b91908a38116d3f2fa6"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage70_R15/PET_all_coverage70_R15_view.py",
+      "sha256": "e2884f5934e4fb3e8e13ab3ad950d85b673a3a332e3adee856b8178f0fc2ca08"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage70_R20/PET_all_coverage70_R20_view.py",
+      "sha256": "8891df5fa01058c6dde5cc4dca1576d2933b7117422fb5ce0a4cf05e8e162cf9"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage50_R10/PET_all_coverage50_R10_view.py",
+      "sha256": "485534152197d9fb9facd67ce2db308f91760205bede3b03fb68e91276651453"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage50_R15/PET_all_coverage50_R15_view.py",
+      "sha256": "527851a8ca3353f4a47ca302094b098816c489c086357479cb463b53d4a3b982"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_all_coverage50_R20/PET_all_coverage50_R20_view.py",
+      "sha256": "32231c6fcfb72bfc2e5ef2dd9b0929ea7c9ff3d4f774a2a4223afe08d824e2c6"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage90_R10/PET_current_core_accessible_coverage90_R10_view.py",
+      "sha256": "93ba943d536cf7e8d8fd4a44b9cd83eaa468eecb84e9f50042f0a65617709754"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage90_R15/PET_current_core_accessible_coverage90_R15_view.py",
+      "sha256": "a80bcb4fc6255706ccdf6c9282f7d7750dca058cbfa1497399b4a8d4d2464675"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage90_R20/PET_current_core_accessible_coverage90_R20_view.py",
+      "sha256": "7a733a2e1394c30374ffcc094046fa1959d0702a55e05689e506e4211df91d5c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage70_R10/PET_current_core_accessible_coverage70_R10_view.py",
+      "sha256": "d323c614fb36c62f5be997257ac4879c3c47ca47c6b778aabe0e0c2218a743a2"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage70_R15/PET_current_core_accessible_coverage70_R15_view.py",
+      "sha256": "be5153fe0d58043f457cd7470ef42666cbe3736d566def21c6b7c6df4e4e370d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage70_R20/PET_current_core_accessible_coverage70_R20_view.py",
+      "sha256": "379646949e9482f19a8758a9f9dce515c17257d93067507d4543b3d6a2e6e846"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage50_R10/PET_current_core_accessible_coverage50_R10_view.py",
+      "sha256": "37301118a1843acb54f83e1c86ed3745d4728a715364d15139bf5afaba147d3b"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage50_R15/PET_current_core_accessible_coverage50_R15_view.py",
+      "sha256": "b0d02daf0dc25aab8e4bce698848bf46790aa0f08667c4413c83d6a1fccfb85f"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_pilot_v1/PET_current_core_accessible_coverage50_R20/PET_current_core_accessible_coverage50_R20_view.py",
+      "sha256": "24148ca561441a904f85a52a21b0e206a780870def5ee986c79bd3564e8fae40"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage90_R10/PA6_all_coverage90_R10_view.py",
+      "sha256": "e847039d32c4ee061ccc75cd5f917e6b10a0850f3e3042e301ddaa6a818acdb5"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage90_R15/PA6_all_coverage90_R15_view.py",
+      "sha256": "ac1e164982da9e6344f15319742e5834b2dbc97fa282a6fbb3ffb632ea8eee13"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage90_R20/PA6_all_coverage90_R20_view.py",
+      "sha256": "c5c0a9cc3773a5b64f0e122f79e2154b81ebdbb8520eea66af6f70bfe250e4f6"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage70_R10/PA6_all_coverage70_R10_view.py",
+      "sha256": "7d1fa46da0efc8b8f14c632d40c999e38e4ab66536259d1058496133715b1132"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage70_R15/PA6_all_coverage70_R15_view.py",
+      "sha256": "b3a71151b00b6e4b2220ebcdc1a9de810a3aaa3b32a1aea7b94eb296d5260153"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage70_R20/PA6_all_coverage70_R20_view.py",
+      "sha256": "f0e8ef41e4e13a541e7fb2de3a006740d5e5671af30ced873c930d19a46c8688"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage50_R10/PA6_all_coverage50_R10_view.py",
+      "sha256": "4dd0bc2afbb99f8dba2320ff8576e77bee79a2bf261575117d017c9e2b5fb88d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage50_R15/PA6_all_coverage50_R15_view.py",
+      "sha256": "d988573005d1b5d460da22593243eb4c16abf336eb387890c39c97d23ab6eb9b"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_all_coverage50_R20/PA6_all_coverage50_R20_view.py",
+      "sha256": "05379c2117d7153a8c4497dfacbc7426cb6cac1b32ac861c137795cc6093c57f"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage90_R10/PA6_current_core_accessible_coverage90_R10_view.py",
+      "sha256": "dd208eda16b807d846213afeb35747f4c51502129c657f5af2ec347f538a39dd"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage90_R15/PA6_current_core_accessible_coverage90_R15_view.py",
+      "sha256": "6ec72f62a1eeaebfe8cd18ab7b2c649dedc770a6694339df82d592b7d2fecde5"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage90_R20/PA6_current_core_accessible_coverage90_R20_view.py",
+      "sha256": "105fc90a1ccba007fc2147ab646ee9053ecb69975b3853456103ce7dd81a1e0d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage70_R10/PA6_current_core_accessible_coverage70_R10_view.py",
+      "sha256": "132ae90ab228c0e611ef336d7315af47112296311bd7d591c06e4eeae84593d6"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage70_R15/PA6_current_core_accessible_coverage70_R15_view.py",
+      "sha256": "903ba2d4fa0befcef611505d4c5c614b68b3a7be77a7a669b631e983bef1af6e"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage70_R20/PA6_current_core_accessible_coverage70_R20_view.py",
+      "sha256": "e1ccafe9fd8d7942e49d5b5359c030bca4330bafcd6ab9c3e77914f8b6b4bcfe"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage50_R10/PA6_current_core_accessible_coverage50_R10_view.py",
+      "sha256": "c7a2b4d4120749eacab5f836ebe5cc189575228da888fcc2d2b64c42101abeb9"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage50_R15/PA6_current_core_accessible_coverage50_R15_view.py",
+      "sha256": "ec2559fbe428cd6f1b0adca7e4201c5c9344d0811909ea242e4bbd61f8631996"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA6_pilot_v1/PA6_current_core_accessible_coverage50_R20/PA6_current_core_accessible_coverage50_R20_view.py",
+      "sha256": "200343e18297a44001b4c673c86bf6bd100585973ab8ef3f9e6f09768161187d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage90_R10/PA66_all_coverage90_R10_view.py",
+      "sha256": "48ccf59642c9ca3716787f2831e0a0fa6c4fd2e7c0b39dbf5d531d9bf076f5b1"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage90_R15/PA66_all_coverage90_R15_view.py",
+      "sha256": "3a16b712c7cce9ed3f09b658a7065355fbc377336cb123a30ec699e9b0236e58"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage90_R20/PA66_all_coverage90_R20_view.py",
+      "sha256": "78e8786c54691566d72bd5dd204414af4da721e6b30fe7dab945e4e65a3f2bc7"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage70_R10/PA66_all_coverage70_R10_view.py",
+      "sha256": "fc12fa55a272affa92ae4c8a55192eaf874018a19c90e11e24a2fa9031de920c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage70_R15/PA66_all_coverage70_R15_view.py",
+      "sha256": "147d57ed2c41bf6b02193d5d6369d6b01f7b1b0c27f5303595ddf28d7e34bbe7"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage70_R20/PA66_all_coverage70_R20_view.py",
+      "sha256": "8d05a6c34e755d1d93cd1a1d2ae6a7afc3354f8f1936d426bbf29d0644ecbe24"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage50_R10/PA66_all_coverage50_R10_view.py",
+      "sha256": "d1c25de6369a4ef1516eaca5a4b138adbcb913f0271779a677cdc20f8f11eafb"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage50_R15/PA66_all_coverage50_R15_view.py",
+      "sha256": "2b2f4150e090a3bf02b139a8c669c4527549a4dc886f8ef3c73c9ecda059a72d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_all_coverage50_R20/PA66_all_coverage50_R20_view.py",
+      "sha256": "e8c4ba7a63aec57599d098652431384b620832896c6e2fb8c634ee4fdc7513be"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage90_R10/PA66_current_core_accessible_coverage90_R10_view.py",
+      "sha256": "90fc2cbda4fbc02deae64a164e740f9786e9c06e2de14dc121e9aa806e6ab53b"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage90_R15/PA66_current_core_accessible_coverage90_R15_view.py",
+      "sha256": "f3ab1a0776868b9a418a4bcefe4967db2667fc82a36883b499dd9c84d452e14a"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage90_R20/PA66_current_core_accessible_coverage90_R20_view.py",
+      "sha256": "4aced8b8070a04ff84c80c184f908bdf3b1ee2baf96577be7ae3deda8765a34c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage70_R10/PA66_current_core_accessible_coverage70_R10_view.py",
+      "sha256": "d10d394977cbc7ab48ee726866f44732f5e6963d44c9d44a8fcf2ba2de9336f1"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage70_R15/PA66_current_core_accessible_coverage70_R15_view.py",
+      "sha256": "7461f0febe2fdf2c8a084c19ee05bd4f502e1b1608712342d13bc0ac664fb606"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage70_R20/PA66_current_core_accessible_coverage70_R20_view.py",
+      "sha256": "cceae0c80c3716248ac48cecb0ef005b05cfa4c4c03852f6a2518e3c16f4d2fa"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage50_R10/PA66_current_core_accessible_coverage50_R10_view.py",
+      "sha256": "5b15c6d7c55585e6e71f5685296f1677f6d71426355d2b102f312d767b4dcd6a"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage50_R15/PA66_current_core_accessible_coverage50_R15_view.py",
+      "sha256": "341d59659541ed3264f43df62e14bb2c9fada0d449c7d20085d940ff3c512061"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/multiscale_material_match_PA66_pilot_v1/PA66_current_core_accessible_coverage50_R20/PA66_current_core_accessible_coverage50_R20_view.py",
+      "sha256": "d0b0351242209aa0d8030a141366c3f756fd17ea8885415b41bce4ade391b169"
+    }
+  ],
+  "unverified": [
+    "PyMOL GUI",
+    "full population fitting",
+    "global optimality",
+    "grid convergence",
+    "independent validation",
+    "enzyme-interface fit at R20"
+  ]
+}

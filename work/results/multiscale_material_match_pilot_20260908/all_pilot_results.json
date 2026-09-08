@@ -1,0 +1,4250 @@
+[
+  {
+    "status": "PILOT_COMPLETE_REQUIRES_SCIENTIFIC_REVIEW",
+    "material": "PET",
+    "pilot": true,
+    "parent_denominator": 578,
+    "evaluated_sites": 8,
+    "radii_A": [
+      10,
+      15,
+      20
+    ],
+    "chemical_typing": {
+      "sdf": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/pet_dp10_400chain_direct_v1/00_chain/PET_DP10.sdf",
+      "sdf_sha256": "1a131f539533920832f72bbf262e0ced20cae376844cdd5f48f2871f0d9021e8",
+      "itp_sha256": "228dc422ede7fd8eb004d04498e5da75d46e65c3ca465c7e40694dcb0194e399",
+      "graph_atom_mapping": "PASS",
+      "atom_count": 231,
+      "logP_fragment_sum": 10.3173,
+      "rdkit_version": "2023.09.6"
+    },
+    "definitions": {
+      "geometry": "original parent exterior-connected approximate water SES; 0.5 A global grid;1 A local mesh",
+      "bulk_filter": "per-vertex >=70% density support on 81-point R10 disk 5A inward along fixed local outward normal; Gaussian3A rho, threshold half median central slab density; nearest carbonyl connected component; proxy, not chain topology removal",
+      "frame": "density outward normal + projected C=O; same material frame across scales; not core-specific rotation",
+      "D95": "maximum of two area-weighted 95th-percentile nearest sampled-mesh distances; triangle centroids weighted by area; vertices/midpoints/centroids target samples",
+      "coverage": "fixed best-candidate matched subset selected at R20, same IDs for R10/R15; measured tolerance is max D95 in that subset; actual matches at tolerance may include extra sites",
+      "candidate_bank": "real site fields + pointwise median, choose lowest required tolerance at R20; finite-library in-sample result, not global optimum",
+      "chemistry": "post-hoc Crippen fragment index/HBA/HBD over actually matched sites; not electrostatic potential or binding energy"
+    },
+    "quadrature_refinement": {
+      "10": {
+        "coarse_D95_A": 5.127659794770859,
+        "refined_D95_A": 5.168615155080733,
+        "absolute_change_A": 0.04095536030987379
+      },
+      "15": {
+        "coarse_D95_A": 7.238334984772264,
+        "refined_D95_A": 7.284842572682703,
+        "absolute_change_A": 0.04650758791043952
+      },
+      "20": {
+        "coarse_D95_A": 9.336500654673001,
+        "refined_D95_A": 9.339497862529338,
+        "absolute_change_A": 0.0029972078563371696
+      }
+    },
+    "results": [
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P026_C22_O10",
+        "chosen_site_ids": [
+          "P026_C22_O10",
+          "P026_C65_O27",
+          "P167_C92_O38",
+          "P272_C75_O31",
+          "P291_C72_O30",
+          "P189_C52_O22",
+          "P390_C95_O39",
+          "P398_C65_O27"
+        ],
+        "tolerance_for_same_subset_A": 11.65358771316281,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P291_C72_O30",
+          "P189_C52_O22",
+          "P398_C65_O27"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 4.112424135128319,
+            "sampled_max_A": 6.146441915584421
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.392799617350111,
+            "sampled_max_A": 7.638324303869396
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 7.191571828468403,
+            "sampled_max_A": 8.498880378069256
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 8.051451865928732,
+            "sampled_max_A": 9.763662426841279
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 6.648972262734762e-05,
+            "sampled_max_A": 0.00010347366333007812
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 3.3688352752250026,
+            "sampled_max_A": 6.917612933682651
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 7.05337553409465,
+            "sampled_max_A": 8.45355477818821
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 11.65358771316281,
+            "sampled_max_A": 13.483381903100476
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 801,
+          "triangles": 1467,
+          "area_A2": 468.19136299439924,
+          "chemically_supported_area_fraction": 0.9812344687877753,
+          "mean_fragment_lipophilicity_index": 0.054938115933328646,
+          "positive_index_area_fraction": 0.9601752853790158,
+          "negative_index_area_fraction": 0.02105918340875949,
+          "material_HBA_weighted_area_fraction": 0.3104314607107504,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P026_C22_O10",
+        "chosen_site_ids": [
+          "P026_C22_O10",
+          "P026_C65_O27",
+          "P167_C92_O38",
+          "P272_C75_O31",
+          "P291_C72_O30",
+          "P189_C52_O22",
+          "P390_C95_O39",
+          "P398_C65_O27"
+        ],
+        "tolerance_for_same_subset_A": 15.754751380465422,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P291_C72_O30",
+          "P189_C52_O22",
+          "P398_C65_O27"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 6.9324809222179375,
+            "sampled_max_A": 10.296929161080266
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 9.551796259909938,
+            "sampled_max_A": 11.516125681908136
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 10.278636915880897,
+            "sampled_max_A": 13.850885657759818
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 11.532615038558129,
+            "sampled_max_A": 14.34260892683647
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 6.544709421676769e-05,
+            "sampled_max_A": 0.00010728836059570312
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 7.447636266806365,
+            "sampled_max_A": 10.730687429791494
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 10.627403715849063,
+            "sampled_max_A": 12.55660373766536
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 15.754751380465422,
+            "sampled_max_A": 18.465678818234835
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1615,
+          "triangles": 2984,
+          "area_A2": 984.3175935187837,
+          "chemically_supported_area_fraction": 0.9803069305456081,
+          "mean_fragment_lipophilicity_index": 0.05542581769110902,
+          "positive_index_area_fraction": 0.9636530374038521,
+          "negative_index_area_fraction": 0.016653893141756106,
+          "material_HBA_weighted_area_fraction": 0.3105752333436965,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P026_C22_O10",
+        "chosen_site_ids": [
+          "P026_C22_O10",
+          "P026_C65_O27",
+          "P167_C92_O38",
+          "P272_C75_O31",
+          "P291_C72_O30",
+          "P189_C52_O22",
+          "P390_C95_O39",
+          "P398_C65_O27"
+        ],
+        "tolerance_for_same_subset_A": 14.57677708619349,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P291_C72_O30",
+          "P189_C52_O22",
+          "P398_C65_O27"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 7.471173252882487,
+            "sampled_max_A": 11.653522938043327
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 11.336082691814,
+            "sampled_max_A": 16.579764457726878
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 8.296735628185647,
+            "sampled_max_A": 12.657418626724008
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 13.23548752534338,
+            "sampled_max_A": 19.327003990093374
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 6.269320694565377e-05,
+            "sampled_max_A": 0.0001087188720703125
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 11.800147455762248,
+            "sampled_max_A": 15.789062442132375
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 12.11971689335597,
+            "sampled_max_A": 16.81498080137149
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 14.57677708619349,
+            "sampled_max_A": 19.63276591053635
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3781,
+          "triangles": 6888,
+          "area_A2": 2279.4969224689303,
+          "chemically_supported_area_fraction": 0.9554257471858736,
+          "mean_fragment_lipophilicity_index": 0.057485650656489196,
+          "positive_index_area_fraction": 0.9377765059245577,
+          "negative_index_area_fraction": 0.01764924126131583,
+          "material_HBA_weighted_area_fraction": 0.3078126737631596,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P026_C22_O10",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P189_C52_O22",
+          "P167_C92_O38"
+        ],
+        "tolerance_for_same_subset_A": 7.366892877809983,
+        "actual_n_at_tolerance": 7,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P291_C72_O30",
+          "P189_C52_O22"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 3.1315659882412814,
+            "sampled_max_A": 4.652391173892304
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 5.8787790886648414,
+            "sampled_max_A": 7.4939084374405684
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 6.253637913638787,
+            "sampled_max_A": 8.63312242625004
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 6.469876289111412,
+            "sampled_max_A": 7.4456937459660555
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 3.7587136808110126,
+            "sampled_max_A": 5.079311971683325
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 4.358640921279661,
+            "sampled_max_A": 6.415558229916324
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 7.366892877809983,
+            "sampled_max_A": 8.56319490809316
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 11.464733853782674,
+            "sampled_max_A": 13.354605787823862
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 658,
+          "triangles": 1181,
+          "area_A2": 376.9533137792076,
+          "chemically_supported_area_fraction": 0.9919101414281386,
+          "mean_fragment_lipophilicity_index": 0.07183003722655135,
+          "positive_index_area_fraction": 0.9919101414281386,
+          "negative_index_area_fraction": 0.0,
+          "material_HBA_weighted_area_fraction": 0.28120647029339485,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P026_C22_O10",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P189_C52_O22",
+          "P167_C92_O38"
+        ],
+        "tolerance_for_same_subset_A": 10.27557592937979,
+        "actual_n_at_tolerance": 7,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P291_C72_O30",
+          "P189_C52_O22"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 4.447064153974975,
+            "sampled_max_A": 8.086749112813223
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.457577327873815,
+            "sampled_max_A": 10.127651444905798
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 10.27557592937979,
+            "sampled_max_A": 13.97774326116622
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 7.70702521671457,
+            "sampled_max_A": 11.293334922587535
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 7.287577354982501,
+            "sampled_max_A": 10.16032491042388
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 8.923715098310083,
+            "sampled_max_A": 12.295662182511004
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 7.62898421331041,
+            "sampled_max_A": 9.173178591166458
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 14.243136059325057,
+            "sampled_max_A": 18.120036883494684
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1727,
+          "triangles": 3136,
+          "area_A2": 1009.4612433414993,
+          "chemically_supported_area_fraction": 0.9740571555225385,
+          "mean_fragment_lipophilicity_index": 0.06382851463667562,
+          "positive_index_area_fraction": 0.9638679016844469,
+          "negative_index_area_fraction": 0.010189253838091527,
+          "material_HBA_weighted_area_fraction": 0.29848612104379973,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P026_C22_O10",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P189_C52_O22",
+          "P167_C92_O38"
+        ],
+        "tolerance_for_same_subset_A": 11.300806134206258,
+        "actual_n_at_tolerance": 6,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P189_C52_O22"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 5.555698807181277,
+            "sampled_max_A": 9.505293518910507
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 7.7102123753644785,
+            "sampled_max_A": 13.56017371613821
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 11.300806134206258,
+            "sampled_max_A": 17.129116620147084
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 7.8645987374673965,
+            "sampled_max_A": 12.197977761773542
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 6.20378563451961,
+            "sampled_max_A": 11.326856035068381
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 14.6533678367867,
+            "sampled_max_A": 17.826581892178172
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 8.523275040834665,
+            "sampled_max_A": 15.062782046648412
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 14.76250625891984,
+            "sampled_max_A": 20.526812861531003
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3921,
+          "triangles": 7239,
+          "area_A2": 2332.0121638118817,
+          "chemically_supported_area_fraction": 0.8841942634540731,
+          "mean_fragment_lipophilicity_index": 0.06289005783157857,
+          "positive_index_area_fraction": 0.8628510040256143,
+          "negative_index_area_fraction": 0.021343259428458893,
+          "material_HBA_weighted_area_fraction": 0.2975927442499709,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P026_C22_O10",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "tolerance_for_same_subset_A": 6.469876289111412,
+        "actual_n_at_tolerance": 6,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P291_C72_O30"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 3.1315659882412814,
+            "sampled_max_A": 4.652391173892304
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 5.8787790886648414,
+            "sampled_max_A": 7.4939084374405684
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 6.253637913638787,
+            "sampled_max_A": 8.63312242625004
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 6.469876289111412,
+            "sampled_max_A": 7.4456937459660555
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 3.7587136808110126,
+            "sampled_max_A": 5.079311971683325
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 4.358640921279661,
+            "sampled_max_A": 6.415558229916324
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 7.366892877809983,
+            "sampled_max_A": 8.56319490809316
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 11.464733853782674,
+            "sampled_max_A": 13.354605787823862
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 658,
+          "triangles": 1181,
+          "area_A2": 376.9533137792076,
+          "chemically_supported_area_fraction": 0.990409894906046,
+          "mean_fragment_lipophilicity_index": 0.0711296674263715,
+          "positive_index_area_fraction": 0.9879677843379553,
+          "negative_index_area_fraction": 0.002442110568090717,
+          "material_HBA_weighted_area_fraction": 0.2823421028140375,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P026_C22_O10",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "tolerance_for_same_subset_A": 7.70702521671457,
+        "actual_n_at_tolerance": 5,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P026_C22_O10",
+          "P189_C52_O22"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 4.447064153974975,
+            "sampled_max_A": 8.086749112813223
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.457577327873815,
+            "sampled_max_A": 10.127651444905798
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 10.27557592937979,
+            "sampled_max_A": 13.97774326116622
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 7.70702521671457,
+            "sampled_max_A": 11.293334922587535
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 7.287577354982501,
+            "sampled_max_A": 10.16032491042388
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 8.923715098310083,
+            "sampled_max_A": 12.295662182511004
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 7.62898421331041,
+            "sampled_max_A": 9.173178591166458
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 14.243136059325057,
+            "sampled_max_A": 18.120036883494684
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1727,
+          "triangles": 3136,
+          "area_A2": 1009.4612433414993,
+          "chemically_supported_area_fraction": 0.9739936411919073,
+          "mean_fragment_lipophilicity_index": 0.06371747833719603,
+          "positive_index_area_fraction": 0.9371290055919111,
+          "negative_index_area_fraction": 0.036864635599996164,
+          "material_HBA_weighted_area_fraction": 0.29611676150840077,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P026_C22_O10",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "tolerance_for_same_subset_A": 7.8645987374673965,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P026_C22_O10"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 5.555698807181277,
+            "sampled_max_A": 9.505293518910507
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 7.7102123753644785,
+            "sampled_max_A": 13.56017371613821
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 11.300806134206258,
+            "sampled_max_A": 17.129116620147084
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 7.8645987374673965,
+            "sampled_max_A": 12.197977761773542
+          },
+          {
+            "site_id": "P026_C22_O10",
+            "D95_A": 6.20378563451961,
+            "sampled_max_A": 11.326856035068381
+          },
+          {
+            "site_id": "P291_C72_O30",
+            "D95_A": 14.6533678367867,
+            "sampled_max_A": 17.826581892178172
+          },
+          {
+            "site_id": "P189_C52_O22",
+            "D95_A": 8.523275040834665,
+            "sampled_max_A": 15.062782046648412
+          },
+          {
+            "site_id": "P398_C65_O27",
+            "D95_A": 14.76250625891984,
+            "sampled_max_A": 20.526812861531003
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3921,
+          "triangles": 7239,
+          "area_A2": 2332.0121638118817,
+          "chemically_supported_area_fraction": 0.9287449689955569,
+          "mean_fragment_lipophilicity_index": 0.06101340394921722,
+          "positive_index_area_fraction": 0.8670212205780873,
+          "negative_index_area_fraction": 0.06172374841746973,
+          "material_HBA_weighted_area_fraction": 0.29836509306224596,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P167_C92_O38"
+        ],
+        "tolerance_for_same_subset_A": 6.837187732680661,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 2.510521972269624,
+            "sampled_max_A": 4.6761375748735
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 4.921152347461906,
+            "sampled_max_A": 7.199736211537502
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 6.837187732680661,
+            "sampled_max_A": 9.036770521085916
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 5.971533034039815,
+            "sampled_max_A": 8.309379086870585
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 702,
+          "triangles": 1271,
+          "area_A2": 412.52096743449874,
+          "chemically_supported_area_fraction": 0.9794946615353533,
+          "mean_fragment_lipophilicity_index": 0.06918589193117049,
+          "positive_index_area_fraction": 0.9373022914006905,
+          "negative_index_area_fraction": 0.042192370134662704,
+          "material_HBA_weighted_area_fraction": 0.2831609309120043,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P167_C92_O38"
+        ],
+        "tolerance_for_same_subset_A": 8.527382256350933,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 3.487487130677928,
+            "sampled_max_A": 6.62611368406227
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.173906230810316,
+            "sampled_max_A": 8.876919843790828
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 8.527382256350933,
+            "sampled_max_A": 12.302721805300788
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 8.284412803675245,
+            "sampled_max_A": 10.950064555588272
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1640,
+          "triangles": 3043,
+          "area_A2": 993.1741826713328,
+          "chemically_supported_area_fraction": 0.9366312872881831,
+          "mean_fragment_lipophilicity_index": 0.06411061321064275,
+          "positive_index_area_fraction": 0.9077376128834359,
+          "negative_index_area_fraction": 0.028893674404747216,
+          "material_HBA_weighted_area_fraction": 0.29363039684006376,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39",
+          "P167_C92_O38"
+        ],
+        "tolerance_for_same_subset_A": 11.442718018160043,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P167_C92_O38",
+          "P390_C95_O39"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 4.948720274997836,
+            "sampled_max_A": 10.420590504068386
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.438153062502879,
+            "sampled_max_A": 10.064775715976083
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 11.442718018160043,
+            "sampled_max_A": 17.285546748786597
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 7.886465057525562,
+            "sampled_max_A": 11.558386410766754
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3750,
+          "triangles": 7085,
+          "area_A2": 2311.141452709692,
+          "chemically_supported_area_fraction": 0.8743039280070646,
+          "mean_fragment_lipophilicity_index": 0.06491775253694813,
+          "positive_index_area_fraction": 0.8353870902005837,
+          "negative_index_area_fraction": 0.03891683780648099,
+          "material_HBA_weighted_area_fraction": 0.2910321270747134,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "tolerance_for_same_subset_A": 5.971533034039815,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 2.510521972269624,
+            "sampled_max_A": 4.6761375748735
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 4.921152347461906,
+            "sampled_max_A": 7.199736211537502
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 6.837187732680661,
+            "sampled_max_A": 9.036770521085916
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 5.971533034039815,
+            "sampled_max_A": 8.309379086870585
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 702,
+          "triangles": 1271,
+          "area_A2": 412.52096743449874,
+          "chemically_supported_area_fraction": 0.9769663929860003,
+          "mean_fragment_lipophilicity_index": 0.07355559750968578,
+          "positive_index_area_fraction": 0.9400828837148564,
+          "negative_index_area_fraction": 0.036883509271143866,
+          "material_HBA_weighted_area_fraction": 0.27486968000478557,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "tolerance_for_same_subset_A": 8.284412803675245,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 3.487487130677928,
+            "sampled_max_A": 6.62611368406227
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.173906230810316,
+            "sampled_max_A": 8.876919843790828
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 8.527382256350933,
+            "sampled_max_A": 12.302721805300788
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 8.284412803675245,
+            "sampled_max_A": 10.950064555588272
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1640,
+          "triangles": 3043,
+          "area_A2": 993.1741826713328,
+          "chemically_supported_area_fraction": 0.9351501719715815,
+          "mean_fragment_lipophilicity_index": 0.06391014976558236,
+          "positive_index_area_fraction": 0.8769554299562791,
+          "negative_index_area_fraction": 0.058194742015302385,
+          "material_HBA_weighted_area_fraction": 0.2920622212525902,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "tolerance_for_same_subset_A": 7.886465057525562,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31",
+          "P390_C95_O39"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 4.948720274997836,
+            "sampled_max_A": 10.420590504068386
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.438153062502879,
+            "sampled_max_A": 10.064775715976083
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 11.442718018160043,
+            "sampled_max_A": 17.285546748786597
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 7.886465057525562,
+            "sampled_max_A": 11.558386410766754
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3750,
+          "triangles": 7085,
+          "area_A2": 2311.141452709692,
+          "chemically_supported_area_fraction": 0.8731210213139244,
+          "mean_fragment_lipophilicity_index": 0.06463221736594939,
+          "positive_index_area_fraction": 0.8105323778046578,
+          "negative_index_area_fraction": 0.06258864350926667,
+          "material_HBA_weighted_area_fraction": 0.29147150760011575,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31"
+        ],
+        "tolerance_for_same_subset_A": 4.921152347461906,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 2.510521972269624,
+            "sampled_max_A": 4.6761375748735
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 4.921152347461906,
+            "sampled_max_A": 7.199736211537502
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 6.837187732680661,
+            "sampled_max_A": 9.036770521085916
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 5.971533034039815,
+            "sampled_max_A": 8.309379086870585
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 702,
+          "triangles": 1271,
+          "area_A2": 412.52096743449874,
+          "chemically_supported_area_fraction": 0.9576319516263062,
+          "mean_fragment_lipophilicity_index": 0.07128394979096321,
+          "positive_index_area_fraction": 0.8366770328798551,
+          "negative_index_area_fraction": 0.12095491874645123,
+          "material_HBA_weighted_area_fraction": 0.27849965837405083,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31"
+        ],
+        "tolerance_for_same_subset_A": 6.173906230810316,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 3.487487130677928,
+            "sampled_max_A": 6.62611368406227
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.173906230810316,
+            "sampled_max_A": 8.876919843790828
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 8.527382256350933,
+            "sampled_max_A": 12.302721805300788
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 8.284412803675245,
+            "sampled_max_A": 10.950064555588272
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1640,
+          "triangles": 3043,
+          "area_A2": 993.1741826713328,
+          "chemically_supported_area_fraction": 0.9152408904451561,
+          "mean_fragment_lipophilicity_index": 0.06809728783488671,
+          "positive_index_area_fraction": 0.7970157960500985,
+          "negative_index_area_fraction": 0.11822509439505755,
+          "material_HBA_weighted_area_fraction": 0.28205589173761214,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      },
+      {
+        "material": "PET",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31"
+        ],
+        "tolerance_for_same_subset_A": 6.438153062502879,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P026_C65_O27",
+          "P272_C75_O31"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P026_C65_O27",
+            "D95_A": 4.948720274997836,
+            "sampled_max_A": 10.420590504068386
+          },
+          {
+            "site_id": "P272_C75_O31",
+            "D95_A": 6.438153062502879,
+            "sampled_max_A": 10.064775715976083
+          },
+          {
+            "site_id": "P167_C92_O38",
+            "D95_A": 11.442718018160043,
+            "sampled_max_A": 17.285546748786597
+          },
+          {
+            "site_id": "P390_C95_O39",
+            "D95_A": 7.886465057525562,
+            "sampled_max_A": 11.558386410766754
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3750,
+          "triangles": 7085,
+          "area_A2": 2311.141452709692,
+          "chemically_supported_area_fraction": 0.8557413117939638,
+          "mean_fragment_lipophilicity_index": 0.06773062988132739,
+          "positive_index_area_fraction": 0.7381730828387018,
+          "negative_index_area_fraction": 0.11756822895526203,
+          "material_HBA_weighted_area_fraction": 0.2848738264628748,
+          "material_HBD_weighted_area_fraction": 0.0
+        }
+      }
+    ],
+    "seconds": 76.28429341316223,
+    "source_sha256": "a9aa18caba8a1b01109d9c42c9b5a6fd2ee6f1d8b3fa30dc8833c4f025f9988e",
+    "limitations": [
+      "No new MD or donor sampling",
+      "Current selected 101-core panel, not full historical library",
+      "Original frame uncertainty preserved",
+      "No enzyme shape compatibility inferred from material matching",
+      "Dense support is approximate; visually review tails/sidewall scope",
+      "Local grid convergence NOT_EVALUATED",
+      "Independent validation NOT_EVALUATED"
+    ]
+  },
+  {
+    "status": "PILOT_COMPLETE_REQUIRES_SCIENTIFIC_REVIEW",
+    "material": "PA6",
+    "pilot": true,
+    "parent_denominator": 413,
+    "evaluated_sites": 8,
+    "radii_A": [
+      10,
+      15,
+      20
+    ],
+    "chemical_typing": {
+      "sdf": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/unbiased_100chain_v1/00_matched_chains/PA6_DP16.sdf",
+      "sdf_sha256": "007430816d39c75be250d6a51dafcf23692e0b0050609e5c9fb6dde15eda0806",
+      "itp_sha256": "ab403d2e0512a7a55ebd43053788850f55c2313e4fb4192093d4eb0651096011",
+      "graph_atom_mapping": "PASS",
+      "atom_count": 316,
+      "logP_fragment_sum": 10.577899999999998,
+      "rdkit_version": "2023.09.6"
+    },
+    "definitions": {
+      "geometry": "original parent exterior-connected approximate water SES; 0.5 A global grid;1 A local mesh",
+      "bulk_filter": "per-vertex >=70% density support on 81-point R10 disk 5A inward along fixed local outward normal; Gaussian3A rho, threshold half median central slab density; nearest carbonyl connected component; proxy, not chain topology removal",
+      "frame": "density outward normal + projected C=O; same material frame across scales; not core-specific rotation",
+      "D95": "maximum of two area-weighted 95th-percentile nearest sampled-mesh distances; triangle centroids weighted by area; vertices/midpoints/centroids target samples",
+      "coverage": "fixed best-candidate matched subset selected at R20, same IDs for R10/R15; measured tolerance is max D95 in that subset; actual matches at tolerance may include extra sites",
+      "candidate_bank": "real site fields + pointwise median, choose lowest required tolerance at R20; finite-library in-sample result, not global optimum",
+      "chemistry": "post-hoc Crippen fragment index/HBA/HBD over actually matched sites; not electrostatic potential or binding energy"
+    },
+    "quadrature_refinement": {
+      "10": {
+        "coarse_D95_A": 3.516602843016727,
+        "refined_D95_A": 3.535313015773585,
+        "absolute_change_A": 0.018710172756858157
+      },
+      "15": {
+        "coarse_D95_A": 7.006977598899804,
+        "refined_D95_A": 7.003746727701858,
+        "absolute_change_A": 0.0032308711979460725
+      },
+      "20": {
+        "coarse_D95_A": 8.118798660701948,
+        "refined_D95_A": 8.080490622525078,
+        "absolute_change_A": 0.03830803817687034
+      }
+    },
+    "results": [
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P127_C32_O6",
+        "chosen_site_ids": [
+          "P127_C32_O6",
+          "P004_C20_O4",
+          "P274_C14_O3",
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P394_C92_O16",
+          "P399_C92_O16",
+          "P265_C62_O11"
+        ],
+        "tolerance_for_same_subset_A": 9.486399373814978,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P265_C62_O11",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6",
+          "P274_C14_O3",
+          "P399_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 3.9711979789632945,
+            "sampled_max_A": 6.187755434554821
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 3.5928911082515196,
+            "sampled_max_A": 5.944267865698585
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 6.352099732578684,
+            "sampled_max_A": 7.861245722651569
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 5.570908713054374,
+            "sampled_max_A": 7.375083105427748
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 4.6683637247927,
+            "sampled_max_A": 6.742155395652062
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 6.103515625e-05,
+            "sampled_max_A": 0.0001220703125
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 3.5181064745605424,
+            "sampled_max_A": 5.314587805860252
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 9.486399373814978,
+            "sampled_max_A": 11.124942666579965
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 973,
+          "triangles": 1800,
+          "area_A2": 593.0909972119631,
+          "chemically_supported_area_fraction": 0.9835588435782107,
+          "mean_fragment_lipophilicity_index": 0.08146413704750106,
+          "positive_index_area_fraction": 0.9604364952127983,
+          "negative_index_area_fraction": 0.023122348365412347,
+          "material_HBA_weighted_area_fraction": 0.11971537673388068,
+          "material_HBD_weighted_area_fraction": 0.12448017367747466
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P127_C32_O6",
+        "chosen_site_ids": [
+          "P127_C32_O6",
+          "P004_C20_O4",
+          "P274_C14_O3",
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P394_C92_O16",
+          "P399_C92_O16",
+          "P265_C62_O11"
+        ],
+        "tolerance_for_same_subset_A": 10.422196735776934,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P265_C62_O11",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6",
+          "P274_C14_O3",
+          "P399_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 5.7945570532859785,
+            "sampled_max_A": 8.492438284186319
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 6.900307623330796,
+            "sampled_max_A": 9.948862214921657
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 8.202395037348683,
+            "sampled_max_A": 11.48755131109927
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 10.422196735776934,
+            "sampled_max_A": 12.36779852598316
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 5.61215540374975,
+            "sampled_max_A": 9.433186231288921
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 6.096480084617625e-05,
+            "sampled_max_A": 0.0001220703125
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 5.275910539315215,
+            "sampled_max_A": 8.99575984563139
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 9.723053129967699,
+            "sampled_max_A": 13.142700670068638
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1864,
+          "triangles": 3526,
+          "area_A2": 1161.9536529245893,
+          "chemically_supported_area_fraction": 0.9777151751932496,
+          "mean_fragment_lipophilicity_index": 0.08128339256199815,
+          "positive_index_area_fraction": 0.946716549049409,
+          "negative_index_area_fraction": 0.030998626143840507,
+          "material_HBA_weighted_area_fraction": 0.11886577092781198,
+          "material_HBD_weighted_area_fraction": 0.12481412828418373
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P127_C32_O6",
+        "chosen_site_ids": [
+          "P127_C32_O6",
+          "P004_C20_O4",
+          "P274_C14_O3",
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P394_C92_O16",
+          "P399_C92_O16",
+          "P265_C62_O11"
+        ],
+        "tolerance_for_same_subset_A": 14.671273700608854,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P265_C62_O11",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6",
+          "P274_C14_O3",
+          "P399_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 11.949599885482552,
+            "sampled_max_A": 16.697041236148614
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 10.445847078538755,
+            "sampled_max_A": 13.284554156160674
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 14.671273700608854,
+            "sampled_max_A": 18.714832046473838
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 12.531746241840608,
+            "sampled_max_A": 16.283537491799365
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 8.311118049519495,
+            "sampled_max_A": 10.898879754295502
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 6.008148193359375e-05,
+            "sampled_max_A": 0.0001303255558013916
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 8.948052134201985,
+            "sampled_max_A": 12.145208888931904
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 14.170762271618067,
+            "sampled_max_A": 19.380518547793194
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3291,
+          "triangles": 6232,
+          "area_A2": 2058.6522513622117,
+          "chemically_supported_area_fraction": 0.9443610428258351,
+          "mean_fragment_lipophilicity_index": 0.08321639465922603,
+          "positive_index_area_fraction": 0.9062988104983013,
+          "negative_index_area_fraction": 0.038062232327533856,
+          "material_HBA_weighted_area_fraction": 0.12191273721411737,
+          "material_HBD_weighted_area_fraction": 0.12099628851320703
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "real_P114_C92_O16",
+        "chosen_site_ids": [
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P274_C14_O3",
+          "P127_C32_O6",
+          "P004_C20_O4",
+          "P394_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 6.474941630694362,
+        "actual_n_at_tolerance": 6,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6",
+          "P274_C14_O3"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 3.5166130142839767,
+            "sampled_max_A": 6.070104084279847
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 6.198883056640625e-05,
+            "sampled_max_A": 0.0001004636287689209
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 7.161686487244168,
+            "sampled_max_A": 8.562704499575544
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 6.474941630694362,
+            "sampled_max_A": 7.356820015687197
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 4.924855828694743,
+            "sampled_max_A": 6.724714007758693
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 3.5928982731876546,
+            "sampled_max_A": 5.944255867111535
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 3.0921156045823173,
+            "sampled_max_A": 5.081604280446461
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 10.289542912331234,
+            "sampled_max_A": 11.504488251233786
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 762,
+          "triangles": 1417,
+          "area_A2": 454.68355790451074,
+          "chemically_supported_area_fraction": 0.9925121544837929,
+          "mean_fragment_lipophilicity_index": 0.07418431362873815,
+          "positive_index_area_fraction": 0.945241467668871,
+          "negative_index_area_fraction": 0.04727068681492193,
+          "material_HBA_weighted_area_fraction": 0.12350124060836512,
+          "material_HBD_weighted_area_fraction": 0.1283138214820807
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "real_P114_C92_O16",
+        "chosen_site_ids": [
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P274_C14_O3",
+          "P127_C32_O6",
+          "P004_C20_O4",
+          "P394_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 10.635592760249002,
+        "actual_n_at_tolerance": 7,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6",
+          "P274_C14_O3",
+          "P399_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 7.006958829403113,
+            "sampled_max_A": 9.743313674320767
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 6.04093074798584e-05,
+            "sampled_max_A": 0.0001004636287689209
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 11.2694868951267,
+            "sampled_max_A": 13.862355648005511
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 10.635592760249002,
+            "sampled_max_A": 12.651068534572719
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 9.034110364845246,
+            "sampled_max_A": 11.258565281506447
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 6.900348080993362,
+            "sampled_max_A": 9.948942367917912
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 7.310714293127205,
+            "sampled_max_A": 11.394813687172626
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 10.163075400395439,
+            "sampled_max_A": 14.321906601521377
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2281,
+          "triangles": 4188,
+          "area_A2": 1356.1388261134623,
+          "chemically_supported_area_fraction": 0.975197555005922,
+          "mean_fragment_lipophilicity_index": 0.08041133938883947,
+          "positive_index_area_fraction": 0.9232956514631054,
+          "negative_index_area_fraction": 0.05190190354281645,
+          "material_HBA_weighted_area_fraction": 0.12089361021764865,
+          "material_HBD_weighted_area_fraction": 0.12560678942253226
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "real_P114_C92_O16",
+        "chosen_site_ids": [
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P274_C14_O3",
+          "P127_C32_O6",
+          "P004_C20_O4",
+          "P394_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 11.905936458130014,
+        "actual_n_at_tolerance": 6,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6",
+          "P274_C14_O3"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 8.118783550723002,
+            "sampled_max_A": 10.981027730800063
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 5.91278076171875e-05,
+            "sampled_max_A": 0.00010156631469726562
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 14.73006933924064,
+            "sampled_max_A": 18.40809026133636
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 11.905936458130014,
+            "sampled_max_A": 17.094541763181383
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 10.85756258782402,
+            "sampled_max_A": 13.419744266228745
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 10.44581720352537,
+            "sampled_max_A": 13.284553888369564
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 9.93829168002935,
+            "sampled_max_A": 13.795155699087578
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 14.742601835679903,
+            "sampled_max_A": 19.623616302424356
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 4738,
+          "triangles": 8764,
+          "area_A2": 2860.966729913259,
+          "chemically_supported_area_fraction": 0.8595788907956604,
+          "mean_fragment_lipophilicity_index": 0.08044730277830958,
+          "positive_index_area_fraction": 0.8028958395179836,
+          "negative_index_area_fraction": 0.056683051277676796,
+          "material_HBA_weighted_area_fraction": 0.12227137788380443,
+          "material_HBD_weighted_area_fraction": 0.12434371375956048
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "real_P033_C80_O14",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4"
+        ],
+        "tolerance_for_same_subset_A": 6.370222935216246,
+        "actual_n_at_tolerance": 6,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6",
+          "P274_C14_O3"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 5.934467843825781e-05,
+            "sampled_max_A": 0.000125885009765625
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 3.51660156095626,
+            "sampled_max_A": 6.070069372714147
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 6.839203890786835,
+            "sampled_max_A": 8.464145875702911
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 6.370222935216246,
+            "sampled_max_A": 7.8838960356947405
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 5.384353518923215,
+            "sampled_max_A": 7.723834334832701
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 3.971207363963063,
+            "sampled_max_A": 6.187732370522068
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 4.777625642512024,
+            "sampled_max_A": 7.185963556940003
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 10.39640945040542,
+            "sampled_max_A": 11.760551373869946
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 680,
+          "triangles": 1175,
+          "area_A2": 375.5127636613379,
+          "chemically_supported_area_fraction": 0.9802252071826603,
+          "mean_fragment_lipophilicity_index": 0.07903701796037042,
+          "positive_index_area_fraction": 0.9223600640378202,
+          "negative_index_area_fraction": 0.05786514314484002,
+          "material_HBA_weighted_area_fraction": 0.12861021481953355,
+          "material_HBD_weighted_area_fraction": 0.11954686456104112
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "real_P033_C80_O14",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4"
+        ],
+        "tolerance_for_same_subset_A": 8.891584971024669,
+        "actual_n_at_tolerance": 5,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4",
+          "P127_C32_O6"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 5.818194977825029e-05,
+            "sampled_max_A": 0.000125885009765625
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 7.006972218373483,
+            "sampled_max_A": 9.743284321895041
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 10.894030143806578,
+            "sampled_max_A": 12.850190357851174
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 8.891584971024669,
+            "sampled_max_A": 12.332870744581536
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 7.886065623474915,
+            "sampled_max_A": 10.848856951421332
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 5.7944689276546795,
+            "sampled_max_A": 8.492455873352373
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 9.1574753280054,
+            "sampled_max_A": 12.274279496873453
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 11.584353502125117,
+            "sampled_max_A": 14.549592878492541
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1791,
+          "triangles": 3251,
+          "area_A2": 1046.243182898093,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.07264757767578932,
+          "positive_index_area_fraction": 0.8842474066586553,
+          "negative_index_area_fraction": 0.11575259334134459,
+          "material_HBA_weighted_area_fraction": 0.12429440321031439,
+          "material_HBD_weighted_area_fraction": 0.1276255091056641
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "real_P033_C80_O14",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4"
+        ],
+        "tolerance_for_same_subset_A": 9.417049514021208,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16",
+          "P004_C20_O4"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 5.744700487233369e-05,
+            "sampled_max_A": 0.000125885009765625
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 8.118876552925117,
+            "sampled_max_A": 10.981047867235983
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 15.239738737519621,
+            "sampled_max_A": 17.952358371309376
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 9.37373499742205,
+            "sampled_max_A": 14.750326452705329
+          },
+          {
+            "site_id": "P004_C20_O4",
+            "D95_A": 9.417049514021208,
+            "sampled_max_A": 13.597449603421598
+          },
+          {
+            "site_id": "P127_C32_O6",
+            "D95_A": 11.949555566683149,
+            "sampled_max_A": 16.697098414229156
+          },
+          {
+            "site_id": "P274_C14_O3",
+            "D95_A": 10.828761766860715,
+            "sampled_max_A": 14.227753877809862
+          },
+          {
+            "site_id": "P399_C92_O16",
+            "D95_A": 14.337872005450846,
+            "sampled_max_A": 17.46580271522483
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3648,
+          "triangles": 6867,
+          "area_A2": 2244.149334943957,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.08132798276857735,
+          "positive_index_area_fraction": 0.8892639242377816,
+          "negative_index_area_fraction": 0.11073607576221851,
+          "material_HBA_weighted_area_fraction": 0.12123160772772947,
+          "material_HBD_weighted_area_fraction": 0.12444275119198872
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "real_P114_C92_O16",
+        "chosen_site_ids": [
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P394_C92_O16",
+          "P265_C62_O11"
+        ],
+        "tolerance_for_same_subset_A": 7.161686487244168,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P265_C62_O11",
+          "P394_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 3.5166130142839767,
+            "sampled_max_A": 6.070104084279847
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 6.198883056640625e-05,
+            "sampled_max_A": 0.0001004636287689209
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 7.161686487244168,
+            "sampled_max_A": 8.562704499575544
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 6.474941630694362,
+            "sampled_max_A": 7.356820015687197
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 762,
+          "triangles": 1417,
+          "area_A2": 454.68355790451074,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.07920286447122461,
+          "positive_index_area_fraction": 0.8986892425661752,
+          "negative_index_area_fraction": 0.1013107574338248,
+          "material_HBA_weighted_area_fraction": 0.11852961778494932,
+          "material_HBD_weighted_area_fraction": 0.12666526663031571
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "real_P114_C92_O16",
+        "chosen_site_ids": [
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P394_C92_O16",
+          "P265_C62_O11"
+        ],
+        "tolerance_for_same_subset_A": 11.2694868951267,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P265_C62_O11",
+          "P394_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 7.006958829403113,
+            "sampled_max_A": 9.743313674320767
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 6.04093074798584e-05,
+            "sampled_max_A": 0.0001004636287689209
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 11.2694868951267,
+            "sampled_max_A": 13.862355648005511
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 10.635592760249002,
+            "sampled_max_A": 12.651068534572719
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2281,
+          "triangles": 4188,
+          "area_A2": 1356.1388261134623,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.07527825999939304,
+          "positive_index_area_fraction": 0.8736838592803517,
+          "negative_index_area_fraction": 0.12631614071964828,
+          "material_HBA_weighted_area_fraction": 0.11992611153763488,
+          "material_HBD_weighted_area_fraction": 0.12929067254656776
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "real_P114_C92_O16",
+        "chosen_site_ids": [
+          "P114_C92_O16",
+          "P033_C80_O14",
+          "P394_C92_O16",
+          "P265_C62_O11"
+        ],
+        "tolerance_for_same_subset_A": 14.73006933924064,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P265_C62_O11",
+          "P394_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 8.118783550723002,
+            "sampled_max_A": 10.981027730800063
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 5.91278076171875e-05,
+            "sampled_max_A": 0.00010156631469726562
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 14.73006933924064,
+            "sampled_max_A": 18.40809026133636
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 11.905936458130014,
+            "sampled_max_A": 17.094541763181383
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 4738,
+          "triangles": 8764,
+          "area_A2": 2860.966729913259,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.08143310809306716,
+          "positive_index_area_fraction": 0.8838374798422822,
+          "negative_index_area_fraction": 0.11616252015771773,
+          "material_HBA_weighted_area_fraction": 0.120394435871473,
+          "material_HBD_weighted_area_fraction": 0.12426044171803441
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 5.8540359204235735,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 2.8816606486908145,
+            "sampled_max_A": 5.0174695944331225
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 3.7276523872581753,
+            "sampled_max_A": 5.586903749287111
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 6.872713911031678,
+            "sampled_max_A": 8.540494888577093
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 5.8540359204235735,
+            "sampled_max_A": 8.039684315978697
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 701,
+          "triangles": 1278,
+          "area_A2": 405.36346870244915,
+          "chemically_supported_area_fraction": 0.9851885864729704,
+          "mean_fragment_lipophilicity_index": 0.08043284295942973,
+          "positive_index_area_fraction": 0.8803680122435955,
+          "negative_index_area_fraction": 0.10482057422937492,
+          "material_HBA_weighted_area_fraction": 0.11449080461694426,
+          "material_HBD_weighted_area_fraction": 0.1291093888377464
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 9.537428660959952,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 3.948797909626926,
+            "sampled_max_A": 6.55212628402569
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 5.9812475121007775,
+            "sampled_max_A": 9.066661262328765
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 10.979831461715868,
+            "sampled_max_A": 12.746072156340105
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 9.537428660959952,
+            "sampled_max_A": 12.33099398534468
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2155,
+          "triangles": 4015,
+          "area_A2": 1281.2248939010933,
+          "chemically_supported_area_fraction": 0.8906990521610924,
+          "mean_fragment_lipophilicity_index": 0.08205802029617802,
+          "positive_index_area_fraction": 0.7606593490556621,
+          "negative_index_area_fraction": 0.13003970310543023,
+          "material_HBA_weighted_area_fraction": 0.11595868430488943,
+          "material_HBD_weighted_area_fraction": 0.12623072002307043
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 9.06587094484719,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16",
+          "P394_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 5.265308619228083,
+            "sampled_max_A": 9.351594657239804
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 6.597058059126013,
+            "sampled_max_A": 10.466648702357462
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 15.52930155783255,
+            "sampled_max_A": 18.4692276760366
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 9.06587094484719,
+            "sampled_max_A": 16.93070144059061
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 4898,
+          "triangles": 9324,
+          "area_A2": 2997.0598533290977,
+          "chemically_supported_area_fraction": 0.8264849424478284,
+          "mean_fragment_lipophilicity_index": 0.08770584378229429,
+          "positive_index_area_fraction": 0.7288584566924512,
+          "negative_index_area_fraction": 0.09762648575537729,
+          "material_HBA_weighted_area_fraction": 0.11871564029514897,
+          "material_HBD_weighted_area_fraction": 0.12117789741529895
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 3.7276523872581753,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 2.8816606486908145,
+            "sampled_max_A": 5.0174695944331225
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 3.7276523872581753,
+            "sampled_max_A": 5.586903749287111
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 6.872713911031678,
+            "sampled_max_A": 8.540494888577093
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 5.8540359204235735,
+            "sampled_max_A": 8.039684315978697
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 701,
+          "triangles": 1278,
+          "area_A2": 405.36346870244915,
+          "chemically_supported_area_fraction": 0.9756132763801096,
+          "mean_fragment_lipophilicity_index": 0.07692809672227915,
+          "positive_index_area_fraction": 0.7881981426567352,
+          "negative_index_area_fraction": 0.18741513372337448,
+          "material_HBA_weighted_area_fraction": 0.11440424729371239,
+          "material_HBD_weighted_area_fraction": 0.1310038976179434
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 5.9812475121007775,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 3.948797909626926,
+            "sampled_max_A": 6.55212628402569
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 5.9812475121007775,
+            "sampled_max_A": 9.066661262328765
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 10.979831461715868,
+            "sampled_max_A": 12.746072156340105
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 9.537428660959952,
+            "sampled_max_A": 12.33099398534468
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2155,
+          "triangles": 4015,
+          "area_A2": 1281.2248939010933,
+          "chemically_supported_area_fraction": 0.8382130710920903,
+          "mean_fragment_lipophilicity_index": 0.08833271157777839,
+          "positive_index_area_fraction": 0.6809029529704043,
+          "negative_index_area_fraction": 0.15731011812168602,
+          "material_HBA_weighted_area_fraction": 0.11613120921892145,
+          "material_HBD_weighted_area_fraction": 0.1224042921803427
+        }
+      },
+      {
+        "material": "PA6",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16"
+        ],
+        "tolerance_for_same_subset_A": 6.597058059126013,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P033_C80_O14",
+          "P114_C92_O16"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P033_C80_O14",
+            "D95_A": 5.265308619228083,
+            "sampled_max_A": 9.351594657239804
+          },
+          {
+            "site_id": "P114_C92_O16",
+            "D95_A": 6.597058059126013,
+            "sampled_max_A": 10.466648702357462
+          },
+          {
+            "site_id": "P265_C62_O11",
+            "D95_A": 15.52930155783255,
+            "sampled_max_A": 18.4692276760366
+          },
+          {
+            "site_id": "P394_C92_O16",
+            "D95_A": 9.06587094484719,
+            "sampled_max_A": 16.93070144059061
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 4898,
+          "triangles": 9324,
+          "area_A2": 2997.0598533290977,
+          "chemically_supported_area_fraction": 0.7920841998687865,
+          "mean_fragment_lipophilicity_index": 0.09513864568999363,
+          "positive_index_area_fraction": 0.6672272494552112,
+          "negative_index_area_fraction": 0.12485695041357547,
+          "material_HBA_weighted_area_fraction": 0.11420801088363924,
+          "material_HBD_weighted_area_fraction": 0.11900662335453789
+        }
+      }
+    ],
+    "seconds": 104.72067141532898,
+    "source_sha256": "a9aa18caba8a1b01109d9c42c9b5a6fd2ee6f1d8b3fa30dc8833c4f025f9988e",
+    "limitations": [
+      "No new MD or donor sampling",
+      "Current selected 101-core panel, not full historical library",
+      "Original frame uncertainty preserved",
+      "No enzyme shape compatibility inferred from material matching",
+      "Dense support is approximate; visually review tails/sidewall scope",
+      "Local grid convergence NOT_EVALUATED",
+      "Independent validation NOT_EVALUATED"
+    ]
+  },
+  {
+    "status": "PILOT_COMPLETE_REQUIRES_SCIENTIFIC_REVIEW",
+    "material": "PA66",
+    "pilot": true,
+    "parent_denominator": 445,
+    "evaluated_sites": 8,
+    "radii_A": [
+      10,
+      15,
+      20
+    ],
+    "chemical_typing": {
+      "sdf": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/unbiased_100chain_v1/00_matched_chains/PA66_DP8.sdf",
+      "sdf_sha256": "3aa38fd0c78322a437b685e5ecce5500db4ab5d353b39f79495efbd4161e2267",
+      "itp_sha256": "a7e3a633fccdde46fdf72a382b91cfa2daeee77d042f10bebb8be0bfcbe4839c",
+      "graph_atom_mapping": "PASS",
+      "atom_count": 316,
+      "logP_fragment_sum": 10.577899999999996,
+      "rdkit_version": "2023.09.6"
+    },
+    "definitions": {
+      "geometry": "original parent exterior-connected approximate water SES; 0.5 A global grid;1 A local mesh",
+      "bulk_filter": "per-vertex >=70% density support on 81-point R10 disk 5A inward along fixed local outward normal; Gaussian3A rho, threshold half median central slab density; nearest carbonyl connected component; proxy, not chain topology removal",
+      "frame": "density outward normal + projected C=O; same material frame across scales; not core-specific rotation",
+      "D95": "maximum of two area-weighted 95th-percentile nearest sampled-mesh distances; triangle centroids weighted by area; vertices/midpoints/centroids target samples",
+      "coverage": "fixed best-candidate matched subset selected at R20, same IDs for R10/R15; measured tolerance is max D95 in that subset; actual matches at tolerance may include extra sites",
+      "candidate_bank": "real site fields + pointwise median, choose lowest required tolerance at R20; finite-library in-sample result, not global optimum",
+      "chemistry": "post-hoc Crippen fragment index/HBA/HBD over actually matched sites; not electrostatic potential or binding energy"
+    },
+    "quadrature_refinement": {
+      "10": {
+        "coarse_D95_A": 4.919490894891244,
+        "refined_D95_A": 4.890388981813979,
+        "absolute_change_A": 0.029101913077265174
+      },
+      "15": {
+        "coarse_D95_A": 8.824615288258329,
+        "refined_D95_A": 8.806034368817201,
+        "absolute_change_A": 0.01858091944112772
+      },
+      "20": {
+        "coarse_D95_A": 12.75561512609455,
+        "refined_D95_A": 12.736708927072671,
+        "absolute_change_A": 0.01890619902187929
+      }
+    },
+    "results": [
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P251_C69_O12",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P319_C45_O8",
+          "P399_C86_O15",
+          "P112_C38_O7",
+          "P002_C26_O5"
+        ],
+        "tolerance_for_same_subset_A": 6.873380213662149,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12",
+          "P399_C86_O15"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 4.938345574412618,
+            "sampled_max_A": 6.958980000925442
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 5.1833305094001,
+            "sampled_max_A": 7.022020213667944
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 6.873380213662149,
+            "sampled_max_A": 8.908755010674492
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 4.354698914070856,
+            "sampled_max_A": 6.423115856836093
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 5.299657720380086,
+            "sampled_max_A": 7.904415829953283
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 4.849573044014159,
+            "sampled_max_A": 6.770710424989518
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 6.140285242722584e-05,
+            "sampled_max_A": 9.5367431640625e-05
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 5.078761392503926,
+            "sampled_max_A": 7.847793984151632
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 821,
+          "triangles": 1499,
+          "area_A2": 480.3608888481199,
+          "chemically_supported_area_fraction": 0.9991894929953842,
+          "mean_fragment_lipophilicity_index": 0.09626242172269474,
+          "positive_index_area_fraction": 0.9742564595348269,
+          "negative_index_area_fraction": 0.024933033460557346,
+          "material_HBA_weighted_area_fraction": 0.12311738472410495,
+          "material_HBD_weighted_area_fraction": 0.11066566590504087
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P251_C69_O12",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P319_C45_O8",
+          "P399_C86_O15",
+          "P112_C38_O7",
+          "P002_C26_O5"
+        ],
+        "tolerance_for_same_subset_A": 8.6379729285699,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12",
+          "P399_C86_O15"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 7.648680660553323,
+            "sampled_max_A": 10.189441422109107
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 5.962046496934302,
+            "sampled_max_A": 9.71910399584596
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 7.992353734689052,
+            "sampled_max_A": 11.001007484711728
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 6.1128041257060755,
+            "sampled_max_A": 9.834709813909205
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 8.6379729285699,
+            "sampled_max_A": 12.932003444004595
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 7.410577902644688,
+            "sampled_max_A": 10.000969060860145
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 5.969803170036027e-05,
+            "sampled_max_A": 0.00010633468627929688
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 7.498297638229595,
+            "sampled_max_A": 10.307555737911676
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1847,
+          "triangles": 3429,
+          "area_A2": 1119.1309135408706,
+          "chemically_supported_area_fraction": 0.9638393213741969,
+          "mean_fragment_lipophilicity_index": 0.09740330770053955,
+          "positive_index_area_fraction": 0.9351173092728216,
+          "negative_index_area_fraction": 0.02872201210137543,
+          "material_HBA_weighted_area_fraction": 0.12021294234880413,
+          "material_HBD_weighted_area_fraction": 0.11061752530630073
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.9,
+        "denominator": 8,
+        "required_n": 8,
+        "candidate": "real_P251_C69_O12",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P319_C45_O8",
+          "P399_C86_O15",
+          "P112_C38_O7",
+          "P002_C26_O5"
+        ],
+        "tolerance_for_same_subset_A": 11.76005836760837,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12",
+          "P399_C86_O15"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 11.76005836760837,
+            "sampled_max_A": 15.756899004551329
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 6.963582327445623,
+            "sampled_max_A": 11.29381115978155
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 8.903225806900542,
+            "sampled_max_A": 13.659702343725467
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 7.456818460492199,
+            "sampled_max_A": 13.30309743395226
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 8.234035554818245,
+            "sampled_max_A": 12.730845495386863
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 9.43402969627623,
+            "sampled_max_A": 11.900898674588346
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 5.817413330078125e-05,
+            "sampled_max_A": 0.00011444091796875
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 9.117695230678178,
+            "sampled_max_A": 12.947961240609256
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3462,
+          "triangles": 6502,
+          "area_A2": 2108.9497842950836,
+          "chemically_supported_area_fraction": 0.9487862685459373,
+          "mean_fragment_lipophilicity_index": 0.09546532068633591,
+          "positive_index_area_fraction": 0.9212217939195363,
+          "negative_index_area_fraction": 0.027564474626400923,
+          "material_HBA_weighted_area_fraction": 0.116599174345389,
+          "material_HBD_weighted_area_fraction": 0.11457603394886386
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "real_P251_C69_O12",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P319_C45_O8",
+          "P399_C86_O15"
+        ],
+        "tolerance_for_same_subset_A": 6.873380213662149,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12",
+          "P399_C86_O15"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 4.938345574412618,
+            "sampled_max_A": 6.958980000925442
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 5.1833305094001,
+            "sampled_max_A": 7.022020213667944
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 6.873380213662149,
+            "sampled_max_A": 8.908755010674492
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 4.354698914070856,
+            "sampled_max_A": 6.423115856836093
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 5.299657720380086,
+            "sampled_max_A": 7.904415829953283
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 4.849573044014159,
+            "sampled_max_A": 6.770710424989518
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 6.140285242722584e-05,
+            "sampled_max_A": 9.5367431640625e-05
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 5.078761392503926,
+            "sampled_max_A": 7.847793984151632
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 821,
+          "triangles": 1499,
+          "area_A2": 480.3608888481199,
+          "chemically_supported_area_fraction": 0.9991894929953842,
+          "mean_fragment_lipophilicity_index": 0.09626242172269474,
+          "positive_index_area_fraction": 0.9742564595348269,
+          "negative_index_area_fraction": 0.024933033460557346,
+          "material_HBA_weighted_area_fraction": 0.12311738472410495,
+          "material_HBD_weighted_area_fraction": 0.11066566590504087
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "real_P251_C69_O12",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P319_C45_O8",
+          "P399_C86_O15"
+        ],
+        "tolerance_for_same_subset_A": 8.6379729285699,
+        "actual_n_at_tolerance": 8,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12",
+          "P399_C86_O15"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 7.648680660553323,
+            "sampled_max_A": 10.189441422109107
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 5.962046496934302,
+            "sampled_max_A": 9.71910399584596
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 7.992353734689052,
+            "sampled_max_A": 11.001007484711728
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 6.1128041257060755,
+            "sampled_max_A": 9.834709813909205
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 8.6379729285699,
+            "sampled_max_A": 12.932003444004595
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 7.410577902644688,
+            "sampled_max_A": 10.000969060860145
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 5.969803170036027e-05,
+            "sampled_max_A": 0.00010633468627929688
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 7.498297638229595,
+            "sampled_max_A": 10.307555737911676
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1847,
+          "triangles": 3429,
+          "area_A2": 1119.1309135408706,
+          "chemically_supported_area_fraction": 0.9638393213741969,
+          "mean_fragment_lipophilicity_index": 0.09740330770053955,
+          "positive_index_area_fraction": 0.9351173092728216,
+          "negative_index_area_fraction": 0.02872201210137543,
+          "material_HBA_weighted_area_fraction": 0.12021294234880413,
+          "material_HBD_weighted_area_fraction": 0.11061752530630073
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.7,
+        "denominator": 8,
+        "required_n": 6,
+        "candidate": "real_P251_C69_O12",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P319_C45_O8",
+          "P399_C86_O15"
+        ],
+        "tolerance_for_same_subset_A": 9.117695230678178,
+        "actual_n_at_tolerance": 6,
+        "actual_site_ids": [
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P251_C69_O12",
+          "P399_C86_O15"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 11.76005836760837,
+            "sampled_max_A": 15.756899004551329
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 6.963582327445623,
+            "sampled_max_A": 11.29381115978155
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 8.903225806900542,
+            "sampled_max_A": 13.659702343725467
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 7.456818460492199,
+            "sampled_max_A": 13.30309743395226
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 8.234035554818245,
+            "sampled_max_A": 12.730845495386863
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 9.43402969627623,
+            "sampled_max_A": 11.900898674588346
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 5.817413330078125e-05,
+            "sampled_max_A": 0.00011444091796875
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 9.117695230678178,
+            "sampled_max_A": 12.947961240609256
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 3462,
+          "triangles": 6502,
+          "area_A2": 2108.9497842950836,
+          "chemically_supported_area_fraction": 0.9020980981354512,
+          "mean_fragment_lipophilicity_index": 0.0957637132106049,
+          "positive_index_area_fraction": 0.8598663099343133,
+          "negative_index_area_fraction": 0.04223178820113781,
+          "material_HBA_weighted_area_fraction": 0.11737365513735201,
+          "material_HBD_weighted_area_fraction": 0.11416121721310495
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 10,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P002_C50_O9",
+          "P155_C33_O6",
+          "P112_C38_O7"
+        ],
+        "tolerance_for_same_subset_A": 5.337094594143264,
+        "actual_n_at_tolerance": 6,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 5.1382605272127995,
+            "sampled_max_A": 7.015808679648563
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 4.441171959811943,
+            "sampled_max_A": 5.568540248984263
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 7.188668824770166,
+            "sampled_max_A": 9.401640309442435
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 3.411925025071631,
+            "sampled_max_A": 5.200842740069934
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 5.337094594143264,
+            "sampled_max_A": 7.061902360737303
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 4.482080686737259,
+            "sampled_max_A": 5.936430648113863
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 3.634501141796202,
+            "sampled_max_A": 5.600162434166298
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 5.425073220728566,
+            "sampled_max_A": 7.897405489986177
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 653,
+          "triangles": 1189,
+          "area_A2": 391.2032388372404,
+          "chemically_supported_area_fraction": 0.9753017943043273,
+          "mean_fragment_lipophilicity_index": 0.08801587129840235,
+          "positive_index_area_fraction": 0.915894530060039,
+          "negative_index_area_fraction": 0.05940726424428835,
+          "material_HBA_weighted_area_fraction": 0.12818478716376017,
+          "material_HBD_weighted_area_fraction": 0.11276394846180973
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 15,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P002_C50_O9",
+          "P155_C33_O6",
+          "P112_C38_O7"
+        ],
+        "tolerance_for_same_subset_A": 7.712505119091503,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P155_C33_O6",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 8.290268262314802,
+            "sampled_max_A": 10.874334919295926
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 5.81332628893832,
+            "sampled_max_A": 8.79248280554262
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 9.392438495568735,
+            "sampled_max_A": 11.579472685390535
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 8.116139293126825,
+            "sampled_max_A": 11.35808899810406
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 7.712505119091503,
+            "sampled_max_A": 10.900329970687757
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 6.0700370319113395,
+            "sampled_max_A": 8.692888927566104
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 5.9238966668568676,
+            "sampled_max_A": 8.671971875409488
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 9.23145494538398,
+            "sampled_max_A": 11.846188385369155
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1565,
+          "triangles": 2933,
+          "area_A2": 954.316422028033,
+          "chemically_supported_area_fraction": 0.9170841120272402,
+          "mean_fragment_lipophilicity_index": 0.09808074761115328,
+          "positive_index_area_fraction": 0.8612362899073865,
+          "negative_index_area_fraction": 0.05584782211985364,
+          "material_HBA_weighted_area_fraction": 0.11509136574836874,
+          "material_HBD_weighted_area_fraction": 0.11361757052702418
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "all",
+        "radius_A": 20,
+        "target_fraction": 0.5,
+        "denominator": 8,
+        "required_n": 4,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P251_C69_O12",
+          "P002_C50_O9",
+          "P155_C33_O6",
+          "P112_C38_O7"
+        ],
+        "tolerance_for_same_subset_A": 7.561082104270345,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P155_C33_O6",
+          "P002_C50_O9",
+          "P112_C38_O7",
+          "P251_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 13.26303319008103,
+            "sampled_max_A": 16.31536703066904
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 7.14140200668244,
+            "sampled_max_A": 11.52064620270153
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 11.549158912880937,
+            "sampled_max_A": 15.725457628272977
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 11.129190309794785,
+            "sampled_max_A": 15.332230944207097
+          },
+          {
+            "site_id": "P002_C50_O9",
+            "D95_A": 7.126065837124448,
+            "sampled_max_A": 10.008299465218169
+          },
+          {
+            "site_id": "P112_C38_O7",
+            "D95_A": 7.561082104270345,
+            "sampled_max_A": 12.147229805104674
+          },
+          {
+            "site_id": "P251_C69_O12",
+            "D95_A": 6.695804516970423,
+            "sampled_max_A": 9.007784081468202
+          },
+          {
+            "site_id": "P399_C86_O15",
+            "D95_A": 11.907465537383157,
+            "sampled_max_A": 16.140415292788276
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 9,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2960,
+          "triangles": 5585,
+          "area_A2": 1813.082999361711,
+          "chemically_supported_area_fraction": 0.9298621781228954,
+          "mean_fragment_lipophilicity_index": 0.09460797774555861,
+          "positive_index_area_fraction": 0.8596538934441742,
+          "negative_index_area_fraction": 0.07020828467872124,
+          "material_HBA_weighted_area_fraction": 0.11250330468134642,
+          "material_HBD_weighted_area_fraction": 0.11822769401332785
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "real_P319_C45_O8",
+        "chosen_site_ids": [
+          "P319_C45_O8",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C26_O5"
+        ],
+        "tolerance_for_same_subset_A": 7.333472531696911,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 5.206475188883256,
+            "sampled_max_A": 7.09389228954764
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 6.908203898023145,
+            "sampled_max_A": 9.23653958063483
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 5.793571472167969e-05,
+            "sampled_max_A": 0.00010061264038085938
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 7.333472531696911,
+            "sampled_max_A": 9.297271323476718
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 506,
+          "triangles": 882,
+          "area_A2": 288.43768913118737,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.09294080510034634,
+          "positive_index_area_fraction": 0.9033813347626504,
+          "negative_index_area_fraction": 0.09661866523734963,
+          "material_HBA_weighted_area_fraction": 0.12413619725371385,
+          "material_HBD_weighted_area_fraction": 0.11368543699081539
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "real_P319_C45_O8",
+        "chosen_site_ids": [
+          "P319_C45_O8",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C26_O5"
+        ],
+        "tolerance_for_same_subset_A": 9.902734918583016,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 7.610607684061786,
+            "sampled_max_A": 9.823225690543282
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 9.427867044042928,
+            "sampled_max_A": 12.790292447358976
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 6.040585960415791e-05,
+            "sampled_max_A": 0.00010061264038085938
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 9.902734918583016,
+            "sampled_max_A": 12.086804968850858
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1132,
+          "triangles": 2040,
+          "area_A2": 665.1637504001012,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.08678894596388737,
+          "positive_index_area_fraction": 0.8779329562326622,
+          "negative_index_area_fraction": 0.1220670437673378,
+          "material_HBA_weighted_area_fraction": 0.12175179961935095,
+          "material_HBD_weighted_area_fraction": 0.1189713789761008
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.9,
+        "denominator": 4,
+        "required_n": 4,
+        "candidate": "real_P319_C45_O8",
+        "chosen_site_ids": [
+          "P319_C45_O8",
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P002_C26_O5"
+        ],
+        "tolerance_for_same_subset_A": 11.40325240817779,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 11.40325240817779,
+            "sampled_max_A": 14.074772667741417
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 9.672067236865319,
+            "sampled_max_A": 12.688494707316101
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 6.085047497425993e-05,
+            "sampled_max_A": 0.00011110363344117086
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 10.02279641877322,
+            "sampled_max_A": 12.48875103565996
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2382,
+          "triangles": 4309,
+          "area_A2": 1418.5925672022242,
+          "chemically_supported_area_fraction": 1.0,
+          "mean_fragment_lipophilicity_index": 0.09364822233584352,
+          "positive_index_area_fraction": 0.873206956570662,
+          "negative_index_area_fraction": 0.12679304342933792,
+          "material_HBA_weighted_area_fraction": 0.11561400381956968,
+          "material_HBD_weighted_area_fraction": 0.11747594257378363
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P319_C45_O8"
+        ],
+        "tolerance_for_same_subset_A": 7.0265860292316935,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 4.401019026314301,
+            "sampled_max_A": 6.311955125380831
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 4.153353746418313,
+            "sampled_max_A": 5.281019032363933
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 7.0265860292316935,
+            "sampled_max_A": 9.227629603714965
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 3.8565355317259753,
+            "sampled_max_A": 5.664865960648627
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 591,
+          "triangles": 1054,
+          "area_A2": 341.6014334408492,
+          "chemically_supported_area_fraction": 0.9550812628781633,
+          "mean_fragment_lipophilicity_index": 0.09233055562298854,
+          "positive_index_area_fraction": 0.8891173363216422,
+          "negative_index_area_fraction": 0.06596392655652109,
+          "material_HBA_weighted_area_fraction": 0.11970682084773064,
+          "material_HBD_weighted_area_fraction": 0.1136164765387058
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P319_C45_O8"
+        ],
+        "tolerance_for_same_subset_A": 8.285535638751789,
+        "actual_n_at_tolerance": 4,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 6.224752185170465,
+            "sampled_max_A": 9.230272814519491
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 5.050484907488444,
+            "sampled_max_A": 7.553464097645768
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 8.285535638751789,
+            "sampled_max_A": 11.029286963354433
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 7.3889081889267825,
+            "sampled_max_A": 10.429897019093863
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1335,
+          "triangles": 2499,
+          "area_A2": 820.9378487869299,
+          "chemically_supported_area_fraction": 0.9146355003739933,
+          "mean_fragment_lipophilicity_index": 0.08992705582720964,
+          "positive_index_area_fraction": 0.8619862687996642,
+          "negative_index_area_fraction": 0.05264923157432907,
+          "material_HBA_weighted_area_fraction": 0.1283512419260403,
+          "material_HBD_weighted_area_fraction": 0.11071825027001629
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.7,
+        "denominator": 4,
+        "required_n": 3,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12",
+          "P319_C45_O8"
+        ],
+        "tolerance_for_same_subset_A": 9.507155457728691,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P155_C33_O6",
+          "P319_C45_O8",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 11.423769987228612,
+            "sampled_max_A": 15.90810076852022
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 7.384281838036778,
+            "sampled_max_A": 11.603686061016845
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 9.507155457728691,
+            "sampled_max_A": 13.998860887083422
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 9.502077383046739,
+            "sampled_max_A": 12.848641672230933
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2729,
+          "triangles": 5104,
+          "area_A2": 1658.849873806521,
+          "chemically_supported_area_fraction": 0.8215356510794505,
+          "mean_fragment_lipophilicity_index": 0.09480223062892504,
+          "positive_index_area_fraction": 0.737176562157066,
+          "negative_index_area_fraction": 0.0843590889223845,
+          "material_HBA_weighted_area_fraction": 0.11772737863855051,
+          "material_HBD_weighted_area_fraction": 0.11431630385097308
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 10,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12"
+        ],
+        "tolerance_for_same_subset_A": 4.153353746418313,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 4.401019026314301,
+            "sampled_max_A": 6.311955125380831
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 4.153353746418313,
+            "sampled_max_A": 5.281019032363933
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 7.0265860292316935,
+            "sampled_max_A": 9.227629603714965
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 3.8565355317259753,
+            "sampled_max_A": 5.664865960648627
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 591,
+          "triangles": 1054,
+          "area_A2": 341.6014334408492,
+          "chemically_supported_area_fraction": 0.9402007290488392,
+          "mean_fragment_lipophilicity_index": 0.09753933443426187,
+          "positive_index_area_fraction": 0.8470440033258082,
+          "negative_index_area_fraction": 0.09315672572303106,
+          "material_HBA_weighted_area_fraction": 0.12151762246930402,
+          "material_HBD_weighted_area_fraction": 0.10923642766565464
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 15,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12"
+        ],
+        "tolerance_for_same_subset_A": 7.3889081889267825,
+        "actual_n_at_tolerance": 3,
+        "actual_site_ids": [
+          "P002_C26_O5",
+          "P155_C33_O6",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 6.224752185170465,
+            "sampled_max_A": 9.230272814519491
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 5.050484907488444,
+            "sampled_max_A": 7.553464097645768
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 8.285535638751789,
+            "sampled_max_A": 11.029286963354433
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 7.3889081889267825,
+            "sampled_max_A": 10.429897019093863
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 1335,
+          "triangles": 2499,
+          "area_A2": 820.9378487869299,
+          "chemically_supported_area_fraction": 0.9113968952970187,
+          "mean_fragment_lipophilicity_index": 0.09160234925860725,
+          "positive_index_area_fraction": 0.8599453648138665,
+          "negative_index_area_fraction": 0.05145153048315215,
+          "material_HBA_weighted_area_fraction": 0.12919769125558647,
+          "material_HBD_weighted_area_fraction": 0.10967378386597988
+        }
+      },
+      {
+        "material": "PA66",
+        "cohort": "current_core_accessible",
+        "radius_A": 20,
+        "target_fraction": 0.5,
+        "denominator": 4,
+        "required_n": 2,
+        "candidate": "median_all",
+        "chosen_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12"
+        ],
+        "tolerance_for_same_subset_A": 9.502077383046739,
+        "actual_n_at_tolerance": 2,
+        "actual_site_ids": [
+          "P155_C33_O6",
+          "P396_C69_O12"
+        ],
+        "coverage_at_fixed_A": {
+          "1": 0,
+          "2": 0,
+          "3": 0
+        },
+        "per_site_errors": [
+          {
+            "site_id": "P002_C26_O5",
+            "D95_A": 11.423769987228612,
+            "sampled_max_A": 15.90810076852022
+          },
+          {
+            "site_id": "P155_C33_O6",
+            "D95_A": 7.384281838036778,
+            "sampled_max_A": 11.603686061016845
+          },
+          {
+            "site_id": "P319_C45_O8",
+            "D95_A": 9.507155457728691,
+            "sampled_max_A": 13.998860887083422
+          },
+          {
+            "site_id": "P396_C69_O12",
+            "D95_A": 9.502077383046739,
+            "sampled_max_A": 12.848641672230933
+          }
+        ],
+        "status": "PILOT_DESCRIPTIVE_IN_SAMPLE",
+        "candidate_bank_size": 5,
+        "mesh_status": "AVAILABLE",
+        "mesh_stats": {
+          "vertices": 2729,
+          "triangles": 5104,
+          "area_A2": 1658.849873806521,
+          "chemically_supported_area_fraction": 0.6626826681445283,
+          "mean_fragment_lipophilicity_index": 0.0841178051008905,
+          "positive_index_area_fraction": 0.5643307864914138,
+          "negative_index_area_fraction": 0.09835188165311444,
+          "material_HBA_weighted_area_fraction": 0.117202934189788,
+          "material_HBD_weighted_area_fraction": 0.12083487913808257
+        }
+      }
+    ],
+    "seconds": 98.51445007324219,
+    "source_sha256": "a9aa18caba8a1b01109d9c42c9b5a6fd2ee6f1d8b3fa30dc8833c4f025f9988e",
+    "limitations": [
+      "No new MD or donor sampling",
+      "Current selected 101-core panel, not full historical library",
+      "Original frame uncertainty preserved",
+      "No enzyme shape compatibility inferred from material matching",
+      "Dense support is approximate; visually review tails/sidewall scope",
+      "Local grid convergence NOT_EVALUATED",
+      "Independent validation NOT_EVALUATED"
+    ]
+  }
+]
