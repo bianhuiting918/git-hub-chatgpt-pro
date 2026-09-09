@@ -1,0 +1,164 @@
+{
+  "status": "ALL_THREE_MATERIALS_NUMERIC_AND_RENDER_CHECKS_PASS",
+  "materials": [
+    {
+      "material": "pet",
+      "fit_sites": 1143,
+      "topology_counts": {
+        "BACKBONE": {
+          "total": 7600,
+          "accessible": 1162
+        },
+        "ACYL_CAP": {
+          "total": 400,
+          "accessible": 44
+        },
+        "ALKYL_CAP": {
+          "total": 400,
+          "accessible": 90
+        }
+      },
+      "groups": [
+        {
+          "label": "0 < S <= 0.0025",
+          "n": 537,
+          "Rmax_median": 0.5,
+          "Rmax_ge4": 0
+        },
+        {
+          "label": "0.0025 < S <= 0.01",
+          "n": 295,
+          "Rmax_median": 1.5,
+          "Rmax_ge4": 3
+        },
+        {
+          "label": "0.01 < S <= 0.02",
+          "n": 160,
+          "Rmax_median": 3,
+          "Rmax_ge4": 58
+        },
+        {
+          "label": "S > 0.02",
+          "n": 151,
+          "Rmax_median": 6,
+          "Rmax_ge4": 146
+        }
+      ],
+      "files": {
+        "pet_exposure_statistics.jpg": "53b4786872e778fa29e4f16858cd89ce07ec9032",
+        "pet_exposure_interfaces.jpg": "ccb241b75d1245cff87dda8d7a2d9252d3727bed",
+        "summary.json": "fc20a8eadb4599075a743bd7bbafa954a3e765c6"
+      }
+    },
+    {
+      "material": "pa6",
+      "fit_sites": 859,
+      "topology_counts": {
+        "BACKBONE": {
+          "total": 6000,
+          "accessible": 877
+        },
+        "ACYL_CAP": {
+          "total": 400,
+          "accessible": 39
+        },
+        "ALKYL_CAP": {
+          "total": 400,
+          "accessible": 85
+        }
+      },
+      "groups": [
+        {
+          "label": "0 < S <= 0.0025",
+          "n": 481,
+          "Rmax_median": 0.5,
+          "Rmax_ge4": 0
+        },
+        {
+          "label": "0.0025 < S <= 0.01",
+          "n": 204,
+          "Rmax_median": 1.5,
+          "Rmax_ge4": 2
+        },
+        {
+          "label": "0.01 < S <= 0.02",
+          "n": 123,
+          "Rmax_median": 3,
+          "Rmax_ge4": 57
+        },
+        {
+          "label": "S > 0.02",
+          "n": 51,
+          "Rmax_median": 6,
+          "Rmax_ge4": 48
+        }
+      ],
+      "files": {
+        "pa6_exposure_statistics.jpg": "6f43e053c8a20ae5c771efc7854afa520c04ffbf",
+        "summary.json": "a43d1bee68d3127a5a2cdc82a74ce9788f21ea78",
+        "pa6_exposure_interfaces.jpg": "63283399b7ae3a8c68cc339771025d157c7fa4f1"
+      }
+    },
+    {
+      "material": "pa66",
+      "fit_sites": 843,
+      "topology_counts": {
+        "BACKBONE": {
+          "total": 6000,
+          "accessible": 851
+        },
+        "ACYL_CAP": {
+          "total": 400,
+          "accessible": 31
+        },
+        "ALKYL_CAP": {
+          "total": 400,
+          "accessible": 89
+        }
+      },
+      "groups": [
+        {
+          "label": "0 < S <= 0.0025",
+          "n": 451,
+          "Rmax_median": 0.5,
+          "Rmax_ge4": 0
+        },
+        {
+          "label": "0.0025 < S <= 0.01",
+          "n": 210,
+          "Rmax_median": 1.5,
+          "Rmax_ge4": 7
+        },
+        {
+          "label": "0.01 < S <= 0.02",
+          "n": 133,
+          "Rmax_median": 3,
+          "Rmax_ge4": 49
+        },
+        {
+          "label": "S > 0.02",
+          "n": 49,
+          "Rmax_median": 8,
+          "Rmax_ge4": 45
+        }
+      ],
+      "files": {
+        "pa66_exposure_statistics.jpg": "7d8c6e1a77585b3a39434a7148d81270915df715",
+        "summary.json": "4eeca418da7a93d37a8db20a6f526c287741477d",
+        "pa66_exposure_interfaces.jpg": "e7a3c8cded7a3464ff542a757d1f3f45e7cff53b"
+      }
+    }
+  ],
+  "actual_section_counts": {
+    "PET": 2286,
+    "PA6": 1718,
+    "PA66": 1686
+  },
+  "PET_previous_membership_and_mean_unchanged": true,
+  "loose_tail_classification": "NOT_EVALUATED",
+  "jpeg_export": {
+    "quality": 90,
+    "subsampling": 0
+  },
+  "visual_review": "All three interface JPEGs inspected: individual pale contours and bold consensus visible."
+}

@@ -1,0 +1,397 @@
+{
+  "status": "PA6_FULL_NUMERICAL_AUDIT_PASS_DESCRIPTIVE_FIGURES",
+  "source": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_all_parent_20260909_v1/PA6",
+  "source_summary_sha256": "15770ae92b8bceef8d691c0bd4e234836c7f9f79fd8d638f40638a2740cf75ca",
+  "atom_sha256": "8d046a145fe23c621998e1b637840f8ca1ec3416cf399bc42a8a5fb683cc8ccb",
+  "script_sha256": "d1b657d4ca760c682e75d59d66f5f9587d6e1c14368cdfeec3a97a1d34051eb6",
+  "model_bonds": 6800,
+  "accessible_model_bonds": 1001,
+  "no_access_detected": 5799,
+  "topology_counts": {
+    "BACKBONE": {
+      "total": 6000,
+      "accessible": 877
+    },
+    "ACYL_CAP": {
+      "total": 400,
+      "accessible": 39
+    },
+    "ALKYL_CAP": {
+      "total": 400,
+      "accessible": 85
+    }
+  },
+  "unresolved_sites": 217,
+  "bin_connectivity_uncertain": [
+    "P038_C86_O15",
+    "P065_C44_O8",
+    "P099_C26_O5",
+    "P104_C80_O14",
+    "P106_C44_O8",
+    "P109_C14_O3",
+    "P137_C98_O17",
+    "P178_C92_O16",
+    "P181_C80_O14",
+    "P186_C80_O14",
+    "P191_C32_O6",
+    "P199_C86_O15",
+    "P210_C20_O4",
+    "P210_C98_O17",
+    "P231_C92_O16",
+    "P296_C74_O13",
+    "P337_C80_O14",
+    "P348_C92_O16",
+    "P360_C20_O4",
+    "P372_C44_O8",
+    "P373_C32_O6",
+    "P373_C62_O11",
+    "P381_C74_O13",
+    "P389_C56_O10",
+    "P397_C44_O8",
+    "P074_C98_O17",
+    "P077_C50_O9",
+    "P082_C68_O12",
+    "P178_C74_O13",
+    "P210_C92_O16",
+    "P330_C92_O16",
+    "P331_C32_O6",
+    "P331_C50_O9",
+    "P342_C86_O15",
+    "P348_C62_O11",
+    "P360_C92_O16",
+    "P373_C38_O7",
+    "P385_C62_O11"
+  ],
+  "fit_sites": 859,
+  "groups": [
+    {
+      "bin": 0,
+      "label": "0 < S <= 0.0025",
+      "n": 481,
+      "chains": 214,
+      "representative": "P087_C26_O5",
+      "A_median": [
+        0.00390625,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "A_q25": [
+        0.001953125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "A_q75": [
+        0.0078125,
+        0.0009765625,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Rmax_median": 0.5,
+      "Rmax_ge2": 0,
+      "Rmax_ge4": 0,
+      "Rmax_ge8": 0,
+      "Rmax_censored10": 0,
+      "field_heterogeneity": 0.358035147190094,
+      "individual_sections_requested": 962,
+      "representative_S_log": 0.00011297764314441366
+    },
+    {
+      "bin": 1,
+      "label": "0.0025 < S <= 0.01",
+      "n": 204,
+      "chains": 126,
+      "representative": "P192_C74_O13",
+      "A_median": [
+        0.0244140625,
+        0.01025390625,
+        0.0029296875,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "A_q25": [
+        0.0185546875,
+        0.0068359375,
+        0.0009765625,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "A_q75": [
+        0.0302734375,
+        0.0146484375,
+        0.006103515625,
+        0.001953125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Rmax_median": 1.5,
+      "Rmax_ge2": 81,
+      "Rmax_ge4": 2,
+      "Rmax_ge8": 0,
+      "Rmax_censored10": 0,
+      "field_heterogeneity": 0.31952765583992004,
+      "individual_sections_requested": 408,
+      "representative_S_log": 0.009814274655192062
+    },
+    {
+      "bin": 2,
+      "label": "0.01 < S <= 0.02",
+      "n": 123,
+      "chains": 76,
+      "representative": "P081_C44_O8",
+      "A_median": [
+        0.0458984375,
+        0.0283203125,
+        0.0185546875,
+        0.0126953125,
+        0.00390625,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "A_q25": [
+        0.0400390625,
+        0.0234375,
+        0.013671875,
+        0.0078125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "A_q75": [
+        0.05029296875,
+        0.0322265625,
+        0.021484375,
+        0.01513671875,
+        0.005859375,
+        0.0029296875,
+        0.0009765625,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Rmax_median": 3.0,
+      "Rmax_ge2": 123,
+      "Rmax_ge4": 57,
+      "Rmax_ge8": 4,
+      "Rmax_censored10": 1,
+      "field_heterogeneity": 0.28676295280456543,
+      "individual_sections_requested": 246,
+      "representative_S_log": 0.01930939345253195
+    },
+    {
+      "bin": 3,
+      "label": "S > 0.02",
+      "n": 51,
+      "chains": 44,
+      "representative": "P236_C86_O15",
+      "A_median": [
+        0.0634765625,
+        0.04296875,
+        0.03125,
+        0.0244140625,
+        0.01171875,
+        0.0078125,
+        0.00390625,
+        0.001953125,
+        0.0,
+        0.0
+      ],
+      "A_q25": [
+        0.05859375,
+        0.04052734375,
+        0.02880859375,
+        0.021484375,
+        0.01025390625,
+        0.00537109375,
+        0.0009765625,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "A_q75": [
+        0.07080078125,
+        0.05078125,
+        0.037109375,
+        0.02685546875,
+        0.01513671875,
+        0.0107421875,
+        0.0068359375,
+        0.0048828125,
+        0.001953125,
+        0.0009765625
+      ],
+      "Rmax_median": 6.0,
+      "Rmax_ge2": 51,
+      "Rmax_ge4": 48,
+      "Rmax_ge8": 22,
+      "Rmax_censored10": 16,
+      "field_heterogeneity": 0.25476962327957153,
+      "individual_sections_requested": 102,
+      "representative_S_log": 0.023863029019779648
+    }
+  ],
+  "prior_mask_comparisons": 24,
+  "refinement": [
+    {
+      "site_id": "P049_C86_O15",
+      "directions": 2048,
+      "A": [
+        0.00048828125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.00048828125,
+      "S_log": 5.648882157220683e-05
+    },
+    {
+      "site_id": "P363_C14_O3",
+      "directions": 2048,
+      "A": [
+        0.01318359375,
+        0.00390625,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.00341796875,
+      "S_log": 0.002241459493664593
+    },
+    {
+      "site_id": "P093_C98_O17",
+      "directions": 2048,
+      "A": [
+        0.08740234375,
+        0.06494140625,
+        0.05224609375,
+        0.03955078125,
+        0.029296875,
+        0.02197265625,
+        0.01806640625,
+        0.01416015625,
+        0.0068359375,
+        0.00244140625
+      ],
+      "max_absolute_A_change": 0.0029296875,
+      "S_log": 0.04090910973227436
+    }
+  ],
+  "surface_grid": {
+    "spacing_A": [
+      0.4990492424242424,
+      0.4990492424242424,
+      0.5
+    ],
+    "probe_A": 0.5,
+    "shape": [
+      264,
+      264,
+      287
+    ],
+    "connectivity": "6-neighbor with XY periodic boundary and exterior top/bottom seeds"
+  },
+  "surface_grid_checks": [
+    {
+      "site_id": "P049_C86_O15",
+      "mean_absolute_occupancy_difference": 0.07864703238010406,
+      "binary_disagreement_fraction": 0.0684154555122297
+    },
+    {
+      "site_id": "P399_C50_O9",
+      "mean_absolute_occupancy_difference": 0.0645049661397934,
+      "binary_disagreement_fraction": 0.05157745480326126
+    },
+    {
+      "site_id": "P012_C86_O15",
+      "mean_absolute_occupancy_difference": 0.049728140234947205,
+      "binary_disagreement_fraction": 0.03722084367245657
+    },
+    {
+      "site_id": "P392_C92_O16",
+      "mean_absolute_occupancy_difference": 0.04074778035283089,
+      "binary_disagreement_fraction": 0.033676001417936904
+    },
+    {
+      "site_id": "P056_C32_O6",
+      "mean_absolute_occupancy_difference": 0.02617493085563183,
+      "binary_disagreement_fraction": 0.020737327188940093
+    },
+    {
+      "site_id": "P394_C56_O10",
+      "mean_absolute_occupancy_difference": 0.04552770406007767,
+      "binary_disagreement_fraction": 0.031017369727047148
+    },
+    {
+      "site_id": "P083_C86_O15",
+      "mean_absolute_occupancy_difference": 0.037004634737968445,
+      "binary_disagreement_fraction": 0.02676355902162354
+    },
+    {
+      "site_id": "P381_C86_O15",
+      "mean_absolute_occupancy_difference": 0.03537584841251373,
+      "binary_disagreement_fraction": 0.024282169443459765
+    }
+  ],
+  "limitations": [
+    "single snapshot",
+    "loose tails not independently labeled or removed",
+    "caps excluded from main fits but retained in all counts",
+    "zero access is not proof of burial or no curved path",
+    "aligned z maximizes consistency of observed openings, not material normal",
+    "surface envelope uses curved grid connectivity; score uses straight continuous sphere paths",
+    "contours are per-voxel population frequencies, not joint whole-site coverage",
+    "finite-grid morphology is descriptive, not atomistic SES or enzyme shape",
+    "strata are reporting conventions, not validated biological thresholds"
+  ],
+  "seconds": 84.58693957328796
+}
