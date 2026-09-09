@@ -1,0 +1,978 @@
+{
+  "status": "PILOT_TECHNICAL_AUDIT_PASS",
+  "site_records": 72,
+  "unique_material_carbon_sites": 72,
+  "radius_records": 720,
+  "checks": [
+    {
+      "material": "PET",
+      "site": "P001_C2_O1",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P199_C85_O36",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P400_C72_O29",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P001_C5_O4",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P200_C32_O13",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P400_C102_O41",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P001_C15_O8",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P202_C12_O5",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P400_C92_O37",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P001_C65_O28",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P194_C82_O33",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P398_C45_O20",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P002_C2_O1",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P192_C50_O9",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P399_C62_O11",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P001_C2_O1",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P198_C44_O8",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P400_C98_O17",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P001_C14_O3",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P207_C14_O3",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P400_C86_O15",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P001_C8_O2",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P201_C2_O1",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P400_C92_O16",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P001_C38_O7",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P207_C45_O8",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P399_C81_O14",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P001_C14_O3",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P198_C86_O15",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P400_C93_O16",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P001_C2_O1",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P201_C81_O14",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P400_C98_O17",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P205_C50_O9",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P280_C2_O1",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P356_C2_O1",
+      "cohort": "parent_pilot",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P346_C85_O36",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P061_C75_O32",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P072_C12_O5",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P282_C42_O17",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P216_C102_O41",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P390_C95_O40",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P272_C75_O32",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P186_C22_O9",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P327_C35_O16",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P189_C52_O21",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P183_C42_O17",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PET",
+      "site": "P398_C65_O28",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P051_C74_O13",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P380_C62_O11",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P283_C74_O13",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P083_C74_O13",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P306_C86_O15",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P392_C92_O16",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P036_C32_O6",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P388_C74_O13",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P178_C68_O12",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P250_C50_O9",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P136_C56_O10",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA6",
+      "site": "P394_C62_O11",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P364_C38_O7",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P248_C50_O9",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P353_C86_O15",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P023_C62_O11",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P155_C38_O7",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P053_C26_O5",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P255_C74_O13",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P325_C57_O10",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P196_C74_O13",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P064_C86_O15",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P196_C21_O4",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    },
+    {
+      "material": "PA66",
+      "site": "P399_C62_O11",
+      "cohort": "surface_positive_control",
+      "checks": "PASS"
+    }
+  ],
+  "segmentation_checks": [
+    {
+      "material": "PET",
+      "site": "P346_C85_O36",
+      "radius_A": 0.5,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PET",
+      "site": "P346_C85_O36",
+      "radius_A": 2.0,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PET",
+      "site": "P346_C85_O36",
+      "radius_A": 6.0,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PA6",
+      "site": "P051_C74_O13",
+      "radius_A": 0.5,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PA6",
+      "site": "P051_C74_O13",
+      "radius_A": 2.0,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PA6",
+      "site": "P051_C74_O13",
+      "radius_A": 6.0,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PA66",
+      "site": "P364_C38_O7",
+      "radius_A": 0.5,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PA66",
+      "site": "P364_C38_O7",
+      "radius_A": 2.0,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    },
+    {
+      "material": "PA66",
+      "site": "P364_C38_O7",
+      "radius_A": 6.0,
+      "step1_vs_step2": "EXACT_MASK_MATCH"
+    }
+  ],
+  "refinement": [
+    {
+      "material": "PET",
+      "cohort": "parent_pilot",
+      "site_id": "P398_C45_O20",
+      "directions": 2048,
+      "A": [
+        0.02734375,
+        0.0146484375,
+        0.005859375,
+        0.00048828125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.001953125,
+      "S_log": 0.006583708605538556
+    },
+    {
+      "material": "PET",
+      "cohort": "parent_pilot",
+      "site_id": "P194_C82_O33",
+      "directions": 2048,
+      "A": [
+        0.08203125,
+        0.05859375,
+        0.0458984375,
+        0.03662109375,
+        0.0244140625,
+        0.01513671875,
+        0.0087890625,
+        0.0029296875,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.001953125,
+      "S_log": 0.034720243532334445
+    },
+    {
+      "material": "PA6",
+      "cohort": "parent_pilot",
+      "site_id": "P002_C2_O1",
+      "directions": 2048,
+      "A": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.0,
+      "S_log": 0.0
+    },
+    {
+      "material": "PA6",
+      "cohort": "parent_pilot",
+      "site_id": "P400_C98_O17",
+      "directions": 2048,
+      "A": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.0,
+      "S_log": 0.0
+    },
+    {
+      "material": "PA6",
+      "cohort": "parent_pilot",
+      "site_id": "P400_C92_O16",
+      "directions": 2048,
+      "A": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.0,
+      "S_log": 0.0
+    },
+    {
+      "material": "PA66",
+      "cohort": "parent_pilot",
+      "site_id": "P198_C86_O15",
+      "directions": 2048,
+      "A": [
+        0.0068359375,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "max_absolute_A_change": 0.001953125,
+      "S_log": 0.0007908435020108956
+    },
+    {
+      "material": "PET",
+      "cohort": "surface_control",
+      "site_id": "P346_C85_O36",
+      "directions": 2048,
+      "A": [
+        0.12158203125,
+        0.08935546875,
+        0.07275390625,
+        0.0595703125,
+        0.04296875,
+        0.02978515625,
+        0.021484375,
+        0.01513671875,
+        0.00830078125,
+        0.00146484375
+      ],
+      "S_log": 0.05667273885766551,
+      "max_absolute_A_change": 0.00537109375
+    },
+    {
+      "material": "PA6",
+      "cohort": "surface_control",
+      "site_id": "P051_C74_O13",
+      "directions": 2048,
+      "A": [
+        0.0810546875,
+        0.06201171875,
+        0.05126953125,
+        0.04296875,
+        0.03076171875,
+        0.02490234375,
+        0.021484375,
+        0.017578125,
+        0.01220703125,
+        0.0048828125
+      ],
+      "S_log": 0.04138754301610593,
+      "max_absolute_A_change": 0.00244140625
+    },
+    {
+      "material": "PA66",
+      "cohort": "surface_control",
+      "site_id": "P364_C38_O7",
+      "directions": 2048,
+      "A": [
+        0.0888671875,
+        0.06298828125,
+        0.05224609375,
+        0.041015625,
+        0.03173828125,
+        0.025390625,
+        0.0205078125,
+        0.0146484375,
+        0.00439453125,
+        0.0
+      ],
+      "S_log": 0.041368212750822066,
+      "max_absolute_A_change": 0.00244140625
+    }
+  ],
+  "largest_refinement_absolute_A_change": 0.00537109375,
+  "metadata_corrections": [],
+  "manifest": [
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P001_C2_O1_directions.npz",
+      "sha256": "8897236f6d6cbc7e5ebf39319353f9425cd74226a051e8e51203a87d0f0e2bfb"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P199_C85_O36_directions.npz",
+      "sha256": "7446ecc21f9f67f753502b7b150c5257c0252d8e8c2661aab0972957d3003b9d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P400_C72_O29_directions.npz",
+      "sha256": "ad20727975e121bd5f1f0761d4d8eec17c0f75af8d9d7116cf38521d75414891"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P001_C5_O4_directions.npz",
+      "sha256": "468611dd5f723452dca74a4c4fb4c53128a9be5f35fb7d4bd71425a2374b548c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P200_C32_O13_directions.npz",
+      "sha256": "a7e02142cbe27438a7e8ff853192b3d02f771b8c4f62ab6fe610b9dbb4373745"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P400_C102_O41_directions.npz",
+      "sha256": "632d1b62616ef63b8e8ebb4020b167240f143713fb227d0b5cb2acd7fb6abc3a"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P001_C15_O8_directions.npz",
+      "sha256": "012f4bce82c902f9f43bdd71f0856df75a668f482aa4146436280aa318a78308"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P202_C12_O5_directions.npz",
+      "sha256": "44756cdf311ccdc1bde056146de285e890432918c3a60dab76a4b6ddf88c001b"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P400_C92_O37_directions.npz",
+      "sha256": "4abaaeb8bb78a8c6e62f26f6f7d9d12e7872983492203b8b01f42f8fcbb8ad1d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P001_C65_O28_directions.npz",
+      "sha256": "7f259970cee0c1e098284b2f634a2f4de4d0bd82af253c17355cef16f05da952"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P194_C82_O33_directions.npz",
+      "sha256": "34157b06d2e63f371ce1087b4937376849034cc0831b342c1df1d8fe62686713"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PET/P398_C45_O20_directions.npz",
+      "sha256": "a9834b1b8027d2974db576150df78ec72cb8746b90cf22f192df10ca3ccd84b8"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P002_C2_O1_directions.npz",
+      "sha256": "50df52b63518b670bddd3e70ab2e11e61721b8738f1dd99a2c8dadb739341553"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P192_C50_O9_directions.npz",
+      "sha256": "a6695fd28165fda78e9007bcb8d550ce529a68cf74facadd14e0ff6f693197b9"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P399_C62_O11_directions.npz",
+      "sha256": "82ed621a9a242fbb9a7b0963762954d90e18c9431bd70fb03495ce8fdfcfad0c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P001_C2_O1_directions.npz",
+      "sha256": "3ef1f6c704faa36434057216a416cc4571d5307de4f877a35d5b11e235e0e3e7"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P198_C44_O8_directions.npz",
+      "sha256": "b9da215fe03a3d338af3b6e5c9eabb6c0377b6d9020d2b879394a43132c198ba"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P400_C98_O17_directions.npz",
+      "sha256": "6bd35972a56e90812717107e1a51b93b1538a93904ee21a2ec942732c3f362b3"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P001_C14_O3_directions.npz",
+      "sha256": "06d202d19d174e3a006af598b8b0cdf054be3033f6181d356f55d600fdbdf8d1"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P207_C14_O3_directions.npz",
+      "sha256": "200d4025b785c08f92d1cb64895384607ccfb325daf35e63699f15424d799ff0"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P400_C86_O15_directions.npz",
+      "sha256": "01a26fa38b0d19ec336f868af150a84ba2cfc9601e61fee24979dab71f6e2ac8"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P001_C8_O2_directions.npz",
+      "sha256": "d8f07b9b64b906bab88edb6464e598e60d221342c37ea52ef95207c199ef26c2"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P201_C2_O1_directions.npz",
+      "sha256": "1827720631295e2d2b19e453be05387827ffb3882ef6c5dee518e4ca89cf3517"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA6/P400_C92_O16_directions.npz",
+      "sha256": "028837d5353d17be67eb8c5426544d7a3a397a5e24e1d831a24d9b88b39f1a14"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P001_C38_O7_directions.npz",
+      "sha256": "486efa0ee24386a807f01c13fe9ce7dd38614d87c825bbe3e4ad6989f92c5475"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P207_C45_O8_directions.npz",
+      "sha256": "77d9d24505cb6a76142e3a8261191d5c35ae59a7186428a398969104f8c8fcf5"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P399_C81_O14_directions.npz",
+      "sha256": "f5301eff61cf9686adc9004b9fe260eb7671f05c09e2a441bf95378088cfc80f"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P001_C14_O3_directions.npz",
+      "sha256": "e9418e42efd3f805607cccd62e81bbc56d1973b44fe8b1a75e91a5ccadecf6ab"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P198_C86_O15_directions.npz",
+      "sha256": "d91e9d17019eea4cd534a9a009d50aa9a75f519e204bc1c38457f8ead6959152"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P400_C93_O16_directions.npz",
+      "sha256": "88b8ec9fa75a218f04ac3ae999c7243236e5663e4568303e8269932ed8ae0908"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P001_C2_O1_directions.npz",
+      "sha256": "d073051ab75dc8254f17e5f41a04eb3fa32231f65f1e2ca23280335b0700969c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P201_C81_O14_directions.npz",
+      "sha256": "a6767f56319e89dd6d34c3be7ef7ba1a156f2611ce288ac720bea3a96b73f5a1"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P400_C98_O17_directions.npz",
+      "sha256": "04600cfa8d08d9db1ac5b81a42a7e55f60f9c56b52a131e1b725ed2f10b77bce"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P205_C50_O9_directions.npz",
+      "sha256": "fd58c8ba1ec685686dcbbe34bdc80066b050dcc35b40e70d489f1c9910b349a7"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P280_C2_O1_directions.npz",
+      "sha256": "6331a054e1c77ad6afad6e5ce3424615c4901e1be0025fb20115b9391e305b78"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_pilot_20260909_v1/PA66/P356_C2_O1_directions.npz",
+      "sha256": "4e6daa216cbac1bc0d0539937c7cfb7a05a324ce1b175dae70570dec754e51c2"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P346_C85_O36_directions.npz",
+      "sha256": "58802f527486e7917dc2be8b3fc1decea0f45664492d6bab2605ced018d537ef"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P061_C75_O32_directions.npz",
+      "sha256": "05b61e46aea15762aa475152cba5eaa9368f82fed39c83569d949c3fc9041f2d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P072_C12_O5_directions.npz",
+      "sha256": "a62f6bc7d9cc9616328f5b8b19916a9ab84ff8cd1973e5b96c6548770315074c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P282_C42_O17_directions.npz",
+      "sha256": "61a1f3521eceae8f71850e77e3df788b447f49f72e281a5fb0caf369ad246956"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P216_C102_O41_directions.npz",
+      "sha256": "4191249be9762d76ad4176a6d85d1074659dff048bc50ea7da26492c85b00656"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P390_C95_O40_directions.npz",
+      "sha256": "28ecff88f638c354c64dae4c1482b6a5011323723a5cc9caae9818f8e6fe0e17"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P272_C75_O32_directions.npz",
+      "sha256": "0143f87077c85de465b7fb3e48410b6f032452928dfa977174eb80b951d0c1e9"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P186_C22_O9_directions.npz",
+      "sha256": "16e051ae0ed7eecacef055b024c437ab08b2ebe3972143ee322306de53514a6a"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P327_C35_O16_directions.npz",
+      "sha256": "bb16d3e7666a238312290d4c7b270e8c27ea55099bc502d99d667d61d00a9efb"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P189_C52_O21_directions.npz",
+      "sha256": "e6c1b810270221b8eb615c08d08438e6131ea77335f88dc47dff8db417432883"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P183_C42_O17_directions.npz",
+      "sha256": "912d9bc26ff201f3c6e9024213db0b248fd771672ea1fdabc14260edc47ce69b"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PET/P398_C65_O28_directions.npz",
+      "sha256": "2d61d5921609513e0908924abb18eed90103b5cbefda4d03a0d265d439d01f80"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P051_C74_O13_directions.npz",
+      "sha256": "c20b15ab3e28385141e755a24a0b208d287a228ac19a84e9a635977d666dca67"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P380_C62_O11_directions.npz",
+      "sha256": "241574cc13cae6e29f1bb4af13102d5580773eba77b497e2d87b4938f054a354"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P283_C74_O13_directions.npz",
+      "sha256": "36ca08582e86dac13b12f0c4bc9e082937fb89aaa41d4d6848f824c58db61156"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P083_C74_O13_directions.npz",
+      "sha256": "2dd2a213a3cc30cc57d01896a037eda7743b256d0b2a2591326ef92ceb942d0d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P306_C86_O15_directions.npz",
+      "sha256": "0be317836e134d0139bf33b7df0f04897ca70e0501f8838900ec6d6dd6336ce3"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P392_C92_O16_directions.npz",
+      "sha256": "125d3cd11201606f9f447999c026abd2978121718e236cd72bc39755cab6c839"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P036_C32_O6_directions.npz",
+      "sha256": "f4857a7ae5f14cb0ef4c694b79dcba9af8c0379bc1ac690a5d94549a695909c8"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P388_C74_O13_directions.npz",
+      "sha256": "ce2dee508654796eb6325a29e747cbcb02cac04bb4dfaa16a2adcf485666037b"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P178_C68_O12_directions.npz",
+      "sha256": "264a128e9a02235fbbfe9b35c0807fc480385f801e0932263fca2786ea94827c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P250_C50_O9_directions.npz",
+      "sha256": "91639ac7dc9ed3792395f377638da8127a0fb43e4198571f2c95f9029dc93f1c"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P136_C56_O10_directions.npz",
+      "sha256": "a4c19d19edc32f2094e189970f4e7602f463d8c22cd9a209c7e00d7691666574"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA6/P394_C62_O11_directions.npz",
+      "sha256": "12ffcc5713288820a433a6adfe70ea630aa2773e8d5cfc364525d115c42eed3f"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P364_C38_O7_directions.npz",
+      "sha256": "8d25b19778398b7b3e4d4553102b13f20cd91b6746844ac9ba4e9571c4cc233a"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P248_C50_O9_directions.npz",
+      "sha256": "0562ff3e011bbb7d7badd06ae23bea913e0d5a53a4274c770153d23a91fcffe7"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P353_C86_O15_directions.npz",
+      "sha256": "276daa087d63cf9b8b773b80d4a2278520af25e62c711ea4a1f246026b4ced08"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P023_C62_O11_directions.npz",
+      "sha256": "659b7857d81cd9ca3a0a9b72dc9902a3bfc13dded86d460960298b620dead09e"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P155_C38_O7_directions.npz",
+      "sha256": "ba97b775cbe89275685b990bf43cae387d281b1492e684cba0e81ef3090e367a"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P053_C26_O5_directions.npz",
+      "sha256": "61a0b63a3b58d17cd7101f4fbc6cad8cf0fee535d217ec974ffb5a4d124facec"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P255_C74_O13_directions.npz",
+      "sha256": "8295a8d57f28238106f973e5099838809a00878aa987610d49b9054e4e877b1b"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P325_C57_O10_directions.npz",
+      "sha256": "cf928a3d2391cfde0feb715fd21b8af53e47820d651c90797a381a69be51ae5d"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P196_C74_O13_directions.npz",
+      "sha256": "6db2d5309df522c6613185ae95be7934cf2fdd4a8fc7b3519fa4c895b72177ad"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P064_C86_O15_directions.npz",
+      "sha256": "aa0641c411d9dd2096b39f7acdd7232655b63c1dcbcb17450d93e86bb48f7892"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P196_C21_O4_directions.npz",
+      "sha256": "d8b4d9ef5f5355bff980aefc798b315ee230ab373a7982ebc6dcaa43648d2797"
+    },
+    {
+      "path": "/data/bht2/polymer_material_reference_20260827/simulation_slabs/interface_surface_robustness_20260908_v1/tangent_probe_surface_controls_20260909_v1/PA66/P399_C62_O11_directions.npz",
+      "sha256": "4cc7a286119dabf474a23089f176d669feef9cdcbdf1dfb2b6217333a37c8e96"
+    }
+  ],
+  "initial_control_process_exit": 1,
+  "logging_error": "NameError Path; numerical data persisted; logging fix separately recorded; no numerical recompute",
+  "not_evaluated": [
+    "all-population1024-direction classification",
+    "loose-tail/model-end exclusion",
+    "curved approach paths",
+    "triad-donor scan"
+  ]
+}
